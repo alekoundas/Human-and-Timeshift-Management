@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>AdminLTE 2 - @ViewData["Title"]</title>
+
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/libs/bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/libs/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="~/libs/ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="~/css/Datatable/Datatable.css">
+
+    @RenderSection("Styles", required: false)
+
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/libs/admin-lte/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="~/libs/admin-lte/css/skins/_all-skins.min.css">
+
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+
+
+</head>
+<body class="hold-transition skin-blue sidebar-mini fixed">
+
+    <div class="wrapper">
+        @await Html.PartialAsync("_Header")
+
+        <!-- Left side column. contains the sidebar -->
+        @await Html.PartialAsync("_NavBar")
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+
+            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+            @RenderBody()
+        </div>
+        <!-- Page footer. -->
+        @await Html.PartialAsync("_Footer")
+
+    </div>
+    <!-- jQuery -->
+    <script src="~/libs/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="~/libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/js/Datatable/Datatable.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
+    <!-- SlimScroll -->
+    <script src="~/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <!-- FastClick -->
+    <script src="~/libs/fastclick/fastclick.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/libs/admin-lte/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="~/libs/admin-lte/js/demo.js"></script>
+
+
+
+
+
+    <!-- ASP.NET site script -->
+    <environment include="Development">
+        <script src="~/js/site.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+
+    <script>
+        $(document).ready(function () {
+            $('.sidebar-menu').tree()
+        })
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+</body>
+</html>

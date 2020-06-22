@@ -1,0 +1,67 @@
+﻿@model DataAccess.ViewModels.User.UserViewModel
+@{
+    ViewData["Title"] = "Χρήστες εφαρμογής";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-sm-12">
+        <h2>@ViewData["Title"]</h2>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card-box table-responsive">
+            <h4 class="m-t-0 header-title col-md-3"><b>Φακελοι Υποθεσης</b></h4>
+            <table id="caseFoldersDatatable" class="table table-bordered table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th>userName</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th data-searchable="true">userName</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+                jQuery(function () {
+                    var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+                    var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
+                    var table = $('#caseFoldersDatatable').DataTable({
+                        "serverSide": true,
+                        "dom": 'frtlp',
+                        "ajax": {
+                            url: '/api/users/get',
+                            type: 'POST',
+                            contentType: "application/json",
+                            data: (data) => {
+                                data.predicate = "CaseIndex";
+                                console.log(data);
+                                return JSON.stringify(data);
+                            }
+                        },
+                        "columns": [
+                            {
+                                "data": "userName",
+                                "searchable": true,
+                                "orderable": true
+
+                            }
+                        ]
+                    });
+                });
+    </script>
+}
+
+
