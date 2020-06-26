@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Bussiness;
+using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models.Identity;
-using DataAccess.ViewModels.Account;
+using DataAccess.ViewModels.View.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +19,17 @@ namespace WebApplication.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly SecurityDbContext _dbContex;
+        private readonly ISecurityDatawork _datawork;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger<LoginVM> _logger;
+        private readonly ILogger<LoginViewModel> _logger;
 
         public AccountController(SecurityDbContext dbContex,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<LoginVM> logger,
+            ILogger<LoginViewModel> logger,
             UserManager<ApplicationUser> userManager)
         {
-            _dbContex = dbContex;
+            _datawork = new SecurityDataWork(dbContex);
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
@@ -37,7 +39,7 @@ namespace WebApplication.Controllers
         [HttpGet]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
-            LoginVM viewModel = new LoginVM();
+            LoginViewModel viewModel = new LoginViewModel();
             viewModel.ReturnUrl = returnUrl ?? Url.Content("~/");
 
             if (!string.IsNullOrEmpty(viewModel.ErrorMessage))
@@ -52,54 +54,109 @@ namespace WebApplication.Controllers
         // POST: Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginVM viewModel)
+        public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
-
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(viewModel.Email);
                 if (user != null)
                 {
                     var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, lockoutOnFailure: true);
-                    var userRoles = await _dbContex.UserRoles.Where(x => x.UserId == _userManager.FindByEmailAsync(viewModel.Email).Result.Id.ToString()).ToListAsync();
-                    var roles = new List<IdentityRole>();
-
                     if (result.Succeeded)
                     {
+                        var roles =new List<ApplicationRole>();
                         var customClaims = new List<Claim>();
-
-                        if (userRoles.Count() != 0)
+                        try
                         {
-                            roles = _dbContex.Roles.ToList().Where(y => userRoles.Where(z => z.RoleId == y.Id).Count()>0).ToList();
-                            foreach (var role in roles)
-                                customClaims.Add(new Claim(ClaimTypes.Role as string, role.Name));
+                         roles = await _datawork.ApplicationUserRoles.GetRolesFormLoggedInUserEmail(_userManager, viewModel.Email);
+
                         }
-                        var claimsIdentity = new ClaimsIdentity(customClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        catch (Exception ex)
+                        {
+
+                            throw;
+                        }
+
+                        foreach (var role in roles)
+                            customClaims.Add(new Claim(ClaimTypes.Role as string, role.Name));
+
+                        var claimsIdentity = new ClaimsIdentity(customClaims,
+                            CookieAuthenticationDefaults.AuthenticationScheme);
                         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
                         await _signInManager.Context.SignInAsync(IdentityConstants.ApplicationScheme,
-                            claimsPrincipal, new AuthenticationProperties { IsPersistent = viewModel.RememberMe });
+                            claimsPrincipal,
+                            new AuthenticationProperties { IsPersistent = viewModel.RememberMe });
 
                         if (string.IsNullOrWhiteSpace(viewModel.ReturnUrl))
-                        {
                             return RedirectToAction("Index", "Home");
-                        }
                         else
-                        {
                             return Redirect(viewModel.ReturnUrl);
-                        }
                     }
                 }
             }
+            // If we got this far, something failed, redisplay form
+            TempData["StatusMessage"] = "Ωχ! Τα στοιχεία που δώσατε, φαίνεται να είναι λανθασμένα";
+            return View();
+        }
+        // GET: Account/Register
+        [HttpGet]
+        public IActionResult Register(string returnUrl = null)
+        {
+            RegisterViewModel model = new RegisterViewModel();
+            model.ReturnUrl = returnUrl;
+            return View(model);
+        }
+
+        // POST: Account/Register
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model,string returnUrl = null)
+        {
+            returnUrl = returnUrl ?? Url.Content("~/");
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User created a new account with password.");
+
+                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    //var callbackUrl = Url.Page(
+                    //    "/Account/ConfirmEmail",
+                    //    pageHandler: null,
+                    //    values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                    //    protocol: Request.Scheme);
+
+                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                    //if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    //{
+                    //    return RedirectToPage("RegisterConfirmation", new { email = model.Email, returnUrl = returnUrl });
+                    //}
+                    //else
+                    //{
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return LocalRedirect(returnUrl);
+                    //}
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
             // If we got this far, something failed, redisplay form
             return View();
         }
 
         // GET: Account/Logout
         [HttpGet]
-        public async Task<IActionResult> Logout(string returnUrl = null)
+        public  IActionResult Logout()
         {
-            await _signInManager.SignOutAsync();
+             _signInManager.SignOutAsync();
             return View();
         }
 

@@ -1,4 +1,4 @@
-﻿@model DataAccess.ViewModels.User.UserViewModel
+﻿@model DataAccess.ViewModels.User.ApplicationUserViewModel
 @{
     ViewData["Title"] = "Χρήστες εφαρμογής";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,15 +14,19 @@
     <div class="col-sm-12">
         <div class="card-box table-responsive">
             <h4 class="m-t-0 header-title col-md-3"><b>Φακελοι Υποθεσης</b></h4>
-            <table id="caseFoldersDatatable" class="table table-bordered table-hover table-responsive">
+            <table id="usersDatatable" class="table table-bordered table-hover table-responsive">
                 <thead>
                     <tr>
-                        <th>userName</th>
+                        <th>UserName</th>
+                        <th>Email</th>
+                        <th>Buttons</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th data-searchable="true">userName</th>
+                        <th data-searchable="true">UserName</th>
+                        <th data-searchable="true">Email</th>
+                        <th data-searchable="false">Buttons</th>
                     </tr>
                 </tfoot>
             </table>
@@ -34,33 +38,63 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-                jQuery(function () {
-                    var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-                    var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+        jQuery(function () {
+            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
 
-                    var table = $('#caseFoldersDatatable').DataTable({
-                        "serverSide": true,
-                        "dom": 'frtlp',
-                        "ajax": {
-                            url: '/api/users/get',
-                            type: 'POST',
-                            contentType: "application/json",
-                            data: (data) => {
-                                data.predicate = "CaseIndex";
-                                console.log(data);
-                                return JSON.stringify(data);
-                            }
-                        },
-                        "columns": [
-                            {
-                                "data": "userName",
-                                "searchable": true,
-                                "orderable": true
+            var table = $('#usersDatatable').DataTable({
+                "serverSide": true,
+                "dom": 'frtlp',
+                "ajax": {
+                    url: '/api/users/get',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta)=> {
+                        data.predicate = "CaseIndex";
+                        console.log(data);
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[1, 'desc']],
+                "columns": [
+                    {
+                        "data": "UserName",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) =>{
+                            if (data.UserName != null)
+                                return data.UserName;
+                            else 
+                                return "";
+                        }
 
-                            }
-                        ]
-                    });
-                });
+                    },
+                    {
+                        "data": "Email",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) => {
+                            if (data.Email != null)
+
+                                return data.Email;
+                            else 
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Buttons",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null) 
+                                return data.Buttons;
+                            else 
+                                return "";
+                        }
+                    }
+                ]
+            });
+        });
     </script>
 }
 

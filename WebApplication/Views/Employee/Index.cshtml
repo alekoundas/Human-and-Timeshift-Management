@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DataAccess.Models.Employee>
+﻿@model IEnumerable<DataAccess.Models.Entity.Employee>
 
 @{
     ViewData["Title"] = "Index";
@@ -8,7 +8,7 @@
 <h2>Index</h2>
 
 <p>
-    @Html.LinkButton("Employee","Create","Δημιουργία χρήστη")
+    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
@@ -35,7 +35,16 @@
                 @Html.DisplayNameFor(model => model.SocialSecurityNumber)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EmployeeContactId)
+                @Html.DisplayNameFor(model => model.MyProperty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ScpecializationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneBook)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.CreatedOn)
@@ -68,7 +77,16 @@
                 @Html.DisplayFor(modelItem => item.SocialSecurityNumber)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EmployeeContactId)
+                @Html.DisplayFor(modelItem => item.MyProperty)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ScpecializationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PhoneBook.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Company.Id)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedOn)

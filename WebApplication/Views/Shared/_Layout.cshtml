@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>AdminLTE 2 - @ViewData["Title"]</title>
+    <title>Timeshift Manager</title>
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -13,14 +13,13 @@
     <link rel="stylesheet" href="~/libs/font-awesome/css/font-awesome.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="~/libs/ionicons/css/ionicons.min.css">
+    <!-- DataTable -->
     <link rel="stylesheet" href="~/css/Datatable/Datatable.css">
 
     @RenderSection("Styles", required: false)
 
     <!-- Theme style -->
     <link rel="stylesheet" href="~/libs/admin-lte/css/AdminLTE.min.css">
-    <!-- AdminLTE Skins. Choose a skin from the css/skins
-         folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="~/libs/admin-lte/css/skins/_all-skins.min.css">
 
     <!-- Google Font -->
@@ -43,11 +42,12 @@
         <!-- Left side column. contains the sidebar -->
         @await Html.PartialAsync("_NavBar")
 
+            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
 
             @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
-
+            <div style="top:1000px"></div>
             @RenderBody()
         </div>
         <!-- Page footer. -->

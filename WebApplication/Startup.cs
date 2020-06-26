@@ -9,6 +9,10 @@ using Microsoft.Extensions.Hosting;
 using DataAccess;
 using Business.Seed;
 using DataAccess.Models.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace WebApplication
 {
@@ -26,19 +30,56 @@ namespace WebApplication
         {
             //Data
             services.AddDbContext<BaseDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDbContext<SecurityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddRoleManager<RoleManager<IdentityRole>>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<SecurityDbContext>();
 
-            services.AddControllersWithViews();
+
+
+
+
+
+            //services.ConfigureApplicationCookie(options => {
+
+            //    options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+            //    {
+            //        OnRedirectToLogin = ctx =>
+            //        {
+            //            var requestPath = ctx.Request.Path;
+            //            if (requestPath.Value == "/Home/About")
+            //            {
+            //                ctx.Response.Redirect("/Account/Login");
+            //            }
+            //            else if (requestPath.Value == "/Home/Contact")
+            //            {
+            //                ctx.Response.Redirect("/Account/Login");
+            //            }
+
+            //            return Task.CompletedTask;
+            //        }
+            //    };
+
+            //});
+
+
+
+
+            //services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling =
+                        Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
             services.AddRazorPages();
+
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,7 +87,7 @@ namespace WebApplication
             IApplicationBuilder app,
             IWebHostEnvironment env,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<ApplicationRole> roleManager,
             IServiceProvider services)
         {
             if (env.IsDevelopment())

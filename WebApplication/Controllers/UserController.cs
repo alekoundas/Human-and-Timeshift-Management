@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Bussiness;
+using Bussiness.Repository.Security.Interface;
 using DataAccess;
+using DataAccess.Models;
 using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+
+
 
 namespace WebApplication.Controllers
 {
     public class UserController : Controller
     {
-        private readonly BaseDbContext _context;
-
-
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ISecurityDatawork _datawork;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        //private readonly ILogger<Create> _logger;
-        public UserController(BaseDbContext context,
-            RoleManager<IdentityRole> roleManager,
+        public UserController(SecurityDbContext dbContext,
             SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager
-            /*ILogger<Create> logger*/)
+            UserManager<ApplicationUser> userManager)
         {
-            _context = context;
-            _roleManager = roleManager;
+            _datawork = new SecurityDataWork(dbContext);
             _signInManager = signInManager;
             _userManager = userManager;
-            //_logger = logger;
         }
 
         // GET:  User/Index
@@ -56,45 +54,115 @@ namespace WebApplication.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _userManager.CreateAsync(viewModel, "P@ssw0rd");
-                if(result.Succeeded)
-                    TempData["StatusMessage"] = "Ο χρήστης δημιουργήθηκε με επιτυχία.";
+                if (result.Succeeded)
+                    TempData["StatusMessage"] = "Ο χρήστης δημιουργήθηκε με επιτυχία. Κωδικός: P@ssw0rd .";
                 else
                     TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν δημιουργήθηκε.";
                 return RedirectToAction(nameof(Index));
             }
             return View(viewModel);
-
         }
 
-        // GET:  User/Delete/Id
-        [Authorize(Roles = "User_Delete")]
-        public async Task<IActionResult> Delete(int? id)
+        // GET:  User/Edit/Id
+        [Authorize(Roles = "User_Edit")]
+        public IActionResult Edit(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var employee = await _context.Empoyees
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (employee == null)
+            var user = _datawork.ApplicationUsers.Get(id.ToString());
+            //var contact = await _datawork.Contact.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            //ViewData["PhoneId"] = new SelectList(_context.Phone, "Id", "Id", contact.PhoneId);
+            return View(user);
+        }
+
+        // POST:  User/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "User_Edit")]
+        public async Task<IActionResult> Edit(string  id, ApplicationUser applicationUser)
+        {
+            if (id != applicationUser.Id)
             {
                 return NotFound();
             }
 
-            return View(employee);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    applicationUser.UserName = applicationUser.Email;
+                    await _datawork.ApplicationUsers.UpdateUser(applicationUser,_userManager);
+                    _datawork.Complete() ;
+                    TempData["StatusMessage"] = "Ο χρήστης ενημερώθηκε με επιτυχία.";
+
+                }
+                catch (Exception /*e*/)
+                {
+                    TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν ενημερώθηκε.";
+
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(applicationUser);
         }
 
-        // POST:  User/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "User_Delete")]
-        public async Task<IActionResult> Delete(int id)
+        // GET:  User/Details/Id
+        [Authorize(Roles = "User_View")]
+        public IActionResult Details(string id)
         {
-            var employee = await _context.Empoyees.FindAsync(id);
-            _context.Empoyees.Remove(employee);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var viewModel = _datawork.ApplicationUsers.Get(id);
+            return View(viewModel);
+        }
+
+        private bool UserExists(string id)
+        {
+            return _datawork.ApplicationUsers.Get(id) == null;
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+//// GET:  User/Edit/Id
+//[Authorize(Roles = "User_Edit")]
+//public IActionResult Edit(string id)
+//{
+//    var viewModel = _datawork.ApplicationUsers.Get(id);
+//    return View(viewModel);
+//}
+
+//// POST:  User/Edit
+//[HttpPost]
+//[ValidateAntiForgeryToken]
+//[Authorize(Roles = "User_Edit")]
+//public IActionResult Edit([FromBody] ApplicationUser viewModel)
+//{
+//    if (ModelState.IsValid)
+//    {
+//        _datawork.ApplicationUsers.Update(viewModel);
+//        _datawork.Complete();
+//        TempData["StatusMessage"] = "Ο χρήστης ενημερώθηκε με επιτυχία.";
+
+//        return RedirectToAction(nameof(Edit), new { id = viewModel.Id });
+
+//    }
+//    TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν ενημερώθηκε.";
+//    return View(viewModel);
+//}

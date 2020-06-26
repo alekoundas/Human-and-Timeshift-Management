@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using DataAccess.Models;
+using DataAccess.Models.Entity;
+using DataAccess.Models.Entity.PhoneBookContacts;
+using DataAccess.Models.Entity.WorkTimeShift;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess   
@@ -12,11 +15,15 @@ namespace DataAccess
             : base(options)
         {
         }
-        public DbSet<Employee> Empoyees { get; set; }
-        public DbSet<Contact> Contact { get; set; }
-        public DbSet<Phone> Phone { get; set; }
-        public DbSet<EmployeeContact> EmployeeContact { get; set; }
-        public DbSet<Specialization> Specialization { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Specialization> Specializations { get; set; }
+        public DbSet<PhoneBook> PhoneBooks{ get; set; }
+        public DbSet<TimeShift> TimeShifts{ get; set; }
+        public DbSet<WorkHour> WorkHours { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<WorkPlace> WorkPlaces { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -24,15 +24,15 @@
             </div>
 
             @*<div class="form-group">
-            <label asp-for="Input.RoleId"></label>
-            <select asp-for="Input.RoleId"
-                    asp-items="@(new SelectList(Model.Roles,"Id","Name"))">
-                <option>Please select one</option>
-            </select>
-            <span asp-validation-for="Input.RoleId" class="text-danger"></span>
+                    <label asp-for="Input.RoleId"></label>
+                    <select asp-for="Input.RoleId"
+                            asp-items="@(new SelectList(Model.Roles,"Id","Name"))">
+                        <option>Please select one</option>
+                    </select>
+                    <span asp-validation-for="Input.RoleId" class="text-danger"></span>
 
 
-        </div>*@
+                </div>*@
             <button type="submit" class="btn btn-default">Δημιουργία χρήστη</button>
         </form>
     </div>
@@ -43,4 +43,30 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        jQuery(function () {
+            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
+            var table = $('#RolesDataTable').DataTable({
+                "serverSide": true,
+                "dom": 'frtlp',
+                "ajax": {
+                    url: '/api/security/getroles',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data) => {
+                        return JSON.stringify(data);
+                    }
+                },
+                "columns": [
+                    {
+                        "data": "userName",
+                        "searchable": true,
+                        "orderable": true
+                    }
+                ]
+            });
+        });
+    </script>
 }

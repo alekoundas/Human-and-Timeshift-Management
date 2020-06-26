@@ -10,6 +10,5 @@ namespace DataAccess.Models.Identity
 {
     public class ApplicationUser : IdentityUser
     {
-        
     }
 }

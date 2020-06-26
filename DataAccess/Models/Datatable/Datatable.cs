@@ -39,6 +39,9 @@ namespace DataAccess.Models.Datatable
         [JsonPropertyName("predicate")]
         public string Predicate { get; set; }
 
+        [JsonPropertyName("applicationUserId")]
+        public string ApplicationUserId { get; set; }
+
 
     }
 }

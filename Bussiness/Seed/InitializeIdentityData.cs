@@ -12,7 +12,7 @@ namespace Business.Seed
     {
         public static void SeedData(
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<ApplicationRole> roleManager)
         {
             SeedRoles(roleManager);
             SeedUsers(userManager);
@@ -30,14 +30,12 @@ namespace Business.Seed
                 if (result.Succeeded)
                 {
                     userManager.AddToRoleAsync(user, "Employee_View").Wait();
-                    userManager.AddToRoleAsync(user, "Employee_Details").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Create").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
                     
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
-                    userManager.AddToRoleAsync(user, "User_Details").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
@@ -59,7 +57,6 @@ namespace Business.Seed
                 {
                     //Employee
                     userManager.AddToRoleAsync(user, "Employee_View").Wait();
-                    userManager.AddToRoleAsync(user, "Employee_Details").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Create").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();     
@@ -67,7 +64,6 @@ namespace Business.Seed
 
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
-                    userManager.AddToRoleAsync(user, "User_Details").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
@@ -75,37 +71,39 @@ namespace Business.Seed
             }
         }
 
-        protected static void SeedRoles(RoleManager<IdentityRole> roleManager)
+        protected static void SeedRoles(RoleManager<ApplicationRole> roleManager)
         {
             //Employee
             if (!roleManager.RoleExistsAsync("Employee_View").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "Employee_View";
-                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
-            }
-            if (!roleManager.RoleExistsAsync("Employee_Details").Result)
-            {
-                IdentityRole role = new IdentityRole();
-                role.Name = "Employee_Details";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition= role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
             if (!roleManager.RoleExistsAsync("Employee_Create").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "Employee_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
             if (!roleManager.RoleExistsAsync("Employee_Edit").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "Employee_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
             if (!roleManager.RoleExistsAsync("Employee_Delete").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "Employee_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
 
@@ -113,32 +111,34 @@ namespace Business.Seed
             //User
             if (!roleManager.RoleExistsAsync("User_View").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "User_View";
-                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
-            }
-            if (!roleManager.RoleExistsAsync("User_Details").Result)
-            {
-                IdentityRole role = new IdentityRole();
-                role.Name = "User_Details";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
             if (!roleManager.RoleExistsAsync("User_Create").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "User_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
             if (!roleManager.RoleExistsAsync("User_Edit").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "User_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
             if (!roleManager.RoleExistsAsync("User_Delete").Result)
             {
-                IdentityRole role = new IdentityRole();
+                ApplicationRole role = new ApplicationRole();
                 role.Name = "User_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
         }

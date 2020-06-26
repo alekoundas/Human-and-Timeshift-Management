@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,8 +9,8 @@ namespace WebApplication.Controllers
 {
     public class RoleController : Controller
     {
-        private RoleManager<IdentityRole> roleManager;
-        public RoleController(RoleManager<IdentityRole> roleMgr)
+        private RoleManager<ApplicationRole> roleManager;
+        public RoleController(RoleManager<ApplicationRole> roleMgr)
         {
             roleManager = roleMgr;
         }
@@ -25,7 +24,7 @@ namespace WebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityResult result = await roleManager.CreateAsync(new IdentityRole(name));
+                IdentityResult result = await roleManager.CreateAsync(new ApplicationRole() { Name= name });
                 if (result.Succeeded)
                     return RedirectToAction("Index");
                 else
@@ -37,7 +36,7 @@ namespace WebApplication.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
-            IdentityRole role = await roleManager.FindByIdAsync(id);
+            ApplicationRole role = await roleManager.FindByIdAsync(id);
             if (role != null)
             {
                 IdentityResult result = await roleManager.DeleteAsync(role);
