@@ -3,47 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Bussiness.Repository.Interface
 {
     public interface IBaseRepository<TEntity> where TEntity : class
     {
-        TEntity Get(int id);
+        Task<TEntity> FindAsync(int id);
 
-        IEnumerable<TEntity> GetAll(
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
-            int pageSize = 10,
-            int pageIndex = 1);
-
-        IEnumerable<TEntity> Search(
-            Expression<Func<TEntity, bool>> predicate,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
-            int pageSize = 10,
-            int pageIndex = 1);
+        Task<List<TEntity>> GetWithPagging(
+             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
+             int pageSize = 10,
+             int pageIndex = 1);
 
 
-        int CountAll();
 
-        #region Generic Delegates With Filter And Includes
-        IEnumerable<TEntity> GetAllWithFilterAndRelated(
+        Task<int> CountAllAsync();
+
+        Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
             Expression<Func<TEntity, bool>> filter = null,
-            List<Expression<Func<TEntity, object>>> paths = null,
+            List<Expression<Func<TEntity, object>>> includes = null,
             int pageSize = 10,
-            int pageIndex = 1,
-            int userDepartment = 0);
-
-        IEnumerable<TEntity> SearchAllWithFilterAndRelated(
-            Expression<Func<TEntity, bool>> predicate,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
-            Expression<Func<TEntity, bool>> filter = null,
-            List<Expression<Func<TEntity, object>>> paths = null,
-            int pageSize = 10,
-            int pageIndex = 1,
-            int userDepartment = 0);
-
-        int CountAllWithFilter(Expression<Func<TEntity, bool>> filter = null, int userDepartment = 0);
-        #endregion
+            int pageIndex = 1);
 
         int Count(Expression<Func<TEntity, bool>> predicate);
 
@@ -66,11 +48,6 @@ namespace Bussiness.Repository.Interface
 
         void Select(Expression<Func<TEntity, bool>> predicate);
 
-        IEnumerable<TEntity> GetAllWithRelated(
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-            Expression<Func<TEntity, bool>> filter = null,
-            List<Expression<Func<TEntity, object>>> paths = null);
 
-        IEnumerable<TEntity> GetAllWithoutPaging();
     }
 }

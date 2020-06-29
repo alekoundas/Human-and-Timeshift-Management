@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Business.Repository.Interface
 {
     public interface IBaseDatawork
     {
-         IEmployeeRepository Employees { get; }
+        Task<int> CompleteAsync();
+        void Update<TEntity>(TEntity model);
+
 
     }
 }

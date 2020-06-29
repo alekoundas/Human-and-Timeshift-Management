@@ -1,54 +1,103 @@
 ﻿@model IEnumerable<DataAccess.Models.Entity.WorkPlace>
 
 @{
-    ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MyProperty)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedOn)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MyProperty)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Τίτλος</th>
+                            <th>Περιγραφή</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="true">Τίτλος</th>
+                            <th data-searchable="true">Περιγραφή</th>
+                            <th data-searchable="false">Ενέργειες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+
+</div>
+@section Scripts {
+    <script>
+
+        jQuery(function () {
+            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
+            var table = $('#WorkPlacesDatatable').DataTable({
+                "serverSide": true,
+                "dom": 'frtlp',
+                "ajax": {
+                    url: '/api/workplaces/getdatatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                "columns": [
+                    {
+                        "data": "Title",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.Title != null)
+                                return data.Title;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Description",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Description != null)
+                                return data.Description;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Button",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null)
+                                return data.Buttons;
+                            else
+                                return "";
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

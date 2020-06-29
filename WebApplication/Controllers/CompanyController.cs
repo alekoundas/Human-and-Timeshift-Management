@@ -7,19 +7,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity;
+using Bussiness;
+using DataAccess.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication.Controllers
 {
     public class CompanyController : Controller
     {
         private readonly BaseDbContext _context;
-
-        public CompanyController(BaseDbContext context)
+        private BaseDatawork _baseDataWork;
+        public CompanyController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
         {
-            _context = context;
+            _context = BaseDbContext;
+            _baseDataWork = new BaseDatawork(BaseDbContext);
         }
 
         // GET: Companies
+        [Authorize(Roles = "Company_View")]
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Σύνολο εταιριών";
@@ -27,6 +32,8 @@ namespace WebApplication.Controllers
         }
 
         // GET: Companies/Details/5
+
+        [Authorize(Roles = "Company_View")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,6 +53,7 @@ namespace WebApplication.Controllers
         }
 
         // GET: Companies/Create
+        [Authorize(Roles = "Company_Create")]
         public IActionResult Create()
         {
             ViewData["Title"] = "Προσθήκη νέας εταιρίας ";
@@ -53,23 +61,23 @@ namespace WebApplication.Controllers
         }
 
         // POST: Companies/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AFM,Description,Title,Id,CreatedOn")] Company company)
+        public async Task<IActionResult> Create(CompanyCreateViewModel company)
         {
 
             if (ModelState.IsValid)
             {
-                _context.Add(company);
-                await _context.SaveChangesAsync();
+                _baseDataWork.Companies.Add(
+                    CompanyCreateViewModel.CreateFrom(company));
+                await _baseDataWork.CompleteAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(company);
         }
 
         // GET: Companies/Edit/5
+        [Authorize(Roles = "Company_Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -82,15 +90,14 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
+            ViewData["Title"] = "Επεξεργασία εταιρίας ";
             return View(company);
         }
 
         // POST: Companies/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AFM,Description,Title,Id,CreatedOn")] Company company)
+        public async Task<IActionResult> Edit(int id,  Company company)
         {
             if (id != company.Id)
             {
@@ -107,46 +114,13 @@ namespace WebApplication.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!CompanyExists(company.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
             return View(company);
-        }
-
-        // GET: Companies/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var company = await _context.Companies
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-
-            return View(company);
-        }
-
-        // POST: Companies/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var company = await _context.Companies.FindAsync(id);
-            _context.Companies.Remove(company);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool CompanyExists(int id)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 using Bussiness.Repository.Interface;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -26,22 +27,19 @@ namespace Bussiness.Repository
             _set = Context.Set<TEntity>();
         }
 
-
-        public IEnumerable<TEntity> GetAll(
+        public async Task<List<TEntity>> GetWithPagging(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
             int pageSize = 10,
             int pageIndex = 1)
         {
 
             if (orderingInfo == null)
-                return _set.Take(pageSize).ToList();
-
+                return await _set.Take(pageSize).ToListAsync();
 
             var qry = (IQueryable<TEntity>)orderingInfo(_set);
-
             qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
-            return qry.ToList();
+            return await qry.ToListAsync();
         }
 
         public IEnumerable<TEntity> GetAllWithoutPaging()
@@ -49,52 +47,23 @@ namespace Bussiness.Repository
             return _set.ToList();
         }
 
-        public IEnumerable<TEntity> Search(
-            Expression<Func<TEntity, bool>> predicate,
-            //Expression<Func<TEntity, object>>[] includes=null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
+        public async Task<int> CountAllAsync()
+        {
+            return await _set.CountAsync();
+        }
+
+        public async Task<List<TEntity>> GetPaggingWithFilter(
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+            Expression<Func<TEntity, bool>> filter,
+            List<Expression<Func<TEntity, object>>> includes = null,
             int pageSize = 10,
             int pageIndex = 1)
         {
-
-            //IQueryable<TEntity> query; 
-            //foreach (var include in includes)
-            //{
-            //    query = _set.Include(include);
-            //}
-
-            if (orderingInfo == null)
-                return _set.Where(predicate).ToList();
-
-
-            var qry = _set.Where(predicate);
-            qry = orderingInfo(qry).AsQueryable();
-            qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-            return qry.ToList();
-        }
-
-        public int CountAll()
-        {
-            return _set.Count();
-        }
-
-        #region Generic Delegates With Filter And Includes
-        public IEnumerable<TEntity> GetAllWithFilterAndRelated(
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-            Expression<Func<TEntity, bool>> filter = null,
-            List<Expression<Func<TEntity, object>>> paths = null,
-            int pageSize = 10,
-            int pageIndex = 1,
-            int userDepartment = 0)
-        {
-            if (userDepartment != 1 && filter == null)
-                return new List<TEntity>();
-
             var qry = (IQueryable<TEntity>)_set;
 
-            if (paths != null)
-                foreach (var path in paths)
-                    qry = qry.Include(path);
+            if (includes != null)
+                foreach (var include in includes)
+                    qry = qry.Include(include);
 
             if (filter != null)
                 qry = qry.Where(filter);
@@ -104,80 +73,9 @@ namespace Bussiness.Repository
 
             qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
-            return qry.ToList();
+            return await qry.ToListAsync();
         }
 
-        public IEnumerable<TEntity> GetAllWithRelated(
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-            Expression<Func<TEntity, bool>> filter = null,
-            List<Expression<Func<TEntity, object>>> paths = null)
-        {
-            var qry = (IQueryable<TEntity>)_set;
-
-            if (paths != null)
-                foreach (var path in paths)
-                    qry = qry.Include(path);
-
-            if (filter != null)
-                qry = qry.Where(filter);
-
-            if (orderingInfo != null)
-                qry = orderingInfo(qry);
-
-            return qry.ToList();
-        }
-
-        public IEnumerable<TEntity> SearchAllWithFilterAndRelated(
-            Expression<Func<TEntity, bool>> predicate,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
-            Expression<Func<TEntity, bool>> filter = null,
-            List<Expression<Func<TEntity, object>>> paths = null,
-            int pageSize = 10,
-            int pageIndex = 1,
-            int userDepartment = 0)
-        {
-            if (userDepartment != 1 && filter == null)
-                return new List<TEntity>();
-
-            if (orderingInfo == null)
-            {
-                if (filter == null)
-                    return _set.Where(predicate).ToList();
-                else
-                    return _set.Where(predicate).Where(filter).ToList();
-            }
-
-            var qry = (IQueryable<TEntity>)_set;
-
-            if (paths != null)
-                foreach (var path in paths)
-                    qry = qry.Include(path);
-
-            if (filter != null)
-                qry = qry.Where(filter);
-
-            qry = qry.Where(predicate);
-
-            if (orderingInfo != null)
-                qry = orderingInfo(qry).AsQueryable();
-
-            qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return qry.ToList();
-        }
-
-        public int CountAllWithFilter(Expression<Func<TEntity, bool>> filter = null, int userDepartment = 0)
-        {
-            if (userDepartment != 1 && filter == null)
-                return 0;
-            //if (filter == null)
-            //    return _set.Count();
-
-            if (filter != null)
-                return _set.Where(filter).Count();
-            return _set.Count();
-        }
-        #endregion
 
         public int Count(Expression<Func<TEntity, bool>> predicate)
         {
@@ -209,17 +107,6 @@ namespace Bussiness.Repository
             _set.Select(predicate);
         }
 
-        //public void Update(TEntity entity)
-        //{
-        //    var entry = Context.Entry(entity);
-        //    foreach (var dbEntityEntry in Context.ChangeTracker.Entries<IEntityState>())
-        //    {
-        //        IEntityState entityStateInfo = dbEntityEntry.Entity;
-        //        dbEntityEntry.State = EntityState.Modified;
-        //    }
-        //    entry.State = EntityState.Modified;
-        //}
-
         public void AddRange(IEnumerable<TEntity> entities)
         {
             _set.AddRange(entities);
@@ -235,15 +122,16 @@ namespace Bussiness.Repository
             _set.RemoveRange(entities);
         }
 
-        public TEntity Get(int id)
+        public async Task<TEntity> FindAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _set.FindAsync(id);
         }
 
         public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> expression)
         {
-            throw new NotImplementedException();
+            return _set.Where(expression);
         }
+
     }
 }
 

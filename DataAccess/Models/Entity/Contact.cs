@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace DataAccess.Models.Entity.PhoneBookContacts
+namespace DataAccess.Models.Entity
 {
-    public class Contact: BaseEntity
+    public class Contact : BaseEntity
     {
         [Required]
         public string Title { get; set; }
@@ -14,5 +14,10 @@ namespace DataAccess.Models.Entity.PhoneBookContacts
 
         [Required]
         public string PhoneNumber { get; set; }
+
+        public int? EmployeeId { get; set; }
+        public Employee Employee { get; set; }
+        public int? CustomerId { get; set; }
+        public Customer Customer { get; set; }
     }
 }

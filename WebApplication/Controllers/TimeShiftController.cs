@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity.WorkTimeShift;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication.Controllers
 {
@@ -20,13 +21,14 @@ namespace WebApplication.Controllers
         }
 
         // GET: TimeShifts
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = "TimeShift_View")]
+        public IActionResult Index()
         {
-            var baseDbContext = _context.TimeShifts.Include(t => t.WorkPlace);
-            return View(await baseDbContext.ToListAsync());
+            return View();
         }
 
         // GET: TimeShifts/Details/5
+        [Authorize(Roles = "TimeShift_View")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,6 +48,7 @@ namespace WebApplication.Controllers
         }
 
         // GET: TimeShifts/Create
+        [Authorize(Roles = "TimeShift_Create")]
         public IActionResult Create()
         {
             ViewData["WorkPlaceId"] = new SelectList(_context.WorkPlaces, "Id", "Id");
@@ -53,8 +56,6 @@ namespace WebApplication.Controllers
         }
 
         // POST: TimeShifts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,StartOn,EndOn,WorkPlaceId,Id,CreatedOn")] TimeShift timeShift)
@@ -70,6 +71,7 @@ namespace WebApplication.Controllers
         }
 
         // GET: TimeShifts/Edit/5
+        [Authorize(Roles = "TimeShift_Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -87,8 +89,6 @@ namespace WebApplication.Controllers
         }
 
         // POST: TimeShifts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Title,StartOn,EndOn,WorkPlaceId,Id,CreatedOn")] TimeShift timeShift)
@@ -122,35 +122,7 @@ namespace WebApplication.Controllers
             return View(timeShift);
         }
 
-        // GET: TimeShifts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var timeShift = await _context.TimeShifts
-                .Include(t => t.WorkPlace)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (timeShift == null)
-            {
-                return NotFound();
-            }
-
-            return View(timeShift);
-        }
-
-        // POST: TimeShifts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var timeShift = await _context.TimeShifts.FindAsync(id);
-            _context.TimeShifts.Remove(timeShift);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
         private bool TimeShiftExists(int id)
         {

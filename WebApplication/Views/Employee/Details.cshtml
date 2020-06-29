@@ -5,86 +5,102 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Details</h2>
 
-<div>
-    <h4>Employee</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.DateOfBirth)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.DateOfBirth)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ErpCode)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ErpCode)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Afm)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Afm)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.SocialSecurityNumber)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.SocialSecurityNumber)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.MyProperty)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.MyProperty)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ScpecializationId)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ScpecializationId)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.PhoneBook)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.PhoneBook.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Company)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Company.Id)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedOn)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedOn)
-        </dd>
-    </dl>
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    <button asp-controller="Specialization" asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="box-body">
+
+                <div class="form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="FirstName" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="LastName" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DateOfBirth" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="DateOfBirth" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Email" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ErpCode" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="ErpCode" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Afm" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Afm" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="SocialSecurityNumber" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="SocialSecurityNumber" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Specialization" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Specialization.Name" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Company" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Company.Title" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CreatedOn" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="CreatedOn" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
 </div>
+
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

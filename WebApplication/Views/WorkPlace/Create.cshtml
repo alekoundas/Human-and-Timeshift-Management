@@ -1,43 +1,64 @@
-﻿@model DataAccess.Models.Entity.WorkPlace
+﻿@model DataAccess.ViewModels.WorkPlaceCreateViewModel
 
 @{
-    ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Create</h2>
 
-<h4>WorkPlace</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    <button asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MyProperty" class="control-label"></label>
-                <input asp-for="MyProperty" class="form-control" />
-                <span asp-validation-for="MyProperty" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedOn" class="control-label"></label>
-                <input asp-for="CreatedOn" class="form-control" />
-                <span asp-validation-for="CreatedOn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
+
+            <hr />
+
+            <form asp-controller="WorkPlace" asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Description" class="form-control" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CustomerId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="Customer_Select2" asp-for="CustomerId" style="width:70%"></select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
     </div>
+    <div class="col-md-3"> </div>
 </div>
 
 <div>
@@ -46,4 +67,19 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $('.Customer_Select2').select2({
+            ajax: {
+                url: '/api/customers/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+    </script>
 }

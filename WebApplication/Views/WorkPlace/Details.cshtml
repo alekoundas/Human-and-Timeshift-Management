@@ -5,37 +5,41 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Details</h2>
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
 
-<div>
-    <h4>WorkPlace</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.MyProperty)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.MyProperty)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedOn)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedOn)
-        </dd>
-    </dl>
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    <button asp-controller="Specialization" asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="box-body">
+
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Title" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Description" class="form-control" readonly="readonly" disabled />
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |

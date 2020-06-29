@@ -47,7 +47,7 @@ namespace WebApplication.Controllers
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
+            ViewBag.Title = "Είσοδος χρήστη";
             return View(viewModel);
         }
 
@@ -64,14 +64,13 @@ namespace WebApplication.Controllers
                     var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, lockoutOnFailure: true);
                     if (result.Succeeded)
                     {
-                        var roles =new List<ApplicationRole>();
+                        var roles = new List<ApplicationRole>();
                         var customClaims = new List<Claim>();
                         try
                         {
-                         roles = await _datawork.ApplicationUserRoles.GetRolesFormLoggedInUserEmail(_userManager, viewModel.Email);
-
+                            roles = await _datawork.ApplicationUserRoles.GetRolesFormLoggedInUserEmail(_userManager, viewModel.Email);
                         }
-                        catch (Exception ex)
+                        catch (Exception /*ex*/)
                         {
 
                             throw;
@@ -103,6 +102,7 @@ namespace WebApplication.Controllers
         [HttpGet]
         public IActionResult Register(string returnUrl = null)
         {
+            ViewBag.Title = "Εγγραφή χρήστη";
             RegisterViewModel model = new RegisterViewModel();
             model.ReturnUrl = returnUrl;
             return View(model);
@@ -110,7 +110,7 @@ namespace WebApplication.Controllers
 
         // POST: Account/Register
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model,string returnUrl = null)
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
@@ -121,26 +121,8 @@ namespace WebApplication.Controllers
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    //var callbackUrl = Url.Page(
-                    //    "/Account/ConfirmEmail",
-                    //    pageHandler: null,
-                    //    values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
-                    //    protocol: Request.Scheme);
-
-                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    //if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    //{
-                    //    return RedirectToPage("RegisterConfirmation", new { email = model.Email, returnUrl = returnUrl });
-                    //}
-                    //else
-                    //{
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    //}
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -154,9 +136,10 @@ namespace WebApplication.Controllers
 
         // GET: Account/Logout
         [HttpGet]
-        public  IActionResult Logout()
+        public IActionResult Logout()
         {
-             _signInManager.SignOutAsync();
+            _signInManager.SignOutAsync();
+            ViewBag.Title = "Αποσυνδεθήκατε με επιτυχία";
             return View();
         }
 

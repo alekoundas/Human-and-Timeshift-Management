@@ -6,6 +6,9 @@ using Business.Repository.Interface;
 using DataAccess.Models;
 using Bussiness.Repository;
 using DataAccess.Models.Entity;
+using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Repository
 {
@@ -14,8 +17,12 @@ namespace Business.Repository
         public EmployeeRepository(BaseDbContext dbContext) :base (dbContext)
         {
         }
-        public BaseDbContext dbContext { get { return dbContext as BaseDbContext; } }
 
-        
+        public BaseDbContext BaseDbContext
+        {
+            get { return Context as BaseDbContext; }
+        }
+
+      
     }
 }

@@ -9,12 +9,18 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="~/libs/bootstrap/css/bootstrap.min.css">
+    <!-- Bootstrap Toggle -->
+    <link href="~/css/BootstrapToggle/bootstrap-toggle.css" rel="stylesheet" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="~/libs/font-awesome/css/font-awesome.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="~/libs/ionicons/css/ionicons.min.css">
     <!-- DataTable -->
     <link rel="stylesheet" href="~/css/Datatable/Datatable.css">
+    <!-- Select2 -->
+    <link href="~/css/Select2/Select2.min.css" rel="stylesheet" />
+    <!-- Custom Scripts -->
+    <link href="~/css/Custom/MainStyle.css" rel="stylesheet" />
 
     @RenderSection("Styles", required: false)
 
@@ -42,7 +48,6 @@
         <!-- Left side column. contains the sidebar -->
         @await Html.PartialAsync("_NavBar")
 
-            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
 
@@ -54,11 +59,19 @@
         @await Html.PartialAsync("_Footer")
 
     </div>
+
     <!-- jQuery -->
     <script src="~/libs/jquery/jquery.min.js"></script>
     <!-- Bootstrap 3.3.7 -->
     <script src="~/libs/bootstrap/js/bootstrap.min.js"></script>
     <script src="~/js/Datatable/Datatable.js"></script>
+    <!-- Bootstrap Toggle -->
+    @*<script src="~/js/BootstrapToggle/bootstrap-toggle.js"></script>*@
+    @*<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>*@
+    <!-- Select2 -->
+    <script src="~/js/Select2/Select2.min.js"></script>
+    <!-- Application Custom Script -->
+    <script src="~/js/Custom/ApplicationMain.js"></script>
 
     @RenderSection("Scripts", required: false)
 
@@ -68,13 +81,8 @@
     <script src="~/libs/fastclick/fastclick.min.js"></script>
     <!-- AdminLTE App -->
     <script src="~/libs/admin-lte/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="~/libs/admin-lte/js/demo.js"></script>
-
-
-
-
-
+    <!-- AdminLTE for demo purposes
+    <script src="~/libs/admin-lte/js/demo.js"></script>-->
     <!-- ASP.NET site script -->
     <environment include="Development">
         <script src="~/js/site.js"></script>

@@ -29,6 +29,7 @@ namespace Business.Seed
 
                 if (result.Succeeded)
                 {
+                    //Employee
                     userManager.AddToRoleAsync(user, "Employee_View").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Create").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
@@ -40,7 +41,30 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
 
+                    //Specialization
+                    userManager.AddToRoleAsync(user, "Specialization_View").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Delete").Wait();
 
+                    //Company
+                    userManager.AddToRoleAsync(user, "Company_View").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Delete").Wait();
+
+                    //Customer
+                    userManager.AddToRoleAsync(user, "Customer_View").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Delete").Wait();
+
+                    //WorkPlace
+                    userManager.AddToRoleAsync(user, "WorkPlace_View").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Create").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
+                                                      
                 }
             }
 
@@ -61,12 +85,35 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();     
 
-
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
+
+                    //Specialization
+                    userManager.AddToRoleAsync(user, "Specialization_View").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Delete").Wait();
+
+                    //Company
+                    userManager.AddToRoleAsync(user, "Company_View").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Delete").Wait();
+
+                    //Customer
+                    userManager.AddToRoleAsync(user, "Customer_View").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Delete").Wait();
+
+                    //WorkPlace
+                    userManager.AddToRoleAsync(user, "WorkPlace_View").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Create").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
                 }
             }
         }
@@ -137,6 +184,142 @@ namespace Business.Seed
             {
                 ApplicationRole role = new ApplicationRole();
                 role.Name = "User_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
+            //Specialization
+            if (!roleManager.RoleExistsAsync("Specialization_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Specialization_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Specialization_Create").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Specialization_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Specialization_Edit").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Specialization_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Specialization_Delete").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Specialization_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
+            //Company
+            if (!roleManager.RoleExistsAsync("Company_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Company_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Company_Create").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Company_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Company_Edit").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Company_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Company_Delete").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Company_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
+            //Customer
+            if (!roleManager.RoleExistsAsync("Customer_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Customer_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Customer_Create").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Customer_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Customer_Edit").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Customer_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("Customer_Delete").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "Customer_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
+            //WorkPlace
+            if (!roleManager.RoleExistsAsync("WorkPlace_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlace_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("WorkPlace_Create").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlace_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("WorkPlace_Edit").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlace_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("WorkPlace_Delete").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlace_Delete";
                 role.Controller = role.Name.Split('_')[0];
                 role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;

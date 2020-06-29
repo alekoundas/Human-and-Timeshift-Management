@@ -1,18 +1,11 @@
 ﻿
-.formBackground {
-    height: auto;
-    padding: 20px;
-    margin: 0 auto;
-    position: relative;
-    border-radius: 5px;
-    background-color: #898f91;
-    /*    box-shadow: 4px 8px #888888;*/
-    /*    background-color: rgb(155,#222D32171,186);*/
-}
-
-.margin_10{
-    margin: 10px;
-}
-.margin_20 {
-    margin: 20px;
+/* Bootstrap Button Make Circle */
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
 }

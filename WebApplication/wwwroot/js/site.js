@@ -1,6 +1,4 @@
-﻿// Write your Javascript code.
-
-; (function ($) {
+﻿; (function ($) {
 
     'use strict';
 

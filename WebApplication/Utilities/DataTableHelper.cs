@@ -26,17 +26,16 @@ namespace WebApplication.Utilities
         {
             if (filteredCount == -1)
                 filteredCount = total;
-            var a = new DatatableResponse<TEntity>()
+            return new DatatableResponse<TEntity>()
             {
                 data = model,
                 draw = dataTable.Draw,
                 recordsFiltered = filteredCount,
                 recordsTotal = total
             };
-            return a;
         }
 
-        public string GetButtons(string baseRole, string id)
+        public string GetButtons(string baseRole, string apiController, string id)
         {
             var stringToReturn = "";
             _httpContext = new HttpContextAccessor();
@@ -50,7 +49,7 @@ namespace WebApplication.Utilities
                 stringToReturn += EditButton(baseRole, id);
 
             if (currentUserRoles.Contains(baseRole + "_Delete"))
-                stringToReturn += DeleteButton(baseRole, id);
+                stringToReturn += DeleteButton(apiController, id);
 
             return stringToReturn;
         }
@@ -105,7 +104,7 @@ namespace WebApplication.Utilities
             => @"<a href='/" + controller + "/Edit/" + id + "'><i class='fa fa-pencil-square-o'></i></a>";
 
         static string DeleteButton(string controller, string id)
-            => @"<a href='/" + controller + "/index'><i class='fa fa-trash-o'></i></a>";
+            => @"<a ><i urlAttr='/api/" + controller + "/" + id + "' class='fa fa-trash-o DatatableDeleteButton' ></i></a>";
 
         public string RoleViewCheckbox(bool isChecked, string userId, string roleId)
           =>
@@ -150,8 +149,8 @@ namespace WebApplication.Utilities
                         (isChecked == true ? "checked" : "") +
                     ">" +
                 "</div>" +
-              "</div>"; 
-        
+              "</div>";
+
         public string RoleDeleteCheckbox(bool isChecked, string userId, string roleId)
              =>
                "<div class='input-group-prepend'>" +
@@ -166,5 +165,32 @@ namespace WebApplication.Utilities
                      ">" +
                  "</div>" +
                "</div>";
+
+
+
+
+        public string GetToggle(string baseRole, string apiUrl, string toggleState)
+        {
+            var stringToReturn = "";
+            _httpContext = new HttpContextAccessor();
+            var currentUserRoles = _httpContext.HttpContext.User.Claims
+                .Select(x => x.Value).ToList();
+
+            if (currentUserRoles.Contains(baseRole + "_Edit"))
+                stringToReturn += EditToggle(toggleState, apiUrl);
+
+            else if (currentUserRoles.Contains(baseRole + "_View"))
+                stringToReturn += ViewToggle(toggleState, apiUrl);
+
+
+            return stringToReturn;
+        }
+
+        static string ViewToggle(string toggleState, string link)
+           => @"<input urlAttr='" + link + "' class='ToggleSliders disabled' type='checkbox' data-onstyle='success' disabled " + toggleState + ">";
+
+        static string EditToggle(string toggleState, string link)
+            => @"<input urlAttr='" + link + "' class='ToggleSliders' type='checkbox' data-onstyle='success' " + toggleState + ">";
+
     }
 }

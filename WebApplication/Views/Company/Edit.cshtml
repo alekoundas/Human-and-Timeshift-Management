@@ -7,7 +7,6 @@
 <div class="row">
     <div class="col-md-3"> </div>
     <div class="col-md-6">
-
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
@@ -56,17 +55,225 @@
 
                 </div>
             </form>
-
         </div>
     </div>
     <div class="col-md-3"> </div>
 </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="CompanyEmployeesDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Ημερομηνία Γέν.</th>
+                            <th>Email</th>
+                            <th>ErpCode</th>
+                            <th>ΑΦΜ</th>
+                            <th>Αριθμ. Ταυτότητας</th>
+                            <th>Ειδικότητα</th>
+                            <th>Εταιρία</th>
+                            <th>Εργαζόμενοι εταιρίας</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="true">Όνομα</th>
+                            <th data-searchable="true">Επίθετο</th>
+                            <th data-searchable="true">Ημερομηνία Γέν.</th>
+                            <th data-searchable="true">Email</th>
+                            <th data-searchable="true">ErpCode</th>
+                            <th data-searchable="true">ΑΦΜ</th>
+                            <th data-searchable="true">Αριθμ. Ταυτότητας</th>
+                            <th data-searchable="true">Ειδικότητα</th>
+                            <th data-searchable="true">Εταιρία</th>
+                            <th data-searchable="false">Εργαζόμενοι εταιρίας</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+    <input type="checkbox" id="toggle-one" checked data-toggle="toggle" data-onstyle="primary">
+</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/BootstrapToggle/bootstrap-toggle.js"></script>
+
+    <script>
+
+        $(function () {
+            $('#toggle-one').bootstrapToggle();
+        })
+
+        jQuery(function () {
+            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
+            var table = $('#CompanyEmployeesDatatable').DataTable({
+                "serverSide": true,
+                "dom": 'frtlp',
+                "ajax": {
+                    url: '/api/employees/getdatatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+
+                        data.predicate = 'CompanyEdit';
+                        data.genericId =@Model.Id;
+
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                "columns": [
+                    {
+                        "data": "FirstName",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) => {
+                            //console.log(data);
+                            if (data.FirstName != null)
+                                return data.FirstName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "LastName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.LastName != null)
+                                return data.LastName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "DateOfBirth",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.DateOfBirth != null)
+                                return data.DateOfBirth;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Email",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Email != null)
+                                return data.Email;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "ErpCode",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.ErpCode != null)
+                                return data.ErpCode;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Afm",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Afm != null)
+                                return data.Afm;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "SocialSecurityNumber",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.SocialSecurityNumber != null)
+                                return data.SocialSecurityNumber;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "ScpecializationName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.ScpecializationName != null)
+                                return data.ScpecializationName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "CompanyTitle",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.CompanyTitle != null)
+                                return data.CompanyTitle;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "IsInCompany",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.IsInCompany != null)
+                                return data.IsInCompany;
+                            else
+                                return "";
+                        }
+                    }
+                ],
+                "fnDrawCallback": function () {
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    });
+                },
+            });
+        });
+    </script>
+
+    <script>
+
+        $('#CompanyEmployeesDatatable').on('change', '.ToggleSliders', (element) => {
+            var apiUrl = element.target.getAttribute('urlattr');
+            $.ajax({
+                type: "GET",
+                url: apiUrl + element.target.checked,
+                dataType: "json",
+                success: function (response) {
+                    console.log('mmmkeyyyyy');
+                }
+            });
+        });
+    </script>
 }

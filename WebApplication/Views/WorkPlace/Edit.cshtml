@@ -1,50 +1,279 @@
 ﻿@model DataAccess.Models.Entity.WorkPlace
 
 @{
-    ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
 
-<h4>WorkPlace</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    <button asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MyProperty" class="control-label"></label>
-                <input asp-for="MyProperty" class="form-control" />
-                <span asp-validation-for="MyProperty" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CreatedOn" class="control-label"></label>
-                <input asp-for="CreatedOn" class="form-control" />
-                <span asp-validation-for="CreatedOn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
+
+            <hr />
+
+            <form asp-controller="WorkPlace" asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Description" class="form-control" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
     </div>
+    <div class="col-md-3"> </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<div class="row">
+    <div class="col-md-2"> </div>
+    <div class="col-md-8">
 
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="WorkPlaceEmployeesDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Ημερομηνία Γέν.</th>
+                            <th>Email</th>
+                            <th>ErpCode</th>
+                            <th>ΑΦΜ</th>
+                            <th>Αριθμ. Ταυτότητας</th>
+                            <th>Ειδικότητα</th>
+                            <th>Εταιρία</th>
+                            <th>Εργαζόμενοι πόστου</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="true">Όνομα</th>
+                            <th data-searchable="true">Επίθετο</th>
+                            <th data-searchable="true">Ημερομηνία Γέν.</th>
+                            <th data-searchable="true">Email</th>
+                            <th data-searchable="true">ErpCode</th>
+                            <th data-searchable="true">ΑΦΜ</th>
+                            <th data-searchable="true">Αριθμ. Ταυτότητας</th>
+                            <th data-searchable="true">Ειδικότητα</th>
+                            <th data-searchable="true">Εταιρία</th>
+                            <th data-searchable="false">Εργαζόμενοι πόστου</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2"> </div>
+</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/BootstrapToggle/bootstrap-toggle.js"></script>
+
+    <script>
+
+
+        jQuery(function () {
+            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
+            var table = $('#WorkPlaceEmployeesDatatable').DataTable({
+                "serverSide": true,
+                "dom": 'frtlp',
+                "ajax": {
+                    url: '/api/employees/getdatatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+
+                        data.predicate = 'WorkPlaceEdit';
+                        data.genericId =@Model.Id;
+
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                "columns": [
+                    {
+                        "data": "FirstName",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.FirstName != null)
+                                return data.FirstName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "LastName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.LastName != null)
+                                return data.LastName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "DateOfBirth",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.DateOfBirth != null)
+                                return data.DateOfBirth;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Email",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Email != null)
+                                return data.Email;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "ErpCode",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.ErpCode != null)
+                                return data.ErpCode;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Afm",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Afm != null)
+                                return data.Afm;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "SocialSecurityNumber",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.SocialSecurityNumber != null)
+                                return data.SocialSecurityNumber;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "ScpecializationName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.ScpecializationName != null)
+                                return data.ScpecializationName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "CompanyTitle",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.CompanyTitle != null)
+                                return data.CompanyTitle;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "IsInWorkPlace",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.IsInWorkPlace != null)
+                                return data.IsInWorkPlace;
+                            else
+                                return "";
+                        }
+                    }
+                ],
+                "fnDrawCallback": function () {
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    });
+                },
+            });
+        });
+
+
+
+
+    </script>
+
+
+
+
+
+
+    <script>
+
+        $('#WorkPlaceEmployeesDatatable').on('change', '.ToggleSliders', (element) => {
+            var apiUrl = element.target.getAttribute('urlattr');
+            console.log(apiUrl);
+            $.ajax({
+                type: "GET",
+                url: apiUrl + element.target.checked,
+                dataType: "json",
+                success: function (response) {
+                    console.log('mmmkeyyyyy');
+                }
+            });
+        });
+    </script>
 }

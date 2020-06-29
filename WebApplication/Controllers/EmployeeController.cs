@@ -7,26 +7,32 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity;
+using Microsoft.AspNetCore.Authorization;
+using Bussiness;
+using DataAccess.ViewModels;
 
 namespace WebApplication.Controllers
 {
     public class EmployeeController : Controller
     {
         private readonly BaseDbContext _context;
-
-        public EmployeeController(BaseDbContext context)
+        private BaseDatawork _baseDataWork;
+        public EmployeeController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
         {
-            _context = context;
+            _context = BaseDbContext;
+            _baseDataWork = new BaseDatawork(BaseDbContext);
         }
 
         // GET: Employee
-        public async Task<IActionResult> Index()
+        [Authorize(Roles ="Employee_View")]
+        public IActionResult Index()
         {
-            var baseDbContext = _context.Employees.Include(e => e.Company).Include(e => e.PhoneBook);
-            return View(await baseDbContext.ToListAsync());
+            ViewData["Title"] = "Σύνολο υπαλλήλων";
+            return View();
         }
 
         // GET: Employee/Details/5
+        [Authorize(Roles = "Employee_View")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,43 +42,43 @@ namespace WebApplication.Controllers
 
             var employee = await _context.Employees
                 .Include(e => e.Company)
-                .Include(e => e.PhoneBook)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {
                 return NotFound();
             }
 
+            ViewData["Title"] = "Προβολή υπαλλήλου";
             return View(employee);
         }
 
         // GET: Employee/Create
+        [Authorize(Roles = "Employee_Create")]
         public IActionResult Create()
         {
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id");
-            ViewData["PhoneBookId"] = new SelectList(_context.PhoneBooks, "Id", "Name");
+            ViewData["Title"] = "Προσθήκη υπαλλήλου";
             return View();
         }
 
         // POST: Employee/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FirstName,LastName,DateOfBirth,Email,ErpCode,Afm,SocialSecurityNumber,MyProperty,ScpecializationId,PhoneBookId,CompanyId,Id,CreatedOn")] Employee employee)
+        public async Task<IActionResult> Create(EmployeeCreateViewModel employee)
         {
+            var contacts = new List<Contact>();
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
+                _baseDataWork.Employees.Add(
+                    EmployeeCreateViewModel.CreateFrom(employee));
+                await _baseDataWork.CompleteAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);
-            ViewData["PhoneBookId"] = new SelectList(_context.PhoneBooks, "Id", "Name", employee.PhoneBookId);
             return View(employee);
         }
 
         // GET: Employee/Edit/5
+        [Authorize(Roles = "Employee_Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,16 +92,14 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);
-            ViewData["PhoneBookId"] = new SelectList(_context.PhoneBooks, "Id", "Name", employee.PhoneBookId);
+            ViewData["Title"] = "Επεξεργασία υπαλλήλου";
             return View(employee);
         }
 
         // POST: Employee/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FirstName,LastName,DateOfBirth,Email,ErpCode,Afm,SocialSecurityNumber,MyProperty,ScpecializationId,PhoneBookId,CompanyId,Id,CreatedOn")] Employee employee)
+        public async Task<IActionResult> Edit(int id, Employee employee)
         {
             if (id != employee.Id)
             {
@@ -123,39 +127,7 @@ namespace WebApplication.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);
-            ViewData["PhoneBookId"] = new SelectList(_context.PhoneBooks, "Id", "Name", employee.PhoneBookId);
             return View(employee);
-        }
-
-        // GET: Employee/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var employee = await _context.Employees
-                .Include(e => e.Company)
-                .Include(e => e.PhoneBook)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            return View(employee);
-        }
-
-        // POST: Employee/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var employee = await _context.Employees.FindAsync(id);
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool EmployeeExists(int id)

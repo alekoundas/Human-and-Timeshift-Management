@@ -7,25 +7,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.ViewModels;
+using Bussiness;
 
 namespace WebApplication.Controllers
 {
     public class SpecializationController : Controller
     {
         private readonly BaseDbContext _context;
-
-        public SpecializationController(BaseDbContext context)
+        private BaseDatawork _baseDataWork;
+        public SpecializationController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
         {
-            _context = context;
+            _context = BaseDbContext;
+            _baseDataWork = new BaseDatawork(BaseDbContext);
         }
 
         // GET: Specializations
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = "Specialization_View")]
+        public IActionResult Index()
         {
-            return View(await _context.Specializations.ToListAsync());
+            return View();
         }
 
         // GET: Specializations/Details/5
+        [Authorize(Roles = "Specialization_View")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,8 +39,7 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var specialization = await _context.Specializations
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var specialization = await _baseDataWork.Specializations.FindAsync((int)id);
             if (specialization == null)
             {
                 return NotFound();
@@ -44,28 +49,29 @@ namespace WebApplication.Controllers
         }
 
         // GET: Specializations/Create
+        [Authorize(Roles = "Specialization_Create")]
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Specializations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Id,CreatedOn")] Specialization specialization)
+        public async Task<IActionResult> Create(SpecializationCreateViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(specialization);
-                await _context.SaveChangesAsync();
+                _baseDataWork.Specializations.Add(
+                    SpecializationCreateViewModel.CreateFrom(viewModel));
+                await _baseDataWork.CompleteAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(specialization);
+            return View(viewModel);
         }
 
         // GET: Specializations/Edit/5
+        [Authorize(Roles = "Specialization_Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,7 +79,7 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var specialization = await _context.Specializations.FindAsync(id);
+            var specialization = await _baseDataWork.Specializations.FindAsync((int)id);
             if (specialization == null)
             {
                 return NotFound();
@@ -82,11 +88,9 @@ namespace WebApplication.Controllers
         }
 
         // POST: Specializations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Id,CreatedOn")] Specialization specialization)
+        public async Task<IActionResult> Edit(int id, Specialization specialization)
         {
             if (id != specialization.Id)
             {
@@ -97,7 +101,7 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(specialization);
+                    _baseDataWork.Update(specialization);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -114,35 +118,6 @@ namespace WebApplication.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(specialization);
-        }
-
-        // GET: Specializations/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var specialization = await _context.Specializations
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (specialization == null)
-            {
-                return NotFound();
-            }
-
-            return View(specialization);
-        }
-
-        // POST: Specializations/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var specialization = await _context.Specializations.FindAsync(id);
-            _context.Specializations.Remove(specialization);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool SpecializationExists(int id)

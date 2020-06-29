@@ -41,32 +41,9 @@ namespace WebApplication
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<SecurityDbContext>();
 
-
-
-
-
-
-            //services.ConfigureApplicationCookie(options => {
-
-            //    options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
-            //    {
-            //        OnRedirectToLogin = ctx =>
-            //        {
-            //            var requestPath = ctx.Request.Path;
-            //            if (requestPath.Value == "/Home/About")
-            //            {
-            //                ctx.Response.Redirect("/Account/Login");
-            //            }
-            //            else if (requestPath.Value == "/Home/Contact")
-            //            {
-            //                ctx.Response.Redirect("/Account/Login");
-            //            }
-
-            //            return Task.CompletedTask;
-            //        }
-            //    };
-
-            //});
+            //Redirect for account
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/Account/LogIn");
+            services.ConfigureApplicationCookie(options => options.AccessDeniedPath = "/Account/LogInnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
 
 
 

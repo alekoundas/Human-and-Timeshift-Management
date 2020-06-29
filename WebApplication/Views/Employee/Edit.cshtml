@@ -5,80 +5,107 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
 
-<h4>Employee</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    <button asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateOfBirth" class="control-label"></label>
-                <input asp-for="DateOfBirth" class="form-control" />
-                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ErpCode" class="control-label"></label>
-                <input asp-for="ErpCode" class="form-control" />
-                <span asp-validation-for="ErpCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Afm" class="control-label"></label>
-                <input asp-for="Afm" class="form-control" />
-                <span asp-validation-for="Afm" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SocialSecurityNumber" class="control-label"></label>
-                <input asp-for="SocialSecurityNumber" class="form-control" />
-                <span asp-validation-for="SocialSecurityNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MyProperty" class="control-label"></label>
-                <input asp-for="MyProperty" class="form-control" />
-                <span asp-validation-for="MyProperty" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ScpecializationId" class="control-label"></label>
-                <input asp-for="ScpecializationId" class="form-control" />
-                <span asp-validation-for="ScpecializationId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhoneBookId" class="control-label"></label>
-                <select asp-for="PhoneBookId" class="form-control" asp-items="ViewBag.PhoneBookId"></select>
-                <span asp-validation-for="PhoneBookId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyId" class="control-label"></label>
-                <select asp-for="CompanyId" class="form-control" asp-items="ViewBag.CompanyId"></select>
-                <span asp-validation-for="CompanyId" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CreatedOn" class="control-label"></label>
-                <input asp-for="CreatedOn" class="form-control" />
-                <span asp-validation-for="CreatedOn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
+
+            <hr />
+
+            <form asp-controller="Employee" asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LastName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DateOfBirth" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="DateOfBirth" class="form-control" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="ErpCode" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="ErpCode" class="form-control" />
+                            <span asp-validation-for="ErpCode" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Afm" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Afm" class="form-control" />
+                            <span asp-validation-for="Afm" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="SocialSecurityNumber" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="SocialSecurityNumber" class="form-control" />
+                            <span asp-validation-for="SocialSecurityNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="SpecializationId" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Specialization.Name" class="form-control" />
+                            <span asp-validation-for="SpecializationId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="CompanyId" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Company.Title" class="form-control" />
+                            <span asp-validation-for="CompanyId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+        </div>
     </div>
+    <div class="col-md-3"> </div>
 </div>
 
 <div>

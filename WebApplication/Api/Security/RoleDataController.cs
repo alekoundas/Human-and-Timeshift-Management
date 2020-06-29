@@ -8,7 +8,6 @@ using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Identity;
-using DataAccess.ViewModels.DataTable;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Utilities;

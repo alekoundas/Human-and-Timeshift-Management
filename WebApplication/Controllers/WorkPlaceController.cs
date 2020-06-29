@@ -7,27 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity;
+using Bussiness;
+using DataAccess.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication.Controllers
 {
     public class WorkPlaceController : Controller
     {
         private readonly BaseDbContext _context;
-
-        public WorkPlaceController(BaseDbContext context)
+        private BaseDatawork _baseDataWork;
+        public WorkPlaceController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
         {
-            _context = context;
+            _context = BaseDbContext;
+            _baseDataWork = new BaseDatawork(BaseDbContext);
         }
 
         // GET: WorkPlace
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = "WorkPlace_View")]
+        public IActionResult Index()
         {
-            return View(await _context.WorkPlaces.ToListAsync());
+            ViewData["Title"] = "Σύνολο πόστων";
+            return View();
         }
 
         // GET: WorkPlace/Details/5
+        [Authorize(Roles = "WorkPlace_View")]
         public async Task<IActionResult> Details(int? id)
         {
+            ViewData["Title"] = "Προβολή πόστου";
             if (id == null)
             {
                 return NotFound();
@@ -44,28 +52,30 @@ namespace WebApplication.Controllers
         }
 
         // GET: WorkPlace/Create
+        [Authorize(Roles = "WorkPlace_Create")]
         public IActionResult Create()
         {
+            ViewData["Title"] = "Προσθήκη πόστου";
             return View();
         }
 
         // POST: WorkPlace/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Description,MyProperty,Id,CreatedOn")] WorkPlace workPlace)
+        public async Task<IActionResult> Create(WorkPlaceCreateViewModel workPlace)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(workPlace);
-                await _context.SaveChangesAsync();
+                _baseDataWork.WorkPlaces.Add(
+                    WorkPlaceCreateViewModel.CreateFrom(workPlace));
+                await _baseDataWork.CompleteAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(workPlace);
         }
 
         // GET: WorkPlace/Edit/5
+        [Authorize(Roles = "WorkPlace_Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,20 +88,18 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
+            ViewData["Title"] = "Επεξεργασία πόστου";
             return View(workPlace);
         }
 
         // POST: WorkPlace/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Title,Description,MyProperty,Id,CreatedOn")] WorkPlace workPlace)
+        [Authorize(Roles = "WorkPlace_Edit")]
+        public async Task<IActionResult> Edit(int id, WorkPlace workPlace)
         {
             if (id != workPlace.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -103,47 +111,15 @@ namespace WebApplication.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!WorkPlaceExists(workPlace.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
             return View(workPlace);
         }
 
-        // GET: WorkPlace/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var workPlace = await _context.WorkPlaces
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (workPlace == null)
-            {
-                return NotFound();
-            }
-
-            return View(workPlace);
-        }
-
-        // POST: WorkPlace/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var workPlace = await _context.WorkPlaces.FindAsync(id);
-            _context.WorkPlaces.Remove(workPlace);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
         private bool WorkPlaceExists(int id)
         {

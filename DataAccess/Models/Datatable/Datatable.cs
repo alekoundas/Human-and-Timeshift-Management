@@ -31,16 +31,21 @@ namespace DataAccess.Models.Datatable
         [JsonPropertyName("order")]
         public List<Order> Order { get; set; }
 
-      
-
         [JsonPropertyName("searchValue")]
         public string SearchValue { get; set; }
+
+
+
+
 
         [JsonPropertyName("predicate")]
         public string Predicate { get; set; }
 
         [JsonPropertyName("applicationUserId")]
         public string ApplicationUserId { get; set; }
+
+        [JsonPropertyName("genericId")]
+        public int GenericId { get; set; }
 
 
     }

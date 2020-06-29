@@ -5,98 +5,193 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateOfBirth)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ErpCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Afm)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SocialSecurityNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MyProperty)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ScpecializationId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhoneBook)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedOn)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateOfBirth)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ErpCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Afm)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SocialSecurityNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MyProperty)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ScpecializationId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneBook.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Company.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="EmployeesDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Ημερομηνία Γέν.</th>
+                            <th>Email</th>
+                            <th>ErpCode</th>
+                            <th>ΑΦΜ</th>
+                            <th>Αριθμ. Ταυτότητας</th>
+                            <th>Ειδικότητα</th>
+                            <th>Εταιρία</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="true">Όνομα</th>
+                            <th data-searchable="true">Επίθετο</th>
+                            <th data-searchable="true">Ημερομηνία Γέν.</th>
+                            <th data-searchable="true">Email</th>
+                            <th data-searchable="true">ErpCode</th>
+                            <th data-searchable="true">ΑΦΜ</th>
+                            <th data-searchable="true">Αριθμ. Ταυτότητας</th>
+                            <th data-searchable="true">Ειδικότητα</th>
+                            <th data-searchable="true">Εταιρία</th>
+                            <th data-searchable="false">Ενέργειες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+
+</div>
+<link href="~/css/Datatable/Datatable.css" rel="stylesheet" />
+@section Scripts {
+    <script src="~/js/Custom/DatatableDeleteButton.js"></script>
+    <script>
+
+        jQuery(function () {
+            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
+            var table = $('#EmployeesDatatable').DataTable({
+                "serverSide": true,
+                "dom": 'frtlp',
+                "ajax": {
+                    url: '/api/employees/getdatatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                "columns": [
+                    {
+                        "data": "FirstName",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.FirstName != null)
+                                return data.FirstName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "LastName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.LastName != null)
+                                return data.LastName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "DateOfBirth",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.DateOfBirth != null)
+                                return data.DateOfBirth;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Email",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Email != null)
+                                return data.Email;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "ErpCode",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.ErpCode != null)
+                                return data.ErpCode;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Afm",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Afm != null)
+                                return data.Afm;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "SocialSecurityNumber",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.SocialSecurityNumber != null)
+                                return data.SocialSecurityNumber;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "ScpecializationName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.ScpecializationName != null)
+                                return data.ScpecializationName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "CompanyTitle",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.CompanyTitle != null)
+                                return data.CompanyTitle;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Buttons",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null)
+                                return data.Buttons;
+                            else
+                                return "";
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

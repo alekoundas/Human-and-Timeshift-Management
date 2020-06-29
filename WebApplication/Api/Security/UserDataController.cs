@@ -35,7 +35,7 @@ namespace WebApplication.Api.Security
         }
 
         [HttpPost("get")]
-        public async Task<ActionResult<Employee>> Get([FromBody] Datatable datatable)
+        public async Task<ActionResult<ApplicationUser>> Get([FromBody] Datatable datatable)
         {
             var total = _securityDatawork.ApplicationUsers.CountAll();
             var pageSize = datatable.Length;
@@ -62,7 +62,7 @@ namespace WebApplication.Api.Security
             {
                 var expandoObj = expandoObject.GetCopyFrom<ApplicationUser>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("User", result.Id));
+                dictionary.Add("Buttons", dataTableHelper.GetButtons("User","Users", result.Id));
                 returnObjects.Add(expandoObj);
             }
 
