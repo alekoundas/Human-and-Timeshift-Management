@@ -41,8 +41,8 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var customer = await _context.Customers.Include(x => x.Company)
+                .FirstOrDefaultAsync(z => z.Id == id);
             if (customer == null)
             {
                 return NotFound();
@@ -80,16 +80,14 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _context.Customers.Include(x => x.Company)
+                .FirstOrDefaultAsync(z => z.Id == id);
+
             if (customer == null)
-            {
                 return NotFound();
-            }
-            //ViewData["PhoneBookId"] = new SelectList(_context.PhoneBooks, "Id", "Name", customer.PhoneBookId);
+
             ViewData["Title"] = "Επεξεργασία πελάτη ";
 
             return View(customer);
@@ -98,12 +96,10 @@ namespace WebApplication.Controllers
         // POST: Customers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FirstName,LastName,DateOfBirth,AFM,Description,PhoneBookId,Id,CreatedOn")] Customer customer)
+        public async Task<IActionResult> Edit(int id, Customer customer)
         {
             if (id != customer.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -125,7 +121,6 @@ namespace WebApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["PhoneBookId"] = new SelectList(_context.PhoneBooks, "Id", "Name", customer.PhoneBookId);
             return View(customer);
         }
 

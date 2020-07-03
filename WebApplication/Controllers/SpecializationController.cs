@@ -27,6 +27,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "Specialization_View")]
         public IActionResult Index()
         {
+            ViewData["Title"] = "Σύνολο ρόλων";
             return View();
         }
 
@@ -35,16 +36,13 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var specialization = await _baseDataWork.Specializations.FindAsync((int)id);
             if (specialization == null)
-            {
                 return NotFound();
-            }
 
+            ViewData["Title"] = "Στοχοία ρόλου";
             return View(specialization);
         }
 
@@ -52,6 +50,8 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "Specialization_Create")]
         public IActionResult Create()
         {
+            ViewData["Title"] = "Προσθήκη ρόλου";
+
             return View();
         }
 
@@ -75,15 +75,13 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var specialization = await _baseDataWork.Specializations.FindAsync((int)id);
             if (specialization == null)
-            {
                 return NotFound();
-            }
+
+            ViewData["Title"] = "Επεξεργασία ρόλου";
             return View(specialization);
         }
 
@@ -93,9 +91,7 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int id, Specialization specialization)
         {
             if (id != specialization.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -107,13 +103,9 @@ namespace WebApplication.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!SpecializationExists(specialization.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }

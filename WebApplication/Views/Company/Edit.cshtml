@@ -25,7 +25,6 @@
 
                     <div class="form-group">
                         <label asp-for="Title" class="control-label"></label>
-
                         <div class="input-group">
                             <input asp-for="Title" class="form-control" />
                             <span asp-validation-for="Title" class="text-danger"></span>
@@ -34,7 +33,6 @@
 
                     <div class="form-group">
                         <label asp-for="AFM" class="control-label"></label>
-
                         <div class="input-group">
                             <input asp-for="AFM" class="form-control" />
                             <span asp-validation-for="AFM" class="text-danger"></span>
@@ -62,8 +60,8 @@
 
 
 <div class="row">
-    <div class="col-md-3"> </div>
-    <div class="col-md-6">
+    <div class="col-md-1"> </div>
+    <div class="col-md-10">
 
         <div class="box box-danger" style="margin-top:5%;">
 
@@ -106,8 +104,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3"> </div>
-    <input type="checkbox" id="toggle-one" checked data-toggle="toggle" data-onstyle="primary">
+    <div class="col-md-1"> </div>
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

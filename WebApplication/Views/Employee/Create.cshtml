@@ -134,13 +134,10 @@
 </div>
 
 
-
-<link href="~/css/Custom/MainStyle.css" rel="stylesheet" />
-
-
 @section Scripts {
-    <script src="~/js/Custom/ApplicationMain.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="~/js/Custom/Contacts.js"></script>
 
     <script>
         $('.Specialization_Select2').select2({

@@ -83,7 +83,9 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var workPlace = await _context.WorkPlaces.FindAsync(id);
+            var workPlace = await _context.WorkPlaces
+                .Include(x=>x.Customer)
+                .FirstOrDefaultAsync(z=>z.Id==id);
             if (workPlace == null)
             {
                 return NotFound();

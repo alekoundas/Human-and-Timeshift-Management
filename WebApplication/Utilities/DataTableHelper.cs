@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Business.Repository.Interface;
 using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess.Models.Datatable;
@@ -17,6 +18,7 @@ namespace WebApplication.Utilities
     {
         private IHttpContextAccessor _httpContext;
         private ISecurityDatawork _securityDatawork;
+        private IBaseDatawork _baseDatawork;
         public DataTableHelper(SecurityDataWork securityDatawork)
         {
             _securityDatawork = securityDatawork;
@@ -97,13 +99,13 @@ namespace WebApplication.Utilities
             return stringToReturn;
         }
 
-        static string ViewButton(string controller, string id)
+        private static string ViewButton(string controller, string id)
            => @"<a href='/" + controller + "/Details/" + id + "'><i class='fa fa-eye'></i></a>";
 
-        static string EditButton(string controller, string id)
+        private static string EditButton(string controller, string id)
             => @"<a href='/" + controller + "/Edit/" + id + "'><i class='fa fa-pencil-square-o'></i></a>";
 
-        static string DeleteButton(string controller, string id)
+        private static string DeleteButton(string controller, string id)
             => @"<a ><i urlAttr='/api/" + controller + "/" + id + "' class='fa fa-trash-o DatatableDeleteButton' ></i></a>";
 
         public string RoleViewCheckbox(bool isChecked, string userId, string roleId)
@@ -121,7 +123,7 @@ namespace WebApplication.Utilities
                 "</div>" +
               "</div>";
 
-        public string RoleEditCheckbox(bool isChecked, string userId, string roleId)
+        private string RoleEditCheckbox(bool isChecked, string userId, string roleId)
             =>
               "<div class='input-group-prepend'>" +
                 "<div class='input-group-text'>" +
@@ -136,7 +138,7 @@ namespace WebApplication.Utilities
                 "</div>" +
               "</div>";
 
-        public string RoleCreateCheckbox(bool isChecked, string userId, string roleId)
+        private string RoleCreateCheckbox(bool isChecked, string userId, string roleId)
             =>
               "<div class='input-group-prepend'>" +
                 "<div class='input-group-text'>" +
@@ -151,7 +153,7 @@ namespace WebApplication.Utilities
                 "</div>" +
               "</div>";
 
-        public string RoleDeleteCheckbox(bool isChecked, string userId, string roleId)
+        private string RoleDeleteCheckbox(bool isChecked, string userId, string roleId)
              =>
                "<div class='input-group-prepend'>" +
                  "<div class='input-group-text'>" +
@@ -186,11 +188,51 @@ namespace WebApplication.Utilities
             return stringToReturn;
         }
 
-        static string ViewToggle(string toggleState, string link)
+        private static string ViewToggle(string toggleState, string link)
            => @"<input urlAttr='" + link + "' class='ToggleSliders disabled' type='checkbox' data-onstyle='success' disabled " + toggleState + ">";
 
-        static string EditToggle(string toggleState, string link)
+        private static string EditToggle(string toggleState, string link)
             => @"<input urlAttr='" + link + "' class='ToggleSliders' type='checkbox' data-onstyle='success' " + toggleState + ">";
 
+
+
+        public async Task<string> GetHoverElementsAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        {
+            var skata = baseDatawork.Employees.Any(x =>
+            x.Id == employeeId &&
+            x.EmployeeWorkHours.Any(y =>
+                y.WorkHour.TimeShiftId == datatable.GenericId &&
+                y.WorkHour.StartOn.Year == datatable.TimeShiftYear &&
+                y.WorkHour.StartOn.Month == datatable.TimeShiftMonth &&
+                (
+                    y.WorkHour.StartOn.Day == dayOfMonth ||
+                    y.WorkHour.EndOn.Day == dayOfMonth ||
+                    (y.WorkHour.StartOn.Day < dayOfMonth && dayOfMonth < y.WorkHour.EndOn.Day)
+                 )));
+
+
+
+
+
+
+            var kkk = await baseDatawork.WorkHours.GetCurrentAssignedOnCell(
+                datatable.GenericId,
+                datatable.TimeShiftYear,
+                datatable.TimeShiftMonth,
+                dayOfMonth,
+                employeeId);
+
+
+            if (skata)
+                return FaIconEdit(dayOfMonth, "green", employeeId) + FaIconAdd(dayOfMonth, "green", employeeId);
+            return FaIconAdd(dayOfMonth, "", employeeId);
+
+        }
+
+        private static string FaIconEdit(int dayOfMonth, string color, int employeeid)
+          => @"<i class='fa fa-pencil hidden faIconEdit'  employeeid='" + employeeid + "' cellColor='" + color + "' dayOfMonth = '" + dayOfMonth + "'></i>";
+
+        private static string FaIconAdd(int dayOfMonth, string color, int employeeid)
+            => @"<i class='fa fa-plus hidden faIconAdd' employeeid='" + employeeid + "' cellColor=''" + color + "'' dayOfMonth = '" + dayOfMonth + "'></i>";
     }
 }

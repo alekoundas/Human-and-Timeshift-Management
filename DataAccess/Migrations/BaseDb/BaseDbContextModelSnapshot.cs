@@ -163,7 +163,9 @@ namespace DataAccess.Migrations.BaseDb
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkHour", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -180,13 +182,15 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("WorkHourId");
 
-                    b.ToTable("EmployeeWorkHour");
+                    b.ToTable("EmployeeWorkHours");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkPlace", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -203,7 +207,7 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("WorkPlaceId");
 
-                    b.ToTable("EmployeeWorkPlace");
+                    b.ToTable("EmployeeWorkPlaces");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Specialization", b =>

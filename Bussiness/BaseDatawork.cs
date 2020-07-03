@@ -22,7 +22,10 @@ namespace Bussiness
         public ICompanyRepository Companies { get; private set; }
         public ICustomerRepository Customers { get; private set; }
         public IWorkplaceRepository WorkPlaces { get; private set; }
+        public IWorkHourRepository WorkHours { get; private set; }
+        public ITimeShiftRepository TimeShifts { get; private set; }
         public IEmployeeWorkPlaceRepository EmployeeWorkPlaces { get; private set; }
+        public IEmployeeWorkHourRepository EmployeeWorkHours { get; private set; }
 
         public BaseDatawork(BaseDbContext baseDbContext)
         {
@@ -32,7 +35,10 @@ namespace Bussiness
             Companies = new CompanyRepository(_dbcontext);
             Customers = new CustomerRepository(_dbcontext);
             WorkPlaces = new WorkPlaceRepository(_dbcontext);
+            WorkHours = new WorkHourRepository(_dbcontext);
+            TimeShifts = new TimeShiftRepository(_dbcontext);
             EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
+            EmployeeWorkHours = new EmployeeWorkHourRepository(_dbcontext);
         }
 
         public async Task<int> CompleteAsync()

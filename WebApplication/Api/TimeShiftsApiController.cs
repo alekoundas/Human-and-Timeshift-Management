@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity.WorkTimeShift;
+using DataAccess.Models.Datatable;
+using Bussiness;
+using System.Dynamic;
+using Bussiness.Service;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -14,11 +19,15 @@ namespace WebApplication.Api
     [ApiController]
     public class TimeShiftsApiController : ControllerBase
     {
-        private readonly BaseDbContext _context;
-
-        public TimeShiftsApiController(BaseDbContext context)
+        private BaseDbContext _context;
+        private BaseDatawork _baseDataWork;
+        private readonly SecurityDataWork _securityDatawork;
+        public TimeShiftsApiController(BaseDbContext BaseDbContext,
+            SecurityDbContext SecurityDbContext)
         {
-            _context = context;
+            _context = BaseDbContext;
+            _baseDataWork = new BaseDatawork(BaseDbContext);
+            _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
         // GET: api/TimeShiftsApi
@@ -28,7 +37,7 @@ namespace WebApplication.Api
             return await _context.TimeShifts.ToListAsync();
         }
 
-        // GET: api/TimeShiftsApi/5
+        // GET: api/timeshifts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TimeShift>> GetTimeShift(int id)
         {
@@ -42,7 +51,7 @@ namespace WebApplication.Api
             return timeShift;
         }
 
-        // PUT: api/TimeShiftsApi/5
+        // PUT: api/timeshifts/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTimeShift(int id, TimeShift timeShift)
         {
@@ -72,9 +81,7 @@ namespace WebApplication.Api
             return NoContent();
         }
 
-        // POST: api/TimeShiftsApi
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        // POST: api/timeshifts
         [HttpPost]
         public async Task<ActionResult<TimeShift>> PostTimeShift(TimeShift timeShift)
         {
@@ -84,7 +91,7 @@ namespace WebApplication.Api
             return CreatedAtAction("GetTimeShift", new { id = timeShift.Id }, timeShift);
         }
 
-        // DELETE: api/TimeShiftsApi/5
+        // DELETE: api/timeshifts/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<TimeShift>> DeleteTimeShift(int id)
         {
@@ -99,7 +106,42 @@ namespace WebApplication.Api
 
             return timeShift;
         }
+        // POST: api/timeshifts/getdatatable
+        [HttpPost("getdatatable")]
+        public async Task<ActionResult<TimeShift>> getdatatable([FromBody] Datatable datatable)
+        {
+            var total = await _baseDataWork.TimeShifts.CountAllAsync();
+            var pageSize = datatable.Length;
+            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            var isDescending = datatable.Order[0].Dir == "desc";
 
+            //TODO: order by
+            var timeShifts = await _baseDataWork.TimeShifts.GetWithPagging(null,
+                pageSize, pageIndex);
+
+            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
+            var mapedData = MapResults(timeShifts);
+
+            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+        }
+
+        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<TimeShift> results)
+        {
+            var expandoObject = new ExpandoCopier();
+            var dataTableHelper = new DataTableHelper<TimeShift>(_securityDatawork);
+            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+            foreach (var result in results)
+            {
+                var expandoObj = expandoObject.GetCopyFrom<TimeShift>(result);
+                var dictionary = (IDictionary<string, object>)expandoObj;
+                dictionary.Add("Buttons", dataTableHelper.GetButtons("TimeShift",
+                    "TimeShifts", result.Id.ToString()));
+                returnObjects.Add(expandoObj);
+            }
+
+            return returnObjects;
+        }
         private bool TimeShiftExists(int id)
         {
             return _context.TimeShifts.Any(e => e.Id == id);

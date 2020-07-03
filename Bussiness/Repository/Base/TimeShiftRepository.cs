@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using System.Text;
 using Bussiness.Repository.Base.Interface;
 using DataAccess;
-using DataAccess.Models.Entity;
+using DataAccess.Models.Entity.WorkTimeShift;
 
 namespace Bussiness.Repository.Base
 {
-    public class EmployeeWorkPlaceRepository : BaseRepository<EmployeeWorkPlace>, IEmployeeWorkPlaceRepository
+    public class TimeShiftRepository : BaseRepository<TimeShift>, ITimeShiftRepository
     {
-        public EmployeeWorkPlaceRepository(BaseDbContext dbContext) : base(dbContext)
+        public TimeShiftRepository(BaseDbContext dbContext) : base(dbContext)
         {
-        }
 
+        }
         public BaseDbContext BaseDbContext
         {
             get { return Context as BaseDbContext; }
         }
-
     }
 }

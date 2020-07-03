@@ -64,7 +64,13 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "WorkPlace_Create").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
-                                                      
+
+                    //TimeShift
+                    userManager.AddToRoleAsync(user, "TimeShift_View").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Create").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
+
                 }
             }
 
@@ -114,6 +120,13 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "WorkPlace_Create").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
+
+                    //TimeShift
+                    userManager.AddToRoleAsync(user, "TimeShift_View").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Create").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
+
                 }
             }
         }
@@ -320,6 +333,40 @@ namespace Business.Seed
             {
                 ApplicationRole role = new ApplicationRole();
                 role.Name = "WorkPlace_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
+            //TimeShift
+            if (!roleManager.RoleExistsAsync("TimeShift_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "TimeShift_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("TimeShift_Create").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "TimeShift_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("TimeShift_Edit").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "TimeShift_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("TimeShift_Delete").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "TimeShift_Delete";
                 role.Controller = role.Name.Split('_')[0];
                 role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;

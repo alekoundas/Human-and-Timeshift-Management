@@ -40,9 +40,8 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .Include(e => e.Company)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var employee = await _context.Employees.Include(x => x.Company)
+                .Include(y => y.Contacts).FirstOrDefaultAsync(z => z.Id == id);
             if (employee == null)
             {
                 return NotFound();
@@ -86,7 +85,9 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees.Include(x => x.Company)
+                .Include(y => y.Contacts).FirstOrDefaultAsync(z => z.Id == id);
+                
             if (employee == null)
             {
                 return NotFound();
@@ -126,7 +127,6 @@ namespace WebApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);
             return View(employee);
         }
 

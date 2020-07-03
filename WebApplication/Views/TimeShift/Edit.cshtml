@@ -1,55 +1,867 @@
 ﻿@model DataAccess.Models.Entity.WorkTimeShift.TimeShift
 
 @{
-    ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
-
-<h4>TimeShift</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    <button asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="StartOn" class="control-label"></label>
-                <input asp-for="StartOn" class="form-control" />
-                <span asp-validation-for="StartOn" class="text-danger"></span>
+
+            <hr />
+
+            <form asp-controller="TimeShift" asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+
+                        <div class="input-group">
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="StartOn" class="control-label"></label>
+
+                        <div class="input-group">
+                            <input asp-for="StartOn" class="form-control" />
+                            <span asp-validation-for="StartOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="EndOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="EndOn" class="form-control" />
+                            <span asp-validation-for="EndOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="WorkPlaceId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="WorkPlace_Select2" asp-for="WorkPlaceId" style="width:70%">
+                                <option value="@Model.WorkPlaceId" selected="selected">@Model.WorkPlace.Title</option>
+                            </select>
+                            <span asp-validation-for="WorkPlaceId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title"></h3>
             </div>
-            <div class="form-group">
-                <label asp-for="EndOn" class="control-label"></label>
-                <input asp-for="EndOn" class="form-control" />
-                <span asp-validation-for="EndOn" class="text-danger"></span>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                            <th>7</th>
+                            <th>8</th>
+                            <th>9</th>
+                            <th>10</th>
+                            <th>11</th>
+                            <th>12</th>
+                            <th>13</th>
+                            <th>14</th>
+                            <th>15</th>
+                            <th>16</th>
+                            <th>17</th>
+                            <th>18</th>
+                            <th>19</th>
+                            <th>20</th>
+                            <th>21</th>
+                            <th>22</th>
+                            <th>23</th>
+                            <th>24</th>
+                            <th>25</th>
+                            <th>26</th>
+                            <th>27</th>
+                            <th>28</th>
+                            <th>29</th>
+                            <th>30</th>
+                            <th>31</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="false">Όνομα</th>
+                            <th data-searchable="false">Επίθετο</th>
+                            <th data-searchable="false">1</th>
+                            <th data-searchable="false">2</th>
+                            <th data-searchable="false">3</th>
+                            <th data-searchable="false">4</th>
+                            <th data-searchable="false">5</th>
+                            <th data-searchable="false">6</th>
+                            <th data-searchable="false">7</th>
+                            <th data-searchable="false">8</th>
+                            <th data-searchable="false">9</th>
+                            <th data-searchable="false">10</th>
+                            <th data-searchable="false">11</th>
+                            <th data-searchable="false">12</th>
+                            <th data-searchable="false">13</th>
+                            <th data-searchable="false">14</th>
+                            <th data-searchable="false">15</th>
+                            <th data-searchable="false">16</th>
+                            <th data-searchable="false">17</th>
+                            <th data-searchable="false">18</th>
+                            <th data-searchable="false">19</th>
+                            <th data-searchable="false">20</th>
+                            <th data-searchable="false">21</th>
+                            <th data-searchable="false">22</th>
+                            <th data-searchable="false">23</th>
+                            <th data-searchable="false">24</th>
+                            <th data-searchable="false">25</th>
+                            <th data-searchable="false">26</th>
+                            <th data-searchable="false">27</th>
+                            <th data-searchable="false">28</th>
+                            <th data-searchable="false">29</th>
+                            <th data-searchable="false">30</th>
+                            <th data-searchable="false">31</th>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
-            <div class="form-group">
-                <label asp-for="WorkPlaceId" class="control-label"></label>
-                <select asp-for="WorkPlaceId" class="form-control" asp-items="ViewBag.WorkPlaceId"></select>
-                <span asp-validation-for="WorkPlaceId" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CreatedOn" class="control-label"></label>
-                <input asp-for="CreatedOn" class="form-control" />
-                <span asp-validation-for="CreatedOn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+
+
+<div class="modal fade in" id="AddWorkHour_Modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Default Modal</h4>
+            </div>
+            <div class="modal-body" id="AddWorkHour_ModalBody">
+
+                <div class="row" style="padding-top:10px; padding-bottom:15px;">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-6">
+                        <label>Προσθήκη επιπλέων ώρας  </label>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-success" id="AppendWorkHour"><i class="fa fa-plus-square"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Κλείσιμο</button>
+                <button type="button" class="btn btn-primary" id="SaveWorkHours">Αποθήκευση αλλαγών</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
+<div class="modal fade in" id="EditWorkHour_Modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Επεξεργασία ωρών χρήστη</h4>
+            </div>
+            <div class="modal-body" id="EditWorkHour_ModalBody">
+
+               
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Κλείσιμο</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            Datatable();
+
+        });
+        var CelentimDate = "";
+    </script>
+    <script>
+        $('.WorkPlace_Select2').select2({
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+    </script>
+
+    <script>
+        var Calentim = (currentDate, elementId) => {
+            //$("#CallendarButtonNum_" + elementId).data("calentim").destroy();
+            $('#CalentimButtonNum_' + elementId).calentim({
+                dateSeparator: '/-/',
+                startOnMonday: true,
+                dontPrefixHours: false,
+                format: "DD/MM/YYYY HH:mm",
+                hourFormat: 24,
+                calendarCount: 2,
+                minuteSteps: 15,
+                showHeader: false,
+                showButtons: true,
+                locale: "el",
+                target: $("#CalentimInputNum_" + elementId),
+                showOn: "right",
+                rangeOrientation: "vertical",
+                ranges: [
+                    {
+                        title: "Χτές και ημέρα κελιού",
+                        startDate: moment(currentDate).add(1, 'months').subtract(1, 'days'),
+                        endDate: moment(currentDate).add(1, 'months')
+                    },
+                    {
+                        title: "Ημέρα κελιού",
+                        startDate: moment(currentDate).add(1, 'months'),
+                        endDate: moment(currentDate).add(1, 'months')
+                    },
+                    {
+                        title: "Ημέρα κελιού και άυριο",
+                        startDate: moment(currentDate).add(1, 'months'),
+                        endDate: moment(currentDate).add(1, 'months').add(1, 'days')
+                    }
+                ],
+                onbeforehide: () => {
+                    //Set selected date on <p> elements in modal
+                    var splitedDate = $("#CalentimInputNum_" + elementId)[0].value.split('/-/');
+                    var start = new Date(ConvertDate(splitedDate[0]));
+                    var end = new Date(ConvertDate(splitedDate[1]));
+                    if (start.getTime() > end.getTime())
+                        $('#ErrorNum_' + elementId).show();
+                    else
+                        $('#ErrorNum_'+elementId).hide();
+                    document.getElementById('StartOnNum_' + elementId).innerText = splitedDate[0];
+                    document.getElementById('EndOnNum_' + elementId).innerText = splitedDate[1];
+                }
+            })
+        };
+    </script>
+
+
+
+
+    <!--    Modal 'Edit'  Functionality   -->
+    <script>
+        $('#EmployeesWorkhoursDatatable').on('click', '.faIconEdit', (element) => {
+            var currentDate = document.getElementById('StartOn').value;
+            var day = element.target.getAttribute('dayofmonth');
+            var month = moment(currentDate).month();
+            var year = moment(currentDate).year();
+            CelentimDate = year + '-' + month + '-' + day;      //set global variable the date to initialize celentim
+            $('#SaveWorkHours').attr('employeeid', element.target.getAttribute('employeeid'));
+
+
+
+            ///απι να παρω workhours
+
+            document.getElementById('EditWorkHour_ModalBody').insertAdjacentHTML('beforeend',
+                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose" id="CalentimRowNum_' + count + '">' +
+                '<div class="col-md-1"></div>' +
+                '<div class="col-md-2"><button class="btn btn-primary" id="CalentimButtonNum_' + count + '"><i class="fa fa-calendar" ></i></button></div>' +
+                '<div class="col-md-7">' +
+                '<input class="calentim hidden celentimInput" id="CalentimInputNum_' + count + '" />' +
+                'Έναρξη: <span id="StartOnNum_' + count + '"></span>   ' +
+                'Λήξη: <span id="EndOnNum_' + count + '"></span>' +
+                '<p id="ErrorNum_' + count + '" style="display: none; color:red;">Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης</p>' +
+                '</div>' +
+                '<div class="col-md-2">' +
+                '<button class="btn btn-danger celentimDeleteButton" celentimid="' + count + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + count + '"></i></button>' +
+                '</div>' +
+                '</div >')
+            Calentim(CelentimDate, count); //set new Celentim instance
+
+
+
+
+
+
+
+
+
+
+
+
+            $('#EditWorkHour_Modal').modal('show')
+        });
+    </script>
+
+
+
+    <!--    Modal 'Add'  Functionality   -->
+    <script>
+        $('#EmployeesWorkhoursDatatable').on('click', '.faIconAdd', (element) => {
+            var currentDate = document.getElementById('StartOn').value;
+            var day = element.target.getAttribute('dayofmonth');
+            var month = moment(currentDate).month();
+            var year = moment(currentDate).year();
+
+            //set global variable the date to initialize celentim
+            CelentimDate = year + '-' + month + '-' + day;     
+            $('#SaveWorkHours').attr('employeeid', element.target.getAttribute('employeeid'));
+            $('#AddWorkHour_Modal').modal('show')
+        });
+
+        var count = 0;
+        //Append new workhour to modal
+        $('#AppendWorkHour').on('click', (e) => {
+            count++;
+            document.getElementById('AddWorkHour_ModalBody').insertAdjacentHTML('beforeend',
+                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose" id="CalentimRowNum_' + count + '">' +
+                '<div class="col-md-1"></div>' +
+                '<div class="col-md-2"><button class="btn btn-primary" id="CalentimButtonNum_' + count + '"><i class="fa fa-calendar" ></i></button></div>' +
+                '<div class="col-md-7">' +
+                '<input class="calentim hidden celentimInput" id="CalentimInputNum_' + count + '" />' +
+                'Έναρξη: <span id="StartOnNum_' + count + '"></span>   ' +
+                'Λήξη: <span id="EndOnNum_' + count + '"></span>' +
+                '<p id="ErrorNum_' + count + '" style="display: none; color:red;">Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης</p>'+
+                '</div>' +
+                '<div class="col-md-2">' +
+                '<button class="btn btn-danger celentimDeleteButton" celentimid="' + count + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + count + '"></i></button>' +
+                '</div>' +
+                '</div >')
+            Calentim(CelentimDate, count); //set new Celentim instance
+        });
+
+        //Delete Workhour from modal
+        $('#AddWorkHour_Modal').on('click', '.celentimDeleteButton', (e) => {
+            var id = e.target.getAttribute('celentimid');
+            $('#CalentimRowNum_' + id).remove();
+
+        })
+
+        const ConvertDate = (date) => moment(date, 'DD/MM/YYYY HH:mm').format("MM/DD/YYYY HH:mm")
+         var JsonData = {
+            "startOn": "",
+            "endOn": "",
+            "timeShiftId": "",
+            "employeeId": ""
+        }
+        var MapData = (dateInput,employeeId) => {
+            JsonData.startOn = ConvertDate(dateInput.value.split('/-/')[0]);
+            JsonData.endOn = ConvertDate(dateInput.value.split('/-/')[1]);
+            JsonData.timeShiftId=@Model.Id;
+            JsonData.employeeId = employeeId;
+            return JsonData;
+        };
+
+        //Save Button
+        $('#SaveWorkHours').on('click', (e) => {
+            var dateInputs = document.getElementsByClassName('celentimInput');
+            dateInputs = [...dateInputs];//Convert to array
+            var dataToPost = [];
+
+            dateInputs.forEach((input) => dataToPost.push(MapData(input, $('#SaveWorkHours').attr('employeeid'))))
+
+            $.ajax({
+                type: "POST",
+                url: "/api/employeeworkhours/addEmployeeWorkhours",
+                data: JSON.stringify(dataToPost),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json"
+
+            }).done(() => $('#AddWorkHour_Modal').modal('hide'));
+
+        })
+
+        //Cleanup on modal close
+        $('#AddWorkHour_Modal').on('hidden.bs.modal', (e) => {
+            $('.ElementToDeleteOnClose').remove();
+            $('#EmployeesWorkhoursDatatable').DataTable().clear().destroy();
+            Datatable();
+        })
+    </script>
+
+
+
+    <!--    Datatable Hover    -->
+    <script>
+        //Make Datatable cell set/unset backround grey and show/hide <i>
+        $('#EmployeesWorkhoursDatatable')
+            .on('mouseenter', '.DataTableHoverCell', (elem) => {
+                elem.target.setAttribute("style", "background-color:grey;");
+                elem.target.querySelectorAll('i')
+                    .forEach(element => element.classList.remove("hidden"));
+            })
+            .on('mouseleave', '.DataTableHoverCell', (elem) => {
+                elem.target.setAttribute("style", "background-color:;");
+                elem.target.querySelectorAll('i')
+                    .forEach(element => element.classList.add("hidden"));
+            });
+
+        //Cursor change - mouse over <i> Edit
+        $('#EmployeesWorkhoursDatatable')
+            .on('mouseenter', '.faIconEdit', (elem) => {
+                elem.target.setAttribute("style", "cursor:pointer");
+            })
+            .on('mouseleave', '.faIconEdit', (elem) => {
+                elem.target.setAttribute("style", "cursor:");
+            });
+
+        //Cursor change - mouse over <i> Add
+        $('#EmployeesWorkhoursDatatable')
+            .on('mouseenter', '.faIconAdd', (elem) => {
+                elem.target.setAttribute("style", "cursor:pointer");
+            })
+            .on('mouseleave', '.faIconAdd', (elem) => {
+                elem.target.setAttribute("style", "cursor:");
+            });
+    </script>
+
+
+    <script>
+
+           var Datatable = ()=>  $('#EmployeesWorkhoursDatatable').DataTable({
+                "serverSide": true,
+                "dom": 'frtlp',
+                "ajax": {
+                    url: '/api/employees/getdatatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+
+                        data.predicate = 'TimeShiftEdit';
+                        data.genericId =@Model.Id;
+                        data.timeShiftYear =@Model.StartOn.Year;
+                        data.timeShiftMonth =@Model.StartOn.Month;
+
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                "columns": [
+                    {
+                        "data": "FirstName",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) => {
+                            //console.log(data);
+                            if (data.FirstName != null)
+                                return data.FirstName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "LastName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.LastName != null)
+                                return data.LastName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day1",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day1 != null)
+                                return data.Day1;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day2",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day2 != null)
+                                return data.Day2;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day3",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day3 != null)
+                                return data.Day3;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day4",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day4 != null)
+                                return data.Day4;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day5",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day5 != null)
+                                return data.Day5;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day6",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day6 != null)
+                                return data.Day6;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day7",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day7 != null)
+                                return data.Day7;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day8",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day8 != null)
+                                return data.Day8;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day9",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day9 != null)
+                                return data.Day9;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day10",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day10 != null)
+                                return data.Day10;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day11",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day11 != null)
+                                return data.Day11;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day12",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day12 != null)
+                                return data.Day12;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day13",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day13 != null)
+                                return data.Day13;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day14",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day14 != null)
+                                return data.Day14;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day15",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day15 != null)
+                                return data.Day15;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day16",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day16 != null)
+                                return data.Day16;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day17",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day17 != null)
+                                return data.Day17;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day18",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day18 != null)
+                                return data.Day18;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day19",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day19 != null)
+                                return data.Day19;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day20",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day20 != null)
+                                return data.Day20;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day21",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day21 != null)
+                                return data.Day21;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day22",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day22 != null)
+                                return data.Day22;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day23",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day23 != null)
+                                return data.Day23;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day24",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day24 != null)
+                                return data.Day24;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day25",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day25 != null)
+                                return data.Day25;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day26",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day26 != null)
+                                return data.Day26;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day27",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day27 != null)
+                                return data.Day27;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day28",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day28 != null)
+                                return data.Day28;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day29",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day29 != null)
+                                return data.Day29;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day30",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day30 != null)
+                                return data.Day30;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Day31",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Day31 != null)
+                                return data.Day31;
+                            else
+                                return "";
+                        }
+                    }
+                ],
+                 rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
+                     for (var i = 1; i <= 31 ; i++) {
+                         row.querySelectorAll('td')[i + 1].setAttribute("class", "DataTableHoverCell")
+                         //row.querySelectorAll('td')[i + 1].setAttribute("employeeid", data.Id)
+                         row.querySelectorAll('td')[i + 1].setAttribute('style', 'background-color:' + $(data["Day" + i]).attr('cellcolor'))
+                     }
+
+                },
+                "fnDrawCallback": function () {
+
+                },
+            });
+    </script>
+
+
+
 }

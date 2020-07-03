@@ -56,9 +56,7 @@ namespace WebApplication.Api
         public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
             if (id != customer.Id)
-            {
                 return BadRequest();
-            }
 
             _context.Entry(customer).State = EntityState.Modified;
 
@@ -69,13 +67,9 @@ namespace WebApplication.Api
             catch (DbUpdateConcurrencyException)
             {
                 if (!CustomerExists(id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
 
             return NoContent();

@@ -81,6 +81,12 @@ var ButtonDeleteAttributes = (button, id, className) => {
     return button;
 };
 
+
+
+
+
+
+
 $('#ContactInput').on('click', '.ContactDeleteButton', (element) => {
     var contactToRemove = document.getElementsByClassName('ContactNum_' + element.target.id.split('_')[1]);
     if (contactToRemove.length > 0)

@@ -5,7 +5,7 @@ using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DataAccess.Models.Configurations
+namespace DataAccess.Configurations
 {
 public class EmployeeWorkPlaceConfiguration : IEntityTypeConfiguration<EmployeeWorkPlace>
     {
@@ -14,6 +14,8 @@ public class EmployeeWorkPlaceConfiguration : IEntityTypeConfiguration<EmployeeW
             builder.HasOne(u => u.Employee).WithMany(u => u.EmployeeWorkPlaces).IsRequired().OnDelete(DeleteBehavior.Restrict);
             builder.HasKey(t => new { t.Id, t.EmployeeId });
             builder.HasOne(pt => pt.WorkPlace).WithMany(p => p.EmployeeWorkPlaces).HasForeignKey(pt => pt.WorkPlaceId);
+
+            builder.Property(i => i.Id).ValueGeneratedOnAdd();
         }
     }
 }

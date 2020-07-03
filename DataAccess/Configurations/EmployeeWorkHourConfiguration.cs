@@ -5,7 +5,7 @@ using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DataAccess.Models.Configurations
+namespace DataAccess.Configurations
 {
     public class EmployeeWorkHourConfiguration : IEntityTypeConfiguration<EmployeeWorkHour>
     {
@@ -14,6 +14,9 @@ namespace DataAccess.Models.Configurations
             builder.HasOne(u => u.Employee).WithMany(u => u.EmployeeWorkHours).IsRequired().OnDelete(DeleteBehavior.Restrict);
             builder.HasKey(t => new { t.Id, t.EmployeeId });
             builder.HasOne(pt => pt.WorkHour).WithMany(p => p.EmployeeWorkHours).HasForeignKey(pt => pt.WorkHourId);
+
+            builder.Property(i => i.Id).ValueGeneratedOnAdd();
+
         }
     }
 }

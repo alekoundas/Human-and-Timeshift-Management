@@ -150,25 +150,26 @@ namespace DataAccess.Migrations.BaseDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeeWorkPlace",
+                name: "EmployeeWorkPlaces",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     WorkPlaceId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeWorkPlace", x => new { x.Id, x.EmployeeId });
+                    table.PrimaryKey("PK_EmployeeWorkPlaces", x => new { x.Id, x.EmployeeId });
                     table.ForeignKey(
-                        name: "FK_EmployeeWorkPlace_Employees_EmployeeId",
+                        name: "FK_EmployeeWorkPlaces_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_EmployeeWorkPlace_WorkPlaces_WorkPlaceId",
+                        name: "FK_EmployeeWorkPlaces_WorkPlaces_WorkPlaceId",
                         column: x => x.WorkPlaceId,
                         principalTable: "WorkPlaces",
                         principalColumn: "Id",
@@ -221,25 +222,26 @@ namespace DataAccess.Migrations.BaseDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeeWorkHour",
+                name: "EmployeeWorkHours",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     WorkHourId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeWorkHour", x => new { x.Id, x.EmployeeId });
+                    table.PrimaryKey("PK_EmployeeWorkHours", x => new { x.Id, x.EmployeeId });
                     table.ForeignKey(
-                        name: "FK_EmployeeWorkHour_Employees_EmployeeId",
+                        name: "FK_EmployeeWorkHours_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_EmployeeWorkHour_WorkHours_WorkHourId",
+                        name: "FK_EmployeeWorkHours_WorkHours_WorkHourId",
                         column: x => x.WorkHourId,
                         principalTable: "WorkHours",
                         principalColumn: "Id",
@@ -272,23 +274,23 @@ namespace DataAccess.Migrations.BaseDb
                 column: "SpecializationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkHour_EmployeeId",
-                table: "EmployeeWorkHour",
+                name: "IX_EmployeeWorkHours_EmployeeId",
+                table: "EmployeeWorkHours",
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkHour_WorkHourId",
-                table: "EmployeeWorkHour",
+                name: "IX_EmployeeWorkHours_WorkHourId",
+                table: "EmployeeWorkHours",
                 column: "WorkHourId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkPlace_EmployeeId",
-                table: "EmployeeWorkPlace",
+                name: "IX_EmployeeWorkPlaces_EmployeeId",
+                table: "EmployeeWorkPlaces",
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkPlace_WorkPlaceId",
-                table: "EmployeeWorkPlace",
+                name: "IX_EmployeeWorkPlaces_WorkPlaceId",
+                table: "EmployeeWorkPlaces",
                 column: "WorkPlaceId");
 
             migrationBuilder.CreateIndex(
@@ -313,10 +315,10 @@ namespace DataAccess.Migrations.BaseDb
                 name: "Contacts");
 
             migrationBuilder.DropTable(
-                name: "EmployeeWorkHour");
+                name: "EmployeeWorkHours");
 
             migrationBuilder.DropTable(
-                name: "EmployeeWorkPlace");
+                name: "EmployeeWorkPlaces");
 
             migrationBuilder.DropTable(
                 name: "WorkHours");

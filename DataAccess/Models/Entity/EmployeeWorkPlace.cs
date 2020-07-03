@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DataAccess.Models.Entity
 {
-    public class EmployeeWorkPlace:BaseEntity
+    public class EmployeeWorkPlace : BaseEntity
     {
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }

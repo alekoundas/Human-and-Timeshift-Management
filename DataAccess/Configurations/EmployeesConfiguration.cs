@@ -5,7 +5,7 @@ using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DataAccess.Models.Configurations
+namespace DataAccess.Configurations
 {
     public class EmployeesConfiguration : IEntityTypeConfiguration<Employee>
     {

@@ -1,49 +1,62 @@
 ﻿@model DataAccess.Models.Entity.WorkTimeShift.TimeShift
 
 @{
-    ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Details</h2>
+        <div class="row">
+            <div class="col-md-3"> </div>
+            <div class="col-md-6">
 
-<div>
-    <h4>TimeShift</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.StartOn)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.StartOn)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.EndOn)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.EndOn)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.WorkPlace)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.WorkPlace.Id)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedOn)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedOn)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+                <div class="box box-danger" style="margin-top:5%;">
+                    <div class="box-header">
+                        <h3 class="box-title">@ViewData["Title"]</h3>
+                        <div class="pull-right">
+                            <button asp-controller="Specialization" asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label asp-for="Title" class="control-label"></label>
+                            <div class="input-group">
+                                <input asp-for="Title" class="form-control" readonly="readonly" disabled />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="StartOn" class="control-label"></label>
+                            <div class="input-group">
+                                <input asp-for="StartOn" class="form-control" readonly="readonly" disabled />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="EndOn" class="control-label"></label>
+                            <div class="input-group">
+                                <input asp-for="EndOn" class="form-control" readonly="readonly" disabled />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="WorkPlaceId" class="control-label"></label>
+                            <div class="input-group">
+                                <input asp-for="WorkPlaceId" class="form-control" readonly="readonly" disabled />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3"> </div>
+        </div>
+
+
+
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+            <a asp-action="Index">Back to List</a>
+        </div>

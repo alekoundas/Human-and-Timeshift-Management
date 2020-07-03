@@ -100,8 +100,28 @@ namespace WebApplication.Api
         }
 
 
+        // GET: api/workplaces/select2
+        [HttpGet("select2")]
+        public async Task<ActionResult<WorkPlace>> select2(string search, int page)
+        {
+            var workPlaces = new List<WorkPlace>();
+            var select2Helper = new Select2Helper();
+            if (string.IsNullOrWhiteSpace(search))
+            {
+               workPlaces = (List<WorkPlace>)await _baseDataWork
+                    .WorkPlaces
+                    .GetPaggingWithFilter(null, null, null, 10, page);
 
-        
+                return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
+            }
+
+            workPlaces = await _baseDataWork
+                .WorkPlaces
+                .GetPaggingWithFilter(null, x => x.Title.Contains(search), null, 10, page);
+
+            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
+        }
+
         [HttpGet("manageworkplaceemployee/{employeeId}/{workPlaceId}/{toggleState}")]
         public async Task<ActionResult<WorkPlace>> ManageWorkPlaceEmployee(int employeeId, int workPlaceId, string toggleState)
         {
@@ -129,31 +149,18 @@ namespace WebApplication.Api
                         .Where(x=>x.EmployeeId==employeeId&&x.WorkPlaceId==workPlaceId)
                         .FirstOrDefault());
 
+            try
+            {
 
             await _baseDataWork.CompleteAsync();
-
-            return workPlace;
-        }
-
-        // GET: api/companies/select2
-        [HttpGet("select2")]
-        public async Task<ActionResult<WorkPlace>> select2(string search, int page)
-        {
-            var workPlaces = new List<WorkPlace>();
-            var select2Helper = new Select2Helper();
-
-            if (string.IsNullOrWhiteSpace(search))
+            }
+            catch (Exception /*ex*/)
             {
-                workPlaces = (List<WorkPlace>)await _baseDataWork.WorkPlaces
-                    .GetPaggingWithFilter(null, null, null, 10, page);
 
-                return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
+                throw;
             }
 
-            workPlaces = (List<WorkPlace>)await _baseDataWork.WorkPlaces
-               .GetPaggingWithFilter(null, x => x.Title.Contains(search), null, 10, page);
-
-            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
+            return workPlace;
         }
 
         // POST: api/companies/getdatatable

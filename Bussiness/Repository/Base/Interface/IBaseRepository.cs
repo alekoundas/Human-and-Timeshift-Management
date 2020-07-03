@@ -44,7 +44,7 @@ namespace Bussiness.Repository.Interface
 
         IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> expression);
 
-        TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
         void Select(Expression<Func<TEntity, bool>> predicate);
 

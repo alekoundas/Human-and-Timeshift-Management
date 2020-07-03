@@ -45,7 +45,12 @@ namespace DataAccess.Models.Datatable
         public string ApplicationUserId { get; set; }
 
         [JsonPropertyName("genericId")]
-        public int GenericId { get; set; }
+        public int GenericId { get; set; }  
+
+        [JsonPropertyName("timeShiftYear")]
+        public int TimeShiftYear { get; set; }
+        [JsonPropertyName("timeShiftMonth")]
+        public int TimeShiftMonth{ get; set; }
 
 
     }

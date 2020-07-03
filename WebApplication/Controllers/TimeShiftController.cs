@@ -8,16 +8,19 @@ using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity.WorkTimeShift;
 using Microsoft.AspNetCore.Authorization;
+using Bussiness;
+using DataAccess.ViewModels;
 
 namespace WebApplication.Controllers
 {
     public class TimeShiftController : Controller
     {
         private readonly BaseDbContext _context;
-
-        public TimeShiftController(BaseDbContext context)
+        private BaseDatawork _baseDataWork;
+        public TimeShiftController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
         {
-            _context = context;
+            _context = BaseDbContext;
+            _baseDataWork = new BaseDatawork(BaseDbContext);
         }
 
         // GET: TimeShifts
@@ -32,17 +35,14 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var timeShift = await _context.TimeShifts
                 .Include(t => t.WorkPlace)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (timeShift == null)
-            {
                 return NotFound();
-            }
 
             return View(timeShift);
         }
@@ -51,22 +51,20 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "TimeShift_Create")]
         public IActionResult Create()
         {
-            ViewData["WorkPlaceId"] = new SelectList(_context.WorkPlaces, "Id", "Id");
             return View();
         }
 
         // POST: TimeShifts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,StartOn,EndOn,WorkPlaceId,Id,CreatedOn")] TimeShift timeShift)
+        public async Task<IActionResult> Create(TimeShiftCreateViewModel timeShift)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(timeShift);
+                _context.Add(TimeShiftCreateViewModel.CreateFrom(timeShift));
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["WorkPlaceId"] = new SelectList(_context.WorkPlaces, "Id", "Id", timeShift.WorkPlaceId);
             return View(timeShift);
         }
 
@@ -79,19 +77,19 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var timeShift = await _context.TimeShifts.FindAsync(id);
+            var timeShift = await _context.TimeShifts.Include(x=>x.WorkPlace)
+                .FirstOrDefaultAsync(z=>z.Id==id);
             if (timeShift == null)
             {
                 return NotFound();
             }
-            ViewData["WorkPlaceId"] = new SelectList(_context.WorkPlaces, "Id", "Id", timeShift.WorkPlaceId);
             return View(timeShift);
         }
 
         // POST: TimeShifts/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Title,StartOn,EndOn,WorkPlaceId,Id,CreatedOn")] TimeShift timeShift)
+        public async Task<IActionResult> Edit(int id, TimeShift timeShift)
         {
             if (id != timeShift.Id)
             {

@@ -21,7 +21,8 @@
     <link href="~/css/Select2/Select2.min.css" rel="stylesheet" />
     <!-- Custom Scripts -->
     <link href="~/css/Custom/MainStyle.css" rel="stylesheet" />
-
+    <!-- Celentim-->
+    <link href="~/css/Celentim/calentim.min.css" rel="stylesheet" />
     @RenderSection("Styles", required: false)
 
     <!-- Theme style -->
@@ -52,6 +53,12 @@
         <div class="content-wrapper">
 
             @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+            <div class="alert alert-success " id="Alert">
+                <button type="button" class="close" data-dismiss="alert">x</button>
+                <div id="AlertBody"></div>
+            </div>
+
             <div style="top:1000px"></div>
             @RenderBody()
         </div>
@@ -67,11 +74,14 @@
     <script src="~/js/Datatable/Datatable.js"></script>
     <!-- Bootstrap Toggle -->
     @*<script src="~/js/BootstrapToggle/bootstrap-toggle.js"></script>*@
-    @*<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>*@
     <!-- Select2 -->
     <script src="~/js/Select2/Select2.min.js"></script>
-    <!-- Application Custom Script -->
-    <script src="~/js/Custom/ApplicationMain.js"></script>
+    <!-- Celentim-->
+    <script src="~/libs/moment.js/moment.min.js"></script>
+    <script src="~/js/Celentim/calentim.min.js"></script>
+
+
+    <script src="~/js/Custom/AlertMessage.js"></script>
 
     @RenderSection("Scripts", required: false)
 

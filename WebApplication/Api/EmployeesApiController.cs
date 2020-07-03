@@ -32,7 +32,7 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
-       
+
 
         // POST: api/employees
         [HttpPost]
@@ -54,7 +54,7 @@ namespace WebApplication.Api
                 return NotFound();
             }
 
-            var employeeWorkplaces =  _baseDataWork.EmployeeWorkPlaces
+            var employeeWorkplaces = _baseDataWork.EmployeeWorkPlaces
                 .Where(x => x.EmployeeId == id).ToList();
             _baseDataWork.EmployeeWorkPlaces.RemoveRange(employeeWorkplaces);
             _baseDataWork.Employees.Remove(employee);
@@ -81,45 +81,59 @@ namespace WebApplication.Api
             includes.Add(x => x.Company);
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var applicationUsers = new List<Employee>();
+            var employees = new List<Employee>();
 
             if (string.IsNullOrWhiteSpace(datatable.Predicate))
             {
-                applicationUsers = await _baseDataWork.Employees.GetPaggingWithFilter(null, null, includes, pageSize, pageIndex);
+                employees = await _baseDataWork.Employees
+                    .GetPaggingWithFilter(null, null, includes, pageSize, pageIndex);
             }
 
             if (datatable.Predicate == "CompanyEdit")
             {
-                Expression<Func<Employee, bool>> filter = (x => x.CompanyId == datatable.GenericId || x.CompanyId == null);
-                applicationUsers = await _baseDataWork.Employees.GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+                Expression<Func<Employee, bool>> filter =
+                    (x => x.CompanyId == datatable.GenericId || x.CompanyId == null);
+                employees = await _baseDataWork.Employees
+                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
             }
             if (datatable.Predicate == "WorkPlaceEdit")
             {
-                Expression<Func<Employee, bool>> filter = (x => x.Company.Customers.Any(y => y.WorkPlaces.Any(z => z.Id == datatable.GenericId)));
-                applicationUsers = await _baseDataWork.Employees.GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+                Expression<Func<Employee, bool>> filter = (x => x.Company.Customers
+                .Any(y => y.WorkPlaces
+                .Any(z => z.Id == datatable.GenericId)));
+
+                employees = await _baseDataWork.Employees
+                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+            }
+            if (datatable.Predicate == "TimeShiftEdit")
+            {
+                Expression<Func<Employee, bool>> filter = (x => x.Company.Customers
+                .Any(y => y.WorkPlaces
+                .Any(z => z.TimeShift
+                .Any(a => a.Id == datatable.GenericId))));
+
+                employees = await _baseDataWork.Employees
+                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
             }
 
-            var mapedData = MapResults(applicationUsers, datatable.Predicate, datatable.GenericId);
+            var mapedData = MapResults(employees, datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Employee> results, string datatablePredicate, int genericId = 0)
+        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Employee> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var result in results)
             {
-
-
                 var expandoObj = expandoObject.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                 dictionary.Add("ScpecializationName", result.Specialization.Name);
 
-
-                if (string.IsNullOrWhiteSpace(datatablePredicate))
+                if (string.IsNullOrWhiteSpace(datatable.Predicate))
                 {
                     if (result.Company != null)
                         dictionary.Add("CompanyTitle", result.Company.Title);
@@ -129,9 +143,9 @@ namespace WebApplication.Api
 
                     returnObjects.Add(expandoObj);
                 }
-                else if (datatablePredicate == "CompanyEdit")
+                else if (datatable.Predicate == "CompanyEdit")
                 {
-                    var apiUrl = UrlHelper.EmployeePerCompany(result.Id, genericId);
+                    var apiUrl = UrlHelper.EmployeePerCompany(result.Id, datatable.GenericId);
 
                     if (result.Company != null)
                     {
@@ -145,15 +159,15 @@ namespace WebApplication.Api
 
                     returnObjects.Add(expandoObj);
                 }
-                else if (datatablePredicate == "WorkPlaceEdit")
+                else if (datatable.Predicate == "WorkPlaceEdit")
                 {
-                    var apiUrl = UrlHelper.EmployeePerWorkPlace(result.Id, genericId);
+                    var apiUrl = UrlHelper.EmployeePerWorkPlace(result.Id, datatable.GenericId);
 
                     if (result.Company != null)
                         dictionary.Add("CompanyTitle", result.Company.Title);
 
                     if (_baseDataWork.EmployeeWorkPlaces
-                        .Any(x => x.EmployeeId == result.Id && x.WorkPlaceId == genericId))
+                        .Any(x => x.EmployeeId == result.Id && x.WorkPlaceId == datatable.GenericId))
                     {
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                             "Employee", apiUrl, "checked"));
@@ -164,8 +178,14 @@ namespace WebApplication.Api
 
                     returnObjects.Add(expandoObj);
                 }
-            }
+                else if (datatable.Predicate == "TimeShiftEdit")
+                {
+                    for (int i = 1; i <= 31; i++)
+                        dictionary.Add("Day" + i, dataTableHelper.GetHoverElementsAsync(_baseDataWork, i, datatable, result.Id));
 
+                    returnObjects.Add(expandoObj);
+                }
+            }
             return returnObjects;
         }
 
