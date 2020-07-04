@@ -404,7 +404,7 @@
             var workHourId = element.target.getAttribute('workhourid')
             
             $.ajax({ type: "DELETE", url: "/api/workhours/" + workHourId })
-                .done((workHours) => console.log('done motherfucker'));
+                .done((result) => $('#EditWorkHour_Modal').modal('hide'));
 
         })
 
