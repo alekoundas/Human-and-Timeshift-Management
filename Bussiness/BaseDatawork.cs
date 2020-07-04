@@ -25,7 +25,6 @@ namespace Bussiness
         public IWorkHourRepository WorkHours { get; private set; }
         public ITimeShiftRepository TimeShifts { get; private set; }
         public IEmployeeWorkPlaceRepository EmployeeWorkPlaces { get; private set; }
-        public IEmployeeWorkHourRepository EmployeeWorkHours { get; private set; }
 
         public BaseDatawork(BaseDbContext baseDbContext)
         {
@@ -38,7 +37,6 @@ namespace Bussiness
             WorkHours = new WorkHourRepository(_dbcontext);
             TimeShifts = new TimeShiftRepository(_dbcontext);
             EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
-            EmployeeWorkHours = new EmployeeWorkHourRepository(_dbcontext);
         }
 
         public async Task<int> CompleteAsync()

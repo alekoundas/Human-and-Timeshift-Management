@@ -24,13 +24,11 @@ namespace DataAccess
         public DbSet<Customer> Customers { get; set; }
         public DbSet<WorkPlace> WorkPlaces { get; set; }
         public DbSet<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
-        public DbSet<EmployeeWorkHour> EmployeeWorkHours { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.ApplyConfiguration(new EmployeeWorkPlaceConfiguration());
-            builder.ApplyConfiguration(new EmployeeWorkHourConfiguration());
         }
     }
 }

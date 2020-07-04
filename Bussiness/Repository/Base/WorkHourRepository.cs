@@ -23,16 +23,28 @@ namespace Bussiness.Repository.Base
             get { return Context as BaseDbContext; }
         }
 
-        public async Task<List<WorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId)
+        public List<WorkHour> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId)
         {
-            return await Context.WorkHours.Where(x =>
+            return  Context.WorkHours.Where(x =>
                     x.TimeShiftId == timeShiftId &&
                     x.StartOn.Year == year &&
                     x.StartOn.Month == month &&
                     (x.StartOn.Day <= day && day <= x.EndOn.Day) &&
-                    x.EmployeeWorkHours.Any(y => y.EmployeeId == employeeId))
-                .ToListAsync();
+                    x.Employee.Id == employeeId)
+                .ToList();
+        }
+
+        public bool IsDateOverlaps(WorkHoursApiViewModel workHour)
+        {
+
+            return Context.WorkHours.Where(x =>
+                  x.TimeShiftId == workHour.TimeShiftId &&
+                  (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
+                  (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn))
+                    .Any(y => y.Employee.Id == workHour.EmployeeId);
 
         }
+
+       
     }
 }

@@ -208,42 +208,22 @@ namespace DataAccess.Migrations.BaseDb
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     StartOn = table.Column<DateTime>(nullable: false),
                     EndOn = table.Column<DateTime>(nullable: false),
-                    TimeShiftId = table.Column<int>(nullable: false)
+                    TimeShiftId = table.Column<int>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkHours", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkHours_TimeShifts_TimeShiftId",
-                        column: x => x.TimeShiftId,
-                        principalTable: "TimeShifts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EmployeeWorkHours",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<int>(nullable: false),
-                    CreatedOn = table.Column<DateTime>(nullable: false),
-                    WorkHourId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeWorkHours", x => new { x.Id, x.EmployeeId });
-                    table.ForeignKey(
-                        name: "FK_EmployeeWorkHours_Employees_EmployeeId",
+                        name: "FK_WorkHours_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EmployeeWorkHours_WorkHours_WorkHourId",
-                        column: x => x.WorkHourId,
-                        principalTable: "WorkHours",
+                        name: "FK_WorkHours_TimeShifts_TimeShiftId",
+                        column: x => x.TimeShiftId,
+                        principalTable: "TimeShifts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -274,16 +254,6 @@ namespace DataAccess.Migrations.BaseDb
                 column: "SpecializationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkHours_EmployeeId",
-                table: "EmployeeWorkHours",
-                column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkHours_WorkHourId",
-                table: "EmployeeWorkHours",
-                column: "WorkHourId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_EmployeeWorkPlaces_EmployeeId",
                 table: "EmployeeWorkPlaces",
                 column: "EmployeeId");
@@ -297,6 +267,11 @@ namespace DataAccess.Migrations.BaseDb
                 name: "IX_TimeShifts_WorkPlaceId",
                 table: "TimeShifts",
                 column: "WorkPlaceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkHours_EmployeeId",
+                table: "WorkHours",
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkHours_TimeShiftId",
@@ -313,9 +288,6 @@ namespace DataAccess.Migrations.BaseDb
         {
             migrationBuilder.DropTable(
                 name: "Contacts");
-
-            migrationBuilder.DropTable(
-                name: "EmployeeWorkHours");
 
             migrationBuilder.DropTable(
                 name: "EmployeeWorkPlaces");

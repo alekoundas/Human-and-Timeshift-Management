@@ -24,8 +24,9 @@ namespace DataAccess.Models.Entity
         public Company Company { get; set; }
 
         public ICollection<Contact> Contacts{ get; set; }
+        public ICollection<WorkHour> WorkHours { get; set; }
         public ICollection<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
-        public ICollection<EmployeeWorkHour> EmployeeWorkHours { get; set; }
+
 
     }
 }

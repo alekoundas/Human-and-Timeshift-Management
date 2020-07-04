@@ -196,26 +196,26 @@ namespace WebApplication.Utilities
 
 
 
-        public async Task<string> GetHoverElementsAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        public string GetHoverElementsAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
             var skata = baseDatawork.Employees.Any(x =>
             x.Id == employeeId &&
-            x.EmployeeWorkHours.Any(y =>
-                y.WorkHour.TimeShiftId == datatable.GenericId &&
-                y.WorkHour.StartOn.Year == datatable.TimeShiftYear &&
-                y.WorkHour.StartOn.Month == datatable.TimeShiftMonth &&
+            x.WorkHours.Any(y =>
+                y.TimeShiftId == datatable.GenericId &&
+                y.StartOn.Year == datatable.TimeShiftYear &&
+                y.StartOn.Month == datatable.TimeShiftMonth &&
                 (
-                    y.WorkHour.StartOn.Day == dayOfMonth ||
-                    y.WorkHour.EndOn.Day == dayOfMonth ||
-                    (y.WorkHour.StartOn.Day < dayOfMonth && dayOfMonth < y.WorkHour.EndOn.Day)
+                    y.StartOn.Day == dayOfMonth ||
+                    y.EndOn.Day == dayOfMonth ||
+                    (y.StartOn.Day < dayOfMonth && dayOfMonth < y.EndOn.Day)
                  )));
 
 
 
 
 
-
-            var kkk = await baseDatawork.WorkHours.GetCurrentAssignedOnCell(
+            //TODO :Async
+            var kkk =  baseDatawork.WorkHours.GetCurrentAssignedOnCell(
                 datatable.GenericId,
                 datatable.TimeShiftYear,
                 datatable.TimeShiftMonth,
@@ -224,13 +224,13 @@ namespace WebApplication.Utilities
 
 
             if (skata)
-                return FaIconEdit(dayOfMonth, "green", employeeId) + FaIconAdd(dayOfMonth, "green", employeeId);
+                return FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId) + FaIconAdd(dayOfMonth, "green", employeeId);
             return FaIconAdd(dayOfMonth, "", employeeId);
 
         }
 
-        private static string FaIconEdit(int dayOfMonth, string color, int employeeid)
-          => @"<i class='fa fa-pencil hidden faIconEdit'  employeeid='" + employeeid + "' cellColor='" + color + "' dayOfMonth = '" + dayOfMonth + "'></i>";
+        private static string FaIconEdit(int dayOfMonth, string color, int employeeid,int timeshiftid)
+          => @"<i class='fa fa-pencil hidden faIconEdit'   timeshiftid='" + timeshiftid + "' employeeid='" + employeeid + "' cellColor='" + color + "' dayOfMonth = '" + dayOfMonth + "'></i>";
 
         private static string FaIconAdd(int dayOfMonth, string color, int employeeid)
             => @"<i class='fa fa-plus hidden faIconAdd' employeeid='" + employeeid + "' cellColor=''" + color + "'' dayOfMonth = '" + dayOfMonth + "'></i>";

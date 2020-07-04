@@ -13,7 +13,8 @@ namespace DataAccess.Models.Entity
         public int TimeShiftId { get; set; }
         public TimeShift TimeShift { get; set; }
 
-        public ICollection<EmployeeWorkHour> EmployeeWorkHours { get; set; }
+        public int EmployeeId { get; set; }
+        public Employee Employee { get; set; }
 
 
     }
