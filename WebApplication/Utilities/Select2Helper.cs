@@ -40,7 +40,7 @@ namespace WebApplication.Utilities
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
-                    Text = result.FirstName+" "+result.LastName
+                    Text = result.FirstName + " " + result.LastName
                 });
             return new Select2Response() { Results = results };
         }
@@ -53,6 +53,20 @@ namespace WebApplication.Utilities
                 {
                     id = result.Id,
                     Text = result.Title
+                });
+            return new Select2Response() { Results = results };
+        }
+
+        public Select2Response CreateEmployeesResponse(IEnumerable<Employee> workplaces)
+        {
+            var results = new List<Select2Result>();
+            foreach (var result in workplaces)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.FirstName + " " +
+                        result.LastName + " - " +
+                        result.ErpCode
                 });
             return new Select2Response() { Results = results };
         }

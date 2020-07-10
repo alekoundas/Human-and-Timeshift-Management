@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using DataAccess.Models.Entity.WorkTimeShift;
 
 namespace DataAccess.ViewModels
 {
     public class TimeShiftCreateViewModel
     {
+        [Required]
         public string Title { get; set; }
-        public DateTime StartOn { get; set; }
-        public DateTime EndOn { get; set; }
+
+        [Required]
+        public int Month { get; set; }
+
+        [Required]
+        public int Year { get; set; }
+
+        [Required]
         public int WorkPlaceId { get; set; }
 
         public static TimeShift CreateFrom(TimeShiftCreateViewModel viewModel)
@@ -16,8 +24,8 @@ namespace DataAccess.ViewModels
             return new TimeShift
             {
                 Title = viewModel.Title,
-                StartOn = viewModel.StartOn,
-                EndOn = viewModel.EndOn,
+                Month = viewModel.Month,
+                Year = viewModel.Year,
                 WorkPlaceId = viewModel.WorkPlaceId,
                 CreatedOn = DateTime.Now
             };

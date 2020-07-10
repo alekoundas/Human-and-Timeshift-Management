@@ -274,16 +274,16 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartOn")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WorkPlaceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

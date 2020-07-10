@@ -18,7 +18,7 @@ namespace WebApplication.Utilities
     {
         private IHttpContextAccessor _httpContext;
         private ISecurityDatawork _securityDatawork;
-        private IBaseDatawork _baseDatawork;
+        //private IBaseDatawork _baseDatawork;
         public DataTableHelper(SecurityDataWork securityDatawork)
         {
             _securityDatawork = securityDatawork;
@@ -210,10 +210,6 @@ namespace WebApplication.Utilities
                     (y.StartOn.Day < dayOfMonth && dayOfMonth < y.EndOn.Day)
                  )));
 
-
-
-
-
             //TODO :Async
             var kkk =  baseDatawork.WorkHours.GetCurrentAssignedOnCell(
                 datatable.GenericId,
@@ -226,7 +222,6 @@ namespace WebApplication.Utilities
             if (skata)
                 return FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId) + FaIconAdd(dayOfMonth, "green", employeeId);
             return FaIconAdd(dayOfMonth, "", employeeId);
-
         }
 
         private static string FaIconEdit(int dayOfMonth, string color, int employeeid,int timeshiftid)
@@ -234,5 +229,8 @@ namespace WebApplication.Utilities
 
         private static string FaIconAdd(int dayOfMonth, string color, int employeeid)
             => @"<i class='fa fa-plus hidden faIconAdd' employeeid='" + employeeid + "' cellColor=''" + color + "'' dayOfMonth = '" + dayOfMonth + "'></i>";
+
+        public string GetEmployeeCheckbox(Datatable datatable, int employeeId)
+            => @"<input class='ToggleSliders' type='checkbox' data-onstyle='success' employeeId=" + employeeId + ">";
     }
 }

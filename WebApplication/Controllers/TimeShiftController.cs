@@ -73,9 +73,7 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var timeShift = await _context.TimeShifts.Include(x=>x.WorkPlace)
                 .FirstOrDefaultAsync(z=>z.Id==id);

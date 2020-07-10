@@ -21,9 +21,11 @@ namespace Business.Seed
         {
             if (userManager.FindByNameAsync("Admin").Result == null)
             {
-                ApplicationUser user = new ApplicationUser();
-                user.UserName = "Admin@Admin";
-                user.Email = "Admin@Admin";
+                ApplicationUser user = new ApplicationUser
+                {
+                    UserName = "Admin@Admin",
+                    Email = "Admin@Admin"
+                };
 
                 IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd").Result;
 

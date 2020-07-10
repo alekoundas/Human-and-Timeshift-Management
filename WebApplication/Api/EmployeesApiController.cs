@@ -14,6 +14,8 @@ using WebApplication.Utilities;
 using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using System.Linq.Expressions;
+using DataAccess.Models.Select2;
+using LinqKit;
 
 namespace WebApplication.Api
 {
@@ -65,6 +67,81 @@ namespace WebApplication.Api
 
 
 
+        // GET: api/employees/getSelet2Option/id
+        [HttpGet("getselect2option/{id}")]
+        public async Task<ActionResult<Employee>> getSelet2Option(int id)
+        {
+            var select2Helper = new Select2Helper();
+            Expression<Func<Employee, bool>> filter = x => x.Id == id;
+
+            var employees = (List<Employee>)await _baseDataWork.Employees
+                     .GetPaggingWithFilter(null, filter, null, 1);
+
+            return Ok(select2Helper.CreateEmployeesResponse(employees));
+        }
+
+        // GET: api/employees/select2
+        [HttpPost("select2")]
+        public async Task<ActionResult<Employee>> select2([FromBody] Select2Get select2)
+        {
+            var employees = new List<Employee>();
+            var select2Helper = new Select2Helper();
+            //Expression<Func<Employee, bool>> filter;
+            var filter = PredicateBuilder.New<Employee>();
+
+            if (select2.ExistingEmployees.Count > 0)
+                foreach (var employeeId in select2.ExistingEmployees)
+                    filter = filter.And(x => x.Id != employeeId);
+
+
+
+            if (select2.TimeShiftId != 0 && !string.IsNullOrWhiteSpace(select2.Search))
+            {
+                var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == select2.TimeShiftId);
+                filter = filter.And(x =>
+                   x.EmployeeWorkPlaces.Any(y =>
+                   y.WorkPlaceId == timeshift.WorkPlaceId) &&
+                   (
+                       x.FirstName.Contains(select2.Search) ||
+                       x.LastName.Contains(select2.Search)
+                   )
+                );
+                if (select2.ExistingEmployees.Count > 0)
+
+
+                    employees = (List<Employee>)await _baseDataWork.Employees
+                      .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+            }
+            else if (select2.TimeShiftId != 0 && string.IsNullOrWhiteSpace(select2.Search))
+            {
+                var timeshift = await _baseDataWork.TimeShifts
+                    .FirstOrDefaultAsync(x => x.Id == select2.TimeShiftId);
+
+                filter = filter.And(x => x.EmployeeWorkPlaces
+                    .Any(y => y.WorkPlaceId == timeshift.WorkPlaceId));
+
+                employees = (List<Employee>)await _baseDataWork.Employees
+                  .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+            }
+            else if (!string.IsNullOrWhiteSpace(select2.Search))
+            {
+                filter = filter.And(x =>
+                    x.FirstName.Contains(select2.Search) ||
+                    x.LastName.Contains(select2.Search) ||
+                    x.ErpCode.ToString().Contains(select2.Search));
+
+                employees = (List<Employee>)await _baseDataWork.Employees
+               .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+            }
+            else
+            {
+                employees = (List<Employee>)await _baseDataWork.Employees
+                    .GetPaggingWithFilter(null, null, null, 10, select2.Page);
+            }
+
+            return Ok(select2Helper.CreateEmployeesResponse(employees));
+        }
+
         // POST: api/employees/getdatatable
         [HttpPost("getdatatable")]
         public async Task<ActionResult<Employee>> GetDatatable([FromBody] Datatable datatable)
@@ -107,10 +184,10 @@ namespace WebApplication.Api
             }
             if (datatable.Predicate == "TimeShiftEdit")
             {
-                Expression<Func<Employee, bool>> filter = (x => x.Company.Customers
-                .Any(y => y.WorkPlaces
-                .Any(z => z.TimeShift
-                .Any(a => a.Id == datatable.GenericId))));
+                var timeShift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+
+                Expression<Func<Employee, bool>> filter = x => x.EmployeeWorkPlaces
+                    .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId);
 
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
@@ -126,30 +203,30 @@ namespace WebApplication.Api
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var result in results)
+            foreach (var employee in results)
             {
-                var expandoObj = expandoObject.GetCopyFrom<Employee>(result);
+                var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                dictionary.Add("ScpecializationName", result.Specialization.Name);
+                dictionary.Add("ScpecializationName", employee.Specialization.Name);
 
                 if (string.IsNullOrWhiteSpace(datatable.Predicate))
                 {
-                    if (result.Company != null)
-                        dictionary.Add("CompanyTitle", result.Company.Title);
+                    if (employee.Company != null)
+                        dictionary.Add("CompanyTitle", employee.Company.Title);
 
                     dictionary.Add("Buttons", dataTableHelper.GetButtons(
-                        "Employee", "Employees", result.Id.ToString()));
+                        "Employee", "Employees", employee.Id.ToString()));
 
                     returnObjects.Add(expandoObj);
                 }
                 else if (datatable.Predicate == "CompanyEdit")
                 {
-                    var apiUrl = UrlHelper.EmployeePerCompany(result.Id, datatable.GenericId);
+                    var apiUrl = UrlHelper.EmployeePerCompany(employee.Id, datatable.GenericId);
 
-                    if (result.Company != null)
+                    if (employee.Company != null)
                     {
-                        dictionary.Add("CompanyTitle", result.Company.Title);
+                        dictionary.Add("CompanyTitle", employee.Company.Title);
                         dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
                             "Employee", apiUrl, "checked"));
                     }
@@ -161,13 +238,13 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "WorkPlaceEdit")
                 {
-                    var apiUrl = UrlHelper.EmployeePerWorkPlace(result.Id, datatable.GenericId);
+                    var apiUrl = UrlHelper.EmployeePerWorkPlace(employee.Id, datatable.GenericId);
 
-                    if (result.Company != null)
-                        dictionary.Add("CompanyTitle", result.Company.Title);
+                    if (employee.Company != null)
+                        dictionary.Add("CompanyTitle", employee.Company.Title);
 
                     if (_baseDataWork.EmployeeWorkPlaces
-                        .Any(x => x.EmployeeId == result.Id && x.WorkPlaceId == datatable.GenericId))
+                        .Any(x => x.EmployeeId == employee.Id && x.WorkPlaceId == datatable.GenericId))
                     {
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                             "Employee", apiUrl, "checked"));
@@ -181,7 +258,9 @@ namespace WebApplication.Api
                 else if (datatable.Predicate == "TimeShiftEdit")
                 {
                     for (int i = 1; i <= 31; i++)
-                        dictionary.Add("Day" + i, dataTableHelper.GetHoverElementsAsync(_baseDataWork, i, datatable, result.Id));
+                        dictionary.Add("Day" + i, dataTableHelper.GetHoverElementsAsync(_baseDataWork, i, datatable, employee.Id));
+
+                    dictionary.Add("ToggleSlider", dataTableHelper.GetEmployeeCheckbox(datatable, employee.Id));
 
                     returnObjects.Add(expandoObj);
                 }

@@ -7,8 +7,8 @@ namespace DataAccess.Models.Entity.WorkTimeShift
     public class TimeShift : BaseEntity
     {
         public string  Title { get; set; }
-        public DateTime StartOn { get; set; }
-        public DateTime EndOn { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
 
         public int WorkPlaceId { get; set; }
         public WorkPlace WorkPlace { get; set; }

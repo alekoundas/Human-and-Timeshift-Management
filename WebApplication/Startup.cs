@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace WebApplication
 {
@@ -46,8 +48,14 @@ namespace WebApplication
             services.ConfigureApplicationCookie(options => options.AccessDeniedPath = "/Account/LogInnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
 
 
+            // using Microsoft.AspNetCore.HttpOverrides;
 
+            //services.UseForwardedHeaders(new ForwardedHeadersOptions
+            //{
+            //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            //});
 
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("el-GR");
             //services.AddControllersWithViews();
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>

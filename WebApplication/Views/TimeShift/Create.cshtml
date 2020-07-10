@@ -1,4 +1,4 @@
-﻿@model DataAccess.Models.Entity.WorkTimeShift.TimeShift
+﻿@model DataAccess.ViewModels.TimeShiftCreateViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -33,31 +33,25 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="StartOn" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="StartOn" class="form-control" />
-                            <span asp-validation-for="StartOn" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="EndOn" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="EndOn" class="form-control" />
-                            <span asp-validation-for="EndOn" class="text-danger"></span>
-                        </div>
-                    </div>
-
+                    <input asp-for="Year" hidden />
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                    <span asp-validation-for="Month" class="text-danger"></span>
+                    <input asp-for="Month" hidden />
 
                     <div class="form-group">
                         <label asp-for="WorkPlaceId" class="control-label"></label>
-                        <div class="input-group" style="width:100%">
+                        <div class="input-group" style="width:30%">
                             <select class="WorkPlace_Select2" asp-for="WorkPlaceId" style="width:70%"></select>
                             <span asp-validation-for="WorkPlaceId" class="text-danger"></span>
                         </div>
                     </div>
-                  
+                    <div class="form-group">
+                        <label class="control-label"> Επιλογή μήνα και έτους</label>
+                        <div class="input-group" style="width:30%">
+                            <input type="text" id="MonthPicker" class="form-control" readonly/>
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
 
                     <hr />
 
@@ -79,6 +73,7 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/jQueryMonthPicker/MonthPicker.js"></script>
 
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
@@ -94,5 +89,19 @@
                 }
             }
         });
+    </script>
+    <script>
+        $('#MonthPicker').MonthPicker({
+            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
+            OnAfterChooseMonth: function () {
+                var month = $(this).val().split('/')[0];
+                var year = $(this).val().split('/')[1];
+                document.getElementById('Year').value = year
+                document.getElementById('Month').value = month
+            }
+
+        });
+        //document.getElementsByClassNkame('calentim-input')[0].setAttribute('style', 'width:600px;')
+        //var lastDay = moment(year + '-' + month+'-1 00:00', 'YYYY-MM-DD h:m').endOf('month').format('D')
     </script>
 }

@@ -184,8 +184,8 @@ namespace DataAccess.Migrations.BaseDb
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Title = table.Column<string>(nullable: true),
-                    StartOn = table.Column<DateTime>(nullable: false),
-                    EndOn = table.Column<DateTime>(nullable: false),
+                    Month = table.Column<int>(nullable: false),
+                    Year = table.Column<int>(nullable: false),
                     WorkPlaceId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

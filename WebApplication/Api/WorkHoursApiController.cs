@@ -66,16 +66,12 @@ namespace WebApplication.Api
             catch (DbUpdateConcurrencyException)
             {
                 if (!WorkHourExists(id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/workhours
@@ -140,18 +136,12 @@ namespace WebApplication.Api
         [HttpPost("getforcell")]
         public async Task<ActionResult<WorkHour>> getForCell([FromBody] WorkHoursApiViewModel workHour)
         {
-            //(StartDate1 <= EndDate2) and (EndDate1 >= StartDate2)
-                //if ( _baseDataWork.WorkHours.IsDateOverlaps(workHour))
-                //    return NotFound();
-
             var varadata = _baseDataWork.WorkHours.GetCurrentAssignedOnCell(
                 workHour.TimeShiftId,
                 workHour.StartOn.Year,
                 workHour.StartOn.Month,
                 workHour.StartOn.Day,
                 workHour.EmployeeId);
-
-
 
             return Ok(varadata);
         }

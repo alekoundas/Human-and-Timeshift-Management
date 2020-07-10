@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20200703164112_InitializeDb")]
+    [Migration("20200706200500_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -276,16 +276,16 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartOn")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WorkPlaceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

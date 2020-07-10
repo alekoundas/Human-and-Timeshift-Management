@@ -33,19 +33,19 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="StartOn" class="control-label"></label>
+                        <label asp-for="Year" class="control-label"></label>
 
                         <div class="input-group">
-                            <input asp-for="StartOn" class="form-control" />
-                            <span asp-validation-for="StartOn" class="text-danger"></span>
+                            <input asp-for="Year" class="form-control" />
+                            <span asp-validation-for="Year" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="EndOn" class="control-label"></label>
+                        <label asp-for="Month" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="EndOn" class="form-control" />
-                            <span asp-validation-for="EndOn" class="text-danger"></span>
+                            <input asp-for="Month" class="form-control" />
+                            <span asp-validation-for="Month" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -85,6 +85,7 @@
                 <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive">
                     <thead>
                         <tr>
+                            <th>Επιλογή</th>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
                             <th>1</th>
@@ -122,6 +123,7 @@
                     </thead>
                     <tfoot>
                         <tr>
+                            <th data-searchable="false">Επιλογή</th>
                             <th data-searchable="false">Όνομα</th>
                             <th data-searchable="false">Επίθετο</th>
                             <th data-searchable="false">1</th>
@@ -222,16 +224,20 @@
     <script>
         $(document).ready(function () {
             Datatable();
-
         });
+
         var CelentimDate = "";
-        var JsonData = {
-            "startOn": "",
-            "endOn": "",
-            "timeShiftId": "",
-            "employeeId": ""
-        }
+          const ConvertDate = (date) => moment(date, 'DD/MM/YYYY HH:mm').format("MM/DD/YYYY HH:mm")
+
+    var MapData = (dateInput, employeeId) =>
+         JsonData = {
+            startOn: ConvertDate(dateInput.value.split('/-/')[0]),
+            endOn: ConvertDate(dateInput.value.split('/-/')[1]),
+            timeShiftId:@Model.Id,
+            employeeId: employeeId
+        };
     </script>
+
     <script>
         $('.WorkPlace_Select2').select2({
             ajax: {
@@ -245,6 +251,37 @@
                 }
             }
         });
+    </script>
+    <script>
+        const GetWorkHourEmployeeIds = (num) => [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + num)].map((data) => data.value).filter((val) => val != "");
+        const BuildSelect2DtoNum = (params, num) => { return {
+                timeShiftId: @Model.Id,
+                search: params.term,
+                page: params.page || 1,
+                existingEmployees: GetWorkHourEmployeeIds(num)
+            }};
+        const BuildSelect2Dto = (params) => { return {
+                timeShiftId: @Model.Id,
+                search: params.term,
+                page: params.page || 1
+            }};
+
+        const EmployeeSelect2 = (id, num) => {
+            $('#EmployeesSelect2Num_' + id).select2({
+                ajax: {
+                    type: "POST",
+                    url: '/api/employees/select2',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: function (params) {
+                        if (num != null)
+                            return JSON.stringify(BuildSelect2DtoNum(params,num));
+                        else
+                            return JSON.stringify(BuildSelect2Dto(params));
+                    }
+                }
+            });
+        }
     </script>
 
     <script>
@@ -303,18 +340,19 @@
     <!--    Modal 'Edit'  Functionality   -->
     <script>
         $('#EmployeesWorkhoursDatatable').on('click', '.faIconEdit', (element) => {
-            var currentDate = document.getElementById('StartOn').value;
             var day = element.target.getAttribute('dayofmonth');
-            var month = moment(currentDate).add(1, 'months').month();
-            var year = moment(currentDate).year();
+            var month = document.getElementById('Month').value;
+            var year = document.getElementById('Year').value;
 
             //set global variable the date to initialize celentim
             CelentimDate = year + '-' + month + '-' + day;
 
-            JsonData.startOn = CelentimDate;
-            JsonData.endOn = CelentimDate;
-            JsonData.timeShiftId = element.target.getAttribute('timeshiftid');
-            JsonData.employeeId = element.target.getAttribute('employeeid');
+            var JsonData = {
+                startOn: CelentimDate,
+                endOn: CelentimDate,
+                timeShiftId: element.target.getAttribute('timeshiftid'),
+                employeeId: element.target.getAttribute('employeeid')
+            }
 
             $.ajax({
                 type: "POST",
@@ -324,35 +362,37 @@
                 dataType: "json"
 
             }).done((workHours) => workHours.forEach((workHour) => AppendDataInModal(workHour)));
-            ///απι να παρω workhours
+
 
             const EditHtml = (workHour) =>
-                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose" id="CalentimRowNum_' + workHour.id + '">' +
+                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose" id="WorkHourRowNum_' + workHour.id + '">' +
                 '<div class="col-md-1"></div>' +
                 '<div class="col-md-1"><button style="display:none;" class="btn btn-primary" id="CalentimButtonNum_' + workHour.id + '"><i class="fa fa-calendar" ></i></button></div>' +
                 '<div class="col-md-7">' +
-                '<input class="calentim hidden celentimInput" id="CalentimInputNum_' + workHour.id + '" />' +
-                'Έναρξη: <span id="StartOnNum_' + workHour.id + '">' + workHour.startOn + '</span>   ' +
-                'Λήξη: <span id="EndOnNum_' + workHour.id + '">' + workHour.endOn + '</span>' +
+                '<input class="calentim hidden calentimInput" id="CalentimInputNum_' + workHour.id + '" />' +
+                '<div class="row">' +
+                '<div class="col-md-4">' +
+                'Έναρξη: </br>' +
+                'Λήξη:' +
+                '</div>' +
+                '<div class="col-md-8">' +
+                '<span id="StartOnNum_' + workHour.id + '">' + workHour.startOn + '</span>  </br> ' +
+                '<span id="EndOnNum_' + workHour.id + '">' + workHour.endOn + '</span>' +
+                '</div>' +
                 '<p id="ErrorNum_' + workHour.id + '" style="display: none; color:red;">Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης</p>' +
                 '</div>' +
+                '</div>' +
                 '<div class="col-md-3 btn-group">' +
-                '<button class="btn btn-warning CelentimEditFormEditButton" id="EditModalEditButtonNum_' + workHour.id + '" workHourId="' + workHour.id + '"><i class="fa fa-pencil CelentimEditFormEditButton" id="EditModalEditFaFaNum_' + workHour.id + '" workHourId="' + workHour.id + '"></i></button>' +
-                '<button class="btn btn-danger  CelentimEditFormDeleteButton" style="display:none;" id="EditModalDeleteButtonNum_' + workHour.id + '" workHourId="' + workHour.id + '"><i class="fa fa-trash-o  CelentimEditFormDeleteButton" id="EditModalDeleteFaFaNum_' + workHour.id + '" workHourId="' + workHour.id + '"></i></button>' +
+                '<button class="btn btn-warning CelentimEditFormEditButton" id="EditModalEditButtonNum_' + workHour.id + '"  employeeid ="' + workHour.employeeId + '" workHourId="' + workHour.id + '"><i class="fa fa-pencil CelentimEditFormEditButton" id="EditModalEditFaFaNum_' + workHour.id + '"  employeeid ="' + workHour.employeeId + '" workHourId="' + workHour.id + '"></i></button>' +
+                '<button class="btn btn-danger  CelentimEditFormDeleteButton" style="display:none;" id="EditModalDeleteButtonNum_' + workHour.id + '"  workHourId="' + workHour.id + '"><i class="fa fa-trash-o  CelentimEditFormDeleteButton" id="EditModalDeleteFaFaNum_' + workHour.id + '" workHourId="' + workHour.id + '"></i></button>' +
                 '</div>' +
                 '</div >';
-            Calentim(CelentimDate, count); //set new Celentim instance
-
-
 
             const EditModalBody = () => document.getElementById('EditWorkHour_ModalBody');
-            const AppendDataInModal = (workHour) => EditModalBody().insertAdjacentHTML('beforeend', EditHtml(workHour));
-
-
-
-
-
-
+            const AppendDataInModal = (workHour) => {
+                EditModalBody().insertAdjacentHTML('beforeend', EditHtml(workHour));
+                Calentim(CelentimDate, workHour.id);//set new Celentim instance
+            };
 
             $('#EditWorkHour_Modal').modal('show')
         });
@@ -382,9 +422,21 @@
             var workHourId = element.target.getAttribute('workhourid')
             var EditModalEditButton = document.getElementById('EditModalEditButtonNum_' + workHourId);
             var EditModalFaFa = document.getElementById('EditModalEditFaFaNum_' + workHourId);
+            var EditModalInput = document.getElementById('CalentimInputNum_' + workHourId);
 
+            var dataPUT = MapData(EditModalInput, element.target.getAttribute('employeeid'));
+            dataPUT.id = workHourId;
             document.getElementById('EditModalDeleteButtonNum_' + workHourId).style.display = 'none';
             document.getElementById('CalentimButtonNum_' + workHourId).style.display = 'none';
+            $.ajax({
+                type: "PUT",
+                url: "/api/workhours/" + workHourId,
+                data: JSON.stringify(dataPUT),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json"
+
+            })
+                .done(() => console.log('zzzzzzzzzz'));
 
             EditModalEditButton.classList.remove('btn-success');
             EditModalEditButton.classList.remove('CelentimEditFormSaveButton');
@@ -402,10 +454,9 @@
         //Delete Workhour in modal
         $('#EditWorkHour_Modal').on('click', '.CelentimEditFormDeleteButton', (element) => {
             var workHourId = element.target.getAttribute('workhourid')
-            
-            $.ajax({ type: "DELETE", url: "/api/workhours/" + workHourId })
-                .done((result) => $('#EditWorkHour_Modal').modal('hide'));
 
+            $.ajax({ type: "DELETE", url: "/api/workhours/" + workHourId })
+                .done(() => $('#WorkHourRowNum_' + workHourId).remove());
         })
 
         //Cleanup on modal close
@@ -421,62 +472,148 @@
     <!--    Modal 'Add'  Functionality   -->
     <script>
         $('#EmployeesWorkhoursDatatable').on('click', '.faIconAdd', (element) => {
-            var currentDate = document.getElementById('StartOn').value;
             var day = element.target.getAttribute('dayofmonth');
-            var month = moment(currentDate).add(1, 'months').month();
-            var year = moment(currentDate).year();
+            var month = document.getElementById('Month').value;
+            var year = document.getElementById('Year').value;
 
             //set global variable the date to initialize celentim
             CelentimDate = year + '-' + month + '-' + day;
             $('#SaveWorkHours').attr('employeeid', element.target.getAttribute('employeeid'));
+            $('#AppendWorkHour').attr('employeeid', element.target.getAttribute('employeeid'));
             $('#AddWorkHour_Modal').modal('show')
         });
 
         var count = 0;
         //Append new workhour to modal
         $('#AppendWorkHour').on('click', (e) => {
+            //Get id from element or father element
+            var employeeId = e.target.getAttribute('employeeid');
+            if (employeeId == null)
+                employeeId = e.target.parentElement.getAttribute('employeeid');
+
+
+            var prependEmployeeIds = [];
+            [...document.getElementsByClassName('ToggleSliders')]
+                .forEach((slider) => {
+                    if (slider.checked)
+                        prependEmployeeIds.push(slider.getAttribute('employeeid'));
+                });
+
             count++;
             document.getElementById('AddWorkHour_ModalBody').insertAdjacentHTML('beforeend',
-                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose" id="CalentimRowNum_' + count + '">' +
+
+                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose AppendEmployeeNum_' + count + '" id="WorkHourRowNum_' + count + '">' +
+                '<label class="control-label"> Προσθήκη έναρξη - λήξη εργασίας για εργαζόμενο/ους:</label>' +
+                '<div class="row">' +
                 '<div class="col-md-1"></div>' +
                 '<div class="col-md-2"><button class="btn btn-primary" id="CalentimButtonNum_' + count + '"><i class="fa fa-calendar" ></i></button></div>' +
-                '<div class="col-md-7">' +
-                '<input class="calentim hidden celentimInput" id="CalentimInputNum_' + count + '" />' +
-                'Έναρξη: <span id="StartOnNum_' + count + '"></span>   ' +
-                'Λήξη: <span id="EndOnNum_' + count + '"></span>' +
-                '<p id="ErrorNum_' + count + '" style="display: none; color:red;">Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης</p>'+
+                '<div class="col-md-5">' +
+                '<div class="row">' +
+                '<input class="calentim hidden calentimInput" id="CalentimInputNum_' + count + '" />' +
+                '<div class="col-md-4">' +
+                'Έναρξη:  </br> ' +
+                'Λήξη: ' +
+                '</div>' +
+                '<div class="col-md-8">' +
+                '<span id="StartOnNum_' + count + '"></span>  </br> ' +
+                '<span id="EndOnNum_' + count + '"></span>' +
+                '</div>' +
+                '<p id="ErrorNum_' + count + '" style="display: none; color:red;">Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης</p>' +
+                '</div>' +
                 '</div>' +
                 '<div class="col-md-2">' +
                 '<button class="btn btn-danger celentimDeleteButton" celentimid="' + count + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + count + '"></i></button>' +
                 '</div>' +
+                '</div >' +
+
+                '<div class="row">' +
+                '<div class="col-md-1"></div>' +
+                '<div class="col-md-2 "><button class="btn btn-success AppendEmployeeToWorkHourButton" Num="' + count + '"><i class="fa fa-plus " Num="' + count + '"></i><i class="fa fa-user " Num="' + count + '"></i></button></div>' +
+                '<div class="col-md-5"><p> Υπάλληλοι:</p></div>' +
+                '</div >' +
                 '</div >')
-            Calentim(CelentimDate, count); //set new Celentim instance
+
+            Calentim(CelentimDate, count); //set new Calentim instance
+
+            var num = count;
+            if (prependEmployeeIds.length > 0) {
+                prependEmployeeIds.forEach((employeeId) => {
+                    $.get("/api/employees/getSelect2Option/" + employeeId, (data) => {
+                        AppendPreloadedEmployeeToWorkHour(num, ++count, employeeId, data.results[0].text);
+                        EmployeeSelect2(count);        //set new Select2 instance
+                    });
+                })
+            }
+            else
+                $.get("/api/employees/getSelect2Option/" + employeeId, (data) => {
+                    AppendPreloadedEmployeeToWorkHour(count, ++count, employeeId, data.results[0].text);
+                    EmployeeSelect2(count);        //set new Select2 instance
+                });
+
+        });
+
+
+        var AppendPreloadedEmployeeToWorkHour = (num, currNum, employeeId, text) =>
+            document.getElementsByClassName('AppendEmployeeNum_' + num)[0].insertAdjacentHTML('beforeend',
+                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
+                '<div class="col-md-3"></div>' +
+                '<div class="col-md-5">' +
+                '<select class="EmployeeSelect2WorkHourNum_' + num + '" id="EmployeesSelect2Num_' + currNum + '" style="width:100%" disabled>' +
+                '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
+                '</select >' +
+                '</select >' +
+                '</div >' +
+                '</div >'
+            );
+
+        var AppendEmployeeToWorkHour = (num, currNum) =>
+            document.getElementsByClassName('AppendEmployeeNum_' + num)[0].insertAdjacentHTML('beforeend',
+                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
+                '<div class="col-md-3"></div>' +
+                '<div class="col-md-5">' +
+                '<select class="EmployeeSelect2WorkHourNum_' + num + '" id="EmployeesSelect2Num_' + currNum + '" style="width:100%"></select >' +
+                '</div >' +
+                '<div class="col-md-1">' +
+                '<button class= "btn btn-danger EmployeeRowDeleteButton" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" Num="' + currNum + '"></i></button >' +
+                '</div >' +
+                '</div >'
+            );
+
+
+        //Append new Select2 Employees search for WorkHour
+        $('#AddWorkHour_Modal').on('click', '.AppendEmployeeToWorkHourButton', (e) => {
+            var num = e.target.getAttribute('num');
+            count++;
+            AppendEmployeeToWorkHour(num, count)
+            EmployeeSelect2(count, num);        //set new Select2 instance
         });
 
         //Delete Workhour from modal
         $('#AddWorkHour_Modal').on('click', '.celentimDeleteButton', (e) => {
             var id = e.target.getAttribute('celentimid');
-            $('#CalentimRowNum_' + id).remove();
+            $('#WorkHourRowNum_' + id).remove();
+
+        })
+        //Delete Employee from workhour
+        $('#AddWorkHour_Modal').on('click', '.EmployeeRowDeleteButton', (e) => {
+            var id = e.target.getAttribute('num');
+            $('#EmployeeRowNum_' + id).remove();
 
         })
 
-        const ConvertDate = (date) => moment(date, 'DD/MM/YYYY HH:mm').format("MM/DD/YYYY HH:mm")
-
-        var MapData = (dateInput,employeeId) => {
-            JsonData.startOn = ConvertDate(dateInput.value.split('/-/')[0]);
-            JsonData.endOn = ConvertDate(dateInput.value.split('/-/')[1]);
-            JsonData.timeShiftId=@Model.Id;
-            JsonData.employeeId = employeeId;
-            return JsonData;
-        };
-
         //Save Button
         $('#SaveWorkHours').on('click', (e) => {
-            var dateInputs = document.getElementsByClassName('celentimInput');
-            dateInputs = [...dateInputs];//Convert to array
             var dataToPost = [];
+            var dateInputs = [...document.getElementsByClassName('calentimInput')];
 
-            dateInputs.forEach((input) => dataToPost.push(MapData(input, $('#SaveWorkHours').attr('employeeid'))))
+            for (var i = 0; i < dateInputs.length; i++) {
+                var workHourId = dateInputs[i].id.split('_')[1];
+                var employeeIds = GetWorkHourEmployeeIds(workHourId);
+                for (var j = 0; j < employeeIds.length; j++) {
+                    dataToPost.push(MapData(dateInputs[i], employeeIds[j]));
+                }
+            }
+
 
             $.ajax({
                 type: "POST",
@@ -487,13 +624,14 @@
 
             });
             $('#AddWorkHour_Modal').modal('hide');
-        })
+        });
 
         //Cleanup on modal close
         $('#AddWorkHour_Modal').on('hidden.bs.modal', (e) => {
             $('.ElementToDeleteOnClose').remove();
             $('#EmployeesWorkhoursDatatable').DataTable().clear().destroy();
             Datatable();
+            count = 0;
         })
     </script>
 
@@ -504,12 +642,12 @@
         //Make Datatable cell set/unset backround grey and show/hide <i>
         $('#EmployeesWorkhoursDatatable')
             .on('mouseenter', '.DataTableHoverCell', (elem) => {
-                elem.target.setAttribute("style", "background-color:grey;");
+                //elem.target.setAttribute("style", "background-color:grey;");
                 elem.target.querySelectorAll('i')
                     .forEach(element => element.classList.remove("hidden"));
             })
             .on('mouseleave', '.DataTableHoverCell', (elem) => {
-                elem.target.setAttribute("style", "background-color:;");
+                //elem.target.setAttribute("style", "background-color:;");
                 elem.target.querySelectorAll('i')
                     .forEach(element => element.classList.add("hidden"));
             });
@@ -547,8 +685,8 @@
 
                         data.predicate = 'TimeShiftEdit';
                         data.genericId =@Model.Id;
-                        data.timeShiftYear =@Model.StartOn.Year;
-                        data.timeShiftMonth =@Model.StartOn.Month;
+                        data.timeShiftYear =@Model.Year;
+                        data.timeShiftMonth =@Model.Month;
 
                         return JSON.stringify(data);
                     }
@@ -556,11 +694,22 @@
                 order: [[0, 'desc']],
                 "columns": [
                     {
+                        "data": "ToggleSlider",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            //console.log(data);
+                            if (data.ToggleSlider != null)
+                                return data.ToggleSlider;
+                            else
+                                return "";
+                        }
+                    },
+                    {
                         "data": "FirstName",
                         "searchable": true,
                         "orderable": true,
                         render: (a, b, data, d) => {
-                            //console.log(data);
                             if (data.FirstName != null)
                                 return data.FirstName;
                             else
@@ -922,15 +1071,18 @@
                 ],
                  rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
                      for (var i = 1; i <= 31 ; i++) {
-                         row.querySelectorAll('td')[i + 1].setAttribute("class", "DataTableHoverCell")
+                         row.querySelectorAll('td')[i + 2].setAttribute("class", "DataTableHoverCell")
                          //row.querySelectorAll('td')[i + 1].setAttribute("employeeid", data.Id)
-                         row.querySelectorAll('td')[i + 1].setAttribute('style', 'background-color:' + $(data["Day" + i]).attr('cellcolor'))
+                         row.querySelectorAll('td')[i + 2].setAttribute('style', 'background-color:' + $(data["Day" + i]).attr('cellcolor'))
                      }
 
-                },
-                "fnDrawCallback": function () {
-
-                },
+               },
+               "fnDrawCallback": function () {
+                   $('.ToggleSliders').bootstrapToggle({
+                       on: 'Ναί',
+                       off: 'Όχι'
+                   });
+               },
             });
     </script>
 
