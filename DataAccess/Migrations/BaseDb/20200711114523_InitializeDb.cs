@@ -200,6 +200,35 @@ namespace DataAccess.Migrations.BaseDb
                 });
 
             migrationBuilder.CreateTable(
+                name: "RealWorkHours",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    StartOn = table.Column<DateTime>(nullable: false),
+                    EndOn = table.Column<DateTime>(nullable: false),
+                    TimeShiftId = table.Column<int>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RealWorkHours", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RealWorkHours_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RealWorkHours_TimeShifts_TimeShiftId",
+                        column: x => x.TimeShiftId,
+                        principalTable: "TimeShifts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WorkHours",
                 columns: table => new
                 {
@@ -264,6 +293,16 @@ namespace DataAccess.Migrations.BaseDb
                 column: "WorkPlaceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RealWorkHours_EmployeeId",
+                table: "RealWorkHours",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RealWorkHours_TimeShiftId",
+                table: "RealWorkHours",
+                column: "TimeShiftId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TimeShifts_WorkPlaceId",
                 table: "TimeShifts",
                 column: "WorkPlaceId");
@@ -291,6 +330,9 @@ namespace DataAccess.Migrations.BaseDb
 
             migrationBuilder.DropTable(
                 name: "EmployeeWorkPlaces");
+
+            migrationBuilder.DropTable(
+                name: "RealWorkHours");
 
             migrationBuilder.DropTable(
                 name: "WorkHours");

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Bussiness.Repository.Interface;
-using DataAccess.Models.Entity.WorkTimeShift;
+using DataAccess.Models.Entity;
 
 namespace Bussiness.Repository.Base.Interface
 {

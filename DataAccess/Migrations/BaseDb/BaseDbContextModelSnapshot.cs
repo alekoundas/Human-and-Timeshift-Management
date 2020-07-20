@@ -185,6 +185,37 @@ namespace DataAccess.Migrations.BaseDb
                     b.ToTable("EmployeeWorkPlaces");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Entity.RealWorkHour", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TimeShiftId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("TimeShiftId");
+
+                    b.ToTable("RealWorkHours");
+                });
+
             modelBuilder.Entity("DataAccess.Models.Entity.Specialization", b =>
                 {
                     b.Property<int>("Id")
@@ -205,6 +236,35 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasKey("Id");
 
                     b.ToTable("Specializations");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.TimeShift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WorkPlaceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkPlaceId");
+
+                    b.ToTable("TimeShifts");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.WorkHour", b =>
@@ -264,35 +324,6 @@ namespace DataAccess.Migrations.BaseDb
                     b.ToTable("WorkPlaces");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Entity.WorkTimeShift.TimeShift", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WorkPlaceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkPlaceId");
-
-                    b.ToTable("TimeShifts");
-                });
-
             modelBuilder.Entity("DataAccess.Models.Entity.Contact", b =>
                 {
                     b.HasOne("DataAccess.Models.Entity.Customer", "Customer")
@@ -341,6 +372,30 @@ namespace DataAccess.Migrations.BaseDb
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Entity.RealWorkHour", b =>
+                {
+                    b.HasOne("DataAccess.Models.Entity.Employee", "Employee")
+                        .WithMany("RealWorkHours")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Models.Entity.TimeShift", "TimeShift")
+                        .WithMany("RealWorkHours")
+                        .HasForeignKey("TimeShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.TimeShift", b =>
+                {
+                    b.HasOne("DataAccess.Models.Entity.WorkPlace", "WorkPlace")
+                        .WithMany("TimeShift")
+                        .HasForeignKey("WorkPlaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("DataAccess.Models.Entity.WorkHour", b =>
                 {
                     b.HasOne("DataAccess.Models.Entity.Employee", "Employee")
@@ -349,7 +404,7 @@ namespace DataAccess.Migrations.BaseDb
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataAccess.Models.Entity.WorkTimeShift.TimeShift", "TimeShift")
+                    b.HasOne("DataAccess.Models.Entity.TimeShift", "TimeShift")
                         .WithMany("WorkHours")
                         .HasForeignKey("TimeShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -361,15 +416,6 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasOne("DataAccess.Models.Entity.Customer", "Customer")
                         .WithMany("WorkPlaces")
                         .HasForeignKey("CustomerId");
-                });
-
-            modelBuilder.Entity("DataAccess.Models.Entity.WorkTimeShift.TimeShift", b =>
-                {
-                    b.HasOne("DataAccess.Models.Entity.WorkPlace", "WorkPlace")
-                        .WithMany("TimeShift")
-                        .HasForeignKey("WorkPlaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

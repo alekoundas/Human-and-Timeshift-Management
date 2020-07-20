@@ -4,7 +4,6 @@ using System.Text;
 using DataAccess.Models;
 using DataAccess.Configurations;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Entity.WorkTimeShift;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess   
@@ -20,6 +19,7 @@ namespace DataAccess
         public DbSet<Specialization> Specializations { get; set; }
         public DbSet<TimeShift> TimeShifts{ get; set; }
         public DbSet<WorkHour> WorkHours { get; set; }
+        public DbSet<RealWorkHour> RealWorkHours { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<WorkPlace> WorkPlaces { get; set; }

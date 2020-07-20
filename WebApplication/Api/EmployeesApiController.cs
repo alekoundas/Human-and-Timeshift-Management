@@ -23,7 +23,7 @@ namespace WebApplication.Api
     [ApiController]
     public class EmployeesApiController : ControllerBase
     {
-        private BaseDbContext _context;
+        private  BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         private readonly SecurityDataWork _securityDatawork;
 
@@ -69,7 +69,7 @@ namespace WebApplication.Api
 
         // GET: api/employees/getSelet2Option/id
         [HttpGet("getselect2option/{id}")]
-        public async Task<ActionResult<Employee>> getSelet2Option(int id)
+        public async Task<ActionResult<Employee>> GetSelet2Option(int id)
         {
             var select2Helper = new Select2Helper();
             Expression<Func<Employee, bool>> filter = x => x.Id == id;
@@ -82,14 +82,14 @@ namespace WebApplication.Api
 
         // GET: api/employees/select2
         [HttpPost("select2")]
-        public async Task<ActionResult<Employee>> select2([FromBody] Select2Get select2)
+        public async Task<ActionResult<Employee>> Select2([FromBody] Select2Get select2)
         {
             var employees = new List<Employee>();
             var select2Helper = new Select2Helper();
             //Expression<Func<Employee, bool>> filter;
             var filter = PredicateBuilder.New<Employee>();
 
-            if (select2.ExistingEmployees.Count > 0)
+            if (select2.ExistingEmployees?.Count > 0)
                 foreach (var employeeId in select2.ExistingEmployees)
                     filter = filter.And(x => x.Id != employeeId);
 
@@ -195,10 +195,10 @@ namespace WebApplication.Api
 
             var mapedData = MapResults(employees, datatable);
 
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+            return Ok(dataTableHelper.CreateResponse(datatable,await mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Employee> results, Datatable datatable)
+        protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Employee> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
@@ -244,7 +244,8 @@ namespace WebApplication.Api
                         dictionary.Add("CompanyTitle", employee.Company.Title);
 
                     if (_baseDataWork.EmployeeWorkPlaces
-                        .Any(x => x.EmployeeId == employee.Id && x.WorkPlaceId == datatable.GenericId))
+                        .Any(x => x.EmployeeId == employee.Id &&
+                        x.WorkPlaceId == datatable.GenericId))
                     {
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                             "Employee", apiUrl, "checked"));
@@ -257,10 +258,14 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "TimeShiftEdit")
                 {
-                    for (int i = 1; i <= 31; i++)
-                        dictionary.Add("Day" + i, dataTableHelper.GetHoverElementsAsync(_baseDataWork, i, datatable, employee.Id));
+                    var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                    for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
+                        dictionary.Add("Day" + i, 
+                            dataTableHelper.GetHoverElementsAsync(_baseDataWork,
+                                i, datatable, employee.Id));
 
-                    dictionary.Add("ToggleSlider", dataTableHelper.GetEmployeeCheckbox(datatable, employee.Id));
+                    dictionary.Add("ToggleSlider", dataTableHelper
+                        .GetEmployeeCheckbox(datatable, employee.Id));
 
                     returnObjects.Add(expandoObj);
                 }

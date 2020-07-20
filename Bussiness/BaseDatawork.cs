@@ -23,6 +23,7 @@ namespace Bussiness
         public ICustomerRepository Customers { get; private set; }
         public IWorkplaceRepository WorkPlaces { get; private set; }
         public IWorkHourRepository WorkHours { get; private set; }
+        public IRealWorkHourRepository RealWorkHours { get; private set; }
         public ITimeShiftRepository TimeShifts { get; private set; }
         public IEmployeeWorkPlaceRepository EmployeeWorkPlaces { get; private set; }
 
@@ -35,6 +36,7 @@ namespace Bussiness
             Customers = new CustomerRepository(_dbcontext);
             WorkPlaces = new WorkPlaceRepository(_dbcontext);
             WorkHours = new WorkHourRepository(_dbcontext);
+            RealWorkHours = new RealWorkHourRepository(_dbcontext);
             TimeShifts = new TimeShiftRepository(_dbcontext);
             EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
         }

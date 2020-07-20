@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace DataAccess.Models.Entity.WorkTimeShift
+namespace DataAccess.Models.Entity
 {
     public class TimeShift : BaseEntity
     {
@@ -13,5 +14,10 @@ namespace DataAccess.Models.Entity.WorkTimeShift
         public int WorkPlaceId { get; set; }
         public WorkPlace WorkPlace { get; set; }
         public ICollection<WorkHour> WorkHours { get; set; }
+        public ICollection<RealWorkHour> RealWorkHours { get; set; }
+
+
+        [NotMapped]
+        public int DaysInMonth { get => DateTime.DaysInMonth(Year,Month);  }
     }
 }

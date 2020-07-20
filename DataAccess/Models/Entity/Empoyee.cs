@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Entity.WorkTimeShift;
 
 namespace DataAccess.Models.Entity
 {
@@ -25,6 +24,7 @@ namespace DataAccess.Models.Entity
 
         public ICollection<Contact> Contacts{ get; set; }
         public ICollection<WorkHour> WorkHours { get; set; }
+        public ICollection<RealWorkHour> RealWorkHours { get; set; }
         public ICollection<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
 
 

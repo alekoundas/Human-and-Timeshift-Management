@@ -1,0 +1,14 @@
+
+
+Base
+add-migration InitializeDb -Context BaseDbContext -Project DataAccess -o Migrations/BaseDb
+
+remove-migration -Context ApplicationDbContext -Project WebApplication
+
+update-database -Context BaseDbContext -Project DataAccess
+
+
+Security:
+add-migration InitializeDb -Context SecurityDbContext -Project DataAccess -o Migrations/SecurityDb
+
+update-database -Context SecurityDbContext -Project DataAccess

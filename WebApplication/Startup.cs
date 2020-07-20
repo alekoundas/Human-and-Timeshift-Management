@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 namespace WebApplication
 {
@@ -75,6 +77,20 @@ namespace WebApplication
             RoleManager<ApplicationRole> roleManager,
             IServiceProvider services)
         {
+
+            var supportedCultures = new[]
+            {
+                new CultureInfo("el-GR")
+            };
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("el-GR"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            });
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -83,7 +83,7 @@
                     <div class="form-group">
                         <label asp-for="SpecializationId" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Specialization.Name" class="form-control" />
+                            <select class="Specialization_Select2" asp-for="CompanyId" style="width:70%"></select>
                             <span asp-validation-for="SpecializationId" class="text-danger"></span>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                     <div class="form-group">
                         <label asp-for="CompanyId" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Company.Title" class="form-control" />
+                            <select class="Company_Select2" asp-for="SpecializationId" style="width:70%"></select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                         <div class="col-sm-1"></div>
                         <div class="col-sm-6">
 
-                            <input type="text" class="form-control hidden" value="@contact.Id"  />
+                            <input type="text" class="form-control hidden" value="@contact.Id" />
 
                             <div class="input-group">
                                 <label asp-for="Contacts.ElementAt(0).Title" class="control-label"></label>
@@ -167,4 +167,36 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="~/js/Custom/Contacts.js"></script>
+
+
+    <script>
+        $('.Specialization_Select2').select2({
+            ajax: {
+                url: '/api/specializations/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+    </script>
+    <script>
+        $('.Company_Select2').select2({
+            ajax: {
+                url: '/api/companies/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+    </script>
 }

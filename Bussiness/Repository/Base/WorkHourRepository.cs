@@ -7,7 +7,7 @@ using Bussiness.Repository.Base.Interface;
 using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
-using DataAccess.ViewModels.View;
+using DataAccess.ViewModels.WorkHours;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bussiness.Repository.Base
@@ -34,17 +34,20 @@ namespace Bussiness.Repository.Base
                 .ToList();
         }
 
-        public bool IsDateOverlaps(WorkHoursApiViewModel workHour)
+        public bool IsDateOverlaping(WorkHoursApiViewModel workHour, int employeeId)
         {
-
             return Context.WorkHours.Where(x =>
-                  x.TimeShiftId == workHour.TimeShiftId &&
                   (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
                   (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn))
-                    .Any(y => y.Employee.Id == workHour.EmployeeId);
-
+                    .Any(y => y.Employee.Id == employeeId);
         }
 
-       
+        public bool HasExactDate(WorkHoursApiViewModel workHour)
+        {
+            return Context.WorkHours.Any(x =>
+                  x.TimeShiftId == workHour.TimeShiftId &&
+                  x.StartOn == workHour.StartOn && workHour.EndOn == x.EndOn);
+        }
+
     }
 }

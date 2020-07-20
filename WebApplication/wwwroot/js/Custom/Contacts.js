@@ -1,5 +1,4 @@
-﻿
-var Count = 0;
+﻿var Count = 0;
 function AppendContactForm() {
 
     var titleDiv = DivElement('form-group');

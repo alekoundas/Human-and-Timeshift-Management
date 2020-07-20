@@ -19,9 +19,10 @@ namespace WebApplication.Utilities
         private IHttpContextAccessor _httpContext;
         private ISecurityDatawork _securityDatawork;
         //private IBaseDatawork _baseDatawork;
-        public DataTableHelper(SecurityDataWork securityDatawork)
+        public DataTableHelper(SecurityDataWork securityDatawork/*, BaseDatawork baseDatawork*/)
         {
             _securityDatawork = securityDatawork;
+            //_baseDatawork = baseDatawork;
         }
 
         public DatatableResponse<TEntity> CreateResponse(Datatable dataTable, IEnumerable<TEntity> model, int total, int filteredCount = -1)
@@ -195,42 +196,79 @@ namespace WebApplication.Utilities
             => @"<input urlAttr='" + link + "' class='ToggleSliders' type='checkbox' data-onstyle='success' " + toggleState + ">";
 
 
-
+        public string GetTableCellBody(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        {
+            return "";
+        }
         public string GetHoverElementsAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
-            var skata = baseDatawork.Employees.Any(x =>
-            x.Id == employeeId &&
-            x.WorkHours.Any(y =>
-                y.TimeShiftId == datatable.GenericId &&
-                y.StartOn.Year == datatable.TimeShiftYear &&
-                y.StartOn.Month == datatable.TimeShiftMonth &&
-                (
-                    y.StartOn.Day == dayOfMonth ||
-                    y.EndOn.Day == dayOfMonth ||
-                    (y.StartOn.Day < dayOfMonth && dayOfMonth < y.EndOn.Day)
-                 )));
+            var skata = baseDatawork.Employees.Where(x =>
+                x.Id == employeeId &&
+                x.WorkHours.Any(y =>
+                    y.TimeShiftId == datatable.GenericId &&
+                    y.StartOn.Year == datatable.TimeShiftYear &&
+                    y.StartOn.Month == datatable.TimeShiftMonth &&
+                    (
+                        y.StartOn.Day == dayOfMonth ||
+                        y.EndOn.Day == dayOfMonth ||
+                        (y.StartOn.Day < dayOfMonth && dayOfMonth < y.EndOn.Day)
+                     )));
 
             //TODO :Async
-            var kkk =  baseDatawork.WorkHours.GetCurrentAssignedOnCell(
+            var cellWorkHours = baseDatawork.WorkHours.GetCurrentAssignedOnCell(
                 datatable.GenericId,
                 datatable.TimeShiftYear,
                 datatable.TimeShiftMonth,
                 dayOfMonth,
                 employeeId);
 
+            if (cellWorkHours.Count() > 0)
+            {
+                var sdafasdf = 234;
+            }
 
-            if (skata)
-                return FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId) + FaIconAdd(dayOfMonth, "green", employeeId);
-            return FaIconAdd(dayOfMonth, "", employeeId);
+            //if (skata)
+            //    return FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId) + FaIconAdd(dayOfMonth, "green", employeeId);
+            //return FaIconAdd(dayOfMonth, "", employeeId);
+
+            var startTimeSpan = String.Join(",",
+                cellWorkHours.Select(x =>
+                    SpanTimeValue(x.StartOn.ToShortTimeString())));
+
+            var endTimeSpan = String.Join(",",
+                cellWorkHours.Select(x =>
+                    SpanTimeValue(x.EndOn.ToShortTimeString())));
+
+            return "<div style='width:110px; white-space: nowrap;'>" +
+                      "<div style='width:50px;display:block;  float: left;'>" +
+                      (!String.IsNullOrEmpty(startTimeSpan)?"<span>Έναρξη</span></br>" :"")+
+                      startTimeSpan +
+                      "</div>" +
+                      "<div style='width:50px; display:block;  float: right; '>" +
+                      (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "")+
+                      endTimeSpan +
+                    "</div>" +
+                     (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
+                        datatable.GenericId) :
+                        "") +
+                     FaIconAdd(dayOfMonth, "", employeeId);
+
         }
 
-        private static string FaIconEdit(int dayOfMonth, string color, int employeeid,int timeshiftid)
+        private static string SpanTimeValue(string time)
+            => @"<span>" + time + "</span></br>";
+        private static string FaIconEdit(int dayOfMonth, string color, int employeeid, int timeshiftid)
           => @"<i class='fa fa-pencil hidden faIconEdit'   timeshiftid='" + timeshiftid + "' employeeid='" + employeeid + "' cellColor='" + color + "' dayOfMonth = '" + dayOfMonth + "'></i>";
 
         private static string FaIconAdd(int dayOfMonth, string color, int employeeid)
             => @"<i class='fa fa-plus hidden faIconAdd' employeeid='" + employeeid + "' cellColor=''" + color + "'' dayOfMonth = '" + dayOfMonth + "'></i>";
 
         public string GetEmployeeCheckbox(Datatable datatable, int employeeId)
-            => @"<input class='ToggleSliders' type='checkbox' data-onstyle='success' employeeId=" + employeeId + ">";
+            => @"<input " +
+                "class='ToggleSliders'" +
+                "type='checkbox'" +
+                "data-onstyle='success'" +
+                "employeeId=" + employeeId +
+              ">";
     }
 }

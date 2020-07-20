@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using DataAccess.Models;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Entity.WorkTimeShift;
 using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.View
+namespace DataAccess.ViewModels.WorkHours
 {
     public class WorkHoursApiViewModel : BaseEntity
     {
@@ -19,19 +18,22 @@ namespace DataAccess.ViewModels.View
         [JsonProperty(PropertyName = "timeShiftId", Required = Required.Default)]
         public int TimeShiftId { get; set; }
 
-        [JsonProperty(PropertyName = "employeeId", Required = Required.Default)]
+        [JsonProperty(PropertyName = "employeeId")]
         public int EmployeeId { get; set; }
 
+        [JsonProperty(PropertyName = "employeeIds")]
+        public List<int> EmployeeIds { get; set; }
 
-        public static WorkHour CreateFrom(WorkHoursApiViewModel viewModel)
-        {
-            return new WorkHour
-            {
-                StartOn = viewModel.StartOn,
-                EndOn = viewModel.EndOn,
-                TimeShiftId = viewModel.TimeShiftId,
-                CreatedOn = DateTime.Now
-            };
-        }
+
+        //public static WorkHour CreateFrom(WorkHoursApiViewModel viewModel)
+        //{
+        //    return new WorkHour
+        //    {
+        //        StartOn = viewModel.StartOn,
+        //        EndOn = viewModel.EndOn,
+        //        TimeShiftId = viewModel.TimeShiftId,
+        //        CreatedOn = DateTime.Now
+        //    };
+        //}
     }
 }

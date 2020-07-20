@@ -9,6 +9,7 @@ using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels.View;
 using Bussiness;
+using DataAccess.ViewModels.WorkHours;
 
 namespace WebApplication.Api
 {
@@ -101,20 +102,53 @@ namespace WebApplication.Api
         }
 
 
+        // POST: api/workhours/hasoverlap
+        [HttpPost("hasoverlap")]
+        public async Task<ActionResult<WorkHour>> HasOverlap([FromBody] WorkHoursApiViewModel workHour)
+        {
+            if (workHour.EmployeeIds != null)
+            {
 
+                List<object> response = new List<object>();
+                workHour.EmployeeIds.ForEach(id =>
+                {
+                    if (_baseDataWork.WorkHours.IsDateOverlaping(workHour, id))
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 0,
+                            value = "Ο χρήστης αυτός έχει ήδη δηλωθεί για αυτές τις ώρες"
+                        });
+                    else
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 1,
+                            value = ""
 
+                        });
 
+                });
+                return Ok(response);
+            }
+
+            //(StartDate1 <= EndDate2) and (EndDate1 >= StartDate2)
+            if (_baseDataWork.WorkHours.HasExactDate(workHour))
+                return Ok(new { value = "Η βάρδια αντιστοιχεί στο χρονόγραμμα ", type = "success" });
+
+            return Ok(new { value = "Δεν βρέθηκε η συγγεκριμενη βάρδια στο χρονόγραμμα ", type = "error" });
+        }
 
 
         // POST: api/workhours/addEmployeeWorkhours
         [HttpPost("addEmployeeWorkhours")]
-        public async Task<ActionResult<WorkHour>> addEmployeeWorkhours([FromBody] List<WorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<WorkHoursApiViewModel> workHours)
         {
             //(StartDate1 <= EndDate2) and (EndDate1 >= StartDate2)
             foreach (var workHour in workHours)
             {
-                if ( _baseDataWork.WorkHours.IsDateOverlaps(workHour))
-                    return NotFound();
+                //if (_baseDataWork.WorkHours.IsDateOverlaping(workHour))
+                //    return NotFound();
 
                 _baseDataWork.WorkHours.Add(new WorkHour()
                 {
@@ -134,7 +168,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/getforcell
         [HttpPost("getforcell")]
-        public async Task<ActionResult<WorkHour>> getForCell([FromBody] WorkHoursApiViewModel workHour)
+        public async Task<ActionResult<WorkHour>> GetForCell([FromBody] WorkHoursApiViewModel workHour)
         {
             var varadata = _baseDataWork.WorkHours.GetCurrentAssignedOnCell(
                 workHour.TimeShiftId,

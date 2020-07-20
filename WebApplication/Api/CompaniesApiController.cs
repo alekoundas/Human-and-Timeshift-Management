@@ -128,6 +128,7 @@ namespace WebApplication.Controllers
 
             return Ok(select2Helper.CreateCompaniesResponse(companies));
         }
+
         [HttpGet("managecompanyemployees/{employeeId}/{companyId}/{toggleState}")]
         public async Task<ActionResult<Company>> ManageCompanyEmployees(int employeeId, int companyId, string toggleState)
         {

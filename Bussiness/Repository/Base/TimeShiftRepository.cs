@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Bussiness.Repository.Base.Interface;
 using DataAccess;
-using DataAccess.Models.Entity.WorkTimeShift;
+using DataAccess.Models.Entity;
 
 namespace Bussiness.Repository.Base
 {

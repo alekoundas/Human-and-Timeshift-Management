@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
-using DataAccess.Models.Entity.WorkTimeShift;
+using DataAccess.Models.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Bussiness;
 using DataAccess.ViewModels;

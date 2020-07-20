@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Entity.WorkTimeShift;
 
 namespace DataAccess.Models.Entity
 {

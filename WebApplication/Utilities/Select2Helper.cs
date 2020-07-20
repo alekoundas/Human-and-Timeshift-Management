@@ -70,5 +70,20 @@ namespace WebApplication.Utilities
                 });
             return new Select2Response() { Results = results };
         }
-    }
+        public Select2Response CreateTimeShiftsResponse(IEnumerable<TimeShift> timeShifts)
+        {
+            var results = new List<Select2Result>();
+            foreach (var result in timeShifts)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.Title + " " +
+                        result.Month + "/" +
+                        result.Month
+                });
+            return new Select2Response() { Results = results };
+        }
+    }  
+
+    
 }

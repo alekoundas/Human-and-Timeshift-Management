@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
-using DataAccess.Models.Entity.WorkTimeShift;
+using DataAccess.Models.Entity;
 using DataAccess.Models.Datatable;
 using Bussiness;
 using System.Dynamic;
 using Bussiness.Service;
 using WebApplication.Utilities;
+using DataAccess.ViewModels;
 
 namespace WebApplication.Api
 {
@@ -106,6 +107,31 @@ namespace WebApplication.Api
 
             return timeShift;
         }
+
+
+        
+
+        // GET: api/timeshifts/select2
+        [HttpGet("select2")]
+        public async Task<ActionResult<TimeShift>> Select2(string search, int page)
+        {
+            var timeShifts = new List<TimeShift>();
+            var select2Helper = new Select2Helper();
+
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                timeShifts= (List<TimeShift>)await _baseDataWork.TimeShifts
+                    .GetPaggingWithFilter(null, null, null, 10, page);
+
+                return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts));
+            }
+
+            timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
+               .GetPaggingWithFilter(null, x => x.Title.Contains(search), null, 10, page);
+
+            return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts));
+        }
+
         // POST: api/timeshifts/getdatatable
         [HttpPost("getdatatable")]
         public async Task<ActionResult<TimeShift>> getdatatable([FromBody] Datatable datatable)

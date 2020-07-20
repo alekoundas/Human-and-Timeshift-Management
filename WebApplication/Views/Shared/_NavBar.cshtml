@@ -17,7 +17,7 @@
             <li class="header">Βασικό μενού</li>
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Υπάλληλοι</span>
+                    <i class="fa fa-users "></i> <span>Υπάλληλοι</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -31,7 +31,7 @@
             <!--TimeShift -->
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Χρονόγραμμα</span>
+                    <i class="fa fa-table"></i> <span>Χρονόγραμμα</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -42,10 +42,24 @@
                 </ul>
             </li>
 
+            <!--RealWorkHour -->
+            <li class="treeview ">
+                <a href="#">
+                    <i class="fa fa-dashboard"></i> <span>Βάρδιες</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    @Html.LinkButton("RealWorkhour", "Create", "Δήλωση νέας βάρδιας")
+                    @Html.LinkButton("RealWorkhour", "Index", "Βάρδιες")
+                </ul>
+            </li>
+
             <!-- Company -->
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Εταιρίες</span>
+                    <i class="fa fa-building-o"></i> <span>Εταιρίες</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -59,7 +73,7 @@
             <!-- Customer -->
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Πελάτες</span>
+                    <i class="fa  fa-user-circle-o"></i> <span>Πελάτες</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -74,7 +88,7 @@
 
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Πόστα</span>
+                    <i class="fa fa-map-marker"></i> <span>Πόστα</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -85,7 +99,7 @@
                 </ul>
             </li>
 
-            
+
 
             <li class="header">Lookups</li>
 
@@ -93,7 +107,7 @@
             <!-- Specialization -->
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Ειδικότητες</span>
+                    <i class="fa fa-database"></i> <span>Ειδικότητες</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -108,10 +122,10 @@
 
             <li class="header">Ασφάλεια</li>
 
-
+            <!-- Specialization -->
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Χρήστες</span>
+                    <i class="fa fa-lock"></i> <span>Διαχείριση</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -125,19 +139,20 @@
 
 
             @* Register *@
-            <li class="treeview ">
-                <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>εγγραφη</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    @Html.LinkButton("Account", "Register", "Εγγραφή")
-                    @Html.LinkButton("Account", "CreateUser", "Προσθήκη νέου χρήστη")
+            <!-- Register -->
+            @*<li class="treeview ">
+            <a href="#">
+                <i class="fa fa-dashboard"></i> <span>εγγραφη</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                @Html.LinkButton("Account", "Register", "Εγγραφή")
+                @Html.LinkButton("Account", "CreateUser", "Προσθήκη νέου χρήστη")
 
-                </ul>
-            </li>
+            </ul>
+        </li>*@
 
 
             @*<li class="header">LABELS</li>

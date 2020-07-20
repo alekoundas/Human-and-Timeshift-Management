@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Entity.WorkTimeShift;
 
 namespace DataAccess.ViewModels
 {

@@ -5,7 +5,7 @@ using DataAccess.Models.Entity;
 
 namespace DataAccess.Models.Entity
 {
-    public class WorkHour : BaseEntity
+    public class RealWorkHour:  BaseEntity
     {
         public DateTime StartOn { get; set; }
         public DateTime EndOn { get; set; }
@@ -15,7 +15,5 @@ namespace DataAccess.Models.Entity
 
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
-
-
     }
 }
