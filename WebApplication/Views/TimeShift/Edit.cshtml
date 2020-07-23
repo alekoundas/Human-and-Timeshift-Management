@@ -92,36 +92,6 @@
                             {
                                 <th>@i+1</th>
                             }
-                            @*<th>2</th>
-                                <th>3</th>
-                                <th>4</th>
-                                <th>5</th>
-                                <th>6</th>
-                                <th>7</th>
-                                <th>8</th>
-                                <th>9</th>
-                                <th>10</th>
-                                <th>11</th>
-                                <th>12</th>
-                                <th>13</th>
-                                <th>14</th>
-                                <th>15</th>
-                                <th>16</th>
-                                <th>17</th>
-                                <th>18</th>
-                                <th>19</th>
-                                <th>20</th>
-                                <th>21</th>
-                                <th>22</th>
-                                <th>23</th>
-                                <th>24</th>
-                                <th>25</th>
-                                <th>26</th>
-                                <th>27</th>
-                                <th>28</th>
-                                <th>29</th>
-                                <th>30</th>
-                                <th>31</th>*@
                         </tr>
                     </thead>
                     <tfoot>
@@ -134,37 +104,6 @@
                                 <th data-searchable="false">@i+1</th>
 
                             }
-                            @*<th data-searchable="false">1</th>
-                                <th data-searchable="false">2</th>
-                                <th data-searchable="false">3</th>
-                                <th data-searchable="false">4</th>
-                                <th data-searchable="false">5</th>
-                                <th data-searchable="false">6</th>
-                                <th data-searchable="false">7</th>
-                                <th data-searchable="false">8</th>
-                                <th data-searchable="false">9</th>
-                                <th data-searchable="false">10</th>
-                                <th data-searchable="false">11</th>
-                                <th data-searchable="false">12</th>
-                                <th data-searchable="false">13</th>
-                                <th data-searchable="false">14</th>
-                                <th data-searchable="false">15</th>
-                                <th data-searchable="false">16</th>
-                                <th data-searchable="false">17</th>
-                                <th data-searchable="false">18</th>
-                                <th data-searchable="false">19</th>
-                                <th data-searchable="false">20</th>
-                                <th data-searchable="false">21</th>
-                                <th data-searchable="false">22</th>
-                                <th data-searchable="false">23</th>
-                                <th data-searchable="false">24</th>
-                                <th data-searchable="false">25</th>
-                                <th data-searchable="false">26</th>
-                                <th data-searchable="false">27</th>
-                                <th data-searchable="false">28</th>
-                                <th data-searchable="false">29</th>
-                                <th data-searchable="false">30</th>
-                                <th data-searchable="false">31</th>*@
                         </tr>
                     </tfoot>
                 </table>
@@ -230,48 +169,22 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        var WorkHourId = 0;
         $(document).ready(function () {
             Datatable();
         });
 
-        const BuildHasOverlapWorkHourDto = (start,end) => ({
-            timeShiftId: @Model.Id,
-            startOn: TimeConverter(new Date(ConvertDate(start)), false),
-            endOn: TimeConverter(new Date(ConvertDate(end)), false)
-        });
-        const GetAllWorkHourIds = () => [...document.getElementsByClassName('WorkHourDiv')].map(div => div.id.split('_')[1]);
-        const HandleWorkHourSpan = (workHourId, errorMessage) => {
-            console.log(workHourId + ' - ' + errorMessage);
-            if (errorMessage != undefined && workHourId !=undefined) {
-                var span = document
-                    .getElementById('WorkHourErrorSpanNum_' + workHourId);
-                span.style = "display:;";
-                if (!span.innerHTML.includes(errorMessage))
-                    span.innerHTML += errorMessage;
-            }
-            else if (workHourId != undefined)
-                [...document.getElementsByClassName('WorkHourErrorSpan')]
-                    .filter(span => span.id == 'WorkHourErrorSpanNum_' + workHourId)
-                    .forEach((span) => {
-                        span.innerHTML = '';
-                        span.style = "display:none;"
-                    });
-            //else
-            //    [...document.getElementsByClassName('WorkHourErrorSpan')]
-            //        .forEach((span) => {
-            //            span.innerHTML = '';
-            //            span.style = "display:none;"
-            //        });
-        }
+
+
         var CelentimDate = "";
         const ConvertDate = (date) => moment(date, 'DD/MM/YYYY HH:mm').format("MM/DD/YYYY HH:mm")
-          const GMTtoUTCconverter = (GMTtime) => Date.UTC(
-                        GMTtime.getUTCFullYear(),
-                        GMTtime.getUTCMonth(),
-                        GMTtime.getUTCDate(),
-                        GMTtime.getUTCHours(),
-                        GMTtime.getUTCMinutes(),
-                        GMTtime.getUTCSeconds());
+        const GMTtoUTCconverter = (GMTtime) => Date.UTC(
+            GMTtime.getUTCFullYear(),
+            GMTtime.getUTCMonth(),
+            GMTtime.getUTCDate(),
+            GMTtime.getUTCHours(),
+            GMTtime.getUTCMinutes(),
+            GMTtime.getUTCSeconds());
         const TimeConverter = (GMTtime, hasLaterDate) => {
             var date = new Date(GMTtoUTCconverter(GMTtime));
             var year = date.getFullYear();
@@ -289,160 +202,15 @@
             var time = year + '-' + month + '-' + day + 'T' + hour + ':' + min;
             return time;
         }
-    var MapData = (dateInput, employeeId) =>
-         JsonData = {
-            startOn: ConvertDate(dateInput.value.split('/-/')[0]),
-            endOn: ConvertDate(dateInput.value.split('/-/')[1]),
-            timeShiftId:@Model.Id,
-            employeeId: employeeId
-        };
+
     </script>
+
+
     <!--///////////////////////////////////////-->
-    <!--///             Handlers            ///-->
+    <!--///             Validation          ///-->
     <!--///////////////////////////////////////-->
-    <script>
-        //Submit button handler
-        const HandleSubmitButton = () => {
-
-
-            var select2Span = [...document.getElementsByClassName('EmployeeSelect2Span')].filter(span =>
-                span.style.display !== "none");
-
-            var workHourSpan = [...document.getElementsByClassName('WorkHourErrorSpan')].filter(span =>
-                span.style.display !== "none");
-
-            if (workHourSpan.length > 0 || select2Span.length > 0)
-                document.getElementById('SaveWorkHours').disabled = true;
-            else
-                document.getElementById('SaveWorkHours').disabled = false;
-        }
-
-        const ClearErrors = (workHourId) => {
-            HandleWorkHourSpan();
-            HandleEmployeeSelect2SpanPerWorkHour(null, null, workHourId);
-
-        }
-    </script>
-    <script>
-        $('.WorkPlace_Select2').select2({
-            ajax: {
-                url: '/api/workplaces/select2',
-                data: function (params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-                    return query;
-                }
-            }
-        });
-    </script>
 
     <script>
-        const GetWorkHourEmployeeIds = (num) => [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + num)].map((data) => data.value).filter((val) => val != "");
-        const BuildSelect2DtoNum = (params, workHourId) => ({
-                timeShiftId: @Model.Id,
-                search: params.term,
-                page: params.page || 1,
-            existingEmployees: GetWorkHourEmployeeIds(workHourId)
-            });
-        const BuildSelect2Dto = (params) => ({
-                timeShiftId: @Model.Id,
-                search: params.term,
-                page: params.page || 1
-            });
-    //< !--Employees Select2-- >
-
-        const EmployeeSelect2 = (workHourId, num) => {
-            $('#EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num).select2({
-                ajax: {
-                    type: "POST",
-                    url: '/api/employees/select2',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: function (params) {
-                        if (num != null)
-                            return JSON.stringify(BuildSelect2DtoNum(params, workHourId));
-                        else
-                            return JSON.stringify(BuildSelect2Dto(params));
-                    }
-                }
-            }).on('change', (e) => {
-                if (!ValidateNullInputs(workHourId)) {
-                    ValidateEmployeesWithRangeToWorkhour(workHourId);
-                }
-                        HandleSubmitButton();
-
-            });
-        }
-    </script>
-
-
-
-    <script>
-        var Calentim = (currentDate, workHourId) => {
-            //$("#CallendarButtonNum_" + workHourId).data("calentim").destroy();
-            $('#CalentimButtonNum_' + workHourId).calentim({
-                dateSeparator: '/-/',
-                startOnMonday: true,
-                dontPrefixHours: false,
-                format: "DD/MM/YYYY HH:mm",
-                hourFormat: 24,
-                calendarCount: 1,
-                minuteSteps: 15,
-                showHeader: false,
-                showButtons: true,
-                locale: "el",
-                target: $("#CalentimInputNum_" + workHourId),
-                showOn: "right",
-                rangeOrientation: "vertical",
-                ranges: [
-                    {
-                        title: "Χτές και ημέρα κελιού",
-                        startDate: moment(currentDate).subtract(1, 'days'),
-                        endDate: moment(currentDate)
-                    },
-                    {
-                        title: "Ημέρα κελιού",
-                        startDate: moment(currentDate),
-                        endDate: moment(currentDate)
-                    },
-                    {
-                        title: "Ημέρα κελιού και άυριο",
-                        startDate: moment(currentDate),
-                        endDate: moment(currentDate).add(1, 'days')
-                    }
-                ],
-                disabledRanges: [
-                    {
-                        start: moment("01/01/1700", "DD/MM/YYYY"),//Earliest date in docs
-                        end: moment(currentDate).set('date', 0)
-                    },
-                    {
-                        start: moment(currentDate).add(1, 'month').set('date', 1),
-                        end: moment("31/12/4000", "DD/MM/YYYY")//Latest date in docs
-                    }],
-                onbeforehide: (calentim) => {
-
-                    HandleWorkHourSpan(workHourId);
-                    ValidateAndAppendWorkHourRange(workHourId);
-                    if (!ValidateNullInputs(workHourId)) {
-                        ValidateAppendedWorkHoursTimeRange(workHourId);
-                        ValidateEmployeesWithRangeToWorkhour(workHourId);
-                    }
-
-                },
-                onaftershow: () => {
-                    //Fix Calentim width
-                    [...document.getElementsByClassName('calentim-input')].forEach((calentim) => { calentim.setAttribute('style', 'width: 600px;'); });
-                }
-            })
-        };
-    </script>
-
-    <!-- Api Validation -->
-    <script>
-
         const ValidateNullInputs = (workHourId) => {
             var hasError = false;
             GetWorkHourIdsForNullDateInputs().filter(nullWorkHourid =>
@@ -453,20 +221,121 @@
                 });
             return hasError;
         };
-
         //Show wrong date in fake span, just to show to user
-        const ValidateAndAppendWorkHourRange = ( workHourId) => {
+        const ValidateAndAppendWorkHourRange = (workHourId) => {
             var splitedDate = $("#CalentimInputNum_" + workHourId)[0].value.split('/-/');
             var start = new Date(ConvertDate(splitedDate[0]));
             var end = new Date(ConvertDate(splitedDate[1]));
 
             if (start.getTime() >= end.getTime())
                 HandleWorkHourSpan(workHourId, 'Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης')
-                document.getElementById('StartOnNum_' + workHourId).innerText = splitedDate[0];
-                document.getElementById('EndOnNum_' + workHourId).innerText = splitedDate[1];
+            document.getElementById('StartOnNum_' + workHourId).innerText = splitedDate[0];
+            document.getElementById('EndOnNum_' + workHourId).innerText = splitedDate[1];
             document.getElementById('TotalHoursNum_' + workHourId).innerText = FindHourDifference(start, end);
 
         }
+
+        const AreDatesOverlaping = (baseDate, checkDate) => {
+            if ((baseDate[0] <= checkDate[0] && checkDate[0] <= baseDate[1]) ||
+                (baseDate[0] <= checkDate[1] && checkDate[1] <= baseDate[1]) ||
+                (checkDate[0] < baseDate[0] && baseDate[1] < checkDate[1]) == true)
+                return true;
+            return false
+        }
+        const ValidateEmployeesWithRangeToWorkhour = (workHourId) =>
+            $.ajax({
+                type: "POST",
+                url: '/api/workhours/hasoverlap',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(BuildValidateDto(workHourId))
+            }).done((responses) => {
+                HandleEmployeeSelect2SpanPerWorkHour(undefined, undefined, workHourId)
+                responses.forEach((response) => {
+                    HandleEmployeeSelect2SpanPerWorkHour(
+                        'EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' +
+                        GetSelect2NumBySelectedEmployeeIdAndWorkHourId(response.employeeId, workHourId),
+                        response
+                    );
+                });
+                HandleSubmitButton();
+            });
+
+        const ValidateAppendedWorkHoursTimeRange = (workHourId) => {
+            var workHourIdFiltered = GetWorkHourIdsForNullDateInputs().filter(nullWorkHourId => nullWorkHourId == WorkHourId);
+            if (workHourIdFiltered.length == 0)
+                GetAllDateInputValuesFiltered(workHourId, GetWorkHourIdsForNullDateInputs()).forEach(response => {
+                    if (AreDatesOverlaping(response.startEndDate, GetDateInputValues(workHourId))) {
+                        HandleWorkHourSpan(response.workHourId, 'Αυτό το ωράριο επειρεάζει ενα υπάρχων ωράριο');
+                        HandleWorkHourSpan(workHourId, 'Αυτό το ωράριο επειρεάζει ενα υπάρχων ωράριο');
+
+                    }
+                })
+        };
+    </script>
+
+
+
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             DTOs                ///-->
+    <!--///////////////////////////////////////-->
+
+    <script>
+          const BuildHasOverlapWorkHourDto = (start,end) => ({
+            timeShiftId: @Model.Id,
+            startOn: TimeConverter(new Date(ConvertDate(start)), false),
+            endOn: TimeConverter(new Date(ConvertDate(end)), false)
+        });
+
+          const BuildSelect2DtoNum = (params, workHourId) => ({
+                timeShiftId: @Model.Id,
+                search: params.term,
+                page: params.page || 1,
+            existingEmployees: GetWorkHourEmployeeIds(workHourId)
+        });
+
+        const BuildSelect2Dto = (params) => ({
+                timeShiftId: @Model.Id,
+                search: params.term,
+                page: params.page || 1
+        });
+
+          const BuildValidateDto = ( workHourId) => ({
+            timeShiftId:@Model.Id,
+            startOn: TimeConverter(
+                new Date(ConvertDate(GetDateInputValues(workHourId)[0])), false),
+            endOn: TimeConverter(
+                new Date(ConvertDate(GetDateInputValues(workHourId)[1])), false),
+            employeeIds: GetAlreadyAppendedEmployeeIdsPerWorkHour(workHourId)
+        });
+
+        var MapData = (dateInput, employeeId) =>
+         ({
+            startOn: ConvertDate(dateInput.value.split('/-/')[0]),
+            endOn: ConvertDate(dateInput.value.split('/-/')[1]),
+            timeShiftId:@Model.Id,
+            employeeId: employeeId
+        });
+    </script>
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Functions           ///-->
+    <!--///////////////////////////////////////-->
+
+    <script>
+        const FindHourDifference = (startOn, endOn) =>
+            (endOn.valueOf() - startOn.valueOf()) / 1000 / 60 / 60;
+
+        const GetWorkHourEmployeeIds = (num) =>
+            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + num)]
+                .map((data) => data.value).filter((val) => val != "");
+
+        const GetAllWorkHourIds = () =>
+            [...document.getElementsByClassName('WorkHourDiv')]
+                .map(div => div.id.split('_')[1]);
 
         const GetDateInputValues = (workHourId) => {
             return document.getElementById('CalentimInputNum_' + workHourId).value
@@ -489,74 +358,74 @@
 
         const GetWorkHourIdsForNullDateInputs = () => {
             var response = [];
-           [...document.getElementsByClassName('TimeSpan')].forEach(input => {
+            [...document.getElementsByClassName('TimeSpan')].forEach(input => {
                 if (input.innerHTML == '')
-                response.push(input.id.split('_')[1]);
+                    response.push(input.id.split('_')[1]);
 
             });
             return response;
         }
 
-        const BuildValidateDto = ( workHourId) => ({
-            timeShiftId:@Model.Id,
-            startOn: TimeConverter(
-                new Date(ConvertDate(GetDateInputValues(workHourId)[0])), false),
-            endOn: TimeConverter(
-                new Date(ConvertDate(GetDateInputValues(workHourId)[1])), false),
-            employeeIds: GetAlreadyAppendedEmployeeIdsPerWorkHour(workHourId)
-        });
-
-        const AreDatesOverlaping = (baseDate,checkDate) => {
-             if((baseDate[0] <= checkDate[0] && checkDate[0] <= baseDate[1]) ||
-                (baseDate[0] <= checkDate[1] && checkDate[1] <= baseDate[1]) ||
-                (checkDate[0] < baseDate[0] && baseDate[1] < checkDate[1]) == true)
-                return true ;
-            return false
-        }
-
-
-
-
-        const ValidateEmployeesWithRangeToWorkhour = (workHourId) =>
-            $.ajax({
-                type: "POST",
-                url: '/api/workhours/hasoverlap',
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                data: JSON.stringify(BuildValidateDto(workHourId))
-            }).done((responses) => {
-                HandleEmployeeSelect2SpanPerWorkHour(undefined,undefined,workHourId)
-                responses.forEach((response) => {
-                    HandleEmployeeSelect2SpanPerWorkHour(
-                        'EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' +
-                        GetSelect2NumBySelectedEmployeeIdAndWorkHourId(response.employeeId, workHourId),
-                        response
-                    );
-                });
-                HandleSubmitButton();
-            });
-
-        const ValidateAppendedWorkHoursTimeRange = (workHourId) => {
-            var workHourIdFiltered = GetWorkHourIdsForNullDateInputs().filter(nullWorkHourId => nullWorkHourId==WorkHourId);
-            if (workHourIdFiltered.length==0)
-                GetAllDateInputValuesFiltered(workHourId, GetWorkHourIdsForNullDateInputs()).forEach(response => {
-                    if (AreDatesOverlaping(response.startEndDate, GetDateInputValues(workHourId))) {
-                        HandleWorkHourSpan(response.workHourId,'Αυτό το ωράριο επειρεάζει ενα υπάρχων ωράριο');
-                        HandleWorkHourSpan(workHourId,'Αυτό το ωράριο επειρεάζει ενα υπάρχων ωράριο');
-
-                    }
-                })
-        };
-    </script>
-
-    <!-- Get Select2 EmployeeNum by employeeId and workHourId -->
-    <script>
+        //Get Select2 EmployeeNum by employeeId and workHourId-- >
         const GetSelect2NumBySelectedEmployeeIdAndWorkHourId = (employeeId, workHourId) => document
             .querySelectorAll('select.EmployeeSelect2WorkHourNum_' + workHourId + ' > option[value="' + employeeId + '"]')[0]
             .parentElement.id
             .split('_')[3]
+
+        const GetAlreadyAppendedEmployeeIdsPerWorkHour = (num) =>
+            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + num + '')]
+                .map((data) => data.value)
+                .filter((val) => val != "");
+
+        const GetSliderCheckedEmployeeIds = () => {
+            var prependEmployeeIds = [];
+            [...document.getElementsByClassName('ToggleSliders')]
+                .forEach((slider) => {
+                    if (slider.checked)
+                        prependEmployeeIds.push(slider.getAttribute('employeeid'));
+                });
+            return prependEmployeeIds;
+        }
     </script>
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Handlers            ///-->
+    <!--///////////////////////////////////////-->
     <script>
+
+        //Submit button handler
+        const HandleSubmitButton = () => {
+            var select2Span = [...document.getElementsByClassName('EmployeeSelect2Span')].filter(span =>
+                span.style.display !== "none");
+
+            var workHourSpan = [...document.getElementsByClassName('WorkHourErrorSpan')].filter(span =>
+                span.style.display !== "none");
+
+            if (workHourSpan.length > 0 || select2Span.length > 0)
+                document.getElementById('SaveWorkHours').disabled = true;
+            else
+                document.getElementById('SaveWorkHours').disabled = false;
+        }
+
+        //WorkHour Span handler
+        const HandleWorkHourSpan = (workHourId, errorMessage) => {
+            if (errorMessage != undefined && workHourId != undefined) {
+                var span = document
+                    .getElementById('WorkHourErrorSpanNum_' + workHourId);
+                span.style = "display:;";
+                if (!span.innerHTML.includes(errorMessage))
+                    span.innerHTML += errorMessage + '</br>';
+            }
+            else if (workHourId != undefined)
+                [...document.getElementsByClassName('WorkHourErrorSpan')]
+                    .filter(span => span.id == 'WorkHourErrorSpanNum_' + workHourId)
+                    .forEach((span) => {
+                        span.innerHTML = '';
+                        span.style = "display:none;"
+                    });
+        }
+
         const HandleEmployeeSelect2SpanPerWorkHour = (elementId, response, workHourId) => {
             if (workHourId != undefined && elementId == undefined && response == undefined)
                 [...document.getElementsByClassName('EmployeeSelect2SpanWorkHourNum_' + workHourId)]
@@ -580,16 +449,6 @@
         }
 
     </script>
-    <!-- Get appended employees ids -->
-    <script>
-        const GetAlreadyAppendedEmployeeIdsPerWorkHour = (num) =>
-            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + num + '')]
-                .map((data) => data.value)
-                .filter((val) => val != "");
-    </script>
-
-
-
 
 
     <!--    Modal 'Edit'  Functionality   -->
@@ -703,8 +562,6 @@
             EditModalFaFa.classList.remove('CelentimEditFormSaveButton');
             EditModalFaFa.classList.add('fa-pencil');
             EditModalFaFa.classList.add('CelentimEditFormEditButton');
-
-
         })
 
         //Delete Workhour in modal
@@ -724,7 +581,6 @@
     </script>
 
 
-
     <!--    Modal 'Add'  Functionality   -->
     <script>
         $('#EmployeesWorkhoursDatatable').on('click', '.faIconAdd', (element) => {
@@ -739,113 +595,35 @@
             $('#AddWorkHour_Modal').modal('show')
         });
 
-
-        //const FindHourDifference = (startOn, endOn) => Math.abs(startOn - endOn) / 36e5;
-        const FindHourDifference = (startOn, endOn) => (endOn.valueOf() - startOn.valueOf()) / 1000 / 60 / 60;
-
         //Append new workhour to modal
-        var WorkHourId = 0;
-
         $('#AppendWorkHour').on('click', (e) => {
             //Get id from element or father element
             var employeeId = e.target.getAttribute('employeeid');
             if (employeeId == null)
                 employeeId = e.target.parentElement.getAttribute('employeeid');
 
-
-            var prependEmployeeIds = [];
-            [...document.getElementsByClassName('ToggleSliders')]
-                .forEach((slider) => {
-                    if (slider.checked)
-                        prependEmployeeIds.push(slider.getAttribute('employeeid'));
-                });
-
+            var prependEmployeeIds = GetSliderCheckedEmployeeIds();
             WorkHourId++;
-            document.getElementById('AddWorkHour_ModalBody').insertAdjacentHTML('beforeend',
-
-                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + WorkHourId + '" id="WorkHourRowNum_' + WorkHourId + '">' +
-                '<label class="control-label"> Προσθήκη έναρξη - λήξη βάρδιας για εργαζόμενο/ους:</label>' +
-                '<div class="row">' +
-                '<div class="col-md-1"></div>' +
-                '<div class="col-md-2"><button class="btn btn-primary" id="CalentimButtonNum_' + WorkHourId + '"><i class="fa fa-calendar" ></i></button></div>' +
-                '<div class="col-md-5">' +
-                '<div class="row">' +
-                '<input class="calentim hidden calentimInput" id="CalentimInputNum_' + WorkHourId + '" />' +
-                '<div class="row">' +
-                '<span id="WorkHourErrorSpanNum_' + WorkHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span>' +
-                '</div>' +
-                '<div class="col-md-4">' +
-                'Έναρξη: </br> ' +
-                'Λήξη:</br> ' +
-                'ΏρεςΕργ.:' +
-                '</div>' +
-                '<div class="col-md-8">' +
-                '<span class="TimeSpan" id="StartOnNum_' + WorkHourId + '"></span> <span id="FakeStartOnNum_' + WorkHourId + '"></span> </br> ' +
-                '<span  id="EndOnNum_' + WorkHourId + '"></span> <span id="FakeEndOnNum_' + WorkHourId + '"></span></br>' +
-                '<span id="TotalHoursNum_' + WorkHourId + '"></span>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '<div class="col-md-2">' +
-                '<button class="btn btn-danger celentimDeleteButton" celentimid="' + WorkHourId + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + WorkHourId + '"></i></button>' +
-                '</div>' +
-                '</div >' +
-
-                '<div class="row">' +
-                '<div class="col-md-1"></div>' +
-                '<div class="col-md-2 "><button class="btn btn-success AppendEmployeeToWorkHourButton" Num="' + WorkHourId + '"><i class="fa fa-plus " Num="' + WorkHourId + '"></i><i class="fa fa-user " Num="' + WorkHourId + '"></i></button></div>' +
-                '<div class="col-md-5"><p> Υπάλληλοι:</p></div>' +
-                '</div >' +
-                '</div >')
-
-            Calentim(CelentimDate, WorkHourId); //set new Calentim instance
+            AppendNewWorkHourToAddModal(WorkHourId);  //Append html to add modal
+            Calentim(CelentimDate, WorkHourId);       //set new Calentim instance
 
             var num = WorkHourId;
-            if (prependEmployeeIds.length > 0) {
+            if (prependEmployeeIds.length > 0)
                 prependEmployeeIds.forEach((employeeId) => {
                     $.get("/api/employees/getSelect2Option/" + employeeId, (data) => {
                         AppendPreloadedEmployeeToWorkHour(num, ++WorkHourId, employeeId, data.results[0].text);
                         EmployeeSelect2(num, WorkHourId);        //set new Select2 instance
                     });
-                })
-            }
+                });
             else
                 $.get("/api/employees/getSelect2Option/" + employeeId, (data) => {
                     AppendPreloadedEmployeeToWorkHour(num, ++WorkHourId, employeeId, data.results[0].text);
                     EmployeeSelect2(num, WorkHourId);        //set new Select2 instance
                 });
+
             ValidateNullInputs(WorkHourId);
             HandleSubmitButton();
         });
-
-
-        var AppendPreloadedEmployeeToWorkHour = (workHourId, currNum, employeeId, text) =>
-            document.getElementsByClassName('AppendEmployeeNum_' + workHourId)[0].insertAdjacentHTML('beforeend',
-                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
-                '<div class="col-md-3"></div>' +
-                '<div class="col-md-5">' +
-                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%" disabled>' +
-                '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
-                '</select >' +
-                '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
-                '</div >' +
-                '</div >'
-            );
-
-        var AppendEmployeeToWorkHour = (workHourId, currNum) =>
-            document.getElementsByClassName('AppendEmployeeNum_' + workHourId)[0].insertAdjacentHTML('beforeend',
-                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
-                '<div class="col-md-3"></div>' +
-                '<div class="col-md-5">' +
-                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
-                '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
-                '</div >' +
-                '<div class="col-md-1">' +
-                '<button class= "btn btn-danger EmployeeRowDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
-                '</div >' +
-                '</div >'
-            );
-
 
         //Append new Select2 Employees search for WorkHour
         $('#AddWorkHour_Modal').on('click', '.AppendEmployeeToWorkHourButton', (e) => {
@@ -862,8 +640,8 @@
             if (!ValidateNullInputs(workHourId))
                 ValidateAppendedWorkHoursTimeRange(workHourId);
             HandleSubmitButton();
-
         })
+
         //Delete Employee from workhour
         $('#AddWorkHour_Modal').on('click', '.EmployeeRowDeleteButton', (e) => {
             var elemId = e.target.getAttribute('num');
@@ -872,27 +650,23 @@
             if (!ValidateNullInputs(workHourId))
                 ValidateEmployeesWithRangeToWorkhour(workHourId);
 
-
             HandleSubmitButton();
         })
 
         //Save Button
-        $('#SaveWorkHours').on('click', (e) => {
+        $('#SaveWorkHours').on('click', e => {
             var dataToPost = [];
             var dateInputs = [...document.getElementsByClassName('calentimInput')];
 
             for (var i = 0; i < dateInputs.length; i++) {
-                if (dateInputs[i].value == "") {
-                    //Alert
+                if (dateInputs[i].value == "")
                     return;
-                }
+
                 var workHourId = dateInputs[i].id.split('_')[1];
                 var employeeIds = GetWorkHourEmployeeIds(workHourId);
-                for (var j = 0; j < employeeIds.length; j++) {
+                for (var j = 0; j < employeeIds.length; j++)
                     dataToPost.push(MapData(dateInputs[i], employeeIds[j]));
-                }
             }
-
 
             $.ajax({
                 type: "POST",
@@ -906,7 +680,7 @@
         });
 
         //Cleanup on modal close
-        $('#AddWorkHour_Modal').on('hidden.bs.modal', (e) => {
+        $('#AddWorkHour_Modal').on('hidden.bs.modal', e => {
             $('.ElementToDeleteOnClose').remove();
             $('#EmployeesWorkhoursDatatable').DataTable().clear().destroy();
             Datatable();
@@ -920,23 +694,21 @@
     <script>
         //Make Datatable cell set/unset backround grey and show/hide <i>
         $('#EmployeesWorkhoursDatatable')
-            .on('mouseenter', '.DataTableHoverCell', (elem) => {
-                //elem.target.setAttribute("style", "background-color:grey;");
+            .on('mouseenter', '.DataTableHoverCell', elem =>
                 elem.target.querySelectorAll('i')
-                    .forEach(element => element.classList.remove("hidden"));
-            })
-            .on('mouseleave', '.DataTableHoverCell', (elem) => {
-                //elem.target.setAttribute("style", "background-color:;");
+                    .forEach(element => element.classList.remove("hidden"))
+            )
+            .on('mouseleave', '.DataTableHoverCell', elem =>
                 elem.target.querySelectorAll('i')
-                    .forEach(element => element.classList.add("hidden"));
-            });
+                    .forEach(element => element.classList.add("hidden"))
+            );
 
         //Cursor change - mouse over <i> Edit
         $('#EmployeesWorkhoursDatatable')
-            .on('mouseenter', '.faIconEdit', (elem) => {
+            .on('mouseenter', '.faIconEdit', elem => {
                 elem.target.setAttribute("style", "cursor:pointer");
             })
-            .on('mouseleave', '.faIconEdit', (elem) => {
+            .on('mouseleave', '.faIconEdit', elem => {
                 elem.target.setAttribute("style", "cursor:");
             });
 
@@ -951,14 +723,128 @@
     </script>
 
 
-    <script>
 
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
+    <!-- Select 2-->
+    <script>
+        $('.WorkPlace_Select2').select2({
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+    </script>
+
+    <!--Employees Select2 -->
+    <script>
+        const EmployeeSelect2 = (workHourId, num) => {
+            $('#EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num).select2({
+                ajax: {
+                    type: "POST",
+                    url: '/api/employees/select2',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: function (params) {
+                        if (num != null)
+                            return JSON.stringify(BuildSelect2DtoNum(params, workHourId));
+                        else
+                            return JSON.stringify(BuildSelect2Dto(params));
+                    }
+                }
+            }).on('change', (e) => {
+                if (!ValidateNullInputs(workHourId)) {
+                    ValidateEmployeesWithRangeToWorkhour(workHourId);
+                }
+                HandleSubmitButton();
+
+            });
+        }
+    </script>
+
+    <!-- Calentim -->
+    <script>
+        var Calentim = (currentDate, workHourId) => {
+            //$("#CallendarButtonNum_" + workHourId).data("calentim").destroy();
+            $('#CalentimButtonNum_' + workHourId).calentim({
+                dateSeparator: '/-/',
+                startOnMonday: true,
+                dontPrefixHours: false,
+                format: "DD/MM/YYYY HH:mm",
+                hourFormat: 24,
+                calendarCount: 1,
+                minuteSteps: 15,
+                showHeader: false,
+                showButtons: true,
+                locale: "el",
+                target: $("#CalentimInputNum_" + workHourId),
+                showOn: "right",
+                rangeOrientation: "vertical",
+                ranges: [
+                    {
+                        title: "Χτές και ημέρα κελιού",
+                        startDate: moment(currentDate).subtract(1, 'days'),
+                        endDate: moment(currentDate)
+                    },
+                    {
+                        title: "Ημέρα κελιού",
+                        startDate: moment(currentDate),
+                        endDate: moment(currentDate)
+                    },
+                    {
+                        title: "Ημέρα κελιού και άυριο",
+                        startDate: moment(currentDate),
+                        endDate: moment(currentDate).add(1, 'days')
+                    }
+                ],
+                disabledRanges: [
+                    {
+                        start: moment("01/01/1700", "DD/MM/YYYY"),//Earliest date in docs
+                        end: moment(currentDate).set('date', 0)
+                    },
+                    {
+                        start: moment(currentDate).add(1, 'month').set('date', 1),
+                        end: moment("31/12/4000", "DD/MM/YYYY")//Latest date in docs
+                    }],
+                onbeforehide: (calentim) => {
+
+                    HandleWorkHourSpan(workHourId);
+                    ValidateAndAppendWorkHourRange(workHourId);
+                    if (!ValidateNullInputs(workHourId)) {
+                        ValidateAppendedWorkHoursTimeRange(workHourId);
+                        ValidateEmployeesWithRangeToWorkhour(workHourId);
+                    }
+
+                },
+                onaftershow: () => {
+                    //Fix Calentim width
+                    [...document.getElementsByClassName('calentim-input')]
+                        .forEach((calentim) =>
+                            calentim.setAttribute('style', 'width: 600px;'));
+                }
+            })
+        };
+    </script>
+
+    <!-- Datatable -->
+    <script>
            var Datatable = ()=>  $('#EmployeesWorkhoursDatatable').DataTable({
-               "serverSide": true,
+               serverSide: true,
                responsive: true,
                colReorder: true,
-                "dom": 'frtlp',
-                "ajax": {
+               processing: true,
+               language: {
+                   processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+               },
+                dom: 'frtlp',
+                ajax: {
                     url: '/api/employees/getdatatable',
                     type: 'POST',
                     contentType: "application/json",
@@ -973,7 +859,7 @@
                     }
                 },
                 order: [[0, 'desc']],
-                "columns": [
+                columns: [
                     {
                         "data": "ToggleSlider",
                         "searchable": false,
@@ -1367,6 +1253,137 @@
             });
     </script>
 
+    <!--    Html Append -->
+    <script>
+        var AppendPreloadedEmployeeToWorkHour = (workHourId, currNum, employeeId, text) =>
+            document.getElementsByClassName('AppendEmployeeNum_' + workHourId)[0].insertAdjacentHTML('beforeend',
+                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
+                '<div class=" col-sm-3 col-md-3"></div>' +
+                '<div class="col-sm-5 col-md-5">' +
+                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%" disabled>' +
+                '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
+                '</select >' +
+                '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '</div >' +
+                '</div >'
+            );
+
+        var AppendEmployeeToWorkHour = (workHourId, currNum) =>
+            document.getElementsByClassName('AppendEmployeeNum_' + workHourId)[0].insertAdjacentHTML('beforeend',
+                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
+                '<div class="col-sm-3 col-md-3"></div>' +
+                '<div class="col-sm-5 col-md-5">' +
+                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
+                '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '</div >' +
+                '<div class="col-sm-1 col-md-1">' +
+                '<button class= "btn btn-danger EmployeeRowDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
+                '</div >' +
+                '</div >'
+            );
+
+        AppendNewWorkHourToAddModal = (WorkHourId) =>
+            document.getElementById('AddWorkHour_ModalBody').insertAdjacentHTML('beforeend',
+
+                '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + WorkHourId + '" id="WorkHourRowNum_' + WorkHourId + '">' +
+                    '<label style="padding-left:10px;" class="control-label"> Προσθήκη έναρξη - λήξη βάρδιας για εργαζόμενο/ους:</label>' +
+                    '<div style="padding-left:40px;" class="row">' +
+                        '<div class=" col-md-2 col-sm-2"><button class="btn btn-primary" id="CalentimButtonNum_' + WorkHourId + '"><i class="fa fa-calendar" ></i></button></div>' +
+                        '<div class="col-md-5 col-sm-5">' +
+                            '<div class="row">' +
+                                '<input class="calentim hidden calentimInput" id="CalentimInputNum_' + WorkHourId + '" />' +
+                                '<div class="row">' +
+                                    '<span id="WorkHourErrorSpanNum_' + WorkHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span>' +
+                                '</div>' +
+                                '<div class="col-md-4 col-sm-42">' +
+                                    'Έναρξη: </br> ' +
+                                    'Λήξη:</br> ' +
+                                    'ΏρεςΕργ.:' +
+                                '</div>' +
+                                '<div class="col-md-8 col-sm-8 ">' +
+                                    '<span class="TimeSpan" id="StartOnNum_' + WorkHourId + '"></span></br> ' +
+                                    '<span  id="EndOnNum_' + WorkHourId + '"></span></br>' +
+                                    '<span id="TotalHoursNum_' + WorkHourId + '"></span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="col-md-2 col-sm-2">' +
+                            '<button class="btn btn-danger celentimDeleteButton" celentimid="' + WorkHourId + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + WorkHourId + '"></i></button>' +
+                        '</div>' +
+                    '</div >' +
+
+                    '<div style="padding-left:40px;" class="row">' +
+                        '<div class="col-md-2 col-sm-2 "><button class="btn btn-success AppendEmployeeToWorkHourButton" Num="' + WorkHourId + '"><i class="fa fa-plus " Num="' + WorkHourId + '"></i><i class="fa fa-user " Num="' + WorkHourId + '"></i></button></div>' +
+                        '<div class="col-md-5 col-sm-5"><p> Υπάλληλοι:</p></div>' +
+                    '</div >' +
+                '</div >');
+    </script>
+
 
 
 }
+
+
+
+
+
+
+
+@*'<div style="padding-top:10px;" class="row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + WorkHourId + '" id="WorkHourRowNum_' + WorkHourId + '">
+        ' +
+        '<label class="control-label"> Προσθήκη έναρξη - λήξη βάρδιας για εργαζόμενο/ους:</label>' +
+        '<div style="width: 100%;">
+            '+
+            '<div style="width: 50px; float: left;"> </div>' +
+            '<div style="width: 50px; float: left;">
+                ' +
+                '<button class="btn btn-primary" id="CalentimButtonNum_' + WorkHourId + '"><i class="fa fa-calendar"></i></button>'+
+                '
+            </div>' +
+            '<div style="width: 300px; float: left;">
+                ' +
+                '<input class="calentim hidden calentimInput" id="CalentimInputNum_' + WorkHourId + '" />' +
+                '<span id="WorkHourErrorSpanNum_' + WorkHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span>' +
+                '<div class="col-sm-4">
+                    ' +
+                    'Έναρξη: </br> ' +
+                    'Λήξη:</br> ' +
+                    'ΏρεςΕργ.:' +
+                    '
+                </div>' +
+                '<div class="col-sm-8">
+                    ' +
+                    '<span class="TimeSpan" id="StartOnNum_' + WorkHourId + '"></span></br> ' +
+                    '<span id="EndOnNum_' + WorkHourId + '"></span></br>' +
+                    '<span id="TotalHoursNum_' + WorkHourId + '"></span>' +
+                    '
+                </div>' +
+                '
+            </div>' +
+            '
+        </div>' +
+        '<div style="width: 50px; float: left;">
+            ' +
+            '<button class="btn btn-danger celentimDeleteButton" celentimid="' + WorkHourId + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + WorkHourId + '"></i></button>' +
+            '
+        </div>' +
+
+
+
+        '<div style="width: 100%;">
+            ' +
+            '<div style="width: 50px; float: left;"> </div>' +
+            '<div style="width: 50px; float: left;">
+                ' +
+                '<button class="btn btn-success AppendEmployeeToWorkHourButton" Num="' + WorkHourId + '"><i class="fa fa-plus " Num="' + WorkHourId + '"></i><i class="fa fa-user " Num="' + WorkHourId + '"></i></button>' +
+                '
+            </div>' +
+            '<div style="width: 300px; float: left;">
+                ' +
+                '<p> Υπάλληλοι:</p> '+
+                '
+            </div>' +
+            '
+        </div>' +
+        '
+    </div>');*@

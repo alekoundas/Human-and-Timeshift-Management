@@ -1,0 +1,238 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <hr />
+
+            <div class="box-body table-responsive">
+
+                <table id="EmployeesCurrentDayDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Επιλογή</th>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Έναρξη βάρδιας</th>
+                            <th>Λήξη βάρδιας</th>
+                            <th>Ενέργιες</th>
+
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="false">Επιλογή</th>
+                            <th data-searchable="false">Όνομα</th>
+                            <th data-searchable="false">Επίθετο</th>
+                            <th data-searchable="false">Έναρξη βάρδιας</th>
+                            <th data-searchable="false">Λήξη βάρδιας</th>
+                            <th data-searchable="false">Ενέργιες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+
+<div class="modal fade in" id="EditRealWorkHour_Modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Επεξεργασία ωρών χρήστη</h4>
+            </div>
+            <div class="modal-body" id="EditWorkHour_ModalBody">
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Κλείσιμο</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+
+
+    <script>
+        $('#EmployeesCurrentDayDatatable').on('click', '.faIconEdit', (e) => {
+            console.log(e);
+        })
+    </script>
+    <script>
+        $('#EmployeesWorkhoursDatatable').on('click', '.faIconAdd', (element) => {
+            var day = element.target.getAttribute('dayofmonth');
+            var month = document.getElementById('Month').value;
+            var year = document.getElementById('Year').value;
+
+            //set global variable the date to initialize celentim
+            CelentimDate = year + '-' + month + '-' + day;
+            $('#SaveWorkHours').attr('employeeid', element.target.getAttribute('employeeid'));
+            $('#AppendWorkHour').attr('employeeid', element.target.getAttribute('employeeid'));
+            $('#AddWorkHour_Modal').modal('show')
+        });
+
+        //Append new workhour to modal
+       const AppendRealWorkHour => {
+            //Get id from element or father element
+            var employeeId = e.target.getAttribute('employeeid');
+            if (employeeId == null)
+                employeeId = e.target.parentElement.getAttribute('employeeid');
+
+            var prependEmployeeIds = GetSliderCheckedEmployeeIds();
+            WorkHourId++;
+            AppendNewWorkHourToAddModal(WorkHourId);  //Append html to add modal
+            Calentim(CelentimDate, WorkHourId);       //set new Calentim instance
+
+            var num = WorkHourId;
+            if (prependEmployeeIds.length > 0)
+                prependEmployeeIds.forEach((employeeId) => {
+                    $.get("/api/employees/getSelect2Option/" + employeeId, (data) => {
+                        AppendPreloadedEmployeeToWorkHour(num, ++WorkHourId, employeeId, data.results[0].text);
+                        EmployeeSelect2(num, WorkHourId);        //set new Select2 instance
+                    });
+                });
+            else
+                $.get("/api/employees/getSelect2Option/" + employeeId, (data) => {
+                    AppendPreloadedEmployeeToWorkHour(num, ++WorkHourId, employeeId, data.results[0].text);
+                    EmployeeSelect2(num, WorkHourId);        //set new Select2 instance
+                });
+
+            ValidateNullInputs(WorkHourId);
+            HandleSubmitButton();
+        });
+
+        //Append new Select2 Employees search for WorkHour
+        $('#AddWorkHour_Modal').on('click', '.AppendEmployeeToWorkHourButton', (e) => {
+            var currentWorkHourId = e.target.getAttribute('num');
+            WorkHourId++;
+            AppendEmployeeToWorkHour(currentWorkHourId, WorkHourId)
+            EmployeeSelect2(currentWorkHourId, WorkHourId);        //set new Select2 instance
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        jQuery(() => {
+            $('#EmployeesCurrentDayDatatable').DataTable({
+                serverSide: true,
+                responsive: true,
+                colReorder: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/employees/getdatatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+                        data.predicate = 'RealWorkHourCurrentDay';
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                columns: [
+                    {
+                        "data": "ToggleSlider",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.ToggleSlider != null)
+                                return data.ToggleSlider;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "FirstName",
+                        "searchable": true,
+                        "orderable": true,
+                        render: (a, b, data, d) => {
+                            if (data.FirstName != null)
+                                return data.FirstName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "LastName",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.LastName != null)
+                                return data.LastName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "StartOn",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.StartOn != null)
+                                return data.StartOn;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "EndOn",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.EndOn != null)
+                                return data.EndOn;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        "data": "Buttons",
+                        "searchable": false,
+                        "orderable": false,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null)
+                                return data.Buttons;
+                            else
+                                return "";
+                        }
+                    }
+                ],
+                fnDrawCallback: function () {
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    });
+                },
+            });
+        });
+    </script>
+}

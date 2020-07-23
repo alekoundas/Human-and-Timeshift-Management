@@ -191,6 +191,17 @@ namespace WebApplication.Api
 
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+            } 
+            if (datatable.Predicate == "RealWorkHourCurrentDay")
+            {
+                includes.Add(x => x.RealWorkHours);
+
+                var today = DateTime.Now;
+                Expression<Func<Employee, bool>> filter = x => x.RealWorkHours
+                    .Any(y => y.StartOn.Date == today.Date);
+
+                employees = await _baseDataWork.Employees
+                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
             }
 
             var mapedData = MapResults(employees, datatable);
@@ -258,14 +269,32 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "TimeShiftEdit")
                 {
-                    var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                    var timeshift = await _baseDataWork.TimeShifts
+                        .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+
                     for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
-                        dictionary.Add("Day" + i, 
+                        dictionary.Add("Day" + i,
                             dataTableHelper.GetHoverElementsAsync(_baseDataWork,
                                 i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper
                         .GetEmployeeCheckbox(datatable, employee.Id));
+
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "RealWorkHourCurrentDay")
+                {
+                    dictionary.Add("StartOn", String.Join<string>("</br>",
+                        employee.RealWorkHours.Select(x => x.StartOn.ToString())));
+
+                    dictionary.Add("EndOn", String.Join<string>("</br>",
+                        employee.RealWorkHours.Select(x => x.EndOn.ToString())));
+
+                    dictionary.Add("ToggleSlider", dataTableHelper
+                        .GetEmployeeCheckbox(datatable, employee.Id));
+
+                    dictionary.Add("Buttons", dataTableHelper
+                        .GetCurrentDayButtons(employee));
 
                     returnObjects.Add(expandoObj);
                 }

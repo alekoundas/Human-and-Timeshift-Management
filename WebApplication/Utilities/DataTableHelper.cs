@@ -9,6 +9,7 @@ using Business.Repository.Interface;
 using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 
@@ -231,21 +232,21 @@ namespace WebApplication.Utilities
             //    return FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId) + FaIconAdd(dayOfMonth, "green", employeeId);
             //return FaIconAdd(dayOfMonth, "", employeeId);
 
-            var startTimeSpan = String.Join(",",
+            var startTimeSpan = String.Join("",
                 cellWorkHours.Select(x =>
                     SpanTimeValue(x.StartOn.ToShortTimeString())));
 
-            var endTimeSpan = String.Join(",",
+            var endTimeSpan = String.Join("",
                 cellWorkHours.Select(x =>
                     SpanTimeValue(x.EndOn.ToShortTimeString())));
 
             return "<div style='width:110px; white-space: nowrap;'>" +
                       "<div style='width:50px;display:block;  float: left;'>" +
-                      (!String.IsNullOrEmpty(startTimeSpan)?"<span>Έναρξη</span></br>" :"")+
+                      (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
                       startTimeSpan +
                       "</div>" +
                       "<div style='width:50px; display:block;  float: right; '>" +
-                      (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "")+
+                      (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
                       endTimeSpan +
                     "</div>" +
                      (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
@@ -270,5 +271,22 @@ namespace WebApplication.Utilities
                 "data-onstyle='success'" +
                 "employeeId=" + employeeId +
               ">";
+
+
+
+        public string GetCurrentDayButtons(Employee employee)
+           => CurrentDayFaIconEdit(employee.Id);
+
+        private static string CurrentDayFaIconEdit(int employeeId)
+           => @"<i class='fa fa-pencil hidden faIconEdit' employeeid='" + employeeId + "'></i>";
+
+
+
+
+
+
+
+
+
     }
 }

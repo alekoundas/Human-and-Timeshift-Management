@@ -150,6 +150,12 @@ namespace WebApplication.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        // POST: RealWorkHours/CurrentDay
+        [HttpGet, ActionName("CurrentDay")]
+        public async Task<IActionResult> CurrentDay()
+        {
+            return View();
+        }
 
         private bool RealWorkHourExists(int id)
         {
