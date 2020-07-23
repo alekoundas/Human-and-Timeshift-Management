@@ -1257,28 +1257,32 @@
     <script>
         var AppendPreloadedEmployeeToWorkHour = (workHourId, currNum, employeeId, text) =>
             document.getElementsByClassName('AppendEmployeeNum_' + workHourId)[0].insertAdjacentHTML('beforeend',
-                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
-                '<div class=" col-sm-3 col-md-3"></div>' +
-                '<div class="col-sm-5 col-md-5">' +
-                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%" disabled>' +
-                '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
-                '</select >' +
-                '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
-                '</div >' +
+                '<div style="padding-left:40px;" class="row" id="EmployeeRowNum_' + currNum + '">' +
+                    '<div style="width: 100%;">' +
+                        '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                        '<div style="width: 45%; float: left;">' +
+                            '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%" disabled>' +
+                                '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
+                            '</select >' +
+                            '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                        '</div >' +
                 '</div >'
             );
 
         var AppendEmployeeToWorkHour = (workHourId, currNum) =>
             document.getElementsByClassName('AppendEmployeeNum_' + workHourId)[0].insertAdjacentHTML('beforeend',
-                '<div class="row" id="EmployeeRowNum_' + currNum + '">' +
-                '<div class="col-sm-3 col-md-3"></div>' +
-                '<div class="col-sm-5 col-md-5">' +
-                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
-                '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
-                '</div >' +
-                '<div class="col-sm-1 col-md-1">' +
-                '<button class= "btn btn-danger EmployeeRowDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
-                '</div >' +
+                '<div style="padding-left:40px;" class="row" id="EmployeeRowNum_' + currNum + '">' +
+                '<div style="width: 100%;">' +
+                '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                    '<div style="width: 45%; float: left;">' +
+                        '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
+                        '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                    '</div >' +
+                '<div style="width: 5%; float: left;">&nbsp;</div >' +
+                    '<div style="width: 20%; float: left;">' +
+                        '<button class= "btn btn-danger EmployeeRowDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
+                    '</div >' +
+                    '</div >'+
                 '</div >'
             );
 
@@ -1288,33 +1292,35 @@
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + WorkHourId + '" id="WorkHourRowNum_' + WorkHourId + '">' +
                     '<label style="padding-left:10px;" class="control-label"> Προσθήκη έναρξη - λήξη βάρδιας για εργαζόμενο/ους:</label>' +
                     '<div style="padding-left:40px;" class="row">' +
-                        '<div class=" col-md-2 col-sm-2"><button class="btn btn-primary" id="CalentimButtonNum_' + WorkHourId + '"><i class="fa fa-calendar" ></i></button></div>' +
-                        '<div class="col-md-5 col-sm-5">' +
-                            '<div class="row">' +
-                                '<input class="calentim hidden calentimInput" id="CalentimInputNum_' + WorkHourId + '" />' +
-                                '<div class="row">' +
-                                    '<span id="WorkHourErrorSpanNum_' + WorkHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span>' +
-                                '</div>' +
-                                '<div class="col-md-4 col-sm-42">' +
-                                    'Έναρξη: </br> ' +
-                                    'Λήξη:</br> ' +
-                                    'ΏρεςΕργ.:' +
-                                '</div>' +
-                                '<div class="col-md-8 col-sm-8 ">' +
-                                    '<span class="TimeSpan" id="StartOnNum_' + WorkHourId + '"></span></br> ' +
-                                    '<span  id="EndOnNum_' + WorkHourId + '"></span></br>' +
-                                    '<span id="TotalHoursNum_' + WorkHourId + '"></span>' +
-                                '</div>' +
+                        '<input class="calentim hidden calentimInput" id="CalentimInputNum_' + WorkHourId + '" />' +
+                        '<div class="row">' +
+                            '<span id="WorkHourErrorSpanNum_' + WorkHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span>' +
+                        '</div>' +
+                        '<div style="width: 100%;">' +
+                            '<div style="width: 15%; float: left;">' +
+                                '<button class="btn btn-primary" id="CalentimButtonNum_' + WorkHourId + '"><i class="fa fa-calendar" ></i></button>'+
+                            '</div>' +
+                            '<div style="width: 20%; float: left;">' +
+                                'Έναρξη: </br> ' +
+                                'Λήξη:</br> ' +
+                                'ΏρεςΕργ.:' +
+                            '</div>' +
+                            '<div style="width: 35%; float: left;">' +
+                                '<span class="TimeSpan" id="StartOnNum_' + WorkHourId + '"></span></br> ' +
+                                '<span  id="EndOnNum_' + WorkHourId + '"></span></br>' +
+                                '<span id="TotalHoursNum_' + WorkHourId + '"></span>' +
+                            '</div>' +
+                            '<div style="width: 15%; float: left;">' +
+                                '<button class="btn btn-danger celentimDeleteButton" celentimid="' + WorkHourId + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + WorkHourId + '"></i></button>' +
+
                             '</div>' +
                         '</div>' +
-                        '<div class="col-md-2 col-sm-2">' +
-                            '<button class="btn btn-danger celentimDeleteButton" celentimid="' + WorkHourId + '"><i class="fa fa-trash-o celentimDeleteButton" celentimid="' + WorkHourId + '"></i></button>' +
-                        '</div>' +
                     '</div >' +
-
-                    '<div style="padding-left:40px;" class="row">' +
-                        '<div class="col-md-2 col-sm-2 "><button class="btn btn-success AppendEmployeeToWorkHourButton" Num="' + WorkHourId + '"><i class="fa fa-plus " Num="' + WorkHourId + '"></i><i class="fa fa-user " Num="' + WorkHourId + '"></i></button></div>' +
-                        '<div class="col-md-5 col-sm-5"><p> Υπάλληλοι:</p></div>' +
+                '<div style="padding-left:40px;" class="row">' +
+                    '<div style="width:  100%;">' +
+                        '<div  style="width: 15%; float: left;"><button class="btn btn-success AppendEmployeeToWorkHourButton" Num="' + WorkHourId + '"><i class="fa fa-plus " Num="' + WorkHourId + '"></i><i class="fa fa-user " Num="' + WorkHourId + '"></i></button></div>' +
+                        '<div  style="width: 20%; float: left;"><p> Υπάλληλοι:</p></div>' +
+                    '</div >' +
                     '</div >' +
                 '</div >');
     </script>

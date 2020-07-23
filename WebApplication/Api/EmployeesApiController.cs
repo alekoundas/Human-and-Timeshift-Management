@@ -155,7 +155,6 @@ namespace WebApplication.Api
 
             var includes = new List<Expression<Func<Employee, object>>>();
             includes.Add(x => x.Specialization);
-            includes.Add(x => x.Company);
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             var employees = new List<Employee>();
@@ -175,6 +174,7 @@ namespace WebApplication.Api
             }
             if (datatable.Predicate == "WorkPlaceEdit")
             {
+            includes.Add(x => x.Company);
                 Expression<Func<Employee, bool>> filter = (x => x.Company.Customers
                 .Any(y => y.WorkPlaces
                 .Any(z => z.Id == datatable.GenericId)));
