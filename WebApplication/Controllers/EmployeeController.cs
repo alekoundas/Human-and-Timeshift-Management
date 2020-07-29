@@ -69,7 +69,7 @@ namespace WebApplication.Controllers
             {
                 _baseDataWork.Employees.Add(
                     EmployeeCreateViewModel.CreateFrom(employee));
-                await _baseDataWork.CompleteAsync();
+                await _baseDataWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);

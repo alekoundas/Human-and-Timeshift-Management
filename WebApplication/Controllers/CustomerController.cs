@@ -69,7 +69,7 @@ namespace WebApplication.Controllers
             {
                 _baseDataWork.Customers.Add(
                     CustomerCreateViewModel.CreateFrom(customer));
-                await _baseDataWork.CompleteAsync();
+                await _baseDataWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(customer);

@@ -86,7 +86,6 @@ namespace WebApplication.Api
         {
             var employees = new List<Employee>();
             var select2Helper = new Select2Helper();
-            //Expression<Func<Employee, bool>> filter;
             var filter = PredicateBuilder.New<Employee>();
 
             if (select2.ExistingEmployees?.Count > 0)

@@ -125,6 +125,11 @@ namespace Bussiness.Repository
         public async Task<TEntity> FindAsync(int id)
         {
             return await _set.FindAsync(id);
+        } 
+        
+        public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity,bool>> filter)
+        {
+            return await _set.Where(filter).ToListAsync();
         }
 
         public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> expression)

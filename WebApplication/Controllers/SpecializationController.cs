@@ -64,7 +64,7 @@ namespace WebApplication.Controllers
             {
                 _baseDataWork.Specializations.Add(
                     SpecializationCreateViewModel.CreateFrom(viewModel));
-                await _baseDataWork.CompleteAsync();
+                await _baseDataWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(viewModel);

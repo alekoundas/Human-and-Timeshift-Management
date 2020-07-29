@@ -27,6 +27,8 @@ namespace Bussiness.Repository.Interface
             int pageSize = 10,
             int pageIndex = 1);
 
+
+        Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter);
         int Count(Expression<Func<TEntity, bool>> predicate);
 
         TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);

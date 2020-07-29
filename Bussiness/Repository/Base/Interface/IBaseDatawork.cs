@@ -7,7 +7,7 @@ namespace Business.Repository.Interface
 {
     public interface IBaseDatawork
     {
-        Task<int> CompleteAsync();
+        Task<int> SaveChangesAsync();
         void Update<TEntity>(TEntity model);
 
 

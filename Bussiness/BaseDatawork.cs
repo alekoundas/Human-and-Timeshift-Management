@@ -41,7 +41,7 @@ namespace Bussiness
             EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
         }
 
-        public async Task<int> CompleteAsync()
+        public async Task<int> SaveChangesAsync()
         {
             return await _dbcontext.SaveChangesAsync();
         }

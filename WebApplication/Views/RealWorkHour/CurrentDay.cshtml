@@ -89,12 +89,29 @@
             $('#AddWorkHour_Modal').modal('show')
         });
 
+    </script>
+
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Functions           ///-->
+    <!--///////////////////////////////////////-->
+
+    <script>
+
+        const GetSliderCheckedEmployeeIds = () => {
+            var prependEmployeeIds = [];
+            [...document.getElementsByClassName('ToggleSliders')]
+                .forEach((slider) => {
+                    if (slider.checked)
+                        prependEmployeeIds.push(slider.getAttribute('employeeid'));
+                });
+            return prependEmployeeIds;
+        }
+
         //Append new workhour to modal
-       const AppendRealWorkHour => {
-            //Get id from element or father element
-            var employeeId = e.target.getAttribute('employeeid');
-            if (employeeId == null)
-                employeeId = e.target.parentElement.getAttribute('employeeid');
+        const AppendRealWorkHour = employeeId => {
+          
 
             var prependEmployeeIds = GetSliderCheckedEmployeeIds();
             WorkHourId++;
@@ -117,7 +134,7 @@
 
             ValidateNullInputs(WorkHourId);
             HandleSubmitButton();
-        });
+        };
 
         //Append new Select2 Employees search for WorkHour
         $('#AddWorkHour_Modal').on('click', '.AppendEmployeeToWorkHourButton', (e) => {
@@ -130,6 +147,63 @@
 
 
 
+    <!--///////////////////////////////////////-->
+    <!--///             Functions           ///-->
+    <!--///////////////////////////////////////-->
+
+    <script>
+        const FindHourDifference = (startOn, endOn) =>
+            (endOn.valueOf() - startOn.valueOf()) / 1000 / 60 / 60;
+
+        const GetWorkHourEmployeeIds = (num) =>
+            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + num)]
+                .map((data) => data.value).filter((val) => val != "");
+
+        const GetAllWorkHourIds = () =>
+            [...document.getElementsByClassName('WorkHourDiv')]
+                .map(div => div.id.split('_')[1]);
+
+        const GetDateInputValues = (workHourId) => {
+            return document.getElementById('CalentimInputNum_' + workHourId).value
+                .split('/-/');
+        };
+
+        const GetAllDateInputValuesFiltered = (workHourId, excludeWorkHourIds) => {
+            var response = [...document.getElementsByClassName('calentimInput')]
+                .filter(input => input.id != 'CalentimInputNum_' + workHourId);
+
+            for (var i = 0; i < excludeWorkHourIds.length; i++)
+                response = response.filter(input =>
+                    input.id != 'CalentimInputNum_' + excludeWorkHourIds[i]);
+
+            return response.map(input => ({
+                startEndDate: input.value.split('/-/'),
+                workHourId: input.id.split('_')[1]
+            }));
+        }
+
+        const GetWorkHourIdsForNullDateInputs = () => {
+            var response = [];
+            [...document.getElementsByClassName('TimeSpan')].forEach(input => {
+                if (input.innerHTML == '')
+                    response.push(input.id.split('_')[1]);
+
+            });
+            return response;
+        }
+
+        const GetSelect2NumBySelectedEmployeeIdAndWorkHourId = (employeeId, workHourId) => document
+            .querySelectorAll('select.EmployeeSelect2WorkHourNum_' + workHourId + ' > option[value="' + employeeId + '"]')[0]
+            .parentElement.id
+            .split('_')[3]
+
+        const GetAlreadyAppendedEmployeeIdsPerWorkHour = (num) =>
+            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + num + '')]
+                .map((data) => data.value)
+                .filter((val) => val != "");
+
+       
+    </script>
 
 
 

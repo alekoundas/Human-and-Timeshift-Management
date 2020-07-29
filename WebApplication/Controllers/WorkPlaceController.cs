@@ -68,7 +68,7 @@ namespace WebApplication.Controllers
             {
                 _baseDataWork.WorkPlaces.Add(
                     WorkPlaceCreateViewModel.CreateFrom(workPlace));
-                await _baseDataWork.CompleteAsync();
+                await _baseDataWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(workPlace);

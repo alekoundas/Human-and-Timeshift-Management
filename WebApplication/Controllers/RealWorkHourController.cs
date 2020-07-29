@@ -71,7 +71,7 @@ namespace WebApplication.Controllers
                     realWorkHour.EmployeeId = x.Id;
                     _baseDataWork.RealWorkHours.Add(realWorkHour);
                 });
-                await _baseDataWork.CompleteAsync();
+                await _baseDataWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View();

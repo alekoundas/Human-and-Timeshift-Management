@@ -9,14 +9,20 @@ namespace DataAccess.ViewModels.WorkHours
 {
     public class WorkHoursApiViewModel : BaseEntity
     {
-        [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
+        [JsonProperty(PropertyName = "startOn")]
         public DateTime StartOn { get; set; }
 
-        [JsonProperty(PropertyName = "endOn", Required = Required.Default)]
+        [JsonProperty(PropertyName = "endOn")]
         public DateTime EndOn { get; set; }
 
-        [JsonProperty(PropertyName = "timeShiftId", Required = Required.Default)]
+        [JsonProperty(PropertyName = "cellDay")]
+        public int CellDay { get; set; }
+
+        [JsonProperty(PropertyName = "timeShiftId")]
         public int TimeShiftId { get; set; }
+
+        [JsonProperty(PropertyName = "workHourId")]
+        public int WorkHourId { get; set; }
 
         [JsonProperty(PropertyName = "employeeId")]
         public int EmployeeId { get; set; }

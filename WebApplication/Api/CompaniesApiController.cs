@@ -144,7 +144,7 @@ namespace WebApplication.Controllers
                 employee.CompanyId = null;
 
             _baseDataWork.Update(employee);
-            await _baseDataWork.CompleteAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return company;
         }

@@ -228,9 +228,6 @@ namespace WebApplication.Utilities
                 var sdafasdf = 234;
             }
 
-            //if (skata)
-            //    return FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId) + FaIconAdd(dayOfMonth, "green", employeeId);
-            //return FaIconAdd(dayOfMonth, "", employeeId);
 
             var startTimeSpan = String.Join("",
                 cellWorkHours.Select(x =>
@@ -278,7 +275,7 @@ namespace WebApplication.Utilities
            => CurrentDayFaIconEdit(employee.Id);
 
         private static string CurrentDayFaIconEdit(int employeeId)
-           => @"<i class='fa fa-pencil hidden faIconEdit' employeeid='" + employeeId + "'></i>";
+           => @"<i class='fa fa-pencil faIconEdit' employeeid='" + employeeId + "'></i>";
 
 
 
