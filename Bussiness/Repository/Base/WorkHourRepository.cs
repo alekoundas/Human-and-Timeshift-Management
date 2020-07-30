@@ -66,7 +66,7 @@ namespace Bussiness.Repository.Base
                   x.TimeShiftId == workHour.TimeShiftId &&
                   x.StartOn == workHour.StartOn && workHour.EndOn == x.EndOn);
         }
-        public async Task<List<WorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(WorkHoursApiViewModel viewModel)
+        public async Task<List<WorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel)
         {
             var filter = PredicateBuilder.New<WorkHour>();
 

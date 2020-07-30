@@ -5,15 +5,15 @@ using Newtonsoft.Json;
 
 namespace DataAccess.ViewModels.WorkHours
 {
-    public class CreateWorkHoursApiViewModel
+    public class GetForEditCellWorkHoursApiViewModel
     {
-        [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
+        [JsonProperty(PropertyName = "startOn")]
         public DateTime StartOn { get; set; }
 
-        [JsonProperty(PropertyName = "endOn", Required = Required.Default)]
+        [JsonProperty(PropertyName = "endOn")]
         public DateTime EndOn { get; set; }
 
-        [JsonProperty(PropertyName = "isDayOff", Required = Required.Default)]
+        [JsonProperty(PropertyName = "isDayOff")]
         public bool IsDayOff { get; set; }
 
         [JsonProperty(PropertyName = "comments")]
@@ -24,7 +24,20 @@ namespace DataAccess.ViewModels.WorkHours
         public int TimeShiftId { get; set; }
 
 
+        [JsonProperty(PropertyName = "cellDay", Required = Required.Default)]
+        public int CellDay { get; set; }
+
+
+        [JsonProperty(PropertyName = "employeeIds")]
+        public List<int> EmployeeIds { get; set; }
+    
+
+
         [JsonProperty(PropertyName = "employeeId", Required = Required.Default)]
         public int EmployeeId { get; set; }
+
+
+        [JsonProperty(PropertyName = "workHourId", Required = Required.Default)]
+        public int WorkHourId { get; set; }
     }
 }

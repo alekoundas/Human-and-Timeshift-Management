@@ -1,14 +1,14 @@
 
 
 Base
-add-migration InitializeDb -Context BaseDbContext -Project DataAccess -o Migrations/BaseDb
+EntityFrameworkCore\add-migration InitializeDb -Context BaseDbContext -Project DataAccess -o Migrations/BaseDb
 
-remove-migration -Context ApplicationDbContext -Project WebApplication
+EntityFrameworkCore\remove-migration -Context ApplicationDbContext -Project WebApplication
 
-update-database -Context BaseDbContext -Project DataAccess
+EntityFrameworkCore\update-database -Context BaseDbContext -Project DataAccess
 
 
 Security:
-add-migration InitializeDb -Context SecurityDbContext -Project DataAccess -o Migrations/SecurityDb
+EntityFrameworkCore\add-migration InitializeDb -Context SecurityDbContext -Project DataAccess -o Migrations/SecurityDb
 
-update-database -Context SecurityDbContext -Project DataAccess
+EntityFrameworkCore\update-database -Context SecurityDbContext -Project DataAccess

@@ -88,9 +88,9 @@
                             <th>Επιλογή</th>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            @for (int i = 0; i < Model.DaysInMonth; i++)
+                            @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                                <th>@i+1</th>
+                                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
                             }
                         </tr>
                     </thead>
@@ -99,10 +99,9 @@
                             <th data-searchable="false">Επιλογή</th>
                             <th data-searchable="false">Όνομα</th>
                             <th data-searchable="false">Επίθετο</th>
-                            @for (int i = 0; i < Model.DaysInMonth; i++)
+                            @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                                <th data-searchable="false">@i+1</th>
-
+                                <th style="white-space: nowrap;" id="tbDayNum_@i"class="TableDays"  data-searchable="false"></th>
                             }
                         </tr>
                     </tfoot>
@@ -124,7 +123,6 @@
                 <h4 class="modal-title">Default Modal</h4>
             </div>
             <div class="modal-body" id="AddWorkHour_ModalBody">
-
                 <div class="row" style="padding-top:10px; padding-bottom:15px;">
                     <div class="col-md-2"></div>
                     <div class="col-md-6">
@@ -143,8 +141,6 @@
     </div>
 </div>
 
-
-
 <div class="modal fade in" data-backdrop="static" id="EditWorkHour_Modal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -154,10 +150,7 @@
                 </button>
                 <h4 class="modal-title">Επεξεργασία ωρών χρήστη</h4>
             </div>
-            <div class="modal-body" id="EditWorkHour_ModalBody">
-
-
-            </div>
+            <div class="modal-body" id="EditWorkHour_ModalBody"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Κλείσιμο</button>
             </div>
@@ -175,7 +168,13 @@
     $(document).ready(function () {
         Datatable();
     });
+</script >
 
+    <!--///////////////////////////////////////-->
+    <!--///          Date Functrions        ///-->
+    <!--///////////////////////////////////////-->
+
+<script >
 
     const FindHourDifference = (startDate, endDate) => {
         if (new Date(endDate).valueOf() > new Date(startDate).valueOf())
@@ -421,8 +420,6 @@
 
 
 
-
-
     <!--///////////////////////////////////////-->
     <!--///             DTOs                ///-->
     <!--///////////////////////////////////////-->
@@ -470,24 +467,28 @@
             employeeIds: GetAlreadyAppendedEmployeeIdsPerWorkHour(workHourId)
         });
 
-        var BuildSaveWorkHourToDbDto = (startDate,endDate, employeeId) =>
+        var BuildSaveWorkHourToDbDto = (startDate, endDate, employeeId, workHourId) =>
          ({
                 startOn: ConvertDateForApi(startDate),
                 endOn: ConvertDateForApi(endDate),
                 timeShiftId:@Model.Id,
-                employeeId: employeeId
-            });
+                employeeId: employeeId,
+                isDayOff: GetIsDayOffValue(workHourId),
+                comments: GetCommentValue(workHourId)
+         });
 
         var BuildEditWorkHourToDbDto = (startDate, endDate, newStartDate,
-            newEndDate, employeeId) =>
+            newEndDate, employeeId, workHourId) =>
          ({
                 startOn: ConvertDateForApi(startDate),
                 endOn: ConvertDateForApi(endDate),
                 newStartOn: ConvertDateForApi( newStartDate),
                 newEndOn: ConvertDateForApi(newEndDate),
                 timeShiftId:@Model.Id,
-                employeeId: employeeId
-            });
+                employeeId: employeeId,
+                isDayOff: GetIsDayOffValue(workHourId),
+                comments: GetCommentValue(workHourId)
+         });
 
         var BuildDeleteWorkHourToDbDto = (startDate, endDate, employeeId) =>
          ({
@@ -495,8 +496,7 @@
                 endOn: ConvertDateForApi(endDate),
                 timeShiftId:@Model.Id,
                 employeeId: employeeId
-            });
-       
+         });
 
         const BuildCellWorkHourDto = (day,employeeIds) => ({
             timeShiftId:@Model.Id,
@@ -540,8 +540,6 @@
                     .style.opacity == '0.5')
                 .map(select2Id => document.getElementById('EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + select2Id))
                 .map(select2 => select2.value);
-        
-
 
         const GetWorkHourEmployeeIds = workHourId =>
             [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + workHourId)]
@@ -557,20 +555,6 @@
 
         const GetDateInputValuesPerDay= (workHourId) => {
             var response = [];
-            //if (IsEdit()) {
-
-            //    if (IsWorkHourEditButtonHidden(workHourId)) {
-            //        var startDate = new Date(ConvertDateFormatToMDYHm(document.getElementById('DatabaseDateStartNum_' + workHourId).value));
-            //        var endDate = new Date(ConvertDateFormatToMDYHm(document.getElementById('DatabaseDateEndNum_' + workHourId).value));
-            //    }
-            //}
-            //else {
-
-            //    var date = document.getElementById('CalentimInputNum_' + workHourId).value;
-            //    var startDate = new Date(ConvertDateFormatToMDYHm(date.split('/-/')[0]));
-            //    var endDate = new Date(ConvertDateFormatToMDYHm(date.split('/-/')[1]));
-            //}
-
             var date = document.getElementById('CalentimInputNum_' + workHourId).value;
             var startDate = new Date(ConvertDateFormatToMDYHm(date.split('/-/')[0]));
             var endDate = new Date(ConvertDateFormatToMDYHm(date.split('/-/')[1]));
@@ -593,6 +577,29 @@
             }
             return response;
         };
+
+        const SetDayOffSliderState = (workHourId, state) => {
+            var slider = document.getElementById('DayOffSliderNum_' + workHourId)
+            if (slider.disabled==true) {
+                slider.disabled = false;
+
+                $('#DayOffSliderNum_' + workHourId)
+                    .bootstrapToggle(state == 'true' || state ==true ? 'on' :'off');
+
+                slider.disabled = true;
+            }
+            else 
+                $('#DayOffSliderNum_' + workHourId)
+                    .bootstrapToggle( state== true ? 'on' :'off');
+        }
+
+        const UndoValues = workHourId => {
+            SetCommentValue(workHourId,GetCommentDatabaseValue(workHourId));
+            SetIsDayOffValue(workHourId, GetIsDayOffDatabaseValue(workHourId));
+            SetDayOffSliderState(workHourId, GetIsDayOffDatabaseValue(workHourId))
+
+        };
+
         const GetDateInputValues = workHourId => 
              document.getElementById('CalentimInputNum_' + workHourId).value
                 .split('/-/').map(date => new Date(ConvertDateFormatToMDYHm(date)));
@@ -706,20 +713,29 @@
             return prependEmployeeIds;
         }
 
-        const SetValuesToEditWorkHour = (workhour,workHourId) => {
+        const SetValuesToEditWorkHour = (workHour,workHourId) => {
             document.getElementById('DateStartOnEndOnNum_' + workHourId).innerHTML =
-                ConvertToDateStartOnEndOn(CreateDateFromApi(workhour.startOn),
-                    CreateDateFromApi(workhour.endOn));
+                ConvertToDateStartOnEndOn(CreateDateFromApi(workHour.startOn),
+                    CreateDateFromApi(workHour.endOn));
 
             document.getElementById('TimeStartOnEndOnNum_' + workHourId).innerHTML =
-                ConvertToTimeStartOnEndOn(CreateDateFromApi(workhour.startOn),
-                    CreateDateFromApi(workhour.endOn));
+                ConvertToTimeStartOnEndOn(CreateDateFromApi(workHour.startOn),
+                    CreateDateFromApi(workHour.endOn));
 
             document.getElementById('DatabaseDateStartNum_' + workHourId).value =
-                CreateDateFromApi(workhour.startOn);
+                CreateDateFromApi(workHour.startOn);
 
             document.getElementById('DatabaseDateEndNum_' + workHourId).value =
-                CreateDateFromApi(workhour.endOn);
+                CreateDateFromApi(workHour.endOn);
+
+            document.getElementById('DatabaseCommentsNum_' + workHourId).value =
+                workHour.comments;
+
+            document.getElementById('DatabaseDayOffSliderNum_' + workHourId).value =
+                workHour.isDayOff;
+
+            SetDayOffSliderState(workHourId, workHour.isDayOff);
+            SetCommentValue(workHourId, workHour.comments);
         }
 
         const SetCalentimInputDateRange = workHourId => {
@@ -756,6 +772,30 @@
             input.setAttribute("id",'CalentimInputNum_' + workHourId);
             return input;
         }
+
+        const GetIsDayOffValue = workHourId =>
+            document.getElementById('DayOffSliderNum_' + workHourId).checked == true;
+
+        const GetIsDayOffDatabaseValue = workHourId =>
+            document.getElementById('DatabaseDayOffSliderNum_' + workHourId).value;
+
+        const SetIsDayOffValue = (workHourId ,value)=>
+            document.getElementById('DayOffSliderNum_' + workHourId).value = value;
+
+        const SetIsDayOffDatabaseValue = (workHourId, value) =>
+            document.getElementById('DatabaseDayOffSliderNum_' + workHourId).value = value;
+
+        const GetCommentValue = workHourId => 
+            document.getElementById('CommentsNum_' + workHourId).value;
+
+        const SetCommentValue = (workHourId, value)=>
+            document.getElementById('CommentsNum_' + workHourId).value = value;
+
+        const GetCommentDatabaseValue = workHourId =>
+            document.getElementById('DatabaseCommentsNum_' + workHourId).value;
+
+        const SetCommentDatabaseValue = (workHourId, value) =>
+            document.getElementById('DatabaseCommentsNum_' + workHourId).value = value;
 
         const IsEdit = () => (
             [...document.getElementsByClassName('IsEdit')].length > 0 ? true
@@ -898,9 +938,6 @@
                         span.innerHTML = response.value + '</br>';
                 }
             }
-            //else
-            //    [...document.getElementsByClassName('EmployeeSelect2Span')]
-            //        .forEach((span) => span.style = "display:none;");
         }
 
         //Edit modal togle show hide buttons
@@ -919,7 +956,8 @@
                 [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + workHourId)].forEach(select2 => select2.disabled = false);
                 GetWorkHourSelect2Ids(workHourId).forEach(select2Id =>
                     document.getElementById('EmployeeRowNum_' + select2Id).style.opacity = '1');
-
+                document.getElementById('CommentsNum_' + workHourId).disabled = false;
+                document.getElementById('DayOffSliderNum_' + workHourId).disabled = false;
             }
             else {
                 document.getElementById('WorkHourEditButtonNum_' + workHourId).style.display = '';
@@ -930,6 +968,8 @@
                 document.getElementById('AppendEmployeeToWorkHourButtonNum_' + workHourId).style.display = 'none';
                 [...document.getElementsByClassName('EmployeeSelect2DeleteButtonNum_' + workHourId)].forEach(empDelButton => empDelButton.style.display = 'none');
                 [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + workHourId)].forEach(select2 => select2.disabled = true);
+                document.getElementById('CommentsNum_' + workHourId).disabled = true;
+                document.getElementById('DayOffSliderNum_' + workHourId).disabled = true;
 
                 document.getElementById('LeftDateOnNum_' + workHourId).style.display = 'none';
                 document.getElementById('LeftTimeOnNum_' + workHourId).style.display = 'none';
@@ -938,7 +978,6 @@
                 document.getElementById('NewDateStartOnEndOnNum_' + workHourId).innerHTML = '';
                 document.getElementById('NewTimeStartOnEndOnNum_' + workHourId).innerHTML = '';
                 HandleWorkHourSpan(workHourId);
-
             }
         };
 
@@ -970,17 +1009,26 @@
                 WorkHourId++;
                 var num = WorkHourId;
                 AppendNewWorkHourToEditModal(WorkHourId, workHour.WorkHourId);
-                Calentim(CelentimDate, WorkHourId, workHour.startOn, workHour.endOn);  //set new Calentim instance
-                HandleShowWorkHourRangeToModal(WorkHourId,false);
+
+                //set new Calentim instance
+                Calentim(CelentimDate, WorkHourId, workHour.startOn, workHour.endOn);
+
+                //set new BootstrapToggle instance
+                DayOffSlider(WorkHourId, workHour);
+
+                SetDayOffSliderState(WorkHourId, workHour.isDayOff)
+                HandleShowWorkHourRangeToModal(WorkHourId, false);
                 SetValuesToEditWorkHour(workHour, WorkHourId);
                 workHour.employeeIds.forEach(employeeId =>
-                    $.get("/api/employees/getSelect2Option/" + employeeId,(response)=> {
-                        AppendPreloadedEmployeeToWorkHourToEditModal(num, ++WorkHourId, employeeId, response.results[0].text);
-                        EmployeeSelect2(num, WorkHourId);  //set new Select2 instance
-                        Calentim(CelentimDate, WorkHourId);//set new Celentim instance
+                    $.get("/api/employees/getSelect2Option/" + employeeId,
+                        (response) => {
+                            AppendPreloadedEmployeeToWorkHourToEditModal(num,
+                                ++WorkHourId, employeeId, response.results[0].text);
+
+                            EmployeeSelect2(num, WorkHourId);  //set new Select2 instance
+                            Calentim(CelentimDate, WorkHourId);//set new Celentim instance
                     }));
             }));
-
 
             $('#EditWorkHour_Modal').modal('show')
         });
@@ -1034,16 +1082,14 @@
             HandleWorkHourEditButton(workHourId);
             RevalidateExistingErrorsOnWorkHours();
             HandleSubmitButton();
-
-
         })
 
         //Undo edit WorkHour in modal
         $('#EditWorkHour_Modal').on('click', '.WorkHourUndoButton', e => {
             var workHourId = e.target.getAttribute('workhourid');
             HandleWorkHourEditButton(workHourId);
+            UndoValues(workHourId);
             RevalidateExistingErrorsOnWorkHours();
-
         })
 
       
@@ -1054,24 +1100,10 @@
             var workHourId = e.target.getAttribute('workhourid')
             var dateInput = document.getElementById('CalentimInputNum_' + workHourId);
             var workHourId = dateInput.id.split('_')[1];
-
-            var newStartDate = new Date(ConvertDateFormatToMDYHm(
-                dateInput.value.split('/-/')[0]));
-
-            var newEndDate = new Date(ConvertDateFormatToMDYHm(
-                dateInput.value.split('/-/')[1]));
-
-            //var startDate = new Date(document
-            //    .getElementById('DatabaseDateStartNum_' + workHourId).value);
-
-            //var endDate = new Date(document
-            //    .getElementById('DatabaseDateEndNum_' + workHourId).value);
-
             var employeeIdsToDelete = GetWorkHourEmployeeIdsToDelete(workHourId);
 
             SplitDateRangeInDates(CreateFakeInputWithDbDateRange(workHourId))
                 .forEach(response => {
-
                     //Fill array  with workHour delete
                     employeeIdsToDelete.forEach(employeeId =>
                         PostWorkHoursDelete.push(BuildDeleteWorkHourToDbDto(response.startDate,
@@ -1079,7 +1111,6 @@
 
                     SplitDateRangeInDates(CreateFakeInputWithEditedDateRange(response.workHourId))
                         .forEach(editResponse => {
-
                             //If user has edited date or added employees
                             GetWorkHourEmployeeIds(workHourId)
                                 .filter(employeeId =>
@@ -1090,8 +1121,8 @@
                                         response.endDate,
                                         editResponse.startDate,
                                         editResponse.endDate,
-                                        employeeId)));
-
+                                        employeeId,
+                                        workHourId)));
                         })
                 });
 
@@ -1102,7 +1133,6 @@
                     data: JSON.stringify(PostWorkHoursDelete),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json"
-
                 });
 
             if (PostWorkHoursEdit.length > 0)
@@ -1112,14 +1142,25 @@
                     data: JSON.stringify(PostWorkHoursEdit),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json"
-
                 });
+
             //Change any values since date maybe edited
+            var newStartDate = new Date(ConvertDateFormatToMDYHm(
+                dateInput.value.split('/-/')[0]));
+
+            var newEndDate = new Date(ConvertDateFormatToMDYHm(
+                dateInput.value.split('/-/')[1]));
+
             document.getElementById('DatabaseDateStartNum_' + workHourId).value =
                 newStartDate;
 
             document.getElementById('DatabaseDateEndNum_' + workHourId).value =
-                newEndDate
+                newEndDate;
+
+
+            SetCommentDatabaseValue(workHourId,GetCommentValue(workHourId)); 
+            SetIsDayOffDatabaseValue(workHourId, GetIsDayOffValue(workHourId)); 
+
             SetCalentimInputDateRange(workHourId);
             HandleShowWorkHourRangeToModal(workHourId, false);
             HandleWorkHourEditButton(workHourId);
@@ -1144,12 +1185,16 @@
 
             //set global variable the date to initialize celentim
             CelentimDate = year + '-' + month + '-' + day;
-            $('#SaveWorkHours').attr('employeeid', element.target.getAttribute('employeeid'));
-            $('#AppendWorkHour').attr('employeeid', element.target.getAttribute('employeeid'));
-            $('#AddWorkHour_Modal').modal('show')
+            $('#SaveWorkHours').attr('employeeid',
+                element.target.getAttribute('employeeid'));
+            $('#AppendWorkHour').attr('employeeid',
+                element.target.getAttribute('employeeid'));
+
+            $('#AddWorkHour_Modal').modal('show');
         });
 
         //Append new workhour to modal
+
         $('#AppendWorkHour').on('click', (e) => {
             //Get id from element or father element
             var employeeId = e.target.getAttribute('employeeid');
@@ -1160,16 +1205,17 @@
             WorkHourId++;
             AppendNewWorkHourToAddModal(WorkHourId);  //Append html to add modal
             Calentim(CelentimDate, WorkHourId);       //set new Calentim instance
+            DayOffSlider(WorkHourId);                 //set new BootstrapToggle instance
 
             var num = WorkHourId;
             if (prependEmployeeIds.length > 0)
-                prependEmployeeIds.forEach(employeeId => 
+                prependEmployeeIds.forEach(employeeId =>
                     $.get("/api/employees/getSelect2Option/" + employeeId, (data) => {
                         AppendPreloadedEmployeeToWorkHour(num, ++WorkHourId,
                             employeeId, data.results[0].text);   //Append Select2 row html to add modal
                         EmployeeSelect2(num, WorkHourId);        //set new Select2 instance
                     }));
-        //}).done(done => ValidateEmployeesWithRangeToWorkhour(WorkHourId)));
+            //}).done(done => ValidateEmployeesWithRangeToWorkhour(WorkHourId)));
 
             else
                 $.get("/api/employees/getSelect2Option/" + employeeId, data => {
@@ -1240,7 +1286,8 @@
                         dataToPost.push(BuildSaveWorkHourToDbDto(
                             startSubmitDate,
                             endSubmitDate,
-                            employeeId));
+                            employeeId,
+                            workHourId));
                         //Increase day by 1 for each selected date
                         startSubmitDate.setDate(startSubmitDate.getDate() + 1);
                     }
@@ -1253,7 +1300,6 @@
                 data: JSON.stringify(dataToPost),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json"
-
             });
             $('#AddWorkHour_Modal').modal('hide');
         });
@@ -1273,32 +1319,26 @@
     <script>
         //Make Datatable cell set/unset backround grey and show/hide <i>
         $('#EmployeesWorkhoursDatatable')
-            .on('mouseenter', '.DataTableHoverCell', elem =>
+            .on('mouseenter', '.DataTableHoverCell', (elem) => 
                 elem.target.querySelectorAll('i')
-                    .forEach(element => element.classList.remove("hidden"))
-            )
-            .on('mouseleave', '.DataTableHoverCell', elem =>
+                    .forEach(element => element.classList.remove("hidden")))
+            .on('mouseleave', '.DataTableHoverCell', (elem) => 
                 elem.target.querySelectorAll('i')
-                    .forEach(element => element.classList.add("hidden"))
-            );
+                    .forEach(element => element.classList.add("hidden")));
 
         //Cursor change - mouse over <i> Edit
         $('#EmployeesWorkhoursDatatable')
-            .on('mouseenter', '.faIconEdit', elem => {
-                elem.target.setAttribute("style", "cursor:pointer");
-            })
-            .on('mouseleave', '.faIconEdit', elem => {
-                elem.target.setAttribute("style", "cursor:");
-            });
+            .on('mouseenter', '.faIconEdit', (elem) => 
+                elem.target.setAttribute("style", "cursor:pointer"))
+            .on('mouseleave', '.faIconEdit', (elem) => 
+                elem.target.setAttribute("style", "cursor:"))
 
-        //Cursor change - mouse over <i> Add
+      //Cursor change - mouse over <i> Add
         $('#EmployeesWorkhoursDatatable')
-            .on('mouseenter', '.faIconAdd', (elem) => {
-                elem.target.setAttribute("style", "cursor:pointer");
-            })
-            .on('mouseleave', '.faIconAdd', (elem) => {
-                elem.target.setAttribute("style", "cursor:");
-            });
+            .on('mouseenter', '.faIconAdd', (elem) => 
+                elem.target.setAttribute("style", "cursor:pointer"))
+            .on('mouseleave', '.faIconAdd', (elem) =>
+                elem.target.setAttribute("style", "cursor:"));
     </script>
 
 
@@ -1320,10 +1360,16 @@
                 }
             }
         });
-    </script>
 
-    <!--Employees Select2 -->
-    <script>
+        const DayOffSlider = workHourId => {
+            $('#DayOffSliderNum_' + workHourId).bootstrapToggle({
+                on: 'Ναί',
+                off: 'Όχι'
+            });
+        }
+
+
+        //Employees Select2
         const EmployeeSelect2 = (workHourId, num) => {
             $('#EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num).select2({
                 ajax: {
@@ -1346,10 +1392,8 @@
 
             });
         }
-    </script>
 
-    <!-- Calentim -->
-    <script>
+        //Calentim
         var Calentim = (currentDate, workHourId,dbStartDate,dbEndDate) => {
             //$("#CallendarButtonNum_" + workHourId).data("calentim").destroy();
             var setStartDate = currentDate;
@@ -1406,439 +1450,120 @@
                     //ValidateTotalWorkTotal(workHourId);
                     HandleShowWorkHourRangeToModal(workHourId)
 
+
                         if (!ValidateNullInputs(workHourId)) {
                             ValidateAppendedWorkHoursTimeRange(workHourId);
                             RevalidateExistingErrorsOnWorkHours();
                             ValidateEmployeesWithRangeToWorkhour(workHourId);
                         }
                 },
-                onaftershow: () => 
+                onaftershow: () =>
                     //Fix Calentim width
                     [...document.getElementsByClassName('calentim-input')]
                         .forEach((calentim) =>
                             calentim.setAttribute('style', 'width: 600px;'))
             })
         };
-    </script>
 
-    <!-- Datatable -->
-    <script>
-           var Datatable = ()=>  $('#EmployeesWorkhoursDatatable').DataTable({
-               serverSide: true,
-               responsive: true,
-               colReorder: true,
-               processing: true,
-               language: {
-                   processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-               },
-                dom: 'frtlp',
-                ajax: {
-                    url: '/api/employees/getdatatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
+        //Datatable
+        var Datatable = () => $('#EmployeesWorkhoursDatatable').DataTable({
+            serverSide: true,
+            responsive: true,
+            colReorder: true,
+            processing: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+            },
+            dom: 'frtlp',
+            ajax: {
+                url: '/api/employees/getdatatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
 
-                        data.predicate = 'TimeShiftEdit';
-                        data.genericId =@Model.Id;
-                        data.timeShiftYear =@Model.Year;
-                        data.timeShiftMonth =@Model.Month;
+                    data.predicate = 'TimeShiftEdit';
+                    data.genericId =@Model.Id;
+                    data.timeShiftYear =@Model.Year;
+                    data.timeShiftMonth =@Model.Month;
 
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        "data": "ToggleSlider",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            //console.log(data);
-                            if (data.ToggleSlider != null)
-                                return data.ToggleSlider;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "FirstName",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) => {
-                            if (data.FirstName != null)
-                                return data.FirstName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "LastName",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.LastName != null)
-                                return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day1",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day1 != null)
-                                return data.Day1;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day2",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day2 != null)
-                                return data.Day2;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day3",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day3 != null)
-                                return data.Day3;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day4",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day4 != null)
-                                return data.Day4;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day5",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day5 != null)
-                                return data.Day5;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day6",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day6 != null)
-                                return data.Day6;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day7",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day7 != null)
-                                return data.Day7;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day8",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day8 != null)
-                                return data.Day8;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day9",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day9 != null)
-                                return data.Day9;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day10",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day10 != null)
-                                return data.Day10;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day11",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day11 != null)
-                                return data.Day11;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day12",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day12 != null)
-                                return data.Day12;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day13",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day13 != null)
-                                return data.Day13;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day14",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day14 != null)
-                                return data.Day14;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day15",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day15 != null)
-                                return data.Day15;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day16",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day16 != null)
-                                return data.Day16;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day17",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day17 != null)
-                                return data.Day17;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day18",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day18 != null)
-                                return data.Day18;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day19",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day19 != null)
-                                return data.Day19;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day20",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day20 != null)
-                                return data.Day20;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day21",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day21 != null)
-                                return data.Day21;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day22",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day22 != null)
-                                return data.Day22;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day23",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day23 != null)
-                                return data.Day23;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day24",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day24 != null)
-                                return data.Day24;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day25",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day25 != null)
-                                return data.Day25;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day26",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day26 != null)
-                                return data.Day26;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day27",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day27 != null)
-                                return data.Day27;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day28",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day28 != null)
-                                return data.Day28;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day29",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day29 != null)
-                                return data.Day29;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day30",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day30 != null)
-                                return data.Day30;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Day31",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Day31 != null)
-                                return data.Day31;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                 rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
-                     for (var i = 1; i <= 31 ; i++) {
-                         row.querySelectorAll('td')[i + 2].setAttribute("class", "DataTableHoverCell")
-                         //row.querySelectorAll('td')[i + 1].setAttribute("employeeid", data.Id)
-                         row.querySelectorAll('td')[i + 2].setAttribute('style', 'background-color:' + $(data["Day" + i]).attr('cellcolor'))
-                     }
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[0, 'desc']],
+            columns: CreateDatatableColumns(),
+            rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
+                for (var i = 1; i <= @Model.DaysInMonth ; i++) {
+                    row.querySelectorAll('td')[i + 2].setAttribute("class", "DataTableHoverCell")
+                    //row.querySelectorAll('td')[i + 1].setAttribute("employeeid", data.Id)
+                    row.querySelectorAll('td')[i + 2].setAttribute('style', 'background-color:' + $(data["Day" + i]).attr('cellcolor'))
+                }
 
-               },
-               "fnDrawCallback": function () {
-                   $('.ToggleSliders').bootstrapToggle({
-                       on: 'Ναί',
-                       off: 'Όχι'
-                   });
-               },
+            },
+            fnDrawCallback: function () {
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                });
+            },
+            initComplete: () => {
+                [...document.getElementsByClassName('TableDays')]
+                    .forEach(tableHead => {
+                        var options = { weekday: 'long', day: 'numeric' };
+                        var day = tableHead.id.split('_')[1];
+
+                        //Visual Studio Bug!!! dont break line
+                        var currDate = new Date(Date.UTC(@Model.Year, @Model.Month, day, 0, 0, 0));
+
+                        var dayToShow = currDate.toLocaleString('el-GR',
+                            options);
+
+                        document.getElementById('thDayNum_' + day)
+                            .innerHTML = dayToShow;
+
+                        document.getElementById('tbDayNum_' + day)
+                            .innerHTML = dayToShow;
+                    });
+            }
+        });
+
+        const RenderDataFromDatatable = (data ,property)=> {
+            if (data[property]!= null)
+                return data[property];
+            else
+                return "";
+        }
+
+         const CreateDatatableColumns = () => {
+            var columns = []
+            columns.push({
+                data: "ToggleSlider",
+                searchable: false,
+                orderable: false,
+                render: (a, b, data, d) => RenderDataFromDatatable(data, 'ToggleSlider')
             });
+            columns.push({
+                data: "FirstName",
+                searchable: false,
+                orderable: false,
+                render: (a, b, data, d) => RenderDataFromDatatable(data, 'FirstName')
+            });
+            columns.push({
+                data: "LastName",
+                searchable: false,
+                orderable: false,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,'LastName')
+            });
+             //Add days of month
+            for (var i = 1; i <= @Model.DaysInMonth; i++)
+                columns.push({
+                    "data": "Day"+i,
+                    "searchable": false,
+                    "orderable": false
+                    //render: (a, b, data, d) => RenderDataFromDatatable(data, "Day" + i)
+                });
+
+            return columns;
+        }
     </script>
 
     <!--    Html Append -->
@@ -1905,15 +1630,35 @@
                             '</div>' +
                             '<div style="width: 15%; float: left;">' +
                                 '<button class="btn btn-danger WorkHourDeleteButton" workhourid="' + workHourId + '"><i class="fa fa-trash-o WorkHourDeleteButton" workhourid="' + workHourId + '"></i></button>' +
-
                             '</div>' +
                         '</div>' +
                     '</div >' +
-                '<div style="padding-left:40px;" class="row">' +
-                    '<div style="width:  100%;">' +
-                        '<div  style="width: 15%; float: left;"><button class="btn btn-success AppendEmployeeToWorkHourButton" id="AppendEmployeeToWorkHourButtonNum_'+workHourId+'" Num="' + workHourId + '"><i class="fa fa-plus " Num="' + workHourId + '"></i><i class="fa fa-user " Num="' + workHourId + '"></i></button></div>' +
-                        '<div  style="width: 20%; float: left;"><p> Υπάλληλοι:</p></div>' +
+                      '<div style="padding-left:40px;" class="row">' +
+                        '<div style="width:  100%;">' +
+                            '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                            '<div style="width: 20%; float: left;"><p> Δήλωση Ημ. ως ρεπό:</p></div>' +
+                            '<div style="width: 20%; float: left;"><input  type="checkbox" id="DayOffSliderNum_'+workHourId+'" data-onstyle="success"></div>' +
+                        '</div >' +
                     '</div >' +
+                    '<div style="padding-left:40px;" class="row">' +
+                        '<div style="width:  100%;">' +
+                            '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                            '<div style="width: 20%; float: left;"><p> Σχόλια:</p></div>' +
+                        '</div >' +
+                    '</div >' +
+                    '<div style="padding-left:40px;" class="row">' +
+                        '<div style="width:  100%;">' +
+                            '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                            '<div style="width: 65%; float: left;">'+
+                                '<textarea class="form-control" id="CommentsNum_'+workHourId+'" rows="3"></textarea>'+
+                            '</div>' +
+                        '</div >' +
+                    '</div >' +
+                    '<div style="padding-left:40px;" class="row">' +
+                        '<div style="width:  100%; max-width:450px;">' +
+                            '<div  style="width: 15%; float: left;"><button class="btn btn-success AppendEmployeeToWorkHourButton" id="AppendEmployeeToWorkHourButtonNum_'+workHourId+'" Num="' + workHourId + '"><i class="fa fa-plus " Num="' + workHourId + '"></i><i class="fa fa-user " Num="' + workHourId + '"></i></button></div>' +
+                            '<div  style="width: 20%; float: left;"><p> Υπάλληλοι:</p></div>' +
+                        '</div >' +
                     '</div >' +
                 '</div >');
 
@@ -1923,9 +1668,11 @@
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + workHourId + '" id="WorkHourDivNum_' + workHourId + '">' +
                     '<label style="padding-left:10px;" class="control-label"> Επεξεργασία βάρδιας κελιού για εργαζόμενο/ους:</label>' +
                     '<div style="padding-left:40px;" class="row">' +
-                        '<input style="display:;" id="DatabaseDateStartNum_' + workHourId + '" />' +
-                        '<input style="display:;" id="DatabaseDateEndNum_' + workHourId + '" />' +
-                        '<input style="display:;" id="CalentimInputNum_' + workHourId + '" class="calentimInput" />' +
+                        '<input style="display:none;" id="DatabaseDateStartNum_' + workHourId + '" />' +
+                        '<input style="display:none;" id="DatabaseDateEndNum_' + workHourId + '" />' +
+                        '<input style="display:none;" id="DatabaseDayOffSliderNum_' + workHourId + '" />' +
+                        '<input style="display:none;" id="DatabaseCommentsNum_' + workHourId + '" />' +
+                        '<input style="display:none;" id="CalentimInputNum_' + workHourId + '" class="calentimInput" />' +
                         '<div class="row"><span id="WorkHourErrorSpanNum_' + workHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span></div>' +
                         '<div style="width: 100%;">' +
                             '<div style="width: 15%; float: left;">' +
@@ -1958,7 +1705,28 @@
                         '</div>' +
                     '</div >' +
                     '<div style="padding-left:40px;" class="row">' +
-                '<div style="width:  100%;">' +
+                        '<div style="width:  100%;">' +
+                            '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                            '<div style="width: 20%; float: left;"><p> Δήλωση Ημ. ως ρεπό:</p></div>' +
+                            '<div style="width: 20%; float: left;"><input disabled type="checkbox" id="DayOffSliderNum_'+workHourId+'" data-onstyle="success"></div>' +
+                        '</div >' +
+                    '</div >' +
+                      '<div style="padding-left:40px;" class="row">' +
+                        '<div style="width:  100%;">' +
+                            '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                            '<div style="width: 20%; float: left;"><p> Σχόλια:</p></div>' +
+                        '</div >' +
+                    '</div >' +
+                    '<div style="padding-left:40px;" class="row">' +
+                        '<div style="width:  100%;">' +
+                            '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                            '<div style="width: 65%; float: left;">'+
+                                '<textarea class="form-control" id="CommentsNum_'+workHourId+'" rows="3" disabled></textarea>'+
+                            '</div>' +
+                        '</div >' +
+                    '</div >' +
+                    '<div style="padding-left:40px;" class="row">' +
+                        '<div style="width:  100%;">' +
                             '<div  style="width: 15%; float: left; "><button style="display:none;" class="btn btn-success AppendEmployeeToWorkHourButton" id="AppendEmployeeToWorkHourButtonNum_' + workHourId + '" Num="' + WorkHourId + '"><i class="fa fa-plus " Num="' + WorkHourId + '"></i><i class="fa fa-user " Num="' + WorkHourId + '"></i></button></div>' +
                             '<div  style="width: 20%; float: left;"><p> Υπάλληλοι:</p></div>' +
                         '</div >' +

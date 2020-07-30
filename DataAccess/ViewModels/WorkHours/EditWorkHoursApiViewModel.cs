@@ -7,24 +7,30 @@ namespace DataAccess.ViewModels.WorkHours
 {
     public class EditWorkHoursApiViewModel
     {
-        [JsonProperty(PropertyName = "startOn")]
+        [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
         public DateTime StartOn { get; set; }
 
-        [JsonProperty(PropertyName = "endOn")]
+        [JsonProperty(PropertyName = "endOn", Required = Required.Default)]
         public DateTime EndOn { get; set; }
 
-        [JsonProperty(PropertyName = "newStartOn")]
+        [JsonProperty(PropertyName = "newStartOn", Required = Required.Default)]
         public DateTime NewStartOn { get; set; }
 
-        [JsonProperty(PropertyName = "newEndOn")]
+        [JsonProperty(PropertyName = "newEndOn", Required = Required.Default)]
         public DateTime NewEndOn { get; set; }
 
+        [JsonProperty(PropertyName = "isDayOff", Required = Required.Default)]
+        public bool IsDayOff { get; set; }
 
-        [JsonProperty(PropertyName = "timeShiftId")]
+        [JsonProperty(PropertyName = "comments")]
+        public string Comments { get; set; }
+
+
+        [JsonProperty(PropertyName = "timeShiftId", Required = Required.Default)]
         public int TimeShiftId { get; set; }
 
 
-        [JsonProperty(PropertyName = "employeeId")]
+        [JsonProperty(PropertyName = "employeeId", Required = Required.Default)]
         public int EmployeeId { get; set; }
     }
 }

@@ -107,6 +107,9 @@ namespace WebApplication.Api
             foreach (var employeeId in workHourViewModel.EmployeeIds)
                 filter = filter.Or(x => x.EmployeeId == employeeId);
 
+            filter = filter.And(x => x.StartOn == workHourViewModel.StartOn &&
+                x.EndOn == workHourViewModel.EndOn);
+
             var workHours = await _baseDataWork.WorkHours.GetFiltered(filter);
             if (workHours.Count > 0)
             {
@@ -191,7 +194,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/addEmployeeWorkhours
         [HttpPost("addEmployeeWorkhours")]
-        public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<WorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<CreateWorkHoursApiViewModel> workHours)
         {
             foreach (var workHour in workHours)
             {
@@ -204,6 +207,8 @@ namespace WebApplication.Api
                     EndOn = workHour.EndOn,
                     TimeShiftId = workHour.TimeShiftId,
                     EmployeeId = workHour.EmployeeId,
+                    IsDayOff = workHour.IsDayOff,
+                    Comments = workHour.Comments,
                     CreatedOn = DateTime.Now
                 });
                 await _baseDataWork.SaveChangesAsync();
@@ -219,8 +224,8 @@ namespace WebApplication.Api
             {
                 var workHourToModify = await _baseDataWork.WorkHours
                     .FirstOrDefaultAsync(x =>
-                        x.StartOn==workHour.StartOn &&
-                        x.EndOn==workHour.EndOn &&
+                        x.StartOn == workHour.StartOn &&
+                        x.EndOn == workHour.EndOn &&
                         x.EmployeeId == workHour.EmployeeId
                  );
                 //if workhour exists for employee, edit it
@@ -228,6 +233,8 @@ namespace WebApplication.Api
                 {
                     workHourToModify.StartOn = workHour.NewStartOn;
                     workHourToModify.EndOn = workHour.NewEndOn;
+                    workHourToModify.IsDayOff = workHour.IsDayOff;
+                    workHourToModify.Comments = workHour.Comments;
                     _baseDataWork.Update(workHourToModify);
                     await _baseDataWork.SaveChangesAsync();
 
@@ -276,9 +283,9 @@ namespace WebApplication.Api
 
         // POST: api/workhours/getforcell
         [HttpPost("getForEditCell")]
-        public async Task<ActionResult<WorkHour>> GetForEditCell([FromBody] WorkHoursApiViewModel workHour)
+        public async Task<ActionResult<WorkHour>> GetForEditCell([FromBody] GetForEditCellWorkHoursApiViewModel workHour)
         {
-            var response = new List<WorkHoursApiViewModel>();
+            var response = new List<GetForEditCellWorkHoursApiViewModel>();
 
             var workHours = await _baseDataWork.WorkHours
                 .GetCurrentAssignedOnCellFilterByEmployeeIds(workHour);
@@ -287,11 +294,13 @@ namespace WebApplication.Api
                 .GroupBy(x => new { x.StartOn, x.EndOn });
 
             foreach (var group in groupedWorkHours)
-                response.Add(new WorkHoursApiViewModel
+                response.Add(new GetForEditCellWorkHoursApiViewModel
                 {
                     WorkHourId = group.Select(x => x.Id).FirstOrDefault(),
                     StartOn = group.Key.StartOn,
                     EndOn = group.Key.EndOn,
+                    IsDayOff = group.Select(x=>x.IsDayOff).FirstOrDefault(),
+                    Comments= group.Select(x=>x.Comments).FirstOrDefault(),
                     EmployeeIds = group.Select(x => x.EmployeeId).ToList()
                 });
 

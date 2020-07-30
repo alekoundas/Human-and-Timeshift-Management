@@ -223,12 +223,6 @@ namespace WebApplication.Utilities
                 dayOfMonth,
                 employeeId);
 
-            if (cellWorkHours.Count() > 0)
-            {
-                var sdafasdf = 234;
-            }
-
-
             var startTimeSpan = String.Join("",
                 cellWorkHours.Select(x =>
                     SpanTimeValue(x.StartOn.ToShortTimeString())));

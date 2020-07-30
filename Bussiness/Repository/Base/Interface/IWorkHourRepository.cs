@@ -14,6 +14,6 @@ namespace Bussiness.Repository.Base.Interface
         bool IsDateOverlaping(WorkHoursApiViewModel workHour,int employeeId);
         bool IsDateOverlaping(HasOverlapRangeWorkHoursApiViewModel workHour,int employeeId);
         bool HasExactDate(WorkHoursApiViewModel workHour);
-        Task<List<WorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(WorkHoursApiViewModel viewModel);
+        Task<List<WorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel);
     }
 }

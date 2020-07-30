@@ -9,6 +9,8 @@ namespace DataAccess.Models.Entity
     {
         public DateTime StartOn { get; set; }
         public DateTime EndOn { get; set; }
+        public bool IsDayOff { get; set; }
+        public string Comments { get; set; }
 
         public int TimeShiftId { get; set; }
         public TimeShift TimeShift { get; set; }
