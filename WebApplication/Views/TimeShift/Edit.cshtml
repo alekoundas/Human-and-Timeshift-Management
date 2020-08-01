@@ -944,11 +944,10 @@
 
             var startTs = moment(dateRange[0], 'DD/MM/YYYY HH:mm').valueOf();
             var endTs = moment(dateRange[1], 'DD/MM/YYYY HH:mm').valueOf();
-            if (startTs == 0 || endTs == 0) {
+            if (isNaN(startTs) || isNaN(endTs)) {
                 var startTs = dateRange[0];
                 var endTs = dateRange[1];
             }
-            console.log(startTs);
             SetCalentimInputValue(workHourId, startTs, endTs);
         }
 
@@ -1593,7 +1592,7 @@
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + workHourId + '" id="WorkHourDivNum_' + workHourId + '">' +
                     '<label style="padding-left:10px;" class="control-label"> Προσθήκη έναρξη - λήξη βάρδιας για εργαζόμενο/ους:</label>' +
                     '<div style="padding-left:40px;" class="row">' +
-                        '<input style="display:;" class="calentim calentimInput" id="CalentimInputNum_' + workHourId + '" />' +
+                        '<input style="display:none;" class="calentim calentimInput" id="CalentimInputNum_' + workHourId + '" />' +
                         '<div class="row">' +
                             '<span id="WorkHourErrorSpanNum_' + workHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span>' +
                         '</div>' +
@@ -1655,10 +1654,10 @@
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + workHourId + '" id="WorkHourDivNum_' + workHourId + '">' +
                     '<label style="padding-left:10px;" class="control-label"> Επεξεργασία βάρδιας κελιού για εργαζόμενο/ους:</label>' +
                     '<div style="padding-left:40px;" class="row">' +
-                        '<input style="display:;" id="DatabaseDayOffSliderNum_' + workHourId + '" />' +
-                        '<input style="display:;" id="DatabaseCommentsNum_' + workHourId + '" />' +
-                        '<input style="display:;" id="CalentimInputNum_' + workHourId + '" class="calentimInput" />' +
-                        '<input style="display:;" id="CalentimInputDatabaseNum_' + workHourId + '"  />' +
+                        '<input style="display:none;" id="DatabaseDayOffSliderNum_' + workHourId + '" />' +
+                        '<input style="display:none;" id="DatabaseCommentsNum_' + workHourId + '" />' +
+                        '<input style="display:none;" id="CalentimInputNum_' + workHourId + '" class="calentimInput" />' +
+                        '<input style="display:none;" id="CalentimInputDatabaseNum_' + workHourId + '"  />' +
                         '<div class="row"><span id="WorkHourErrorSpanNum_' + workHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span></div>' +
                         '<div style="width: 100%;">' +
                             '<div style="width: 15%; float: left;">' +
