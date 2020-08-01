@@ -179,23 +179,21 @@
 </script>
 
     <!--///////////////////////////////////////-->
-    <!--///          Date Functrions        ///-->
+    <!--///          Date Functions         ///-->
     <!--///////////////////////////////////////-->
 
 <script >
 
-    const FindHourDifference = (startDate, endDate) => {
-        if (new Date(endDate).valueOf() > new Date(startDate).valueOf())
-            return (new Date(endDate).valueOf() - new Date(startDate).valueOf())
-                / 1000 / 60 / 60;
+    const FindHourDifference = (startTs, endTs) => {
+        if (startTs > endTs)
+            return (endTs - startTs) / 1000 / 60 / 60;
         else
-            return (new Date(startDate).valueOf() - new Date(endDate).valueOf())
-                / 1000 / 60 / 60;
-    }
+            return (startTs - endTs) / 1000 / 60 / 60;
+    };
 
-    const FindHourDifferencePerDay = (startDate, endDate) => {
-        startDate = new Date(ConvertDateFormatToMDYHm(startDate));
-        endDate = new Date(ConvertDateFormatToMDYHm(endDate));
+    const FindHourDifferencePerDay = (startTs, endTs) => {
+        var startDate = new Date(parseInt(startTs));
+        var endDate = new Date(parseInt(endTs));
 
         startDate.setFullYear(endDate.getFullYear());
         startDate.setMonth(endDate.getMonth());
@@ -206,9 +204,9 @@
         return (endDate.valueOf() - startDate.valueOf()) / 1000 / 60 / 60;
     }
 
-    const FindDaysDifference = (startDate, endDate) => {
-        startDate = new Date(ConvertDateFormatToMDYHm(startDate));
-        endDate = new Date(ConvertDateFormatToMDYHm(endDate));
+    const FindDaysDifference = (startTs, endTs) => {
+        startDate = new Date(parseInt(startTs));
+        endDate = new Date(parseInt(endTs));
 
         startDate.setHours(endDate.getHours());
         startDate.setMinutes(endDate.getMinutes());
@@ -218,58 +216,25 @@
             (1000 * 60 * 60 * 24)) + 1;
     }
 
-    const ConvertToDateStartOnEndOn = (startDate, endDate) => {
-        var start = moment(startDate, 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY');
-        var end = moment(endDate, 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY');
+    const ConvertForDateSpan = (startTs, endTs) => {
+        var start = moment(parseInt(startTs)).format('DD/MM/YYYY');
+        var end = moment(parseInt(endTs)).format('DD/MM/YYYY');
         if (start == end)
             return start;
         else
             return start + ' - ' + end;
     }
 
-    const ConvertToDateStartOnEndOnForFakeImputs = (startDate, endDate) => {
-        var start = moment(startDate, 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm');
-        var end = moment(endDate, 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm');
-        return start + '/-/' + end;
+    const ConvertForTimeSpan = (startTs, endTs) =>
+        moment(parseInt(startTs)).format('HH:mm') + ' - ' + moment(parseInt(endTs)).format('HH:mm');
 
-    }
+    const ConvertFromApiToTimestamp = date =>
+        moment(date, 'YYYY/MM/DD HH:mm:ss').valueOf()
 
-    const ConvertToDateStartOnEndOnForDatabaseValue = (startDate, endDate) => {
-        console.log(startDate);
-        console.log(endDate);
-        var start = moment(new Date(startDate), 'MM/DD/YYYY HH:mm').format('DD/MM/YYYY HH:mm');
-        var end = moment(new Date(endDate), 'MM/DD/YYYY HH:mm').format('DD/MM/YYYY HH:mm');
-        return start + '/-/' + end;
+    const ConvertDateForApi = timeStamp => 
+        CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
-    }
-    const CreateDateFromApi = date => moment(date, 'YYYY/MM/DD HH:mm:ss')
-
-    const ConvertToTimeStartOnEndOn = (startDate, endDate) =>
-        moment(startDate, 'DD/MM/YYYY HH:mm').format('HH:mm') +
-        ' - ' +
-        moment(endDate, 'DD/MM/YYYY HH:mm').format('HH:mm');
-
-    const ConvertDateFormatToMDY = (date) => moment(date, 'DD/MM/YYYY')
-        .format("MM/DD/YYYY");
-    
-    const ConvertDateFormatToMDYHm = (date) => moment(date, 'DD/MM/YYYY HH:mm')
-        .format("MM/DD/YYYY HH:mm");
-
-    const ConvertDateForApi = GMTtime => 
-        CompleteTimeWithZeros( new Date(GMTtoUTCconverter(GMTtime)));
-      
-    const ConvertNewDateToMDYHm = GMTtime => 
-        CompleteTimeWithZeros(new Date(GMTtime));
-
-    const GMTtoUTCconverter = (GMTtime) => Date.UTC(
-        GMTtime.getUTCFullYear(),
-        GMTtime.getUTCMonth(),
-        GMTtime.getUTCDate(),
-        GMTtime.getUTCHours(),
-        GMTtime.getUTCMinutes(),
-        GMTtime.getUTCSeconds());
-
-    CompleteTimeWithZeros = date => {
+    CompleteTimeWithZerosForApiPost = date => {
         var year = date.getFullYear();
         var month = String((date.getMonth() + 1)).length == 1 ?
             '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
@@ -292,22 +257,24 @@
 <script>
         const ValidateWorkHourDateOutOfRange = (workHourId) => {
             var minDate = new Date(DateConstants().Year, DateConstants().Month - 1, 1,
-                0, 0, 0, 0);
+                0, 0, 0, 0).valueOf();
 
             var maxDate = new Date(DateConstants().Year, DateConstants().Month - 1 ,
-                DateConstants().DaysInMonth, 23, 59, 59, 0);
+                DateConstants().DaysInMonth, 23, 59, 59, 0).valueOf();
 
-            var startDate = GetDateInputValues(workHourId)[0];
-            var endDate = GetDateInputValues(workHourId)[1];
+            var startTs = GetCalentimInputValue(workHourId)[0];
+            var endTs = GetCalentimInputValue(workHourId)[1];
 
-            if (startDate < minDate || maxDate < endDate)
+            if (startTs < minDate || maxDate < endTs)
                 HandleWorkHourSpan(workHourId,
                     'Η ημερομηνία δήλωσης πρέπει να βρίσκεται εντός του επιλεγμένου μήνα!')
-        }
-        const ValidateNullInputs = (workHourId) => {
+    }
+
+        const ValidateNullInputs = workHourId => {
             var hasError = false;
-            GetWorkHourIdsForNullDateInputs().filter(nullWorkHourid =>
-                nullWorkHourid == workHourId).forEach(workHourId => {
+            GetWorkHourIdsForNullDateInputs()
+                .filter(nullWorkHourid => nullWorkHourid == workHourId)
+                .forEach(workHourId => {
                     hasError = true;
                     HandleWorkHourSpan(workHourId,
                         'Πρέπει να εισαχθεί ημερομηνία απο το ημερολόγιο!');
@@ -316,11 +283,10 @@
         };
 
         const ValidateStartOnLessThanEndOn = (workHourId) => {
-            var splitedDate = $("#CalentimInputNum_" + workHourId)[0].value.split('/-/');
-            var start = new Date(ConvertDateFormatToMDYHm(splitedDate[0]));
-            var end = new Date(ConvertDateFormatToMDYHm(splitedDate[1]));
+            var startDate = new Date(parseInt(GetCalentimInputValue(workHourId)[0]));
+            var endDate =new Date(parseInt(GetCalentimInputValue(workHourId)[1]));
 
-            if (start.getTime() >= end.getTime())
+            if (startDate.getTime() >= endDate.getTime())
                 HandleWorkHourSpan(workHourId,
                     'Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης');
         }
@@ -359,31 +325,32 @@
                     ValidateAppendedWorkHoursTimeRange(workHourId));
         };
 
-        const GetSelect2ValidationData = workHourId => {
+    const GetSelect2HasOverlapData = workHourId => {
             var response = [];
-            var workHourDateInputs = [...document.getElementsByClassName('calentimInput')];
-            workHourDateInputs.forEach(input =>
+
+        [...document.getElementsByClassName('calentimInput')]
+            .forEach(input =>
                 SplitDateRangeInDates(input).forEach(result => {
                     if (IsEdit())
                         response.push(
                             BuildValidateEmployeesToEditWorkHourDto(
-                                new Date(ConvertDateFormatToMDYHm(result.startDate)),
-                                new Date(ConvertDateFormatToMDYHm(result.endDate)),
-                                new Date(GetDbDateInputStartValue(result.workHourId)),
-                                new Date(GetDbDateInputEndValue(result.workHourId)),
+                                result.startTimestamp,
+                                result.endTimestamp,
+                                GetCalentimInputDatabaseValue(result.workHourId)[0],
+                                GetCalentimInputDatabaseValue(result.workHourId)[1],
                                 result.workHourId))
                     else
                         response.push(
                             BuildValidateEmployeesToAddWorkHourDto(
-                                new Date(ConvertDateFormatToMDYHm(result.startDate)),
-                                new Date(ConvertDateFormatToMDYHm(result.endDate)),
+                                result.startTimestamp,
+                                result.endTimestamp,
                                 result.workHourId))
                 }));
             return response;
             };
 
         const ValidateEmployeesWithRangeToWorkhour = (workHourId) =>
-            AjaxPost('workhours/HasOverlapRange', GetSelect2ValidationData(workHourId))
+            AjaxPost('workhours/HasOverlapRange', GetSelect2HasOverlapData(workHourId))
             .done((responses) => {
                 HandleEmployeeSelect2SpanPerWorkHour(undefined, undefined, workHourId)
                 responses.forEach((response) => {
@@ -446,13 +413,6 @@
     <!--///////////////////////////////////////-->
 
 <script>
-    const BuildHasOverlapWorkHourDto = (start, end) => ({
-        timeShiftId: DateConstants().TimeShiftId,
-        startOn: ConvertDateForApi(
-            new Date(ConvertDateFormatToMDYHm(start))),
-        endOn: ConvertDateForApi(
-            new Date(ConvertDateFormatToMDYHm(end)))
-    });
 
     const BuildSelect2DtoNum = (params, workHourId) => ({
         timeShiftId: DateConstants().TimeShiftId,
@@ -467,59 +427,58 @@
         page: params.page || 1
     });
 
-    const BuildValidateAreDatesOverlapingDto = (startDate, endDate,
-        workHourId) => ({
-            startEndDate: [new Date(startDate), new Date(endDate)],
-            workHourId: workHourId
-        })
+    const BuildValidateAreDatesOverlapingDto = (startTs, endTs, workHourId) => ({
+        startEndDate: [startTs, endTs],
+        workHourId: workHourId
+    });
 
-    const BuildValidateEmployeesToAddWorkHourDto = (startDate, endDate,
+    const BuildValidateEmployeesToAddWorkHourDto = (startTs, endTs,
         workHourId) => ({
             timeShiftId: DateConstants().TimeShiftId,
-            startOn: ConvertDateForApi(startDate),
-            endOn: ConvertDateForApi(endDate),
+            startOn: ConvertDateForApi(startTs),
+            endOn: ConvertDateForApi(endTs),
             isEdit: false,
             employeeIds: GetAlreadyAppendedEmployeeIdsPerWorkHour(workHourId)
         });
 
-    const BuildValidateEmployeesToEditWorkHourDto = (startDate, endDate,
-        excludeStartOn, excludeEndOn, workHourId) => ({
+    const BuildValidateEmployeesToEditWorkHourDto = (startTs, endTs,
+        excludeStartTs, excludeEndTsn, workHourId) => ({
+
             timeShiftId: DateConstants().TimeShiftId,
-            startOn: ConvertDateForApi(startDate),
-            endOn: ConvertDateForApi(endDate),
-            excludeStartOn: ConvertDateForApi(excludeStartOn),
-            excludeEndOn: ConvertDateForApi(excludeEndOn),
+            startOn: ConvertDateForApi(startTs),
+            endOn: ConvertDateForApi(endTs),
+            excludeStartOn: ConvertDateForApi(excludeStartTs),
+            excludeEndOn: ConvertDateForApi(excludeEndTsn),
             isEdit: true,
             employeeIds: GetAlreadyAppendedEmployeeIdsPerWorkHour(workHourId)
         });
 
-    var BuildSaveWorkHourToDbDto = (startDate, endDate, employeeId, workHourId) =>
-        ({
-            startOn: ConvertDateForApi(startDate),
-            endOn: ConvertDateForApi(endDate),
+    var BuildSaveWorkHourToDbDto = (startTs, endTs, employeeId, workHourId)=>({
+            startOn: ConvertDateForApi(startTs),
+            endOn: ConvertDateForApi(endTs),
             timeShiftId: DateConstants().TimeShiftId,
             employeeId: employeeId,
             isDayOff: GetIsDayOffValue(workHourId),
             comments: GetCommentValue(workHourId)
         });
 
-    var BuildEditWorkHourToDbDto = (startDate, endDate, newStartDate,
-        newEndDate, employeeId, workHourId) =>
+    var BuildEditWorkHourToDbDto = (startTd, endTs, newStartTs,
+        newEndTs, employeeId, workHourId) =>
         ({
-            startOn: ConvertDateForApi(startDate),
-            endOn: ConvertDateForApi(endDate),
-            newStartOn: ConvertDateForApi(newStartDate),
-            newEndOn: ConvertDateForApi(newEndDate),
+            startOn: ConvertDateForApi(startTd),
+            endOn: ConvertDateForApi(endTs),
+            newStartOn: ConvertDateForApi(newStartTs),
+            newEndOn: ConvertDateForApi(newEndTs),
             timeShiftId: DateConstants().TimeShiftId,
             employeeId: employeeId,
             isDayOff: GetIsDayOffValue(workHourId),
             comments: GetCommentValue(workHourId)
         });
 
-    var BuildDeleteWorkHourToDbDto = (startDate, endDate, employeeId) =>
+    var BuildDeleteWorkHourToDbDto = (startTs, endTs, employeeId) =>
         ({
-            startOn: ConvertDateForApi(startDate),
-            endOn: ConvertDateForApi(endDate),
+            startOn: ConvertDateForApi(startTs),
+            endOn: ConvertDateForApi(endTs),
             timeShiftId: DateConstants().TimeShiftId,
             employeeId: employeeId
         });
@@ -532,28 +491,10 @@
 
     const BuildDeleteBatchWorkHourDto = workHourId => ({
         timeShiftId: DateConstants().TimeShiftId,
-        startOn: ConvertDateForApi(
-            new Date(ConvertDateFormatToMDYHm(
-                GetDateInputValues(workHourId)[0])),
-            false),
-        endOn: ConvertDateForApi(
-            new Date(ConvertDateFormatToMDYHm(
-                GetDateInputValues(workHourId)[1])),
-            false),
+        startOn: ConvertDateForApi( GetCalentimInputValue(workHourId)[0]),
+        endOn: ConvertDateForApi(GetCalentimInputValue(workHourId)[1]),
         employeeIds: GetWorkHourEmployeeIds(workHourId)
     });
-
-    const BuildSaveEditedWorkHourDto = (dateInput, employeeId) =>
-        ({
-            startOn: ConvertDateFormatToMDYHm(dateInput.value.split('/-/')[0]),
-            endOn: ConvertDateFormatToMDYHm(dateInput.value.split('/-/')[1]),
-            newStartOn: ConvertDateFormatToMDYHm(dateInput.value.split('/-/')[0]),
-            newEndOn: ConvertDateFormatToMDYHm(dateInput.value.split('/-/')[1]),
-            /**/
-            timeShiftId: DateConstants().TimeShiftId,
-    /**/
-    employeeIds: GetWorkHourEmployeeIds(workHourId)
-});
 
 </script>
 
@@ -595,20 +536,14 @@
             [...document.getElementsByClassName('WorkHourDiv')]
                 .map(div => div.id.split('_')[1]);
 
-        const GetDateInputValuesPerDay= (workHourId) => {
+        const GetDateInputValuesPerDay= workHourId => {
             var response = [];
-            var date = document.getElementById('CalentimInputNum_' + workHourId)
-                .value;
-
-            var startDate = new Date(ConvertDateFormatToMDYHm(
-                date.split('/-/')[0]));
-
-            var endDate = new Date(ConvertDateFormatToMDYHm(
-                date.split('/-/')[1]));
+            var startDate = new Date(parseInt(GetCalentimInputValue(workHourId)[0]));
+            var endDate = new Date(parseInt(GetCalentimInputValue(workHourId)[1]));
 
             //Count is kept before date instances get changed bellow
-            var CurrentDateDaysDiff = FindDaysDifference(new Date(startDate),
-                new Date(endDate));
+            var CurrentDateDaysDiff = FindDaysDifference(startDate.valueOf(),
+                endDate.valueOf());
 
             for (var i = 0; i < CurrentDateDaysDiff; i++) {
 
@@ -619,7 +554,7 @@
                 if (startDate.valueOf() > endDate.valueOf())
                     endDate.setDate(startDate.getDate() + 1);
 
-                response.push([new Date(startDate), new Date(endDate)]);
+                response.push([startDate.valueOf(), endDate.valueOf()]);
                 //Add next Day
                 startDate.setDate(startDate.getDate() + 1);
             }
@@ -647,41 +582,14 @@
             SetDayOffSliderState(workHourId, GetIsDayOffDatabaseValue(workHourId))
         };
 
-        const SetDateStartDatabaseValue = (workHourId,value) => 
-            document.getElementById('DatabaseDateStartNum_' + workHourId)
-                .value = value
-
-        const SetCalentimInputDatabaseValue = (workHourId,startDate,endDate) => 
-            document.getElementById('DatabaseDateStartNum_' + workHourId)
-                .value = value
-
-        const SetDateEndDatabaseValue = (workHourId, value) =>
-            document.getElementById('DatabaseDateEndNum_' + workHourId)
-                .value = value
-
-        const GetDateInputValues = workHourId => 
-             document.getElementById('CalentimInputNum_' + workHourId).value
-                .split('/-/').map(date =>
-                    new Date(ConvertDateFormatToMDYHm(date)));
-
-        const GetDbDateInputStartValue = (workHourId) =>
-            ConvertDateFormatToMDYHm(new Date(document.getElementById(
-                'DatabaseDateStartNum_' + workHourId).value));
-
-        const GetDbDateInputEndValue = (workHourId) =>
-            ConvertDateFormatToMDYHm(new Date(document.getElementById(
-                'DatabaseDateEndNum_' + workHourId).value));
-
         const SplitDateRangeInDates = dateInput => {
             var response = [];
-            var startDate = new Date(ConvertDateFormatToMDYHm(
-                dateInput.value.split('/-/')[0]));
-
-            var endDate = new Date(ConvertDateFormatToMDYHm(
-                dateInput.value.split('/-/')[1]));
+            var startDate = new Date(parseInt(dateInput.value.split('/-/')[0]));
+            var endDate = new Date(parseInt(dateInput.value.split('/-/')[1]));
 
             //Has to keep the count before date instances get changed bellow
-            var CurrentDateDaysDiff = FindDaysDifference(new Date(startDate), new Date(endDate));
+            var CurrentDateDaysDiff = FindDaysDifference(startDate.valueOf(),
+                endDate.valueOf());
 
             for (var i = 0; i < CurrentDateDaysDiff; i++) {
 
@@ -692,8 +600,8 @@
                     endDate.setDate(startDate.getDate() + 1);
 
                 response.push({
-                    startDate: new Date(startDate),
-                    endDate: new Date(endDate),
+                    startTimestamp: startDate.valueOf(),
+                    endTimestamp: endDate.valueOf(),
                     workHourId: dateInput.id.split('_')[1]
                 });
 
@@ -702,9 +610,8 @@
             return response;
         }
 
-        const GetAllDateInputValuesFiltered = (workHourId) => {
+        const GetAllDateInputValuesFiltered = workHourId => {
             var response = [];
-
             if (IsEdit()) {
                 GetAllWorkHourIds().filter(id=>id != workHourId).forEach(id => {
                     if (!IsWorkHourEditButtonHidden(id)) 
@@ -712,8 +619,8 @@
                             .forEach(result =>
                                 response.push(
                                     BuildValidateAreDatesOverlapingDto(
-                                        result.startDate,
-                                        result.endDate,
+                                        result.startTimestamp,
+                                        result.endTimestamp,
                                         result.workHourId)));
                     
                     else
@@ -722,8 +629,8 @@
                             .forEach(result =>
                                 response.push(
                                     BuildValidateAreDatesOverlapingDto(
-                                        result.startDate,
-                                        result.endDate,
+                                        result.startTimestamp,
+                                        result.endTimestamp,
                                         result.workHourId)));
                 })
             }
@@ -750,17 +657,58 @@
             return response;
         }
 
-        const GetWorkHourIdsForNullDateInputs = () => 
+        const SetValuesToEditWorkHour = (workHour, workHourId) => {
+            var startTs = new Date(
+                parseInt(ConvertFromApiToTimestamp(workHour.startOn))).valueOf();
+
+            var endTs = new Date(
+                parseInt(ConvertFromApiToTimestamp(workHour.endOn))).valueOf();
+
+            SetCalentimInputDatabaseValue(workHourId, startTs, endTs);
+            SetCalentimInputDatabaseValue(workHourId, startTs, endTs);
+
+            SetDateSpan(workHourId, startTs, endTs);
+            SetTimeSpan(workHourId, startTs, endTs);
+
+            SetCommentDatabaseValue(workHourId,workHour.comments);
+            SetCommentValue(workHourId, workHour.comments);
+            SetIsDayOffDatabaseValue(workHourId, GetIsDayOffValue(workHourId)); 
+            SetDayOffSliderState(workHourId, workHour.isDayOff);
+        }
+
+       
+        const CreateFakeInputWithDbDateRange = workHourId => {
+            var startTs = GetCalentimInputDatabaseValue(workHourId)[0];
+            var endTs = GetCalentimInputDatabaseValue(workHourId)[1];
+            var input = document.createElement("INPUT");
+
+            input.setAttribute("value", startTs + '/-/' + endTs);
+            input.setAttribute("id", 'CalentimInputDatabaseNum_' + workHourId);
+
+            return input;
+        }
+
+        const CreateFakeInputWithEditedDateRange = workHourId => {
+            var startTs=GetCalentimInputValue(workHourId)[0];
+            var endTs=GetCalentimInputValue(workHourId)[1];
+            var input = document.createElement("INPUT");
+
+            input.setAttribute("value",startTs+'/-/'+ endTs);
+
+            return input;
+        }
+
+        const GetWorkHourIdsForNullDateInputs = () =>
             [...document.getElementsByClassName('DateSpan')]
                 .filter(input => input.innerHTML == '')
                 .map(input => input.id.split('_')[1]);
 
         const GetSelect2NumBySelectedEmployeeIdAndWorkHourId =
             (employeeId, workHourId) => document
-            .querySelectorAll('select.EmployeeSelect2WorkHourNum_' + workHourId +
-                ' > option[value="' + employeeId + '"]')[0]
-            .parentElement.id
-            .split('_')[3]
+                .querySelectorAll('select.EmployeeSelect2WorkHourNum_' + workHourId +
+                    ' > option[value="' + employeeId + '"]')[0]
+                .parentElement.id
+                .split('_')[3]
 
         const GetAlreadyAppendedEmployeeIdsPerWorkHour = (num) =>
             [...document.getElementsByClassName(
@@ -768,100 +716,58 @@
                 .map((data) => data.value)
                 .filter((val) => val != "");
 
-        const GetSliderCheckedEmployeeIds = () => 
+        const GetSliderCheckedEmployeeIds = () =>
             [...document.getElementsByClassName('ToggleSliders')]
                 .filter(slider => slider.checked)
                 .map(slider => slider.getAttribute('employeeid'));
-        
 
-        const SetValuesToEditWorkHour = (workHour,workHourId) => {
-            document.getElementById('DateStartOnEndOnNum_' + workHourId).innerHTML =
-                ConvertToDateStartOnEndOn(CreateDateFromApi(workHour.startOn),
-                    CreateDateFromApi(workHour.endOn));
+        const IsEdit = () => (
+            [...document.getElementsByClassName('IsEdit')].length > 0 ? true
+                : false);
 
-            document.getElementById('TimeStartOnEndOnNum_' + workHourId).innerHTML =
-                ConvertToTimeStartOnEndOn(CreateDateFromApi(workHour.startOn),
-                    CreateDateFromApi(workHour.endOn));
-
-            document.getElementById('DatabaseDateStartNum_' + workHourId)
-                .value =   CreateDateFromApi(workHour.startOn);
-
-            document.getElementById('DatabaseDateEndNum_' + workHourId)
-                .value =CreateDateFromApi(workHour.endOn);
-
-            document.getElementById('DatabaseCommentsNum_' + workHourId)
-                .value =workHour.comments;
-
-            document.getElementById('DatabaseDayOffSliderNum_' + workHourId)
-                .value =workHour.isDayOff;
-            //SetDateStartDatabaseValue(workHourId, newStartDate)
-            //SetDateEndDatabaseValue(workHourId, newEndDate)
-            SetDayOffSliderState(workHourId, workHour.isDayOff);
-            SetCommentValue(workHourId, workHour.comments);
+        const IsWorkHourEditButtonHidden = workHourId => {
+            var workHourEditButton = document.getElementById(
+                'WorkHourEditButtonNum_' + workHourId);
+            if (workHourEditButton != undefined)
+                return workHourEditButton.style.display == 'none' ? true : false;
+            return false;
         }
 
-        const SetCalentimInputDateRange = workHourId => {
-            if (IsEdit()) {
-                var start = new Date(document
-                    .getElementById('DatabaseDateStartNum_' + workHourId).value);
+        //Calentim
+        const SetCalentimInputValue = (workHourId, startTs,endTs) =>
+            document.getElementById('CalentimInputNum_' + workHourId)
+                .value = startTs + '/-/' + endTs;
 
-                var end = new Date(document
-                    .getElementById('DatabaseDateEndNum_' + workHourId).value);
-            }
+        const GetCalentimInputValue = workHourId =>
+            document.getElementById('CalentimInputNum_' + workHourId)
+                .value.split('/-/');
 
-            document.getElementById('CalentimInputNum_' + workHourId).value = 
-                ConvertToDateStartOnEndOnForDatabaseValue(start, end);
-        }
+        const SetCalentimInputDatabaseValue = (workHourId, startTs, endTs) =>
+            document.getElementById('CalentimInputDatabaseNum_' + workHourId)
+                .value = startTs + '/-/' + endTs;
 
-        const CreateFakeInputWithDbDateRange = workHourId => {
-            var start = new Date(document
-                .getElementById('DatabaseDateStartNum_' + workHourId).value);
+        const GetCalentimInputDatabaseValue = workHourId =>
+            document.getElementById('CalentimInputDatabaseNum_' + workHourId)
+                .value.split('/-/');
 
-            var end = new Date(document
-                .getElementById('DatabaseDateEndNum_' + workHourId).value);
-
-            var input = document.createElement("INPUT");
-
-            input.setAttribute("value",
-                ConvertToDateStartOnEndOnForFakeImputs(start, end, true));
-            input.setAttribute("id", 'CalentimInputNum_' + workHourId);
-
-            return input;
-        }
-
-        const CreateFakeInputWithEditedDateRange = workHourId => {
-            var editedDate = document
-                .getElementById('CalentimInputNum_' + workHourId).value;
-
-            var start = new Date(ConvertDateFormatToMDYHm(
-                editedDate.split('/-/')[0]));
-
-            var end = new Date(ConvertDateFormatToMDYHm(
-                editedDate.split('/-/')[1]));
-
-            var input = document.createElement("INPUT");
-            input.setAttribute("value",
-                ConvertToDateStartOnEndOnForFakeImputs(start, end, true));
-
-            return input;
-        }
-
+        //IsDayOff
         const GetIsDayOffValue = workHourId =>
             document.getElementById('DayOffSliderNum_' + workHourId)
                 .checked == true;
-
-        const GetIsDayOffDatabaseValue = workHourId =>
-            document.getElementById('DatabaseDayOffSliderNum_' + workHourId)
-                .value;
 
         const SetIsDayOffValue = (workHourId ,value)=>
             document.getElementById('DayOffSliderNum_' + workHourId)
                 .value = value;
 
+        const GetIsDayOffDatabaseValue = workHourId =>
+            document.getElementById('DatabaseDayOffSliderNum_' + workHourId)
+                .value;
+
         const SetIsDayOffDatabaseValue = (workHourId, value) =>
             document.getElementById('DatabaseDayOffSliderNum_' + workHourId)
                 .value = value;
 
+        //Comments
         const GetCommentValue = workHourId => 
             document.getElementById('CommentsNum_' + workHourId)
                 .value;
@@ -870,26 +776,45 @@
             document.getElementById('CommentsNum_' + workHourId)
                 .value = value;
 
-        const GetCommentDatabaseValue = workHourId =>
-            document.getElementById('DatabaseCommentsNum_' + workHourId)
-                .value;
-
         const SetCommentDatabaseValue = (workHourId, value) =>
             document.getElementById('DatabaseCommentsNum_' + workHourId)
                 .value = value;
 
-        const IsEdit = () => (
-            [...document.getElementsByClassName('IsEdit')].length > 0 ? true
-                : false);
+        const GetCommentDatabaseValue = workHourId =>
+            document.getElementById('DatabaseCommentsNum_' + workHourId)
+                .value;
 
-        const IsWorkHourEditButtonHidden = (workHourId) => {
-            var workHourEditButton = document.getElementById(
-                'WorkHourEditButtonNum_' + workHourId);
-            if (workHourEditButton != undefined) 
-                return workHourEditButton.style.display == 'none' ? true : false;
-            return false;
-        }
-        
+        //Span set values
+        const SetDateSpan = (workHourId, startTs, endTs) =>
+            document.getElementById('DateStartOnEndOnNum_' + workHourId)
+                .innerHTML = ConvertForDateSpan(startTs, endTs);
+
+        const SetNewDateSpan = (workHourId, startTs, endTs) =>
+            document.getElementById('NewDateStartOnEndOnNum_' + workHourId)
+                .innerHTML = ConvertForDateSpan(startTs, endTs);
+
+        const SetTimeSpan = (workHourId, startTs, endTs) =>
+            document.getElementById('TimeStartOnEndOnNum_' + workHourId)
+                .innerHTML = ConvertForTimeSpan(startTs, endTs);
+
+        const SetNewTimeSpan = (workHourId, startTs, endTs) =>
+            document.getElementById('NewTimeStartOnEndOnNum_' + workHourId)
+                .innerHTML = ConvertForTimeSpan(startTs, endTs);
+
+        const SetTotalDaysSpan = (workHourId, startTs, endTs) =>
+            document.getElementById('TotalDaysNum_' + workHourId)
+                .innerHTML = FindDaysDifference(startTs, endTs);
+
+        const SetHoursPerDaySpan = (workHourId, startTs, endTs) =>
+            document.getElementById('TotalHoursPerDayNum_' + workHourId)
+                .innerHTML = FindHourDifferencePerDay(startTs, endTs);
+
+        const SetTotalHoursSpan = (workHourId, startTs, endTs) =>
+            document.getElementById('TotalHoursNum_' + workHourId)
+                .innerHTML = FindDaysDifference(startTs, endTs) *
+            FindHourDifferencePerDay(startTs, endTs);
+
+
     </script>
 
 
@@ -900,38 +825,17 @@
 
         //Refresh range date workhour  in any modal
         const HandleShowWorkHourRangeToModal = (workHourId, hasNewDate) => {
-            var splitedDate = document
-                .getElementById('CalentimInputNum_' + workHourId)
-                .value.split('/-/');
+            var startTs = GetCalentimInputValue(workHourId)[0];
+            var endTs = GetCalentimInputValue(workHourId)[1];
 
-            document.getElementById('TotalHoursPerDayNum_' + workHourId)
-                .innerText =
-                FindHourDifferencePerDay(splitedDate[0], splitedDate[1]);
-
-            document.getElementById('TotalDaysNum_' + workHourId)
-                .innerText =
-                FindDaysDifference(splitedDate[0], splitedDate[1]);
-
-            document.getElementById('TotalHoursNum_' + workHourId).innerText =
-                FindDaysDifference(splitedDate[0], splitedDate[1]) *
-                FindHourDifferencePerDay(splitedDate[0], splitedDate[1]);
-
-            if (IsEdit() && hasNewDate !== false) {
-                document.getElementById('DateStartOnEndOnNum_' + workHourId)
-                    .innerHTML = ConvertToDateStartOnEndOn(splitedDate[0],
-                        splitedDate[1]);
-
-                document.getElementById('TimeStartOnEndOnNum_' + workHourId)
-                    .innerHTML = ConvertToTimeStartOnEndOn(splitedDate[0],
-                        splitedDate[1]);
-
-                document.getElementById('NewDateStartOnEndOnNum_' + workHourId)
-                    .innerHTML = ConvertToDateStartOnEndOn(splitedDate[0],
-                        splitedDate[1]);
-
-                document.getElementById('NewTimeStartOnEndOnNum_' + workHourId)
-                    .innerHTML = ConvertToTimeStartOnEndOn(splitedDate[0],
-                        splitedDate[1]);
+            SetHoursPerDaySpan(workHourId, startTs, endTs);
+            SetTotalHoursSpan(workHourId, startTs, endTs);
+            SetTotalDaysSpan(workHourId, startTs, endTs);
+        
+            if ( hasNewDate == true) {
+                SetNewTimeSpan(workHourId, startTs, endTs);
+                SetNewDateSpan(workHourId, startTs, endTs);
+               
 
                 document.getElementById('NewDateStartOnEndOnNum_' + workHourId)
                     .parentElement.style.display = '';
@@ -946,15 +850,8 @@
                     .display = '';
             }
             else {
-                //SetCalentimInputDateRange(workHourId);
-                document.getElementById('DateStartOnEndOnNum_' + workHourId)
-                    .innerText =
-                    ConvertToDateStartOnEndOn(
-                        splitedDate[0], splitedDate[1]);
-
-                document.getElementById('TimeStartOnEndOnNum_' + workHourId)
-                    .innerText =
-                    ConvertToTimeStartOnEndOn(splitedDate[0], splitedDate[1]);
+                SetDateSpan(workHourId, startTs, endTs);
+                SetTimeSpan(workHourId, startTs, endTs);
             }
         };
 
@@ -1042,8 +939,23 @@
             }
         }
 
+        const HandleConvertCalentimDateToTimestamp = workHourId => {
+            var dateRange =GetCalentimInputValue(workHourId)
+
+            var startTs = moment(dateRange[0], 'DD/MM/YYYY HH:mm').valueOf();
+            var endTs = moment(dateRange[1], 'DD/MM/YYYY HH:mm').valueOf();
+            if (startTs == 0 || endTs == 0) {
+                var startTs = dateRange[0];
+                var endTs = dateRange[1];
+            }
+            console.log(startTs);
+            SetCalentimInputValue(workHourId, startTs, endTs);
+        }
+
+
+
         //Edit modal togle show hide buttons
-        const HandleWorkHourEditButton = (workHourId) => {
+        const HandleWorkHourEditButton = workHourId => {
             //if edit button is hidden
             if (document.getElementById('WorkHourEditButtonNum_' + workHourId)
                 .style.display !== 'none') {
@@ -1106,23 +1018,26 @@
             var employeeIds = GetSliderCheckedEmployeeIds();
             if (!employeeIds.includes(cellEmployeeId))
                 employeeIds.push(cellEmployeeId);
-            AjaxPost('workhours/getForEditCell', BuildCellWorkHourDto(day,
-                employeeIds))
+            AjaxPost('workhours/getForEditCell', BuildCellWorkHourDto(day,employeeIds))
                 .done(workHours => workHours.forEach(workHour => {
                       WorkHourId++;
-                      var num = WorkHourId;
-                    AppendNewWorkHourToEditModal(WorkHourId,
-                        workHour.WorkHourId);
+                    var num = WorkHourId;
+                    var startTs = ConvertFromApiToTimestamp(workHour.startOn);
+                    var endTs = ConvertFromApiToTimestamp(workHour.endOn);
+
+                    AppendNewWorkHourToEditModal(WorkHourId, workHour.WorkHourId);
 
                       //set new Calentim instance
                     Calentim(CelentimDate, WorkHourId, workHour.startOn,
                         workHour.endOn);
+                    HandleConvertCalentimDateToTimestamp(WorkHourId);
 
+                    HandleShowWorkHourRangeToModal(WorkHourId);
+                    SetCalentimInputDatabaseValue(WorkHourId, startTs, endTs)
                       //set new BootstrapToggle instance
-                      DayOffSlider(WorkHourId, workHour);
+                      DayOffSlider(WorkHourId);
 
                       SetDayOffSliderState(WorkHourId, workHour.isDayOff)
-                      HandleShowWorkHourRangeToModal(WorkHourId, false);
                       SetValuesToEditWorkHour(workHour, WorkHourId);
                       workHour.employeeIds.forEach(employeeId =>
                           $.get("/api/employees/getSelect2Option/" + employeeId,
@@ -1207,8 +1122,9 @@
                 .forEach(response => {
                     //Fill array  with workHour delete
                     employeeIdsToDelete.forEach(employeeId =>
-                        PostWorkHoursDelete.push(BuildDeleteWorkHourToDbDto(response.startDate,
-                            response.endDate, employeeId)));
+                        PostWorkHoursDelete.push(
+                            BuildDeleteWorkHourToDbDto(response.startTimestamp,
+                                response.endTimestamp, employeeId)));
 
                     SplitDateRangeInDates(CreateFakeInputWithEditedDateRange(response.workHourId))
                         .forEach(editResponse => {
@@ -1218,10 +1134,10 @@
                                     !employeeIdsToDelete.includes(employeeId))
                                 .forEach(employeeId =>
                                     PostWorkHoursEdit.push(BuildEditWorkHourToDbDto(
-                                        response.startDate,
-                                        response.endDate,
-                                        editResponse.startDate,
-                                        editResponse.endDate,
+                                        response.startTimestamp,
+                                        response.endTimestamp,
+                                        editResponse.startTimestamp,
+                                        editResponse.endTimestamp,
                                         employeeId,
                                         workHourId)));
                         })
@@ -1236,20 +1152,35 @@
               
 
             //Change any values since date maybe edited
-            var newStartDate = new Date(ConvertDateFormatToMDYHm(
-                dateInput.value.split('/-/')[0]));
+            var startDate = new Date(parseInt(dateInput.value.split('/-/')[0]));
+            var endDate = new Date(parseInt(dateInput.value.split('/-/')[1]));
+            var cellDay = new Date(parseInt(
+                GetCalentimInputDatabaseValue(workHourId)[0])).getDate();
+            //if new date range is inside cell day show specific date
+            //if not, remove WorkHour from modal
+            if (startDate.getDate() <= cellDay && cellDay <= endDate.getDate()) {
+                startDate.setDate( cellDay);
 
-            var newEndDate = new Date(ConvertDateFormatToMDYHm(
-                dateInput.value.split('/-/')[1]));
+                if (startDate.getTime()>endDate.getTime()) 
+                    cellDay++;
 
-            SetDateStartDatabaseValue(workHourId, newStartDate)
-            SetDateEndDatabaseValue(workHourId, newEndDate)
-            Set
-            SetCommentDatabaseValue(workHourId,GetCommentValue(workHourId)); 
-            SetIsDayOffDatabaseValue(workHourId, GetIsDayOffValue(workHourId)); 
+                endDate.setDate(cellDay);
 
-            SetCalentimInputDateRange(workHourId);
-            HandleShowWorkHourRangeToModal(workHourId, false);
+                SetCalentimInputDatabaseValue(workHourId, startDate.valueOf(),
+                    endDate.valueOf());
+
+                SetCalentimInputValue(workHourId, startDate.valueOf(),
+                    endDate.valueOf());
+                
+
+                SetCommentDatabaseValue(workHourId,GetCommentValue(workHourId)); 
+                SetIsDayOffDatabaseValue(workHourId, GetIsDayOffValue(workHourId)); 
+                HandleShowWorkHourRangeToModal(workHourId);
+            }
+            else {
+                $('#WorkHourDivNum_' + workHourId).remove()
+            }
+
             HandleWorkHourEditButton(workHourId);
         });
 
@@ -1350,17 +1281,14 @@
 
             dateInputs.forEach(date => {
                 var workHourId = date.id.split('_')[1];
-                var startDate = new Date(ConvertDateFormatToMDYHm(
-                    date.value.split('/-/')[0]));
+                var startTs =date.value.split('/-/')[0];
+                var endTs = date.value.split('/-/')[1];
 
-                var endDate = new Date(ConvertDateFormatToMDYHm(
-                    date.value.split('/-/')[1]));
-
-                var daysCount = FindDaysDifference(startDate, endDate);
+                var daysCount = FindDaysDifference(startTs, endTs);
 
                 GetWorkHourEmployeeIds(workHourId).forEach(employeeId => {
-                    var startSubmitDate = new Date(startDate);
-                    var endSubmitDate = new Date(endDate);
+                    var startSubmitDate = new Date(parseInt(startTs));
+                    var endSubmitDate = new Date(parseInt(endTs));
 
                     for (var i = 0; i < daysCount; i++) {
                         endSubmitDate.setFullYear(startSubmitDate.getFullYear());
@@ -1371,8 +1299,8 @@
                             endSubmitDate.setDate(startSubmitDate.getDate() + 1);
 
                         dataToPost.push(BuildSaveWorkHourToDbDto(
-                            startSubmitDate,
-                            endSubmitDate,
+                            startSubmitDate.valueOf(),
+                            endSubmitDate.valueOf(),
                             employeeId,
                             workHourId));
 
@@ -1525,8 +1453,12 @@
                         end: moment("31/12/4000", "DD/MM/YYYY")//Latest date in docs
                     }],
                 onbeforehide: (calentim) => {
+                    HandleConvertCalentimDateToTimestamp(workHourId);
                     HandleWorkHourSpan(workHourId);
-                    HandleShowWorkHourRangeToModal(workHourId)
+                    if (IsEdit())
+                        HandleShowWorkHourRangeToModal(workHourId, true);
+                    else
+                        HandleShowWorkHourRangeToModal(workHourId);
 
                     if (!ValidateNullInputs(workHourId)) {
                         ValidateAppendedWorkHoursTimeRange(workHourId);
@@ -1569,7 +1501,7 @@
             },
             order: [[0, 'desc']],
             columns: CreateDatatableColumns(),
-            rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
+            rowCallback:  (row, data, displayNum, displayIndex, dataIndex)=> {
                 for (var i = 1; i <= DateConstants().DaysInMonth; i++) {
                     row.querySelectorAll('td')[i + 2]
                         .setAttribute("class", "DataTableHoverCell")
@@ -1579,7 +1511,6 @@
                             $(data["Day" + i])
                                 .attr('cellcolor'))
                 }
-
             },
             fnDrawCallback: () => {
 
@@ -1655,45 +1586,14 @@
 
     <!--    Html Append -->
     <script>
-        var AppendPreloadedEmployeeToWorkHour = (workHourId, currNum, employeeId, text) =>
-            document.getElementById('WorkHourDivNum_' + workHourId).insertAdjacentHTML('beforeend',
-                '<div style="padding-left:40px;" class="row" id="EmployeeRowNum_' + currNum + '">' +
-                    '<div style="width: 100%;">' +
-                        '<div style="width: 15%; float: left;">&nbsp;</div >' +
-                        '<div style="width: 45%; float: left;">' +
-                            '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%" disabled>' +
-                                '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
-                            '</select >' +
-                            '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
-                        '</div >' +
-                 '</div >'+
-                 '</div >'
-            );
-
-        var AppendEmployeeToWorkHour = (workHourId, currNum) =>
-            document.getElementById('WorkHourDivNum_' + workHourId).insertAdjacentHTML('beforeend',
-                '<div style="padding-left:40px;" class="row" id="EmployeeRowNum_' + currNum + '">' +
-                '<div style="width: 100%;">' +
-                '<div style="width: 15%; float: left;">&nbsp;</div >' +
-                    '<div style="width: 45%; float: left;">' +
-                        '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
-                        '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
-                    '</div >' +
-                    '<div style="width: 5%; float: left;">&nbsp;</div >' +
-                    '<div style="width: 20%; float: left;">' +
-                        '<button class= "btn btn-danger EmployeeSelect2DeleteButton EmployeeSelect2DeleteButtonNum_'+workHourId+'" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
-                    '</div >' +
-                    '</div >'+
-                '</div >'
-            );
-
+       
         AppendNewWorkHourToAddModal = (workHourId) =>
             document.getElementById('AddWorkHour_ModalBody').insertAdjacentHTML('beforeend',
 
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + workHourId + '" id="WorkHourDivNum_' + workHourId + '">' +
                     '<label style="padding-left:10px;" class="control-label"> Προσθήκη έναρξη - λήξη βάρδιας για εργαζόμενο/ους:</label>' +
                     '<div style="padding-left:40px;" class="row">' +
-                        '<input style="display:none;" class="calentim calentimInput" id="CalentimInputNum_' + workHourId + '" />' +
+                        '<input style="display:;" class="calentim calentimInput" id="CalentimInputNum_' + workHourId + '" />' +
                         '<div class="row">' +
                             '<span id="WorkHourErrorSpanNum_' + workHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span>' +
                         '</div>' +
@@ -1755,11 +1655,10 @@
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + workHourId + '" id="WorkHourDivNum_' + workHourId + '">' +
                     '<label style="padding-left:10px;" class="control-label"> Επεξεργασία βάρδιας κελιού για εργαζόμενο/ους:</label>' +
                     '<div style="padding-left:40px;" class="row">' +
-                        '<input style="display:none;" id="DatabaseDateStartNum_' + workHourId + '" />' +
-                        '<input style="display:none;" id="DatabaseDateEndNum_' + workHourId + '" />' +
-                        '<input style="display:none;" id="DatabaseDayOffSliderNum_' + workHourId + '" />' +
-                        '<input style="display:none;" id="DatabaseCommentsNum_' + workHourId + '" />' +
-                        '<input style="display:none;" id="CalentimInputNum_' + workHourId + '" class="calentimInput" />' +
+                        '<input style="display:;" id="DatabaseDayOffSliderNum_' + workHourId + '" />' +
+                        '<input style="display:;" id="DatabaseCommentsNum_' + workHourId + '" />' +
+                        '<input style="display:;" id="CalentimInputNum_' + workHourId + '" class="calentimInput" />' +
+                        '<input style="display:;" id="CalentimInputDatabaseNum_' + workHourId + '"  />' +
                         '<div class="row"><span id="WorkHourErrorSpanNum_' + workHourId + '" class="WorkHourErrorSpan text-danger" style="display: none;"></span></div>' +
                         '<div style="width: 100%;">' +
                             '<div style="width: 15%; float: left;">' +
@@ -1839,5 +1738,38 @@
                     '</div >'+
                 '</div >'
             );
+
+         var AppendPreloadedEmployeeToWorkHour = (workHourId, currNum, employeeId, text) =>
+            document.getElementById('WorkHourDivNum_' + workHourId).insertAdjacentHTML('beforeend',
+                '<div style="padding-left:40px;" class="row" id="EmployeeRowNum_' + currNum + '">' +
+                    '<div style="width: 100%;">' +
+                        '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                        '<div style="width: 45%; float: left;">' +
+                            '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%" disabled>' +
+                                '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
+                            '</select >' +
+                            '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                        '</div >' +
+                 '</div >'+
+                 '</div >'
+            );
+
+        var AppendEmployeeToWorkHour = (workHourId, currNum) =>
+            document.getElementById('WorkHourDivNum_' + workHourId).insertAdjacentHTML('beforeend',
+                '<div style="padding-left:40px;" class="row" id="EmployeeRowNum_' + currNum + '">' +
+                '<div style="width: 100%;">' +
+                '<div style="width: 15%; float: left;">&nbsp;</div >' +
+                    '<div style="width: 45%; float: left;">' +
+                        '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
+                        '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                    '</div >' +
+                    '<div style="width: 5%; float: left;">&nbsp;</div >' +
+                    '<div style="width: 20%; float: left;">' +
+                        '<button class= "btn btn-danger EmployeeSelect2DeleteButton EmployeeSelect2DeleteButtonNum_'+workHourId+'" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
+                    '</div >' +
+                    '</div >'+
+                '</div >'
+            );
+
     </script>
 }
