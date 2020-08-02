@@ -256,19 +256,28 @@
 
 <script>
         const ValidateWorkHourDateOutOfRange = (workHourId) => {
-            var minDate = new Date(DateConstants().Year, DateConstants().Month - 1, 1,
+            var minTs = new Date(DateConstants().Year, DateConstants().Month - 1, 1,
                 0, 0, 0, 0).valueOf();
 
-            var maxDate = new Date(DateConstants().Year, DateConstants().Month - 1 ,
+            var maxTs = new Date(DateConstants().Year, DateConstants().Month - 1 ,
                 DateConstants().DaysInMonth, 23, 59, 59, 0).valueOf();
 
             var startTs = GetCalentimInputValue(workHourId)[0];
             var endTs = GetCalentimInputValue(workHourId)[1];
+            var startDate = new Date(parseInt(startTs));
+            var endDate = new Date(parseInt(endTs));
 
-            if (startTs < minDate || maxDate < endTs)
+            startDate.setFullYear(endDate.getFullYear());
+            startDate.setMonth(endDate.getMonth());
+            startDate.setDate(endDate.getDate());
+
+            if (startDate.getTime() > endDate.getTime())
+                endTs = (endDate.setDate(endDate.getDate() + 1)).valueOf();
+
+            if (startTs < minTs || maxTs < endTs)
                 HandleWorkHourSpan(workHourId,
                     'Η ημερομηνία δήλωσης πρέπει να βρίσκεται εντός του επιλεγμένου μήνα!')
-    }
+        }
 
         const ValidateNullInputs = workHourId => {
             var hasError = false;
@@ -281,15 +290,6 @@
                 });
             return hasError;
         };
-
-        const ValidateStartOnLessThanEndOn = (workHourId) => {
-            var startDate = new Date(parseInt(GetCalentimInputValue(workHourId)[0]));
-            var endDate =new Date(parseInt(GetCalentimInputValue(workHourId)[1]));
-
-            if (startDate.getTime() >= endDate.getTime())
-                HandleWorkHourSpan(workHourId,
-                    'Η ημερομηνία έναρξης πρεπει να είναι προγενέστερη απο της λήξης');
-        }
 
         const AreDatesOverlaping = (baseDate, checkDate) => {
             if (baseDate.length > 0 && toString.call(baseDate[0]) === "[object Array]") {
@@ -649,8 +649,8 @@
                     SplitDateRangeInDates(input).forEach(result => 
                         response.push(
                             BuildValidateAreDatesOverlapingDto(
-                                result.startDate,
-                                result.endDate,
+                                result.startTimestamp,
+                                result.endTimestamp,
                                 result.workHourId))));
             }
             
@@ -1308,7 +1308,10 @@
                     }
                 });
             })
-            AjaxPost('workhours/addEmployeeWorkhours', dataToPost)
+            var btn = document.getElementById("SaveWorkHours");
+            var loader = new ldLoader({ root: btn });
+            loader.toggle()
+            AjaxPost('workhours/addEmployeeWorkhours', dataToPost).done(() => loader.toggle())
             $('#AddWorkHour_Modal').modal('hide');
         });
 
@@ -1476,6 +1479,7 @@
 
         //Datatable
         var Datatable = () => $('#EmployeesWorkhoursDatatable').DataTable({
+             sScrollY: ($(window).height() - 200),
             serverSide: true,
             responsive: true,
             colReorder: true,

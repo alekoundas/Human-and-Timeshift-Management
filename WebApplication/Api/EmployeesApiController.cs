@@ -166,6 +166,7 @@ namespace WebApplication.Api
 
             if (datatable.Predicate == "CompanyEdit")
             {
+            includes.Add(x => x.Company);
                 Expression<Func<Employee, bool>> filter =
                     (x => x.CompanyId == datatable.GenericId || x.CompanyId == null);
                 employees = await _baseDataWork.Employees

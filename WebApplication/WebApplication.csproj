@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\css\LoadingIo\ldLoader\" />
     <Folder Include="wwwroot\js\jQueryMonthPicker\" />
   </ItemGroup>
 
