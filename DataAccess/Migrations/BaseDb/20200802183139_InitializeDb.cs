@@ -31,7 +31,8 @@ namespace DataAccess.Migrations.BaseDb
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(nullable: true)
+                    Description = table.Column<string>(nullable: true),
+                    PayPerHour = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -237,6 +238,8 @@ namespace DataAccess.Migrations.BaseDb
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     StartOn = table.Column<DateTime>(nullable: false),
                     EndOn = table.Column<DateTime>(nullable: false),
+                    IsDayOff = table.Column<bool>(nullable: false),
+                    Comments = table.Column<string>(nullable: true),
                     TimeShiftId = table.Column<int>(nullable: false),
                     EmployeeId = table.Column<int>(nullable: false)
                 },

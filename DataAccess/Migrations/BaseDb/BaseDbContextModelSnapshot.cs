@@ -233,6 +233,9 @@ namespace DataAccess.Migrations.BaseDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("PayPerHour")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Specializations");

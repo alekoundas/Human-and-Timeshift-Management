@@ -3,39 +3,54 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Καλωσορίσατε</h1>
 </div>
 
 
 
-<li class=''>
-    <a href="/User/index"><i class='fa fa-eye'></i></a>
-    <a href="/User/index"><i class='fa fa-pencil-square-o'></i></a>
-    <a href="/User/index"><i class='fa fa-trash-o'></i></a>
-    <a href="/User/index"><i class='fa fa-trash'></i></a>
-<li class=''><a href="/User/index"><i class='fa fa-th-list'></i></a></li>
+@*<li class=''>
+        <a href="/User/index"><i class='fa fa-eye'></i></a>
+        <a href="/User/index"><i class='fa fa-pencil-square-o'></i></a>
+        <a href="/User/index"><i class='fa fa-trash-o'></i></a>
+        <a href="/User/index"><i class='fa fa-trash'></i></a>
+    <li class=''><a href="/User/index"><i class='fa fa-th-list'></i></a></li>*@
 
 
-<div style="width:50px; height:50px;">
-    <div class="spinner-fast">
+@*<div style="width:50px; height:50px;">
         <div class="spinner-fast">
             <div class="spinner-fast">
                 <div class="spinner-fast">
+                    <div class="spinner-fast">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </div>*@
 
-<div class="btn btn-primary ld-ext-right"
-     onclick="this.classList.toggle('running')">
-    Clike Me
-    <div class="ld ld-ring ld-spin"></div>
-</div>
+<button type="submit" data-reset="Αποθήκευση" data-loading="<img src='/img/LoadingBox.gif' alt='loading gif'/>  Αποθήκευση" class="btn btn-primary" id="subbtn"></button>
+<button type="submit" class="btn btn-primary ld ld-loader" id="xaxa"></button>
+<button type="button"
+        class="btn btn-primary"
+        id="SaveWorkHours"
+        data-reset="Αποθήκευση αλλαγών"
+        data-loading="<img src='/img/LoadingBox.gif' style='height:30px; width:30px;'/> Αποθήκευση αλλαγών">
+    Αποθήκευση αλλαγών
+</button>
+
+
+@section Scripts {
+    <script src="~/js/Custom/ButtonLoading.js"></script>
+    <script>
+        $(document).on('click', '#xaxa', () => {
+            ButtonLoadingToggle("SaveWorkHours");
+        });
 
 
 
+    </script>
+
+
+}
 
 
 

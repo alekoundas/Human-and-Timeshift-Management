@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20200730103507_AddCommentsAndIsDayOffColumns")]
-    partial class AddCommentsAndIsDayOffColumns
+    [Migration("20200802183139_InitializeDb")]
+    partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -234,6 +234,9 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PayPerHour")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
