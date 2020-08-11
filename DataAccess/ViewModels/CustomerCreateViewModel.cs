@@ -9,7 +9,6 @@ namespace DataAccess.ViewModels
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTime? DateOfBirth { get; set; }
         public string AFM { get; set; }
         public string Description { get; set; }
         public int? CompanyId { get; set; }
@@ -23,7 +22,6 @@ namespace DataAccess.ViewModels
             {
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
-                DateOfBirth = viewModel.DateOfBirth,
                 AFM = viewModel.AFM,
                 Description = viewModel.Description,
                 CompanyId = (int)viewModel.CompanyId,

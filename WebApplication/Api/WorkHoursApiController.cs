@@ -196,12 +196,14 @@ namespace WebApplication.Api
         [HttpPost("addEmployeeWorkhours")]
         public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<CreateWorkHoursApiViewModel> workHours)
         {
+            var dataToSaveRange = new List<WorkHour>();
+
             foreach (var workHour in workHours)
             {
                 //if (_baseDataWork.WorkHours.IsDateOverlaping(workHour))
                 //    return NotFound();
 
-                _baseDataWork.WorkHours.Add(new WorkHour()
+                dataToSaveRange.Add(new WorkHour()
                 {
                     StartOn = workHour.StartOn,
                     EndOn = workHour.EndOn,
@@ -211,15 +213,18 @@ namespace WebApplication.Api
                     Comments = workHour.Comments,
                     CreatedOn = DateTime.Now
                 });
-                await _baseDataWork.SaveChangesAsync();
             }
+            _baseDataWork.WorkHours.AddRange(dataToSaveRange);
+            await _baseDataWork.SaveChangesAsync();
 
-            return Ok("success my dudes");
+            return Ok(dataToSaveRange);
         }
         // POST: api/workhours/editEmployeeWorkhours
         [HttpPost("editEmployeeWorkhours")]
         public async Task<ActionResult<WorkHour>> EditEmployeeWorkhours([FromBody] List<EditWorkHoursApiViewModel> workHours)
         {
+            var dataToSaveRange = new List<WorkHour>();
+
             foreach (var workHour in workHours)
             {
                 var workHourToModify = await _baseDataWork.WorkHours
@@ -242,7 +247,7 @@ namespace WebApplication.Api
                 //if workhour does NOT exists for employee, create it
                 else
                 {
-                    _baseDataWork.WorkHours.Add(new WorkHour()
+                    dataToSaveRange.Add(new WorkHour()
                     {
                         StartOn = workHour.NewStartOn,
                         EndOn = workHour.NewEndOn,
@@ -250,14 +255,14 @@ namespace WebApplication.Api
                         EmployeeId = workHour.EmployeeId,
                         CreatedOn = DateTime.Now
                     });
-                    await _baseDataWork.SaveChangesAsync();
                 }
 
             }
 
+            _baseDataWork.WorkHours.AddRange(dataToSaveRange);
             await _baseDataWork.SaveChangesAsync();
 
-            return Ok("success my dudes");
+            return Ok(dataToSaveRange);
         }
         // POST: api/workhours/deleteEmployeeWorkhours
         [HttpPost("deleteEmployeeWorkhours")]
@@ -299,8 +304,8 @@ namespace WebApplication.Api
                     WorkHourId = group.Select(x => x.Id).FirstOrDefault(),
                     StartOn = group.Key.StartOn,
                     EndOn = group.Key.EndOn,
-                    IsDayOff = group.Select(x=>x.IsDayOff).FirstOrDefault(),
-                    Comments= group.Select(x=>x.Comments).FirstOrDefault(),
+                    IsDayOff = group.Select(x => x.IsDayOff).FirstOrDefault(),
+                    Comments = group.Select(x => x.Comments).FirstOrDefault(),
                     EmployeeIds = group.Select(x => x.EmployeeId).ToList()
                 });
 

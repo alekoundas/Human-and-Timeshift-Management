@@ -10,6 +10,8 @@ namespace Bussiness.Repository.Base.Interface
 {
     public interface IRealWorkHourRepository : IBaseRepository<RealWorkHour>
     {
-        public bool IsDateOverlaping(RealWorkHourApiViewModel realWorkHour, int employeeId);
+        public bool AreDatesOverlaping(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
+        public bool AreDatesOverlapingLeaves(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
+        public bool AreDatesOverlapingDayOff(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
     }
 }

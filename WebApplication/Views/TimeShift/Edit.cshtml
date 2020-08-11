@@ -232,6 +232,12 @@
                 return start + ' - ' + end;
         }
 
+        const SetTimeStampTimeToMax = timeStamp =>
+            new Date(parseInt(timeStamp)).setHours(23, 59, 59).valueOf();
+
+        const SetTimeStampTimeToMin = timeStamp =>
+            new Date(parseInt(timeStamp)).setHours(00, 00, 00).valueOf();
+
         const ConvertForTimeSpan = (startTs, endTs) =>
             moment(parseInt(startTs)).format('HH:mm') + ' - ' + moment(parseInt(endTs)).format('HH:mm');
 
@@ -322,7 +328,7 @@
             return false
         }
 
-        const RevalidateExistingErrorsOnWorkHours = () => {
+        const ValidateExistingErrorsOnWorkHours = () => {
             [...document.getElementsByClassName('WorkHourErrorSpan')]
                 .filter(span =>
                     span.innerHTML.includes('Αυτή η βάρδια επειρεάζει μία ' +
@@ -330,30 +336,6 @@
                 .map(span => span.id.split('_')[1])
                 .forEach(workHourId =>
                     ValidateAppendedWorkHoursTimeRange(workHourId));
-        };
-
-        const GetSelect2HasOverlapData = workHourId => {
-            var response = [];
-
-            [...document.getElementsByClassName('calentimInput')]
-                .forEach(input =>
-                    SplitDateRangeInDates(input).forEach(result => {
-                        if (IsEdit())
-                            response.push(
-                                BuildValidateEmployeesToEditWorkHourDto(
-                                    result.startTimestamp,
-                                    result.endTimestamp,
-                                    GetCalentimInputDatabaseValue(result.workHourId)[0],
-                                    GetCalentimInputDatabaseValue(result.workHourId)[1],
-                                    result.workHourId))
-                        else
-                            response.push(
-                                BuildValidateEmployeesToAddWorkHourDto(
-                                    result.startTimestamp,
-                                    result.endTimestamp,
-                                    result.workHourId))
-                    }));
-            return response;
         };
 
         const ValidateEmployeesWithRangeToWorkhour = (workHourId) =>
@@ -465,7 +447,7 @@
             endOn: ConvertDateForApi(endTs),
             timeShiftId: DateConstants().TimeShiftId,
             employeeId: employeeId,
-            isDayOff: GetIsDayOffValue(workHourId),
+            isDayOff: IsDayOff(workHourId),
             comments: GetCommentValue(workHourId)
         });
 
@@ -478,7 +460,7 @@
                 newEndOn: ConvertDateForApi(newEndTs),
                 timeShiftId: DateConstants().TimeShiftId,
                 employeeId: employeeId,
-                isDayOff: GetIsDayOffValue(workHourId),
+                isDayOff: IsDayOff(workHourId),
                 comments: GetCommentValue(workHourId)
             });
 
@@ -511,8 +493,8 @@
     <!--///////////////////////////////////////-->
 
     <script>
-        const AjaxPost = async (url, data) =>
-            await $.ajax({
+        const AjaxPost = async (url, data) => {
+            var ajaxResponse = await $.ajax({
                 type: "POST",
                 async: true,
                 url: "/api/" + url,
@@ -520,6 +502,9 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json"
             });
+            console.log(ajaxResponse);
+            return ajaxResponse;
+        }
 
         const GetWorkHourEmployeeIdsToDelete = workHourId =>
             GetWorkHourSelect2Ids(workHourId).filter(select2Id =>
@@ -680,7 +665,7 @@
 
             SetCommentDatabaseValue(workHourId, workHour.comments);
             SetCommentValue(workHourId, workHour.comments);
-            SetIsDayOffDatabaseValue(workHourId, GetIsDayOffValue(workHourId));
+            SetIsDayOffDatabaseValue(workHourId, IsDayOff(workHourId));
             SetDayOffSliderState(workHourId, workHour.isDayOff);
         }
 
@@ -717,6 +702,30 @@
                     ' > option[value="' + employeeId + '"]')[0]
                 .parentElement.id
                 .split('_')[3]
+
+        const GetSelect2HasOverlapData = workHourId => {
+            var response = [];
+
+            [...document.getElementsByClassName('calentimInput')]
+                .forEach(input =>
+                    SplitDateRangeInDates(input).forEach(result => {
+                        if (IsEdit())
+                            response.push(
+                                BuildValidateEmployeesToEditWorkHourDto(
+                                    result.startTimestamp,
+                                    result.endTimestamp,
+                                    GetCalentimInputDatabaseValue(result.workHourId)[0],
+                                    GetCalentimInputDatabaseValue(result.workHourId)[1],
+                                    result.workHourId))
+                        else
+                            response.push(
+                                BuildValidateEmployeesToAddWorkHourDto(
+                                    result.startTimestamp,
+                                    result.endTimestamp,
+                                    result.workHourId))
+                    }));
+            return response;
+        };
 
         const GetAlreadyAppendedEmployeeIdsPerWorkHour = (num) =>
             [...document.getElementsByClassName(
@@ -759,7 +768,7 @@
                 .value.split('/-/');
 
         //IsDayOff
-        const GetIsDayOffValue = workHourId =>
+        const IsDayOff = workHourId =>
             document.getElementById('DayOffSliderNum_' + workHourId)
                 .checked == true;
 
@@ -840,6 +849,19 @@
             SetTotalHoursSpan(workHourId, startTs, endTs);
             SetTotalDaysSpan(workHourId, startTs, endTs);
 
+            //From now on we take in consideration 'next day' if any
+            var startDate = new Date(parseInt(startTs));
+            var endDate = new Date(parseInt(endTs));
+
+            startDate.setFullYear(endDate.getFullYear());
+            startDate.setMonth(endDate.getMonth());
+            startDate.setDate(endDate.getDate());
+
+            if (endDate.valueOf() < startDate.valueOf()) {
+                endDate.setDate(endDate.getDate() + 1);
+                endTs = endDate.valueOf();
+            }
+
             if (hasNewDate == true) {
                 SetNewTimeSpan(workHourId, startTs, endTs);
                 SetNewDateSpan(workHourId, startTs, endTs);
@@ -901,8 +923,7 @@
 
                 var workHourSpan = [...document
                     .getElementsByClassName('WorkHourErrorSpan')]
-                    .filter(span =>
-                        span.style.display !== "none");
+                    .filter(span => span.style.display !== "none");
 
                 if (workHourSpan.length > 0 || select2Span.length > 0)
                     document.getElementById('SaveWorkHours').disabled = true;
@@ -949,15 +970,20 @@
             }
         }
 
-        const HandleConvertCalentimDateToTimestamp = workHourId => {
+        const HandleConvertAndSetCalentimInputValue = workHourId => {
             var dateRange = GetCalentimInputValue(workHourId)
-
             var startTs = moment(dateRange[0], 'DD/MM/YYYY HH:mm').valueOf();
             var endTs = moment(dateRange[1], 'DD/MM/YYYY HH:mm').valueOf();
+
             if (isNaN(startTs) || isNaN(endTs)) {
-                var startTs = dateRange[0];
-                var endTs = dateRange[1];
+                startTs = dateRange[0];
+                endTs = dateRange[1];
             }
+            if (IsDayOff(workHourId)) {
+                startTs = SetTimeStampTimeToMin(startTs);
+                endTs = SetTimeStampTimeToMax(endTs)
+            }
+
             SetCalentimInputValue(workHourId, startTs, endTs);
         }
 
@@ -1039,7 +1065,7 @@
                     //set new Calentim instance
                     Calentim(CelentimDate, WorkHourId, workHour.startOn,
                         workHour.endOn);
-                    HandleConvertCalentimDateToTimestamp(WorkHourId);
+                    HandleConvertAndSetCalentimInputValue(WorkHourId);
 
                     HandleShowWorkHourRangeToModal(WorkHourId);
                     SetCalentimInputDatabaseValue(WorkHourId, startTs, endTs)
@@ -1066,8 +1092,8 @@
             var workHourId = element.target.getAttribute('workhourid')
 
             AjaxPost('workhours/deleteBatch', BuildDeleteBatchWorkHourDto(workHourId))
-                .done(() => $('#WorkHourDivNum_' + workHourId).remove());
-            RevalidateExistingErrorsOnWorkHours();
+                .then(() => $('#WorkHourDivNum_' + workHourId).remove());
+            ValidateExistingErrorsOnWorkHours();
             HandleSubmitButton();
 
         })
@@ -1095,7 +1121,7 @@
                 employeeRow.remove();
 
             HandleSubmitButton();
-            RevalidateExistingErrorsOnWorkHours();
+            ValidateExistingErrorsOnWorkHours();
 
 
         })
@@ -1104,7 +1130,7 @@
         $('#EditWorkHour_Modal').on('click', '.WorkHourEditButton', e => {
             var workHourId = e.target.getAttribute('workhourid');
             HandleWorkHourEditButton(workHourId);
-            RevalidateExistingErrorsOnWorkHours();
+            ValidateExistingErrorsOnWorkHours();
             HandleSubmitButton();
         })
 
@@ -1114,7 +1140,7 @@
             HandleWorkHourEditButton(workHourId);
             UndoValues(workHourId);
             ValidateAppendedWorkHoursTimeRange(workHourId);
-            RevalidateExistingErrorsOnWorkHours();
+            ValidateExistingErrorsOnWorkHours();
         })
 
 
@@ -1152,28 +1178,18 @@
                         })
                 });
 
-            //Handle loading
+            //Handle loading AND save changes to DataBase
             ButtonLoadingToggle("WorkHourSaveButton")
                 .then(async value => {
                     if (PostWorkHoursDelete.length > 0)
-                        await AjaxPost('workhours/deleteEmployeeWorkhours', PostWorkHoursDelete);
-                    return "11111";
+                        return await AjaxPost('workhours/deleteEmployeeWorkhours', PostWorkHoursDelete);
                 })
                 .then(async value => {
                     if (PostWorkHoursEdit.length > 0)
-                        await AjaxPost('workhours/addEmployeeWorkhours', PostWorkHoursEdit)
-                    return "22222";
+                        return await AjaxPost('workhours/addEmployeeWorkhours', PostWorkHoursEdit)
                 })
                 .then(response => ButtonLoadingToggle("WorkHourSaveButton"))
                 .catch(error => console.log(error));
-
-
-            //if (PostWorkHoursDelete.length > 0)
-            //    AjaxPost('workhours/deleteEmployeeWorkhours', PostWorkHoursDelete)
-
-
-            //if (PostWorkHoursEdit.length > 0)
-            //    AjaxPost('workhours/editEmployeeWorkhours', PostWorkHoursEdit)
 
 
             //Change any values since date maybe edited
@@ -1199,7 +1215,7 @@
 
 
                 SetCommentDatabaseValue(workHourId, GetCommentValue(workHourId));
-                SetIsDayOffDatabaseValue(workHourId, GetIsDayOffValue(workHourId));
+                SetIsDayOffDatabaseValue(workHourId, IsDayOff(workHourId));
                 HandleShowWorkHourRangeToModal(workHourId);
             }
             else {
@@ -1283,7 +1299,7 @@
         $('#AddWorkHour_Modal').on('click', '.WorkHourDeleteButton', (e) => {
             var workHourId = e.target.getAttribute('workhourid');
             $('#WorkHourDivNum_' + workHourId).remove();
-            RevalidateExistingErrorsOnWorkHours();
+            ValidateExistingErrorsOnWorkHours();
             ValidateEmployeesWithRangeToWorkhour(workHourId);
             HandleSubmitButton();
         })
@@ -1337,11 +1353,12 @@
 
             //Handle loading
             ButtonLoadingToggle("SaveWorkHours")
-                .then(value => AjaxPost('workhours/addEmployeeWorkhours', dataToPost))
+                .then(async value => await AjaxPost('workhours/addEmployeeWorkhours', dataToPost))
                 .then(response => {
                     ButtonLoadingToggle("SaveWorkHours");
                     $('#AddWorkHour_Modal').modal('hide');
                 });
+
         });
 
         //Cleanup on modal close
@@ -1386,8 +1403,9 @@
     <!--///////////////////////////////////////-->
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
-    <!-- Select 2-->
     <script>
+        //Workplaces Select2
+
         $('.WorkPlace_Select2').select2({
             ajax: {
                 url: '/api/workplaces/select2',
@@ -1401,11 +1419,40 @@
             }
         });
 
+        //DayOff BootstrapToggle
         const DayOffSlider = workHourId =>
             $('#DayOffSliderNum_' + workHourId).bootstrapToggle({
                 on: 'Ναί',
                 off: 'Όχι'
-            });
+            }).on('change', (e) => {
+                if (e.target.checked == true && !ValidateNullInputs(workHourId)) {
+
+                    var startTs = SetTimeStampTimeToMin(
+                        GetCalentimInputValue(workHourId)[0]);
+
+                    var endTs = SetTimeStampTimeToMax(
+                        GetCalentimInputValue(workHourId)[1]);
+
+                    SetCalentimInputValue(workHourId, startTs, endTs);
+                    HandleShowWorkHourRangeToModal(workHourId);
+
+                    if (IsEdit()) {
+                        var startDbTs = SetTimeStampTimeToMin(
+                            GetCalentimInputDatabaseValue(workHourId)[0]);
+
+                        var endDbTs = SetTimeStampTimeToMax(
+                            GetCalentimInputDatabaseValue(workHourId)[1]);
+
+                        SetCalentimInputDatabaseValue(workHourId, startDbTs, endDbTs);
+                        HandleShowWorkHourRangeToModal(workHourId, true);
+                    }
+
+                    ValidateAppendedWorkHoursTimeRange(workHourId);
+                    ValidateExistingErrorsOnWorkHours();
+                    ValidateWorkHourDateOutOfRange(workHourId);
+                    ValidateEmployeesWithRangeToWorkhour(workHourId);
+                }
+            })
 
 
 
@@ -1414,7 +1461,7 @@
             $('#EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num).select2({
                 ajax: {
                     type: "POST",
-                    url: '/api/employees/select2',
+                    url: '/api/employees/select2filtered',
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     data: function (params) {
@@ -1486,28 +1533,26 @@
                         start: moment(currentDate).add(1, 'month').set('date', 1),
                         end: moment("31/12/4000", "DD/MM/YYYY")//Latest date in docs
                     }],
-                onbeforehide: (calentim) => {
+                onbeforehide: () => {
 
-                    new Promise((resolve, reject) => {
-                        ButtonLoadingToggle("SaveWorkHours");
-                        resolve();
-                    }).then(() => {
-                        HandleConvertCalentimDateToTimestamp(workHourId);
-                        HandleWorkHourSpan(workHourId);
-                        if (IsEdit())
-                            HandleShowWorkHourRangeToModal(workHourId, true);
-                        else
-                            HandleShowWorkHourRangeToModal(workHourId);
+                    //Handle Loading
+                    ButtonLoadingToggle("SaveWorkHours")
+                        .then(() => {
+                            HandleConvertAndSetCalentimInputValue(workHourId);
+                            HandleWorkHourSpan(workHourId);
+                            if (IsEdit())
+                                HandleShowWorkHourRangeToModal(workHourId, true);
+                            else
+                                HandleShowWorkHourRangeToModal(workHourId);
 
-                        if (!ValidateNullInputs(workHourId)) {
-                            ValidateAppendedWorkHoursTimeRange(workHourId);
-                            RevalidateExistingErrorsOnWorkHours();
-                            ValidateWorkHourDateOutOfRange(workHourId);
-                            ValidateEmployeesWithRangeToWorkhour(workHourId);
-                        }
-                    }).then(() => ButtonLoadingToggle("SaveWorkHours"));
-
-
+                            if (!ValidateNullInputs(workHourId)) {
+                                ValidateAppendedWorkHoursTimeRange(workHourId);
+                                ValidateExistingErrorsOnWorkHours();
+                                ValidateWorkHourDateOutOfRange(workHourId);
+                                ValidateEmployeesWithRangeToWorkhour(workHourId);
+                            }
+                        })
+                        .then(() => ButtonLoadingToggle("SaveWorkHours"));
                 },
                 onaftershow: () =>
                     //Fix Calentim width
@@ -1556,7 +1601,6 @@
                 }
             },
             fnDrawCallback: () => {
-
                 $('.ToggleSliders').bootstrapToggle({
                     on: 'Ναί',
                     off: 'Όχι'
@@ -1569,7 +1613,7 @@
                         var day = tableHead.id.split('_')[1];
 
                         var currDate = new Date(Date.UTC(DateConstants().Year,
-                            DateConstants().Month, day, 0, 0, 0));
+                            DateConstants().Month - 1, day, 0, 0, 0));
 
                         var dayToShow = currDate.toLocaleString('el-GR',
                             options);
@@ -1619,8 +1663,6 @@
                     "data": "Day" + i,
                     "searchable": false,
                     "orderable": false
-                    //render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    //"Day" + i)
                 });
 
             return columns;

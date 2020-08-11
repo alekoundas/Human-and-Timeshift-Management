@@ -24,6 +24,7 @@ namespace DataAccess
         public DbSet<Customer> Customers { get; set; }
         public DbSet<WorkPlace> WorkPlaces { get; set; }
         public DbSet<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
+        public DbSet<Leave> Leaves { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -110,32 +110,44 @@ namespace WebApplication.Api
 
         // POST: api/realworkhours/hasoverlap
         [HttpPost("hasoverlap")]
-        public async Task<ActionResult<RealWorkHour>> HasOverlap([FromBody] RealWorkHourApiViewModel realWorkHour)
+        public async Task<ActionResult<RealWorkHour>> HasOverlap([FromBody] ApiRealWorkHourHasOverlap apiOverlap)
         {
-            //(StartDate1 <= EndDate2) and (EndDate1 >= StartDate2)
-            List<object> response = new List<object>();
-            realWorkHour.EmployeeIds.ForEach(id =>
+            var dataToReturn = new List<ApiRealWorkHourHasOverlapResponse>();
+            foreach (var id in apiOverlap.EmployeeIds)
             {
-                if (_baseDataWork.RealWorkHours.IsDateOverlaping(realWorkHour, id))
-                    response.Add(new
+                if (_baseDataWork.RealWorkHours.AreDatesOverlaping(apiOverlap, id))
+                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
                     {
-                        employeeId = id,
-                        isSuccessful = 0,
-                        value = "Ο χρήστης αυτός έχει ήδη δηλωθεί για αυτές τις ώρες"
-
-                    });
-                else
-                    response.Add(new
-                    {
-                        employeeId = id,
-                        isSuccessful = 1,
-                        value = ""
-
+                        EmployeeId = id,
+                        ErrorType = "error",
+                        ErrorValue = "Ο χρήστης αυτός έχει ήδη δηλωθεί για αυτές τις ώρες",
                     });
 
-            });
+                if (_baseDataWork.RealWorkHours.AreDatesOverlapingLeaves(
+                    apiOverlap, id))
 
-            return Ok(response);
+                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
+                    {
+                        EmployeeId = id,
+                        ErrorType = "warning",
+                        ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
+                                        "αυτές τις ώρες ως άδεια",
+                    });
+
+                if (_baseDataWork.RealWorkHours.AreDatesOverlapingDayOff(
+                   apiOverlap, id))
+
+                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
+                    {
+                        EmployeeId = id,
+                        ErrorType = "warning",
+                        ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
+                                        "αυτές τις ώρες ως ρεπό",
+                    });
+            };
+
+
+            return Ok(dataToReturn);
         }
 
 

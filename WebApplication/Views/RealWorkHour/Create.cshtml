@@ -43,9 +43,9 @@
 
                             <div class="form-group" id="TimeRangeDiv" style="display:none;">
                                 <input id="TimeRange" />
-                                <br>
-                                <span id="TimeRangeSpan" style="display:none;" class="text-warning"></span>
                             </div>
+                            </br>
+                            <span id="TimeRangeSpan" style="display:none;" class="text-warning"></span>
                         </div>
                     </div>
 
@@ -57,8 +57,8 @@
                                 <div class="input-group" style="width:100%">
                                     <div class="row">
                                         <div class="col-md-1"></div>
-                                        <div class="col-md-1">
-                                            <button type="button" onclick="AppendEmployeeForm()" class="btn btn-success btn-circle"><i class="fa fa-user"></i><i class="fa fa-plus"></i></button>
+                                        <div class="col-md-2">
+                                            <button type="button" id="AppendEmployeeForm" class="btn btn-success "><i class="fa fa-user"></i><i class="fa fa-plus"></i></button>
                                         </div>
                                         <div class="col-md-10">Προσθήκη επιπλέων υπαλλήλου</div>
                                     </div>
@@ -112,89 +112,65 @@
     <!--///             Handlers            ///-->
     <!--///////////////////////////////////////-->
     <script>
-        //Submit button handler
-        const HandleSubmitButton = (responses) => {
-            if (responses == undefined) {
-                var startOn = document.getElementById('StartOn').value;
-                var endOn = document.getElementById('EndOn').value;
-                var employeeSelect2CurrentErrorCount = 0
-                var employeeIds = GetAlreadyAppendedEmployeeIds();
-                employeeIds.forEach(id => {
-                    if (window.getComputedStyle(
-                        document.getElementById('EmployeesSelect2SpanNum_' + GetSelect2NumBySelectedEmployeeId(id)))
-                        .display !== "none")
-                        employeeSelect2CurrentErrorCount++;
-                })
+        const HandleSubmitButton = () => {
+            [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
+                .filter(span => span.style.display == '').length > 0 ?
+                HideSaveButton() : ShowSaveButton();
 
-                //Check if we have selected employees
-                if (employeeSelect2CurrentErrorCount == 0 &&
-                    employeeIds.length > 0 && startOn != '' && endOn != '')
-                    document.getElementById('SubmitButton').disabled = false;
-                else
-                    document.getElementById('SubmitButton').disabled = true;
-            }
-            else {
-                var errorCount = 0;
-                responses.forEach((response) =>
-                    !response.isSuccessful ? errorCount++ : errorCount);
-
-                if (errorCount > 0 || responses.length == 0)
-                    document.getElementById('SubmitButton').disabled = true;
-                else
-                    //if (GetAlreadyAppendedEmployeeIds().length > 0)
-                    document.getElementById('SubmitButton').disabled = false;
-            }
         }
+        //const HandleSubmitButton = (responses) => {
+        //    if (responses == undefined) {
+        //        var startOn = document.getElementById('StartOn').value;
+        //        var endOn = document.getElementById('EndOn').value;
+        //        var employeeSelect2CurrentErrorCount = 0
+        //        var employeeIds = GetAlreadyAppendedEmployeeIds();
+        //        employeeIds.forEach(id => {
+        //            if (window.getComputedStyle(
+        //                document.getElementById('EmployeesSelect2ErrorSpanNum_' + GetSelect2NumBySelectedEmployeeId(id)))
+        //                .display !== "none")
+        //                employeeSelect2CurrentErrorCount++;
+        //        })
 
-        // Employee Select2 span handler
-        const HandleEmployeeSelect2Span = (elementId, value, isSuccessful) => {
-            if (elementId != undefined) {
-                var span = document.getElementById(elementId)
-                if (isSuccessful) {
-                    span.style = "display:none;";
-                }
-                else {
-                    span.style = "display:;";
-                    span.innerHTML = value;
-                }
-            }
-            else
-                [...document.getElementsByClassName('EmployeeSelect2Span')]
-                    .forEach((span) => span.style = "display:none;");
-        }
+        //        //Check if we have selected employees
+        //        if (employeeSelect2CurrentErrorCount == 0 &&
+        //            employeeIds.length > 0 && startOn != '' && endOn != '')
+        //            document.getElementById('SubmitButton').disabled = false;
+        //        else
+        //            document.getElementById('SubmitButton').disabled = true;
+        //    }
+        //    else {
+        //        var errorCount = 0;
+        //        responses.forEach((response) =>
+        //            !response.isSuccessful ? errorCount++ : errorCount);
 
-        // Time range calentim span handler
+        //        if (errorCount > 0 || responses.length == 0)
+        //            document.getElementById('SubmitButton').disabled = true;
+        //        else
+        //            //if (GetAlreadyAppendedEmployeeIds().length > 0)
+        //            document.getElementById('SubmitButton').disabled = false;
+        //    }
+        //}
+
+
+
         const HandleTimeRangeSpan = (response) => {
             if (response != undefined) {
                 var span = document.getElementById('TimeRangeSpan');
                 span.style.display = '';
                 span.classList = [];
                 span.classList.add('text-' + response.type);
-                span.innerHTML = response.value;
+                span.innerHTML = '</br>' + response.value;
             }
             else
                 document.getElementById('TimeRangeSpan').style.display = 'none';
         };
+
+
     </script>
 
-    <!-- Get Select2 number by employeeId -->
-    <script>
-        const GetSelect2NumBySelectedEmployeeId = (employeeId) => document
-            .querySelectorAll('select.EmployeesSelect2 > option[value="' + employeeId + '"]')[0]
-            .parentElement.id
-            .split('[')[1]
-            .split(']')[0]
-    </script>
-
-    <!-- Get appended employees ids -->
-    <script>
-        const GetAlreadyAppendedEmployeeIds = () =>
-            [...document.getElementsByClassName('EmployeesSelect2')]
-                .map((data) => data.value)
-                .filter((val) => val != "");
-    </script>
-
-    <!-- Api Validation -->
+    <!--///////////////////////////////////////-->
+    <!--///             Validation          ///-->
+    <!--///////////////////////////////////////-->
     <script>
         const ValidateEmployeesWithRangeToRealWorkhour = () => {
             var startOn = document.getElementById('StartOn').value;
@@ -210,64 +186,88 @@
                     BuildHasOverlapRealWorkHourDto(startOn, endOn, employeeIds))
             }).done((data) => {
                 ShowResultPerEmployeeDropdown(data);
-                HandleSubmitButton(data);
+                HandleSubmitButton();
             });
         };
     </script>
 
-    <!-- TimeShift Select2-->
+    <!--///////////////////////////////////////-->
+    <!--///             Functions           ///-->
+    <!--///////////////////////////////////////-->
+
     <script>
-        $('.TimeShift_Select2').select2({
-            ajax: {
-                url: '/api/timeshifts/select2',
-                data: (params) => ({
-                    search: params.term,
-                    page: params.page || 1
-                })
+        const GetSelect2NumBySelectedEmployeeId = employeeId =>
+            [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
+                .filter(span =>
+                    GetSelect2ValueByNum(span.id.split('_')[1]) == employeeId)[0]
+                .id.split('_')[1];
+
+        const GetAlreadyAppendedEmployeeIds = () =>
+            [...document.getElementsByClassName('EmployeesSelect2')]
+                .map((data) => data.value)
+                .filter((val) => val != "");
+
+        const HideSaveButton = () => {
+            var button = document.getElementById('SubmitButton');
+            button.style.opacity = '0.5';
+            button.disabled = true;
+
+        }
+
+        const GetSelect2ValueByNum = num =>
+            document.getElementById('EmployeesSelect2Num_' + num).value;
+
+        const ShowSaveButton = () => {
+            var button = document.getElementById('SubmitButton');
+            button.style.opacity = '1';
+            button.disabled = false;
+
+        }
+        const HandleEmployeeSelect2Span = response => {
+            if (response != undefined) {
+
+                var num = GetSelect2NumBySelectedEmployeeId(response.employeeId);
+
+                var errorSpan = document
+                    .getElementById('EmployeesSelect2ErrorSpanNum_' + num);
+
+                var warningSpan = document.
+                    getElementById('EmployeesSelect2WarningSpanNum_' + num);
+
+                if (response.errorType == 'error') {
+
+                    errorSpan.innerHTML = response.errorValue;
+                    errorSpan.style.display = '';
+                }
+                else if (response.errorType == 'warning') {
+                    if (!warningSpan.innerHTML.includes(response.errorValue)) {
+                        warningSpan.innerHTML += response.errorValue;
+                        warningSpan.style.display = '';
+                    }
+                }
             }
-        });
-    </script>
+            else {
 
-    <!-- Handle the api response errors to show in spans-->
-    <script>
-        const ShowResultPerEmployeeDropdown = (responses) =>
-            responses.forEach((response) =>
-                HandleEmployeeSelect2Span(
-                    'EmployeesSelect2SpanNum_' + GetSelect2NumBySelectedEmployeeId(response.employeeId),
-                    response.value,
-                    response.isSuccessful)
-            );
+                [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
+                    .forEach(span => span.style.display = 'none');
+                [...document.getElementsByClassName('EmployeeSelect2WarningSpan')]
+                    .forEach(span => span.style.display = 'none');
+            }
+        };
 
-    </script>
+        const ShowResultPerEmployeeDropdown = responses =>
+            responses.forEach(response =>
+                HandleEmployeeSelect2Span(response));
 
-    <!-- Set DateRange to hidden date inputs -->
-    <script>
         const AppendDateRangeToDateInputs = (startDate, endDate, hasLaterDate) => {
             document.getElementById('StartOn').value = TimeConverter(startDate);
             document.getElementById('EndOn').value = TimeConverter(endDate, hasLaterDate);
         };
     </script>
 
-    <!-- Employees Select2-->
-    <script>
-
-        const EmployeeSelect2 = (num) => {
-            $('.EmployeesSelect2Num_' + num).select2({
-                ajax: {
-                    type: "POST",
-                    url: '/api/employees/select2',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: (params) => JSON.stringify(BuildSelect2Dto(params))
-                }
-            }).on('change', (e) => {
-                ValidateEmployeesWithRangeToRealWorkhour();
-                HandleSubmitButton();
-            });
-        }
-    </script>
-
-    <!-- Calentim -->
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
     <script>
         const TimeConverter = (ticks, hasLaterDate) => {
             var date = new Date(ticks);
@@ -298,8 +298,6 @@
             //endEmpty: Date().Now,
             format: "hh:mm",
             ontimechange: (calentim, startDate, endDate) => {
-
-                HandleEmployeeSelect2Span();//Reset employee span errors
                 OnGoingTimeChanges++;
                 var hasLaterDate = 0;
                 if (startDate > endDate)
@@ -316,6 +314,7 @@
                             data: JSON.stringify(
                                 BuildHasOverlapWorkHourDto(startDate, endDate))
                         }).done((data) => {
+                            HandleEmployeeSelect2Span();
                             AppendDateRangeToDateInputs(startDate, endDate, hasLaterDate);
                             HandleTimeRangeSpan(data);
                             ValidateEmployeesWithRangeToRealWorkhour();
@@ -325,11 +324,34 @@
                 HandleTimeRangeSpan();
             }
         });
-    </script>
 
-    <!-- Show - Hide employees div-->
-    <script>
-        $('#TimeShiftId').on('change', (e) => {
+        //Employees Select2
+        const EmployeeSelect2 = (num) => {
+            $('#EmployeesSelect2Num_' + num).select2({
+                ajax: {
+                    type: "POST",
+                    url: '/api/employees/select2',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: (params) => JSON.stringify(BuildSelect2Dto(params))
+                }
+            }).on('change', (e) => {
+                HandleEmployeeSelect2Span();
+                ValidateEmployeesWithRangeToRealWorkhour();
+                HandleSubmitButton();
+            });
+        }
+
+        //TimeShift Select2
+        $('.TimeShift_Select2').select2({
+            ajax: {
+                url: '/api/timeshifts/select2',
+                data: (params) => ({
+                    search: params.term,
+                    page: params.page || 1
+                })
+            }
+        }).on('change', (e) => {
             if (e.target.value != "") {
                 document.getElementById('EmployeesDiv').style = 'display:;';
                 document.getElementById('TimeRangeDiv').style = 'display:;';
@@ -341,36 +363,43 @@
         });
     </script>
 
-    <!--Append employee Select2-->
+
+
+    <!-- Show - Hide employees div-->
     <script>
+
+        //Append employee Select2
         var Count = 0;
-        function AppendEmployeeForm() {
+        $('#AppendEmployeeForm').on('click', (e) => {
+
             document.getElementById('EmployeeInput').insertAdjacentHTML('beforeend',
                 '<div class="row" id = "EmployeeRowNum_' + Count + '">' +
-                '<div class="col-md-1"></div>' +
-                '<div class="col-md-5">' +
-                '<select class="EmployeesSelect2 EmployeesSelect2Num_' + Count + '" id="Employees[' + Count + '].Id" name="Employees[' + Count + '].Id" style="width:100%"></select>' +
-                '<span style="display:none;"id="EmployeesSelect2SpanNum_' + Count + '" class="text-danger EmployeeSelect2Span"></span>' +
+                '<div style="width: 100%;">' +
+                '<div style="width: 15%; float: left;">&nbsp;</div>' +
+                '<div style="width: 50%; float: left;">' +
+                '<select class="EmployeesSelect2" id="EmployeesSelect2Num_' + Count + '" name="Employees['+Count+'].Id" style="width:100%"></select>' +
+                '<span style="display:none;"id="EmployeesSelect2ErrorSpanNum_' + Count + '" class="text-danger EmployeeSelect2ErrorSpan"></span>' +
+                '<span style="display:none;"id="EmployeesSelect2WarningSpanNum_' + Count + '" class="text-danger EmployeeSelect2WarningSpan"></span>' +
                 '</div>' +
-                '<div class="col-md-1">' +
-                '<button type = "button"  class="btn btn-danger btn-circle DeleteEmployeeSelect2" id="' + Count + '"> <i class="fa fa-user" id="' + Count + '"></i></button >' +
+                '<div style="width: 5%; float: left;">&nbsp;</div>' +
+                '<div style="width: 10%; float: left;">' +
+                '<button type = "button"  class="btn btn-danger DeleteEmployeeSelect2" id="' + Count + '"> <i class="fa fa-user" id="' + Count + '"></i></button >' +
+                '</div >' +
                 '</div >' +
                 '</div>'
             );
             EmployeeSelect2(Count);
             Count++;
-        }
-    </script>
+        });
 
-    <!-- Delete employee Select2-->
-    <script>
+        // Delete employee Select2
         $('#EmployeeInput').on('click', '.DeleteEmployeeSelect2', (e) => {
 
             document.getElementById('EmployeeRowNum_' + e.target.id).remove();
             HandleSubmitButton();
         });
-    </script>
 
+    </script>
 
 
 

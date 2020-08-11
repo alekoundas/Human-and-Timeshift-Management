@@ -23,7 +23,7 @@ namespace WebApplication.Api
     [ApiController]
     public class EmployeesApiController : ControllerBase
     {
-        private  BaseDbContext _context;
+        private BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         private readonly SecurityDataWork _securityDatawork;
 
@@ -80,9 +80,40 @@ namespace WebApplication.Api
             return Ok(select2Helper.CreateEmployeesResponse(employees));
         }
 
+
         // GET: api/employees/select2
         [HttpPost("select2")]
         public async Task<ActionResult<Employee>> Select2([FromBody] Select2Get select2)
+        {
+            var employees = new List<Employee>();
+            var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<Employee>();
+            var parentFilter = filter;
+
+            if (select2.ExistingEmployees?.Count > 0)
+                foreach (var employeeId in select2.ExistingEmployees)
+                    filter = filter.And(x => x.Id != employeeId);
+            if (select2.Search != null)
+                filter = filter.And(x =>
+                   x.EmployeeWorkPlaces.Any(y =>
+                       x.FirstName.Contains(select2.Search) ||
+                       x.LastName.Contains(select2.Search)
+                    )
+                );
+
+            if (parentFilter == filter)
+                employees = (List<Employee>)await _baseDataWork.Employees
+                  .GetPaggingWithFilter(null, null, null, 10, select2.Page);
+            else
+                employees = (List<Employee>)await _baseDataWork.Employees
+              .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+
+            return Ok(select2Helper.CreateEmployeesResponse(employees));
+        }
+
+        // GET: api/employees/select2
+        [HttpPost("select2filtered")]
+        public async Task<ActionResult<Employee>> Select2Filtered([FromBody] Select2FilteredGet select2)
         {
             var employees = new List<Employee>();
             var select2Helper = new Select2Helper();
@@ -96,7 +127,9 @@ namespace WebApplication.Api
 
             if (select2.TimeShiftId != 0 && !string.IsNullOrWhiteSpace(select2.Search))
             {
-                var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == select2.TimeShiftId);
+                var timeshift = await _baseDataWork.TimeShifts
+                    .FirstOrDefaultAsync(x => x.Id == select2.TimeShiftId);
+
                 filter = filter.And(x =>
                    x.EmployeeWorkPlaces.Any(y =>
                    y.WorkPlaceId == timeshift.WorkPlaceId) &&
@@ -106,8 +139,6 @@ namespace WebApplication.Api
                    )
                 );
                 if (select2.ExistingEmployees.Count > 0)
-
-
                     employees = (List<Employee>)await _baseDataWork.Employees
                       .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
             }
@@ -166,7 +197,7 @@ namespace WebApplication.Api
 
             if (datatable.Predicate == "CompanyEdit")
             {
-            includes.Add(x => x.Company);
+                includes.Add(x => x.Company);
                 Expression<Func<Employee, bool>> filter =
                     (x => x.CompanyId == datatable.GenericId || x.CompanyId == null);
                 employees = await _baseDataWork.Employees
@@ -174,7 +205,7 @@ namespace WebApplication.Api
             }
             if (datatable.Predicate == "WorkPlaceEdit")
             {
-            includes.Add(x => x.Company);
+                includes.Add(x => x.Company);
                 Expression<Func<Employee, bool>> filter = (x => x.Company.Customers
                 .Any(y => y.WorkPlaces
                 .Any(z => z.Id == datatable.GenericId)));
@@ -191,7 +222,7 @@ namespace WebApplication.Api
 
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
-            } 
+            }
             if (datatable.Predicate == "RealWorkHourCurrentDay")
             {
                 includes.Add(x => x.RealWorkHours);
@@ -206,7 +237,7 @@ namespace WebApplication.Api
 
             var mapedData = MapResults(employees, datatable);
 
-            return Ok(dataTableHelper.CreateResponse(datatable,await mapedData, total));
+            return Ok(dataTableHelper.CreateResponse(datatable, await mapedData, total));
         }
 
         protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Employee> results, Datatable datatable)
@@ -274,7 +305,7 @@ namespace WebApplication.Api
 
                     for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
                         dictionary.Add("Day" + i,
-                            dataTableHelper.GetHoverElementsAsync(_baseDataWork,
+                            dataTableHelper.GetCellBodyAsync(_baseDataWork,
                                 i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper

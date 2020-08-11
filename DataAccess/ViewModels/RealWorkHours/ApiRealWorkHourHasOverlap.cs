@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace DataAccess.ViewModels.RealWorkHours
 {
-    public class RealWorkHourApiViewModel : BaseEntity
+    public class ApiRealWorkHourHasOverlap : BaseEntity
     {
         [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
         public DateTime StartOn { get; set; }
@@ -20,16 +20,5 @@ namespace DataAccess.ViewModels.RealWorkHours
         [JsonProperty(PropertyName = "employeeIds")]
         public List<int> EmployeeIds { get; set; }
 
-
-        //public static WorkHour CreateFrom(WorkHoursApiViewModel viewModel)
-        //{
-        //    return new WorkHour
-        //    {
-        //        StartOn = viewModel.StartOn,
-        //        EndOn = viewModel.EndOn,
-        //        TimeShiftId = viewModel.TimeShiftId,
-        //        CreatedOn = DateTime.Now
-        //    };
-        //}
     }
 }

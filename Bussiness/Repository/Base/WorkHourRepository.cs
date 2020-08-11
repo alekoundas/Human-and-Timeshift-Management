@@ -50,13 +50,13 @@ namespace Bussiness.Repository.Base
                         .Where(x =>
                       (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
                       (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-                      (workHour.StartOn < x.StartOn && workHour.EndOn < workHour.EndOn))
+                      (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
                         .Any(y => y.Employee.Id == employeeId);
             else
                 return Context.WorkHours.Where(x =>
                 (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
                 (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-                (workHour.StartOn < x.StartOn && workHour.EndOn < workHour.EndOn))
+                (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
                   .Any(y => y.Employee.Id == employeeId);
         }
 

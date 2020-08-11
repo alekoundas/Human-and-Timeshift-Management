@@ -9,5 +9,7 @@ namespace DataAccess.Models.Select2
     {
         [JsonProperty(PropertyName = "results")]
         public ICollection<Select2Result> Results { get; set; }
+        [JsonProperty(PropertyName = "pagination")]
+        public Select2Pagination Pagination { get; set; }
     }
 }

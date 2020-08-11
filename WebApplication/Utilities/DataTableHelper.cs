@@ -201,19 +201,19 @@ namespace WebApplication.Utilities
         {
             return "";
         }
-        public string GetHoverElementsAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        public string GetCellBodyAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
-            var skata = baseDatawork.Employees.Where(x =>
-                x.Id == employeeId &&
-                x.WorkHours.Any(y =>
-                    y.TimeShiftId == datatable.GenericId &&
-                    y.StartOn.Year == datatable.TimeShiftYear &&
-                    y.StartOn.Month == datatable.TimeShiftMonth &&
-                    (
-                        y.StartOn.Day == dayOfMonth ||
-                        y.EndOn.Day == dayOfMonth ||
-                        (y.StartOn.Day < dayOfMonth && dayOfMonth < y.EndOn.Day)
-                     )));
+            //var skata = baseDatawork.Employees.Where(x =>
+            //    x.Id == employeeId &&
+            //    x.WorkHours.Any(y =>
+            //        y.TimeShiftId == datatable.GenericId &&
+            //        y.StartOn.Year == datatable.TimeShiftYear &&
+            //        y.StartOn.Month == datatable.TimeShiftMonth &&
+            //        (
+            //            y.StartOn.Day == dayOfMonth ||
+            //            y.EndOn.Day == dayOfMonth ||
+            //            (y.StartOn.Day < dayOfMonth && dayOfMonth < y.EndOn.Day)
+            //         )));
 
             //TODO :Async
             var cellWorkHours = baseDatawork.WorkHours.GetCurrentAssignedOnCell(
@@ -223,27 +223,48 @@ namespace WebApplication.Utilities
                 dayOfMonth,
                 employeeId);
 
-            var startTimeSpan = String.Join("",
-                cellWorkHours.Select(x =>
-                    SpanTimeValue(x.StartOn.ToShortTimeString())));
+            var cellLeaves = baseDatawork.Leaves.GetCurrentAssignedOnCell(
+               datatable.TimeShiftYear,
+               datatable.TimeShiftMonth,
+               dayOfMonth,
+               employeeId);
 
-            var endTimeSpan = String.Join("",
-                cellWorkHours.Select(x =>
-                    SpanTimeValue(x.EndOn.ToShortTimeString())));
+            if (cellWorkHours.Any(x => x.IsDayOff))
+                return
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                    "<center><p><b>Ρεπό</b></p></center>" +
+                     "</div>";
+            else if(cellLeaves.Count()>0)
+                return
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                    "<center><p><b>Άδεια</b></p></center>" +
+                     "</div>";
+            else
+            {
 
-            return "<div style='width:110px; white-space: nowrap;'>" +
-                      "<div style='width:50px;display:block;  float: left;'>" +
-                      (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
-                      startTimeSpan +
-                      "</div>" +
-                      "<div style='width:50px; display:block;  float: right; '>" +
-                      (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
-                      endTimeSpan +
-                    "</div>" +
-                     (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
-                        datatable.GenericId) :
-                        "") +
-                     FaIconAdd(dayOfMonth, "", employeeId);
+
+                var startTimeSpan = String.Join("",
+        cellWorkHours.Select(x =>
+            SpanTimeValue(x.StartOn.ToShortTimeString())));
+
+                var endTimeSpan = String.Join("",
+                    cellWorkHours.Select(x =>
+                        SpanTimeValue(x.EndOn.ToShortTimeString())));
+
+                return "<div style='width:110px; white-space: nowrap;'>" +
+                          "<div style='width:50px;display:block;  float: left;'>" +
+                          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
+                          startTimeSpan +
+                          "</div>" +
+                          "<div style='width:50px; display:block;  float: right; '>" +
+                          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
+                          endTimeSpan +
+                        "</div>" +
+                         (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
+                            datatable.GenericId) :
+                            "") +
+                         FaIconAdd(dayOfMonth, "", employeeId);
+            }
 
         }
 

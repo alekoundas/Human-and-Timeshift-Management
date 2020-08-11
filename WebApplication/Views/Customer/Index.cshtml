@@ -29,7 +29,6 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Ημερομηνία Γέν.</th>
                             <th>ΑΦΜ</th>
                             <th>Ενέργειες</th>
                         </tr>
@@ -38,7 +37,6 @@
                         <tr>
                             <th data-searchable="true">Όνομα</th>
                             <th data-searchable="false">Επίθετο</th>
-                            <th data-searchable="false">Ημερομηνία Γέν.</th>
                             <th data-searchable="false">ΑΦΜ</th>
                             <th data-searchable="false">Ενέργειες</th>
                         </tr>
@@ -91,17 +89,6 @@
                         render: (a, b, data, d) => {
                             if (data.LastName != null)
                                 return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "DateOfBirth",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.DateOfBirth != null)
-                                return data.DateOfBirth;
                             else
                                 return "";
                         }

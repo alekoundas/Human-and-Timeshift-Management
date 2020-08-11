@@ -12,54 +12,75 @@ namespace WebApplication.Utilities
         public Select2Response CreateSpecializationResponse(IEnumerable<Specialization> specializations)
         {
             var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
             foreach (var result in specializations)
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
                     Text = result.Name
                 });
-            return new Select2Response() { Results = results };
+
+
+            pegination.More = true;
+            return new Select2Response() { Results = results,Pagination = pegination };
         }
 
         public Select2Response CreateCompaniesResponse(IEnumerable<Company> companies)
         {
             var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
             foreach (var result in companies)
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
                     Text = result.Title
                 });
-            return new Select2Response() { Results = results };
+
+            pegination.More = true;
+            return new Select2Response() { Results = results, Pagination = pegination };
+
         }
 
         public Select2Response CreateCustomersResponse(IEnumerable<Customer> customers)
         {
             var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
             foreach (var result in customers)
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
                     Text = result.FirstName + " " + result.LastName
                 });
-            return new Select2Response() { Results = results };
+
+            pegination.More = true;
+            return new Select2Response() { Results = results, Pagination = pegination };
+
         }
 
         public Select2Response CreateWorkplacesResponse(IEnumerable<WorkPlace> workplaces)
         {
             var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
             foreach (var result in workplaces)
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
                     Text = result.Title
                 });
-            return new Select2Response() { Results = results };
+
+            pegination.More = true;
+            return new Select2Response() { Results = results, Pagination = pegination };
         }
 
         public Select2Response CreateEmployeesResponse(IEnumerable<Employee> workplaces)
         {
             var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
             foreach (var result in workplaces)
                 results.Add(new Select2Result()
                 {
@@ -68,11 +89,16 @@ namespace WebApplication.Utilities
                         result.LastName + " - " +
                         result.ErpCode
                 });
-            return new Select2Response() { Results = results };
+
+            pegination.More = true;
+            return new Select2Response() { Results = results, Pagination = pegination };
+
         }
         public Select2Response CreateTimeShiftsResponse(IEnumerable<TimeShift> timeShifts)
         {
             var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
             foreach (var result in timeShifts)
                 results.Add(new Select2Result()
                 {
@@ -81,7 +107,10 @@ namespace WebApplication.Utilities
                         result.Month + "/" +
                         result.Month
                 });
-            return new Select2Response() { Results = results };
+
+            pegination.More = true;
+            return new Select2Response() { Results = results, Pagination = pegination };
+
         }
     }  
 

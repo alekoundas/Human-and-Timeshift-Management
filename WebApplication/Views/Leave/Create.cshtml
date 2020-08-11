@@ -1,0 +1,389 @@
+﻿@model DataAccess.Models.Entity.Leave
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    <button asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="box-body">
+
+                <div class="form-group">
+                    <label asp-for="StartOn" class="control-label"></label>
+
+                    <div class="input-group">
+                        <input id="StartOn" class="form-control" />
+                        <span id="StartOnSpan" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="EndOn" class="control-label"></label>
+
+                    <div class="input-group">
+                        <input id="EndOn" class="form-control" />
+                        <span id="EndOnSpan" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Description" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group" id="EmployeesDiv">
+                            <label asp-for="EmployeeId" class="control-label"></label>
+                            <div class="input-group" style="width:100%">
+                                <div class="row">
+                                    <div class="col-md-1"></div>
+                                    <div class="col-md-2">
+                                        <button type="button" id="AppendEmployeeForm" class="btn btn-success "><i class="fa fa-user"></i><i class="fa fa-plus"></i></button>
+                                    </div>
+                                    <div class="col-md-10">Προσθήκη επιπλέων υπαλλήλου</div>
+                                </div>
+                                <div id="EmployeeInput" style="width:100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group pull-right">
+                    <button class="btn btn-primary" id="SaveLeaves">Αποθήκευση</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             DTOs                ///-->
+    <!--///////////////////////////////////////-->
+
+    <script>
+        const BuildSelect2Dto = params => ({
+            search: params.term,
+            page: params.page || 1,
+            existingEmployees: GetAlreadyAppendedEmployeeIds()
+        });
+
+        const BuildHasOverlapDto = employeeId => ({
+            startOn: ConvertDateForApi(SetMinTime(GetInputValue('StartOn'))),
+            endOn: ConvertDateForApi(SetMaxTime(GetInputValue('EndOn'))),
+            description: GetDescription(),
+            employeeIds: employeeId == "" ?
+                GetAlreadyAppendedEmployeeIds() : [employeeId]
+        });
+
+        const BuildSaveToDbDto = () => ({
+            startOn: ConvertDateForApi(SetMinTime(GetInputValue('StartOn'))),
+            endOn: ConvertDateForApi(SetMaxTime(GetInputValue('EndOn'))),
+            description: GetDescription(),
+            employeeIds:  GetAlreadyAppendedEmployeeIds()
+        });
+    </script>
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Functions           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        const ConvertDateForApi = dateToConvert => {
+            var date = new Date(moment(dateToConvert, 'DD/MM/YYYY'));
+            var year = date.getFullYear();
+            var month = String((date.getMonth() + 1)).length == 1 ?
+                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+            var day = String(date.getDate()).length == 1 ?
+                '0' + date.getDate() : date.getDate();
+            var hour = String(date.getHours()).length == 1 ?
+                '0' + date.getHours() : date.getHours();
+            var min = String(date.getMinutes()).length == 1 ?
+                '0' + date.getMinutes() : date.getMinutes();
+
+            return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+        }
+
+        const GetInitDate = () => moment().format('DD/MM/YYYY')
+
+        const SetMinTime = date => {
+            var dateToReturn = new Date(moment(date, 'DD/MM/YYYY'));
+            dateToReturn.setHours(00, 00, 00);
+            return dateToReturn;
+        }
+
+        const SetMaxTime = date => {
+            var dateToReturn = new Date(moment(date, 'DD/MM/YYYY'));
+            dateToReturn.setHours(23, 59, 59);
+            return dateToReturn;
+        }
+
+        const GetInputValue = id =>
+            document.getElementById(id).value;
+
+        const GetDescription = () =>
+            document.getElementById('Description').value;
+
+        const GetInputValueSplited = id =>
+            document.getElementById(id).value.split('/-/');
+
+        const SetInputValue = (id, date) =>
+            document.getElementById(id).value = date;
+
+        const GetSelect2EmployeeId = num =>
+            document.getElementById('EmployeeSelect2Num_' + num).value;
+
+        const GetAlreadyAppendedEmployeeIds = () =>
+            [...document.getElementsByClassName('EmployeesSelect2')]
+                .map(data => data.value)
+                .filter(val => val != "");
+
+        const GetSelect2NumBySelectedEmployeeId = employeeId =>
+            [...document.getElementsByClassName('EmployeesSelect2')]
+                .filter(select2 => select2.value == employeeId)
+                .map(select2 => select2.id.split('_')[1])[0];
+
+        const ShowErrorsPerEmployeeDropdown = responses =>
+            responses.forEach((response) =>
+                HandleEmployeeSelect2Span(
+                    GetSelect2NumBySelectedEmployeeId(response.givenEmployeeId),
+                    response.typeOf));
+
+        const AreEmployeesSelect2WithError = () =>
+            [...document.getElementsByClassName('EmployeeSelect2Span')]
+                .filter(span => span.style.display == '').length > 0 ? true : false;
+
+
+        const TranslateTypeToGreek = dbType => {
+            switch (dbType) {
+                case 'DayOff':
+                    return 'ρεπό'
+                    break;
+                case 'Leave':
+                    return 'άδεια'
+                    break;
+                case 'WorkHour':
+                    return 'βάρδια'
+                    break;
+
+            }
+        };
+
+
+
+    </script>
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Validation          ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        const ValidateEmployeesWithRangeToDb = employeeId => {
+            if (GetAlreadyAppendedEmployeeIds().length > 0)
+                $.ajax({
+                    type: "POST",
+                    url: '/api/leaves/hasoverlap',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify(BuildHasOverlapDto(employeeId))
+                }).done(response => {
+                    //Reset errors for all or one Select2 (employeeId == undefined -> All)
+                    HandleEmployeeSelect2Span(
+                        GetSelect2NumBySelectedEmployeeId(employeeId));
+
+                    ShowErrorsPerEmployeeDropdown(response);
+                    HandleSubmitButton();
+                });
+        };
+    </script>
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Handlers            ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        const HandleSubmitButton = () => {
+            var saveButton = document.getElementById('SaveLeaves');
+            if (AreEmployeesSelect2WithError()) {
+
+                saveButton.style.opacity = '0.5';
+                saveButton.disabled = true;
+            }
+            else {
+                saveButton.style.opacity = '1';
+                saveButton.disabled = false;
+            }
+        }
+
+        const HandleEmployeeSelect2Span = (elementId, dbType) => {
+            if (elementId != undefined) {
+                var span = document.
+                    getElementById('EmployeeSelect2SpanNum_' + elementId);
+
+                if (dbType != undefined) {
+                    var translatedType = TranslateTypeToGreek(dbType);
+
+                    if (!span.innerHTML.includes('<br>Η συγκεκριμένη άδεια συμπίπτει με ' + translatedType)) {
+                        span.style.display = '';
+                        span.innerHTML += '<br>Η συγκεκριμένη άδεια συμπίπτει με ' + translatedType;
+                    }
+                }
+                else {
+                    span.style.display = 'none';
+                    span.innerHTML = '';
+                }
+            }
+            else
+                [...document.getElementsByClassName('EmployeeSelect2Span')]
+                    .forEach((span) => {
+                        span.style.display = "none";
+                        span.innerHTML = '';
+                    });
+        }
+    </script>
+
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        const EmployeeSelect2 = (num) => {
+            $('#EmployeeSelect2Num_' + num).select2({
+                ajax: {
+                    type: "POST",
+                    url: '/api/employees/select2',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: (params) => JSON.stringify(BuildSelect2Dto(params))
+                }
+            }).on('change', (e) => {
+                ValidateEmployeesWithRangeToDb(GetSelect2EmployeeId(num));
+                HandleSubmitButton();
+            });
+        }
+
+        $('#StartOn').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showFooter: false,
+            calendarCount: 1,
+            format: "DD/MM/YYYY",
+            dateSeparator: '/-/',
+            locale: "el",
+            oninit: () => SetInputValue('StartOn',GetInitDate()),
+            onbeforehide: () => {
+                var date = GetInputValueSplited('StartOn');
+                SetInputValue('StartOn', date[0]);
+                SetInputValue('EndOn', date[1]);
+                ValidateEmployeesWithRangeToDb();
+                HandleSubmitButton();
+            },
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach(calentim =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        });
+
+        $('#EndOn').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showFooter: false,
+            calendarCount: 1,
+            format: "DD/MM/YYYY",
+            dateSeparator: '/-/',
+            locale: "el",
+            oninit: () => SetInputValue('EndOn', GetInitDate()),
+            onbeforehide: () => {
+                var date = GetInputValueSplited('EndOn');
+                SetInputValue('StartOn', date[0]);
+                SetInputValue('EndOn', date[1]);
+                ValidateEmployeesWithRangeToDb();
+                HandleSubmitButton();
+            },
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        });
+
+
+    </script>
+
+
+    <!-- Show - Hide employees div-->
+    <script>
+
+        //Append employee Select2
+        var Count = 0;
+        $('#AppendEmployeeForm').on('click', (e) => {
+
+            document.getElementById('EmployeeInput').insertAdjacentHTML('beforeend',
+                '<div class="row" id = "EmployeeRowNum_' + Count + '">' +
+                '<div style="width: 100%;">' +
+                '<div style="width: 15%; float: left;">&nbsp;</div>' +
+                '<div style="width: 50%; float: left;">' +
+                '<select class="EmployeesSelect2" id="EmployeeSelect2Num_' + Count + '" style="width:100%"></select>' +
+                '<span style="display:none;" id="EmployeeSelect2SpanNum_' + Count + '" class="text-danger EmployeeSelect2Span"></span>' +
+                '</div>' +
+                '<div style="width: 5%; float: left;">&nbsp;</div>' +
+                '<div style="width: 10%; float: left;">' +
+                '<button type = "button"  class="btn btn-danger DeleteEmployeeSelect2" id="DeleteEmployeeSelect2Num_' + Count + '"> <i class="fa fa-user DeleteEmployeeSelect2" id="DeleteEmployeeSelect2Num_' + Count + '"></i></button >' +
+                '</div >' +
+                '</div >' +
+                '</div>'
+            );
+            EmployeeSelect2(Count);
+            Count++;
+        });
+
+        // Delete employee Select2
+        $('#EmployeesDiv').on('click', '.DeleteEmployeeSelect2', (e) => {
+            document.getElementById('EmployeeRowNum_' + e.target.id.split('_')[1])
+                .remove();
+            HandleSubmitButton();
+        });
+
+        $('#SaveLeaves').on('click', (e) => {
+            $.ajax({
+                type: "POST",
+                url: '/api/leaves/postleave',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(BuildSaveToDbDto())
+            });
+            window.location.href = 'index';
+        });
+
+
+    </script>
+
+}
