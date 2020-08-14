@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Bussiness.Repository.Interface;
 using DataAccess;
+using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bussiness.Repository
 {
@@ -55,7 +57,7 @@ namespace Bussiness.Repository
         public async Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
             Expression<Func<TEntity, bool>> filter,
-            List<Expression<Func<TEntity, object>>> includes = null,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
             int pageSize = 10,
             int pageIndex = 1)
         {
@@ -63,7 +65,7 @@ namespace Bussiness.Repository
 
             if (includes != null)
                 foreach (var include in includes)
-                    qry = qry.Include(include);
+                    qry = include(qry);
 
             if (filter != null)
                 qry = qry.Where(filter);
@@ -75,6 +77,8 @@ namespace Bussiness.Repository
 
             return await qry.ToListAsync();
         }
+
+    
 
 
         public int Count(Expression<Func<TEntity, bool>> predicate)
@@ -125,9 +129,9 @@ namespace Bussiness.Repository
         public async Task<TEntity> FindAsync(int id)
         {
             return await _set.FindAsync(id);
-        } 
-        
-        public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity,bool>> filter)
+        }
+
+        public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter)
         {
             return await _set.Where(filter).ToListAsync();
         }

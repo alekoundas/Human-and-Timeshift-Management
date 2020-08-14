@@ -17,6 +17,7 @@ using System.Threading;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using Newtonsoft.Json;
 
 namespace WebApplication
 {
@@ -71,6 +72,13 @@ namespace WebApplication
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
             services.AddRazorPages();
+
+            //ignore nulls kai kala
+            //services.AddMvc()
+            //.AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.IgnoreNullValues = true;
+            //});
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }

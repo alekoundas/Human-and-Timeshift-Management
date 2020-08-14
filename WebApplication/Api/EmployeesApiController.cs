@@ -16,6 +16,7 @@ using Bussiness.Repository.Security.Interface;
 using System.Linq.Expressions;
 using DataAccess.Models.Select2;
 using LinqKit;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace WebApplication.Api
 {
@@ -183,8 +184,8 @@ namespace WebApplication.Api
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var isDescending = datatable.Order[0].Dir == "desc";
 
-            var includes = new List<Expression<Func<Employee, object>>>();
-            includes.Add(x => x.Specialization);
+            var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
+            includes.Add(x => x.Include(y => y.Specialization));
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             var employees = new List<Employee>();
@@ -197,7 +198,7 @@ namespace WebApplication.Api
 
             if (datatable.Predicate == "CompanyEdit")
             {
-                includes.Add(x => x.Company);
+                includes.Add(x => x.Include(y => y.Company));
                 Expression<Func<Employee, bool>> filter =
                     (x => x.CompanyId == datatable.GenericId || x.CompanyId == null);
                 employees = await _baseDataWork.Employees
@@ -205,7 +206,8 @@ namespace WebApplication.Api
             }
             if (datatable.Predicate == "WorkPlaceEdit")
             {
-                includes.Add(x => x.Company);
+                includes.Add(x => x.Include(y => y.Company));
+
                 Expression<Func<Employee, bool>> filter = (x => x.Company.Customers
                 .Any(y => y.WorkPlaces
                 .Any(z => z.Id == datatable.GenericId)));
@@ -225,7 +227,7 @@ namespace WebApplication.Api
             }
             if (datatable.Predicate == "RealWorkHourCurrentDay")
             {
-                includes.Add(x => x.RealWorkHours);
+                includes.Add(x => x.Include(y => y.RealWorkHours));
 
                 var today = DateTime.Now;
                 Expression<Func<Employee, bool>> filter = x => x.RealWorkHours
@@ -233,6 +235,12 @@ namespace WebApplication.Api
 
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+            }
+            if (datatable.Predicate == "ProjectionDifference")
+            {
+
+                employees = await _baseDataWork.Employees
+                    .ProjectionDifference(null, datatable.StartOn, datatable.EndOn,pageSize, pageIndex);
             }
 
             var mapedData = MapResults(employees, datatable);
@@ -327,6 +335,24 @@ namespace WebApplication.Api
                     dictionary.Add("Buttons", dataTableHelper
                         .GetCurrentDayButtons(employee));
 
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "ProjectionDifference")
+                {
+                    var workHourDate = "Δηλώθηκαν οι:</br>";
+                    //if (employee.RealWorkHours.Count() > 0)
+                    //    foreach (var realWorkHour in employee.RealWorkHours)
+                    //    {
+                    //        dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
+                    //        foreach (var workHour in realWorkHour.TimeShift.WorkHours)
+                    //        {
+                    //            workHourDate = workHourDate + workHour.StartOn + " - " + workHour.EndOn + "</br>";
+                    //        }
+                    //        dictionary.Add("WorkHourDate", workHourDate);
+                    //    }
+
+                    dictionary.Add("RealWorkHourDate", "asdasdasdasdasdasd");
+                    dictionary.Add("WorkHourDate", "asdasdasd");
                     returnObjects.Add(expandoObj);
                 }
             }

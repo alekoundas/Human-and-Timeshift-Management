@@ -20,6 +20,8 @@ namespace WebApplication.Controllers
 
         public IActionResult Difference()
         {
+            ViewData["Title"] = "Διαφορές βαρδιών απο πραγματικές και χρονόγραμμα";
+            ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
             return View();
         }
 

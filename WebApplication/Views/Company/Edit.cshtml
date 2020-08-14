@@ -111,11 +111,7 @@
 
     <script>
 
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-
-            var table = $('#CompanyEmployeesDatatable').DataTable({
+         $('#CompanyEmployeesDatatable').DataTable({
                 "serverSide": true,
                 "dom": 'frtlp',
                 "ajax": {
@@ -251,7 +247,6 @@
                     });
                 },
             });
-        });
     </script>
 
     <script>

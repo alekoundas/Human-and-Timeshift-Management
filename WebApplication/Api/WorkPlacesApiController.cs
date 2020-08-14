@@ -102,15 +102,15 @@ namespace WebApplication.Api
 
         // GET: api/workplaces/select2
         [HttpGet("select2")]
-        public async Task<ActionResult<WorkPlace>> select2(string search, int page)
+        public async Task<ActionResult<WorkPlace>> Select2(string search, int page)
         {
             var workPlaces = new List<WorkPlace>();
             var select2Helper = new Select2Helper();
             if (string.IsNullOrWhiteSpace(search))
             {
-               workPlaces = (List<WorkPlace>)await _baseDataWork
-                    .WorkPlaces
-                    .GetPaggingWithFilter(null, null, null, 10, page);
+                workPlaces = (List<WorkPlace>)await _baseDataWork
+                     .WorkPlaces
+                     .GetPaggingWithFilter(null, null, null, 10, page);
 
                 return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
             }
@@ -131,28 +131,28 @@ namespace WebApplication.Api
             if (employee == null || workPlace == null)
                 return NotFound();
 
-            if(toggleState == "true" && _baseDataWork.EmployeeWorkPlaces
+            if (toggleState == "true" && _baseDataWork.EmployeeWorkPlaces
                 .Any(x => x.EmployeeId == employeeId && x.WorkPlaceId == workPlaceId))
-                    return NotFound();
+                return NotFound();
 
             if (toggleState == "true")
-                _baseDataWork.EmployeeWorkPlaces.Add(new EmployeeWorkPlace() 
+                _baseDataWork.EmployeeWorkPlaces.Add(new EmployeeWorkPlace()
                 {
-                    EmployeeId=employeeId,
-                    WorkPlaceId= workPlaceId,
-                    CreatedOn=DateTime.Now
+                    EmployeeId = employeeId,
+                    WorkPlaceId = workPlaceId,
+                    CreatedOn = DateTime.Now
                 });
 
             else
                 _baseDataWork.EmployeeWorkPlaces.Remove(
                      _baseDataWork.EmployeeWorkPlaces
-                        .Where(x=>x.EmployeeId==employeeId&&x.WorkPlaceId==workPlaceId)
+                        .Where(x => x.EmployeeId == employeeId && x.WorkPlaceId == workPlaceId)
                         .FirstOrDefault());
 
             try
             {
 
-            await _baseDataWork.SaveChangesAsync();
+                await _baseDataWork.SaveChangesAsync();
             }
             catch (Exception /*ex*/)
             {

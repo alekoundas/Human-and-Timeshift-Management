@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bussiness.Repository.Interface
 {
@@ -23,7 +24,7 @@ namespace Bussiness.Repository.Interface
         Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
             Expression<Func<TEntity, bool>> filter = null,
-            List<Expression<Func<TEntity, object>>> includes = null,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
             int pageSize = 10,
             int pageIndex = 1);
 
