@@ -111,21 +111,21 @@ namespace WebApplication.Api
             {
                 customers = (List<Customer>)await _baseDataWork
                     .Customers
-                    .GetPaggingWithFilter(null, null, null,10, page);
+                    .GetPaggingWithFilter(null, null, null, 10, page);
 
                 return Ok(select2Helper.CreateCustomersResponse(customers));
             }
 
             customers = await _baseDataWork
                 .Customers
-                .GetPaggingWithFilter(null, x => x.FirstName.Contains(search) || x.LastName.Contains(search), null,10, page);
+                .GetPaggingWithFilter(null, x => x.FirstName.Contains(search) || x.LastName.Contains(search), null, 10, page);
 
             return Ok(select2Helper.CreateCustomersResponse(customers));
         }
 
-        // POST: api/customers/getdatatable
-        [HttpPost("getdatatable")]
-        public async Task<ActionResult<Customer>> getdatatable([FromBody] Datatable datatable)
+        // POST: api/customers/datatable
+        [HttpPost("datatable")]
+        public async Task<ActionResult<Customer>> Datatable([FromBody] Datatable datatable)
         {
 
             var total = await _baseDataWork.Employees.CountAllAsync();
@@ -138,7 +138,7 @@ namespace WebApplication.Api
             if (string.IsNullOrWhiteSpace(datatable.Predicate))
             {
 
-             customers = await _baseDataWork.Customers.GetPaggingWithFilter(null,null,null, pageSize, pageIndex);
+                customers = await _baseDataWork.Customers.GetPaggingWithFilter(null, null, null, pageSize, pageIndex);
             }
 
             if (datatable.Predicate == "CompanyEdit")
@@ -162,7 +162,7 @@ namespace WebApplication.Api
             {
                 var expandoObj = expandoObject.GetCopyFrom<Customer>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("Customer","Customers", result.Id.ToString()));
+                dictionary.Add("Buttons", dataTableHelper.GetButtons("Customer", "Customers", result.Id.ToString()));
                 returnObjects.Add(expandoObj);
             }
 

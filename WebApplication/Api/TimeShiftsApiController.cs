@@ -132,9 +132,9 @@ namespace WebApplication.Api
             return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts));
         }
 
-        // POST: api/timeshifts/getdatatable
-        [HttpPost("getdatatable")]
-        public async Task<ActionResult<TimeShift>> getdatatable([FromBody] Datatable datatable)
+        // POST: api/timeshifts/datatable
+        [HttpPost("datatable")]
+        public async Task<ActionResult<TimeShift>> datatable([FromBody] Datatable datatable)
         {
             var total = await _baseDataWork.TimeShifts.CountAllAsync();
             var pageSize = datatable.Length;

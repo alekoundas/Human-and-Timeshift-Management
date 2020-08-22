@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
+using LinqKit;
 
 namespace Business.Repository
 {
@@ -24,12 +25,14 @@ namespace Business.Repository
         {
             get { return Context as BaseDbContext; }
         }
+
         public async Task<List<Employee>> ProjectionDifference(
-       Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderingInfo,
-       DateTime startOn,
-       DateTime endOn,
-       int pageSize = 10,
-       int pageIndex = 1)
+            Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderingInfo,
+            DateTime startOn,
+            DateTime endOn,
+            int workPlaceId = 0,
+            int pageSize = 10,
+            int pageIndex = 1)
         {
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
 
@@ -37,17 +40,18 @@ namespace Business.Repository
             includes.Add(x => x.Include(y => y.WorkHours).ThenInclude(z => z.TimeShift));
             includes.Add(x => x.Include(y => y.Specialization));
 
-            Expression<Func<Employee, bool>> filter = x =>
-                    (x.RealWorkHours.Any(y =>
-                          (y.StartOn <= startOn && startOn <= y.EndOn) ||
-                          (y.StartOn <= endOn && endOn <= y.EndOn) ||
-                          (startOn < y.StartOn && y.EndOn < endOn)) ||
-
-                    (x.WorkHours.Any(y =>
+            var filter = PredicateBuilder.True<Employee>();
+            filter = filter.And(x =>
+                   x.RealWorkHours.Any(y =>
                          (y.StartOn <= startOn && startOn <= y.EndOn) ||
                          (y.StartOn <= endOn && endOn <= y.EndOn) ||
-                         (startOn < y.StartOn && y.EndOn < endOn)))
-                 );
+                         (startOn < y.StartOn && y.EndOn < endOn)) ||
+
+                  x.WorkHours.Any(y =>
+                        (y.StartOn <= startOn && startOn <= y.EndOn) ||
+                        (y.StartOn <= endOn && endOn <= y.EndOn) ||
+                        (startOn < y.StartOn && y.EndOn < endOn)));
+
 
             IQueryable<RealWorkHour> realWorkHours = (IQueryable<RealWorkHour>)Context.RealWorkHours.Where(x =>
                         (x.StartOn <= startOn && startOn <= x.EndOn) ||
@@ -62,15 +66,24 @@ namespace Business.Repository
                    x.IsDayOff == false
                    );
 
+
+            if (workPlaceId != 0)
+            {
+                workHours.Where(x => x.TimeShift.WorkPlaceId == workPlaceId);
+                realWorkHours.Where(x => x.TimeShift.WorkPlaceId == workPlaceId);
+                filter = filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == workPlaceId));
+            }
+
             var qry = (IQueryable<Employee>)Context.Employees;
 
             foreach (var include in includes)
                 qry = include(qry);
 
-            qry = qry.Where(filter);
 
             if (orderingInfo != null)
                 qry = orderingInfo(qry);
+
+            qry = qry.Where(filter);
 
             qry = qry.Select(x => new Employee
             {
@@ -81,10 +94,14 @@ namespace Business.Repository
                 Email = x.Email,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
-                RealWorkHours = x.RealWorkHours.Where(y => !workHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn)).ToList(),
-                WorkHours = x.WorkHours.Where(y => !realWorkHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn) && y.IsDayOff == false).ToList(),
+                RealWorkHours = x.RealWorkHours.Where(z => (z.StartOn <= startOn && startOn <= z.EndOn) ||
+                        (z.StartOn <= endOn && endOn <= z.EndOn) ||
+                        (startOn < z.StartOn && z.EndOn < endOn)).Where(y => !workHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn)).ToList(),
+                WorkHours = x.WorkHours.Where(z => (z.StartOn <= startOn && startOn <= z.EndOn) ||
+                        (z.StartOn <= endOn && endOn <= z.EndOn) ||
+                        (startOn < z.StartOn && z.EndOn < endOn)).Where(y => !realWorkHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn) && y.IsDayOff == false).ToList(),
                 Specialization = x.Specialization
-            })/*.Where(x => x.RealWorkHours.Any()&& x.WorkHours.Any() )*/;
+            });
 
             qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 

@@ -163,9 +163,9 @@ namespace WebApplication.Api
             return workPlace;
         }
 
-        // POST: api/companies/getdatatable
-        [HttpPost("getdatatable")]
-        public async Task<ActionResult<WorkPlace>> getdatatable([FromBody] Datatable datatable)
+        // POST: api/companies/datatable
+        [HttpPost("datatable")]
+        public async Task<ActionResult<WorkPlace>> datatable([FromBody] Datatable datatable)
         {
             var total = await _baseDataWork.Companies.CountAllAsync();
             var pageSize = datatable.Length;

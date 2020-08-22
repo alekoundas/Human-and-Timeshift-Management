@@ -130,8 +130,8 @@ namespace WebApplication.Api
         }
 
         // POST: api/specializations
-        [HttpPost("getdatatable")]
-        public async Task<ActionResult<Specialization>> getdatatable([FromBody] Datatable datatable)
+        [HttpPost("datatable")]
+        public async Task<ActionResult<Specialization>> datatable([FromBody] Datatable datatable)
         {
             var total = await _baseDataWork.Employees.CountAllAsync();
             var pageSize = datatable.Length;

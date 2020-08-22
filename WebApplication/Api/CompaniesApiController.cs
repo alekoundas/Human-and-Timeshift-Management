@@ -13,6 +13,9 @@ using DataAccess.Models.Datatable;
 using System.Dynamic;
 using Bussiness.Service;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Dynamic.Core;
+
 
 namespace WebApplication.Controllers
 {
@@ -118,13 +121,13 @@ namespace WebApplication.Controllers
             if (string.IsNullOrWhiteSpace(search))
             {
                 companies = (List<Company>)await _baseDataWork.Companies
-                    .GetPaggingWithFilter(null, null, null,10, page);
+                    .GetPaggingWithFilter(null, null, null, 10, page);
 
                 return Ok(select2Helper.CreateCompaniesResponse(companies));
             }
 
-             companies = (List<Company>) await _baseDataWork.Companies
-                .GetPaggingWithFilter(null,x=>x.Title.Contains(search), null,10, page);
+            companies = (List<Company>)await _baseDataWork.Companies
+               .GetPaggingWithFilter(null, x => x.Title.Contains(search), null, 10, page);
 
             return Ok(select2Helper.CreateCompaniesResponse(companies));
         }
@@ -149,9 +152,9 @@ namespace WebApplication.Controllers
             return company;
         }
 
-        // POST: api/companies/getdatatable
-        [HttpPost("getdatatable")]
-        public async Task<ActionResult<Company>> getdatatable([FromBody] Datatable datatable)
+        // POST: api/companies/Datatable
+        [HttpPost("Datatable")]
+        public async Task<ActionResult<Company>> Datatable([FromBody] Datatable datatable)
         {
             var total = await _baseDataWork.Companies.CountAllAsync();
             var pageSize = datatable.Length;
@@ -159,8 +162,9 @@ namespace WebApplication.Controllers
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var isDescending = datatable.Order[0].Dir == "desc";
 
+
             //TODO: order by
-            var companies = await _baseDataWork.Companies.GetWithPagging(null, pageSize, pageIndex);
+            var companies = await _baseDataWork.Companies.GetWithPagging(SetOrderBy(columnName,isDescending), pageSize, pageIndex);
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             var mapedData = MapResults(companies);
@@ -168,7 +172,7 @@ namespace WebApplication.Controllers
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Company> results)
+        private IEnumerable<ExpandoObject> MapResults(IEnumerable<Company> results)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Company>(_securityDatawork);
@@ -177,11 +181,18 @@ namespace WebApplication.Controllers
             {
                 var expandoObj = expandoObject.GetCopyFrom<Company>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("Company","Companies", result.Id.ToString()));
+                dictionary.Add("Buttons", dataTableHelper.GetButtons("Company", "Companies", result.Id.ToString()));
                 returnObjects.Add(expandoObj);
             }
 
             return returnObjects;
+        }
+        private Func<IQueryable<Company>, IOrderedQueryable<Company>> SetOrderBy(string collumnName, bool isDiscending)
+        {
+            if (isDiscending)
+                return x => x.OrderBy(collumnName+" DESC");
+            else
+                return x => x.OrderBy(collumnName+" ASC");
         }
 
         private bool CompanyExists(int id)

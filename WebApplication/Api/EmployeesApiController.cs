@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 using DataAccess.Models.Select2;
 using LinqKit;
 using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Dynamic.Core;
 
 namespace WebApplication.Api
 {
@@ -173,16 +174,16 @@ namespace WebApplication.Api
             return Ok(select2Helper.CreateEmployeesResponse(employees));
         }
 
-        // POST: api/employees/getdatatable
-        [HttpPost("getdatatable")]
-        public async Task<ActionResult<Employee>> GetDatatable([FromBody] Datatable datatable)
+        // POST: api/employees/datatable
+        [HttpPost("datatable")]
+        public async Task<ActionResult<Employee>> datatable([FromBody] Datatable datatable)
         {
 
             var total = await _baseDataWork.Employees.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var isDescending = datatable.Order[0].Dir == "desc";
+            var orderDirection = datatable.Order[0].Dir;
 
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.Specialization));
@@ -193,7 +194,7 @@ namespace WebApplication.Api
             if (string.IsNullOrWhiteSpace(datatable.Predicate))
             {
                 employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(null, null, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
             }
 
             if (datatable.Predicate == "CompanyEdit")
@@ -202,7 +203,7 @@ namespace WebApplication.Api
                 Expression<Func<Employee, bool>> filter =
                     (x => x.CompanyId == datatable.GenericId || x.CompanyId == null);
                 employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
             if (datatable.Predicate == "WorkPlaceEdit")
             {
@@ -213,7 +214,7 @@ namespace WebApplication.Api
                 .Any(z => z.Id == datatable.GenericId)));
 
                 employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
             if (datatable.Predicate == "TimeShiftEdit")
             {
@@ -223,7 +224,7 @@ namespace WebApplication.Api
                     .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId);
 
                 employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
             if (datatable.Predicate == "RealWorkHourCurrentDay")
             {
@@ -234,13 +235,13 @@ namespace WebApplication.Api
                     .Any(y => y.StartOn.Date == today.Date);
 
                 employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(null, filter, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
             if (datatable.Predicate == "ProjectionDifference")
             {
-
                 employees = await _baseDataWork.Employees
-                    .ProjectionDifference(null, datatable.StartOn, datatable.EndOn,pageSize, pageIndex);
+                    .ProjectionDifference(SetOrderBy(columnName, orderDirection), datatable.StartOn, datatable.EndOn,
+                    datatable.GenericId, pageSize, pageIndex);
             }
 
             var mapedData = MapResults(employees, datatable);
@@ -339,24 +340,41 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "ProjectionDifference")
                 {
-                    var workHourDate = "Δηλώθηκαν οι:</br>";
-                    //if (employee.RealWorkHours.Count() > 0)
-                    //    foreach (var realWorkHour in employee.RealWorkHours)
-                    //    {
-                    //        dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
-                    //        foreach (var workHour in realWorkHour.TimeShift.WorkHours)
-                    //        {
-                    //            workHourDate = workHourDate + workHour.StartOn + " - " + workHour.EndOn + "</br>";
-                    //        }
-                    //        dictionary.Add("WorkHourDate", workHourDate);
-                    //    }
+                    if (employee.RealWorkHours.Count() > 0)
+                        foreach (var realWorkHour in employee.RealWorkHours)
+                        {
+                            expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+                            dictionary = (IDictionary<string, object>)expandoObj;
+                            dictionary.Add("ScpecializationName", employee.Specialization.Name);
+                            dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
+                            returnObjects.Add(expandoObj);
 
-                    dictionary.Add("RealWorkHourDate", "asdasdasdasdasdasd");
-                    dictionary.Add("WorkHourDate", "asdasdasd");
-                    returnObjects.Add(expandoObj);
+                        }
+                    if (employee.WorkHours.Count() > 0)
+                        foreach (var workHour in employee.WorkHours)
+                        {
+                            expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+                            dictionary = (IDictionary<string, object>)expandoObj;
+                            dictionary.Add("ScpecializationName", employee.Specialization.Name);
+                            dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
+                            returnObjects.Add(expandoObj);
+                        }
                 }
+
             }
             return returnObjects;
+        }
+
+        private Func<IQueryable<Employee>, IOrderedQueryable<Employee>> SetOrderBy(string columnName, string orderDirection)
+        {
+            if (columnName == "WorkHourDate")
+                return x => x.OrderBy(y => y.WorkHours.OrderBy(z => z.StartOn));
+            else if (columnName == "RealWorkHourDate")
+                return x => x.OrderBy(y => y.RealWorkHours.OrderBy(z => z.StartOn));
+            else if (columnName != "")
+                return x => x.OrderBy(columnName+" " + orderDirection.ToUpper());
+            else 
+                return null;
         }
 
 

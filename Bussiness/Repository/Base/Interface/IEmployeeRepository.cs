@@ -11,10 +11,11 @@ namespace Business.Repository.Interface
     public interface IEmployeeRepository : IBaseRepository<Employee>
     {
         Task<List<Employee>> ProjectionDifference(
-     Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderingInfo,
-     DateTime startOn,
-     DateTime endOn,
-     int pageSize = 10,
-     int pageIndex = 1);
+            Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderingInfo,
+            DateTime startOn,
+            DateTime endOn,
+            int workPlaceId = 0,
+            int pageSize = 10,
+            int pageIndex = 1);
     }
 }
