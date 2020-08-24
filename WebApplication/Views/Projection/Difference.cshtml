@@ -22,7 +22,6 @@
             <div class="box-body">
                 <div style="width:100%;">
                     <div style="width:50%; float:left;">
-
                         <div class="form-group">
                             <label class="control-label">Πόστο</label>
                             <div class="input-group" style="width:100%">
@@ -39,7 +38,18 @@
 
                     </div>
                 </div>
-
+                <div style="width:100%;">
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Ανα χρονόγραμμα</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderWorkHour">
+                        </div>  
+                    </div>
+                    <div style="width:100%; float:left;">
+                        <label class="control-label">Ανα πραγματική</label>&nbsp
+                        <input type="checkbox"class="filterSlider" id="SliderRealWorkHour">
+                    </div>
+                </div>
 
 
             </div>
@@ -92,6 +102,12 @@
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
+        const GetSliderWorkHourValue = () =>
+            document.getElementById('SliderWorkHour').checked == true;
+
+        const GetSliderRealWorkHourValue = () =>
+            document.getElementById('SliderRealWorkHour').checked == true;
+
         const GetStartOn = () =>
             moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm');
@@ -123,8 +139,24 @@
                 }
             }
         }).on('change', () =>
-            $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload(),
-        );
+            $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
+
+        $('#SliderWorkHour').bootstrapToggle({
+            on: '',
+            off: ''
+        });
+
+        $('#SliderRealWorkHour').bootstrapToggle({
+            on: '',
+            off: ''
+        });
+
+        
+
+        $('.filterSlider').change(e => $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
+        //$('#SliderRealWorkHour').change(() => $('#SliderWorkHour').bootstrapToggle('off'));
+        //$('#SliderRealWorkHour').change(() => $('#SliderWorkHour').bootstrapToggle('off'));
+
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
             startOnMonday: true,
@@ -157,6 +189,8 @@
                         data.genericId = GetSelectedWorkPlaceId();
                     data.StartOn = GetStartOn();
                     data.EndOn = GetEndOn();
+                    data.filterByWorkHour = GetSliderWorkHourValue();
+                    data.filterByRealWorkHour = GetSliderRealWorkHourValue();
 
                     return JSON.stringify(data);
                 }

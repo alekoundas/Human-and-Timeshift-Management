@@ -340,25 +340,31 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "ProjectionDifference")
                 {
-                    if (employee.RealWorkHours.Count() > 0)
-                        foreach (var realWorkHour in employee.RealWorkHours)
-                        {
-                            expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
-                            dictionary = (IDictionary<string, object>)expandoObj;
-                            dictionary.Add("ScpecializationName", employee.Specialization.Name);
-                            dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
-                            returnObjects.Add(expandoObj);
+                    if (datatable.FilterByRealWorkHour == true || 
+                        (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
+                        if (employee.RealWorkHours.Count() > 0)
+                            foreach (var realWorkHour in employee.RealWorkHours)
+                            {
+                                expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+                                dictionary = (IDictionary<string, object>)expandoObj;
+                                dictionary.Add("ScpecializationName", employee.Specialization.Name);
+                                dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
+                                returnObjects.Add(expandoObj);
 
-                        }
-                    if (employee.WorkHours.Count() > 0)
-                        foreach (var workHour in employee.WorkHours)
-                        {
-                            expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
-                            dictionary = (IDictionary<string, object>)expandoObj;
-                            dictionary.Add("ScpecializationName", employee.Specialization.Name);
-                            dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
-                            returnObjects.Add(expandoObj);
-                        }
+                            }
+                    
+                    if (datatable.FilterByWorkHour == true || 
+                        (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
+                        if (employee.WorkHours.Count() > 0)
+                            foreach (var workHour in employee.WorkHours)
+                            {
+                                expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+                                dictionary = (IDictionary<string, object>)expandoObj;
+                                dictionary.Add("ScpecializationName", employee.Specialization.Name);
+                                dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
+                                returnObjects.Add(expandoObj);
+                            }
+                    
                 }
 
             }
@@ -372,8 +378,8 @@ namespace WebApplication.Api
             else if (columnName == "RealWorkHourDate")
                 return x => x.OrderBy(y => y.RealWorkHours.OrderBy(z => z.StartOn));
             else if (columnName != "")
-                return x => x.OrderBy(columnName+" " + orderDirection.ToUpper());
-            else 
+                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+            else
                 return null;
         }
 

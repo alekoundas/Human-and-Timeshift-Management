@@ -61,7 +61,9 @@ namespace DataAccess.Models.Datatable
         [JsonProperty(PropertyName = "endOn")]
         public DateTime EndOn { get; set; }
 
-        [JsonProperty(PropertyName = "MyProperty", Required = Required.Default)]
-        public int MyProperty { get; set; }
+        [JsonProperty(PropertyName = "filterByWorkHour")]
+        public bool FilterByWorkHour { get; set; }
+        [JsonProperty(PropertyName = "filterByRealWorkHour")]
+        public bool FilterByRealWorkHour { get; set; }
     }
 }

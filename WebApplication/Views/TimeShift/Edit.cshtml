@@ -1229,8 +1229,8 @@
         //Cleanup on modal close
         $('#EditWorkHour_Modal').on('hidden.bs.modal', (e) => {
             $('.ElementToDeleteOnClose').remove();
-            $('#EmployeesWorkhoursDatatable').DataTable().clear().destroy();
-            Datatable();
+            $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
+            //Datatable();
         })
     </script>
 
@@ -1364,8 +1364,10 @@
         //Cleanup on modal close
         $('#AddWorkHour_Modal').on('hidden.bs.modal', e => {
             $('.ElementToDeleteOnClose').remove();
-            $('#EmployeesWorkhoursDatatable').DataTable().clear().destroy();
-            Datatable();
+            //$('#EmployeesWorkhoursDatatable').DataTable().clear().destroy();
+            //Datatable();
+            $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
+
             count = 0;
         })
     </script>
@@ -1587,7 +1589,7 @@
                     return JSON.stringify(data);
                 }
             },
-            order: [[0, 'desc']],
+            order: [[1, 'desc']],
             columns: CreateDatatableColumns(),
             rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
                 for (var i = 1; i <= DateConstants().DaysInMonth; i++) {
