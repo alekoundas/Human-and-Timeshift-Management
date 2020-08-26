@@ -11,5 +11,6 @@ namespace Bussiness.Repository.Security.Interface
     {
         Task<List<ApplicationRole>> GetRolesFormLoggedInUserEmail(UserManager<ApplicationUser> userManager, string userEmail);
         Task<List<ApplicationRole>> GetRolesFormUserId(string userId);
+        Task<List<IdentityUserRole<string>>> GetUserRolesToDelete(List<string> idsToDelete, string userId);
     }
 }

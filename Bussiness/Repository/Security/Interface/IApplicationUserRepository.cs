@@ -17,11 +17,9 @@ namespace Archium.Security.Core.Repositories
            int pageSize = 10,
            int pageIndex = 1);
         Task<ApplicationUser> UpdateUser(ApplicationUser applicationUser, UserManager<ApplicationUser> userManager);
-        //IEnumerable<ApplicationUser> SearchWithProfile(
-        //    Expression<Func<ApplicationUser, bool>> predicate,
-        //    Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> orderingInfo = null,
-        //    int pageSize = 10,
-        //    int pageIndex = 1);
+
+        Task<ApplicationRole> GetRoleByWorkPlaceAndUser(string workPlaceId, string employeeId);
+
 
     }
 }

@@ -92,8 +92,8 @@ namespace WebApplication.Api
             var filter = PredicateBuilder.New<Employee>();
             var parentFilter = filter;
 
-            if (select2.ExistingEmployees?.Count > 0)
-                foreach (var employeeId in select2.ExistingEmployees)
+            if (select2.ExistingIds?.Count > 0)
+                foreach (var employeeId in select2.ExistingIds)
                     filter = filter.And(x => x.Id != employeeId);
             if (select2.Search != null)
                 filter = filter.And(x =>
@@ -121,8 +121,8 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<Employee>();
 
-            if (select2.ExistingEmployees?.Count > 0)
-                foreach (var employeeId in select2.ExistingEmployees)
+            if (select2.ExistingIds?.Count > 0)
+                foreach (var employeeId in select2.ExistingIds)
                     filter = filter.And(x => x.Id != employeeId);
 
 
@@ -140,7 +140,7 @@ namespace WebApplication.Api
                        x.LastName.Contains(select2.Search)
                    )
                 );
-                if (select2.ExistingEmployees.Count > 0)
+                if (select2.ExistingIds.Count > 0)
                     employees = (List<Employee>)await _baseDataWork.Employees
                       .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
             }

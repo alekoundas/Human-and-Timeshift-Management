@@ -23,11 +23,11 @@ namespace WebApplication.Api.Security
 {
     [Route("api/users/")]
     [ApiController]
-    public class UserDataController : ControllerBase
+    public class UserApiController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SecurityDataWork _securityDatawork;
-        public UserDataController(UserManager<ApplicationUser> userManager,
+        public UserApiController(UserManager<ApplicationUser> userManager,
           SecurityDbContext securityDbContext)
         {
             _securityDatawork = new SecurityDataWork(securityDbContext);

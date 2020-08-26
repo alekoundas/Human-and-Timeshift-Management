@@ -407,7 +407,7 @@
             timeShiftId: DateConstants().TimeShiftId,
             search: params.term,
             page: params.page || 1,
-            existingEmployees: GetWorkHourEmployeeIds(workHourId)
+            existingIds: GetWorkHourEmployeeIds(workHourId)
         });
 
         const BuildSelect2Dto = (params) => ({

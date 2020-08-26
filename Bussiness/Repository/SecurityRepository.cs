@@ -65,6 +65,10 @@ namespace Bussiness.Repository
         {
             return _set.FirstOrDefault(predicate);
         }
+        public async Task<TEntity >FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _set.FirstOrDefaultAsync(predicate);
+        }
 
         public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
         {

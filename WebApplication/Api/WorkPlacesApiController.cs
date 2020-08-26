@@ -12,6 +12,8 @@ using WebApplication.Utilities;
 using DataAccess.Models.Datatable;
 using System.Dynamic;
 using Bussiness.Service;
+using LinqKit;
+using DataAccess.Models.Select2;
 
 namespace WebApplication.Api
 {
@@ -121,6 +123,31 @@ namespace WebApplication.Api
 
             return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
         }
+
+        // POST: api/workplaces/select2filtered
+        [HttpPost("select2filtered")]
+        public async Task<ActionResult<WorkPlace>> Select2Filtered([FromBody] Select2FilteredGet select2)
+        {
+            var workPlaces = new List<WorkPlace>();
+            var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<WorkPlace>();
+            filter = filter.And(x => true);
+
+            if (select2.ExistingIds?.Count > 0)
+                foreach (var workPlaceId in select2.ExistingIds)
+                    filter = filter.And(x => x.Id != workPlaceId);
+
+            if (!string.IsNullOrWhiteSpace(select2.Search))
+                filter = filter.And(x => x.Title.Contains(select2.Search));
+
+            workPlaces = await _baseDataWork
+             .WorkPlaces
+             .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+
+            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
+        }
+
+
 
         [HttpGet("manageworkplaceemployee/{employeeId}/{workPlaceId}/{toggleState}")]
         public async Task<ActionResult<WorkPlace>> ManageWorkPlaceEmployee(int employeeId, int workPlaceId, string toggleState)

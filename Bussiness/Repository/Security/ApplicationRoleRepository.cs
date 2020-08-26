@@ -8,6 +8,7 @@ using Archium.Security.Core.Repositories;
 using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models.Identity;
+using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,15 +22,36 @@ namespace Bussiness.Repository.Security
             _dbContext = dbContext;
         }
 
-        public SecurityDbContext SecurityDbContext 
+        public SecurityDbContext SecurityDbContext
         {
             get { return Context as SecurityDbContext; }
         }
 
+        public async Task<List<ApplicationRole>> GetWorkPlaceRolesByUserId(string userId)
+        {
+            var filter = PredicateBuilder.New<ApplicationRole>();
+
+            var userRoles = await SecurityDbContext.UserRoles
+                .Where(x => x.UserId == userId).ToListAsync();
+
+            foreach (var userRole in userRoles)
+                filter = filter.Or(x => x.Id == userRole.RoleId );
+
+            filter = filter.And(x => x.Name == "Specific_WorkPlace");
+
+            return SecurityDbContext.Roles
+                .Where(filter)
+                .ToList();
+        }
         public async Task<List<string>> GetAvailableControllers()
         {
             return await SecurityDbContext.Roles.Select(x => x.Controller)
                 .Distinct().ToListAsync();
+        }
+
+        public bool IsWorkPlaceIdAnExistingRole(string workPlaceId)
+        {
+            return SecurityDbContext.Roles.Any(x => x.WorkPlaceId == workPlaceId);
         }
 
     }

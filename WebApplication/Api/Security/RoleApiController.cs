@@ -16,11 +16,11 @@ namespace WebApplication.Api.Security
 {
     [Route("api/role")]
     [ApiController]
-    public class RoleDataController : ControllerBase
+    public class RoleApiController : ControllerBase
     {
 
         private readonly SecurityDataWork _securityDatawork;
-        public RoleDataController(SecurityDbContext securityDbContext)
+        public RoleApiController(SecurityDbContext securityDbContext)
         {
             _securityDatawork = new SecurityDataWork(securityDbContext);
         }

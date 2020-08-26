@@ -13,11 +13,11 @@ namespace DataAccess.Models.Select2
         [JsonProperty(PropertyName = "page", Required = Required.Default)]
         public int Page { get; set; }
 
-        [JsonProperty(PropertyName = "timeShiftId", Required = Required.Default)]
+        [JsonProperty(PropertyName = "timeShiftId")]
         public int TimeShiftId { get; set; }
 
-        [JsonProperty(PropertyName = "existingEmployees", Required = Required.Default)]
-        public List<int> ExistingEmployees { get; set; }
+        [JsonProperty(PropertyName = "existingIds")]
+        public List<int> ExistingIds { get; set; }
 
     }
 }

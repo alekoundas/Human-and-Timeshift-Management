@@ -10,5 +10,7 @@ namespace DataAccess.Models.Identity
     {
         public string Controller { get; set; }
         public string Permition { get; set; }
+        public string WorkPlaceName { get; set; }
+        public string WorkPlaceId { get; set; }
     }
 }

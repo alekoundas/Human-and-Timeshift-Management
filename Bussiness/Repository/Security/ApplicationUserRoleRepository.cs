@@ -7,6 +7,7 @@ using Business.ViewModels;
 using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models.Identity;
+using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,7 @@ namespace Bussiness.Repository.Security
                 .Result.Id.ToString();
 
             var userRoles = await SecurityDbContext.UserRoles
-                .Where(x =>x.UserId == loggedInUserId)
+                .Where(x => x.UserId == loggedInUserId)
                 .ToListAsync();
 
             if (userRoles.Count() > 0)
@@ -40,20 +41,47 @@ namespace Bussiness.Repository.Security
                 return new List<ApplicationRole>();
         }
 
-        public async Task<List<ApplicationRole>> GetRolesFormUserId( string userId)
+        public async Task<List<IdentityUserRole<string>>> GetUserRolesToDelete(List<string> idsToDelete, string userId)
+        {
+            var filterUserRole = PredicateBuilder.New<IdentityUserRole<string>>();
+            var filterRole = PredicateBuilder.New<ApplicationRole>();
+            //filterRole = filterRole.And(x => );
+
+
+            var userRoles = await SecurityDbContext.UserRoles
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            foreach (var userRole in userRoles)
+                foreach (var idToDelete in idsToDelete)
+                    filterRole = filterRole.Or(x => x.WorkPlaceId == idToDelete &&
+                    x.Id == userRole.RoleId &&
+                    x.Name== "Specific_WorkPlace"
+                    );
+
+            var roles = await SecurityDbContext.Roles
+                .Where(filterRole)
+                .ToListAsync();
+
+            foreach (var role in roles)
+                filterUserRole = filterUserRole.Or(x => x.RoleId == role.Id);
+
+            return userRoles.Where(filterUserRole).ToList();
+        }
+        public async Task<List<ApplicationRole>> GetRolesFormUserId(string userId)
         {
 
             //var userRoles = await SecurityDbContext.UserRoles
-               //.Where(x => x.UserId == userId).ToListAsync();
+            //.Where(x => x.UserId == userId).ToListAsync();
 
             //var roles = await SecurityDbContext.Roles.ToListAsync();
 
-            var userRoles =  SecurityDbContext.UserRoles
+            var userRoles = SecurityDbContext.UserRoles
                 .Where(x => x.UserId == userId).ToList();
 
-            var roles =  SecurityDbContext.Roles.ToList();
+            var roles = SecurityDbContext.Roles.ToList();
             if (userRoles.Count() > 0)
-                return  roles
+                return roles
                     .Where(y => userRoles.Any(z => z.RoleId == y.Id))
                     .ToList();
             else

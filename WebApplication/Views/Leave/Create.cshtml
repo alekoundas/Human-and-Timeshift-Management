@@ -93,7 +93,7 @@
         const BuildSelect2Dto = params => ({
             search: params.term,
             page: params.page || 1,
-            existingEmployees: GetAlreadyAppendedEmployeeIds()
+            existingIds: GetAlreadyAppendedEmployeeIds()
         });
 
         const BuildHasOverlapDto = employeeId => ({

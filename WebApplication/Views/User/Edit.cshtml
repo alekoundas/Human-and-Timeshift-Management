@@ -1,4 +1,4 @@
-﻿@model DataAccess.Models.Identity.ApplicationUser;
+﻿@model DataAccess.ViewModels.UserRole.ControllerGetEdit;
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -34,20 +34,20 @@
                     </div>
 
                     @*<div class="form-group">
-                        <label asp-for="" class="control-label"></label>
-                        <div class="input-group">
-                            <input type="text" asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" aria-label="Email" placeholder="Email" class="text-danger"></span>
+                            <label asp-for="" class="control-label"></label>
+                            <div class="input-group">
+                                <input type="text" asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" aria-label="Email" placeholder="Email" class="text-danger"></span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label asp-for="Email" class="control-label"></label>
-                        <div class="input-group">
-                            <input type="text" asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" aria-label="Email" placeholder="Email" class="text-danger"></span>
-                        </div>
-                    </div>*@
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <div class="input-group">
+                                <input type="text" asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" aria-label="Email" placeholder="Email" class="text-danger"></span>
+                            </div>
+                        </div>*@
 
                     <div class="form-group pull-right">
                         <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
@@ -63,8 +63,8 @@
 
 
 <div class="row">
-    <div class="col-md-3"> </div>
-    <div class="col-md-6">
+    <div class="col-md-1"> </div>
+    <div class="col-md-5">
 
         <div class="box box-danger" style="margin-top:5%;">
 
@@ -97,21 +97,240 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3"> </div>
+    <div class="col-md-1"> </div>
+    <div class="col-md-4">
+
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">Φιλτράρισμα αποτελεσμάτων με βάση συγκεκριμένα πόστα</h3>
+            </div>
+            <hr />
+            <div class="box-body">
+                <div style="width:100%;" id="BoxWorkPlace">
+                    <div style="width:100%; float:left;">
+                        Προσθήκη πόστου
+                        <button id="ButtonAddWorkPlace" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                    </div>
+
+                    <div style="width:100%; float:left;" id="DivToAppendSelect2"></div>
+
+                    <div class="form-group pull-right">
+                        <button @*style="display:none;"*@ value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveWorkPlaces">Αποθήκευση</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-1"> </div>
 
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        var Select2Count = 0;
+        var WorkPlaceRoleIds = @Html.Raw(Json.Serialize(Model.WorkPlaceRoles))
+        var UserId = @Html.Raw(Json.Serialize(Model.Id))
+
+
+        const BuildSelect2DtoNum = params => ({
+            search: params.term,
+            page: params.page || 1,
+            existingIds: GetSelectedWokPlaceIds()
+        });
+
+        const BuildUpdateWorkPlaceRolesDto = () => ({
+            userId: UserId,
+            workPlaceValues: BuildWokPlaceValuesDto(),
+            workPlaceIdsToDelete: GetToDeleteWokPlaceIds()
+        });
+
+        const BuildWokPlaceValuesDto = () =>
+            [...document.getElementsByClassName('WorkPlaceSelect2')]
+                .filter(select2 => select2.value != '' &&
+                    !IsSelect2ToBeDeleted(select2.id.split('_')[1]) &&
+                    HasChangedValueToSelect2(select2.id.split('_')[1]))
+                .map(select2 => ({
+                    existingWorkPlaceId: GetDatabaseValueId(select2.id.split('_')[1]),
+                    newWorkPlaceId: select2.value
+                }));
+    </script>
+
+    <!--///////////////////////////////////////-->
+    <!--///             Functions           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+
+        const AppendExistingWorkPlaceRole = role =>
+            document.getElementById('DivToAppendSelect2')
+                .insertAdjacentHTML('beforeend', ExistingSelect2HTML(role));
+
+        const GetSelectedWokPlaceIds = () =>
+            [...document.getElementsByClassName('WorkPlaceSelect2')]
+                .map(select2 => select2.value)
+                .filter(val => val != "");
+
+        const GetDatabaseValueId = num =>
+            document.getElementById('DatabaseValueIdNum_' + num).value;
+
+        const GetDatabaseValueName = num =>
+            document.getElementById('DatabaseValueNameNum_' + num).value;
+
+        const SetDatabaseValueId = (num, value) =>
+            document.getElementById('DatabaseValueIdNum_' + num).value = value;
+
+        const SetDatabaseValueName = (num, value) =>
+            document.getElementById('DatabaseValueNameNum_' + num).value = value;
+
+        const GetNewValuesWokPlaceIds = () =>
+            [...document.getElementsByClassName('WorkPlaceSelect2')]
+                .filter(select2 => document.getElementById('DatabaseValueIdNum_' + select2.id.split('_')[1]).value != select2.value)
+                .map(select2 => select2.value)
+                .filter(val => val != "");
+
+        const GetToDeleteWokPlaceIds = () =>
+            [...document.getElementsByClassName('DivSelect2')]
+                .filter(div => div.style.opacity == '0.5')
+                .map(div => document
+                    .getElementById('WorkPlaceSelect2Num_' + div.id.split('_')[1])
+                    .value)
+                .filter(val => val != "")
+
+        const RefreshWorkPlaceRoles = response => {
+            //remove old divs
+            [...document.getElementsByClassName('DivSelect2')].forEach(div => div.remove());
+            //Append new divs
+            response.forEach(role => {
+                AppendExistingWorkPlaceRole(role);
+                WorkPlaceSelect2(Select2Count);
+            })
+        }
+
+        const IsSelect2ToBeDeleted = num =>
+            document.getElementById('DivSelect2Num_' + num).style.opacity == '0.5';
+
+        const HasChangedValueToSelect2 = num =>
+            document.getElementById('WorkPlaceSelect2Num_' + num).value != document.getElementById('DatabaseValueIdNum_' + num).value;
+
+        //Add WorkPlace Select2
+        $('#ButtonAddWorkPlace').on('click', () => {
+            document.getElementById('DivToAppendSelect2')
+                .insertAdjacentHTML('beforeend', NewSelect2HTML());
+
+            WorkPlaceSelect2(Select2Count);
+        });
+
+        //Edit WorkPlace
+        $('#BoxWorkPlace').on('click', '.Select2EditButton', e => {
+            HandleSelect2State(e.target.id.split('_')[1]);
+        })
+
+        //Undo WorkPlace
+        $('#BoxWorkPlace').on('click', '.Select2UndoButton', e => {
+            var num = e.target.id.split('_')[1];
+            HandleSelect2State(num);
+            $('#WorkPlaceSelect2Num_' + num).select2('data', {
+                id: GetDatabaseValueId(num),
+                text: GetDatabaseValueName(num)
+            });
+
+
+        })
+
+
+        //Save WorkPlaces
+        $('#BoxWorkPlace').on('click', '#ButtonSaveWorkPlaces', e => {
+            $.ajax({
+                type: "POST",
+                url: '/api/userrole/updateworkplaceroles',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(BuildUpdateWorkPlaceRolesDto())
+            }).done(response => RefreshWorkPlaceRoles(response));
+        })
+
+
+        //Delete WorkPlace
+        $('#BoxWorkPlace').on('click', '.Select2DeleteButton', e => {
+            var num = e.target.id.split('_')[1];
+            if (document.getElementById('DatabaseValueIdNum_' + num).value == '')
+                document.getElementById('DivSelect2Num_' + num).remove()
+            else
+                document.getElementById('DivSelect2Num_' + num).style.opacity = '0.5';
+
+
+        });
+
+
+        const HandleSelect2State = workPlaceId => {
+            var editButton = document
+                .getElementById('Select2EditButtonNum_' + workPlaceId);
+
+            var undoButton = document
+                .getElementById('Select2UndoButtonNum_' + workPlaceId);
+
+            var deleteButton = document
+                .getElementById('Select2DeleteButtonNum_' + workPlaceId);
+
+            var select2 = document
+                .getElementById('WorkPlaceSelect2Num_' + workPlaceId);
+
+            if (editButton.style.display == '') {
+                editButton.style.display = 'none';
+                undoButton.style.display = '';
+                deleteButton.style.display = '';
+                select2.disabled = false;
+            } else {
+                editButton.style.display = '';
+                undoButton.style.display = 'none';
+                deleteButton.style.display = 'none';
+                select2.disabled = true;
+            }
+        }
+    </script>
+
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+
+        //WorkPlaces Select2
+        const WorkPlaceSelect2 = Select2Count => {
+            $('#WorkPlaceSelect2Num_' + Select2Count).select2({
+                ajax: {
+                    type: "POST",
+                    url: '/api/workplaces/select2filtered',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: params => JSON.stringify(BuildSelect2DtoNum(params))
+                }
+            }).on('change', (e) => {
+                //ButtonLoadingToggle("SaveWorkHours").then(() => {
+                //    if (!ValidateNullInputs(workHourId))
+                //        ValidateEmployeesWithRangeToWorkhour(workHourId);
+                //})
+                //    .then(() => ButtonLoadingToggle("SaveWorkHours"))
+
+                //HandleSubmitButton();
+            });
+        }
 
         jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+            console.log(WorkPlaceRoleIds);
+            //Append existing workplaces
+            [...WorkPlaceRoleIds].forEach(role => {
+                AppendExistingWorkPlaceRole(role);
+                WorkPlaceSelect2(Select2Count);
+            });
 
-            var table = $('#rolesDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
+
+             $('#rolesDatatable').DataTable({
+                serverSide: true,
+                dom: 'frtlp',
+                ajax: {
                     url: '/api/role/get',
                     type: 'POST',
                     contentType: "application/json",
@@ -121,13 +340,13 @@
                     }
                 },
                 order: [[0, 'desc']],
-                "columns": [
+                columns: [
                     {
-                        "data": "Name",
-                        "searchable": true,
-                        "orderable": true,
+                        data: "Name",
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
-                            console.log(data);
+                            //console.log(data);
                             if (data.Name != null)
                                 return data.Name;
                             else
@@ -135,9 +354,9 @@
                         }
                     },
                     {
-                        "data": "View",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "View",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.View != null)
                                 return data.View.result;
@@ -146,9 +365,9 @@
                         }
                     },
                     {
-                        "data": "Edit",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Edit",
+                       searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Edit != null)
                                 return data.Edit.result ;
@@ -157,9 +376,9 @@
                         }
                     },
                     {
-                        "data": "Create",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Create",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Create != null)
                                 return data.Create.result;
@@ -168,9 +387,9 @@
                         }
                     },
                     {
-                        "data": "Delete",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Delete",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Delete != null)
                                 return data.Delete.result;
@@ -186,19 +405,17 @@
 
     <script>
         $('#rolesDatatable').on("change", ".PermitionCheckbox", (data) => {
-
             var userId = data.target.attributes['userid'].nodeValue;
             var roleId = data.target.attributes['roleid'].nodeValue;
-
             var apiUrl = "/api/userrole/delete/" + userId + "/" + roleId;
-            if (data.target.checked) 
+
+            if (data.target.checked)
                 apiUrl = "/api/userrole/add/" + userId + "/" + roleId;
 
-            //var permition = data.target.id.split('_')[1];//ex. Employee_Delete
             var userId = data.target.attributes['userid'].nodeValue;
             var roleId = data.target.attributes['roleid'].nodeValue;
             $.ajax({
-                url: apiUrl ,
+                url: apiUrl,
                 type: "POST",
                 success: function (data, textStatus, jqXHR) {
                     console.log('success');
@@ -207,9 +424,40 @@
                     console.log('error');
                 }
             });
-
-
         });
+
+
+
+        const NewSelect2HTML = () => '' +
+            '<div style="width:100%; padding-top:10px;"class="DivSelect2"  id="DivSelect2Num_' + ++Select2Count + '">' +
+            '<div style="width: 60%; float: left;">' +
+            '<input style="display: none;" id="DatabaseValueIdNum_' + Select2Count + '"/>' +
+            '<select id="WorkPlaceSelect2Num_' + Select2Count + '"class="WorkPlaceSelect2" style="width:100%"></select >' +
+            '</div >' +
+            '<div style="width: 5%; float: left;">&nbsp;</div >' +
+            '<div style="width: 20%; float: left;">' +
+            '<button style="display:none;" class= "btn btn-warning Select2EditButton" id="Select2EditButtonNum_' + Select2Count + '"> <i class="fa fa-pencil Select2EditButton" id="Select2EditFafaNum_' + Select2Count + '"></i></button >' +
+            '<button class= "btn btn-danger Select2DeleteButton" id="Select2DeleteButtonNum_' + Select2Count + '"> <i class="fa fa-trash Select2DeleteButton" id="Select2DeleteFafaNum_' + Select2Count + '"></i></button >' +
+            '</div >' +
+            '</div >';
+
+        const ExistingSelect2HTML = role => '' +
+            '<div style="width:100%; padding-top:10px;"class="DivSelect2" id="DivSelect2Num_' + ++Select2Count + '">' +
+            '<div style="width: 60%; float: left;">' +
+            '<input style="display: none;" id="DatabaseValueIdNum_' + Select2Count + '" value="' + role.workPlaceId + '"/>' +
+            '<input style="display: none;" id="DatabaseValueNameNum_' + Select2Count + '" value="' + role.Name + '"/>' +
+            '<select id="WorkPlaceSelect2Num_' + Select2Count + '"class="WorkPlaceSelect2" style="width:100%" disabled>' +
+            '<option value="' + role.workPlaceId + '" selected="selected">' + role.name + '</option>' +
+            '</select >' +
+            '</div >' +
+            '<div style="width: 5%; float: left;">&nbsp;</div >' +
+            '<div style="width: 20%; float: left;">' +
+            '<button style="display:none;" class= "btn btn-primary Select2UndoButton" id="Select2UndoButtonNum_' + Select2Count + '"> <i class="fa fa-pencil Select2UndoButton" id="Select2UndoFafaNum_' + Select2Count + '"></i></button >' +
+            '<button class= "btn btn-warning Select2EditButton" id="Select2EditButtonNum_' + Select2Count + '"> <i class="fa fa-pencil Select2EditButton" id="Select2EditFafaNum_' + Select2Count + '"></i></button >' +
+            '<button style="display:none;" class= "btn btn-danger Select2DeleteButton" id="Select2DeleteButtonNum_' + Select2Count + '"> <i class="fa fa-trash Select2DeleteButton" id="Select2DeleteFafaNum_' + Select2Count + '"></i></button >' +
+            '</div >' +
+            '</div >';
+
     </script>
 
 

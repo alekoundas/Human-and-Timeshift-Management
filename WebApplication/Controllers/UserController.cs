@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models;
 using DataAccess.Models.Identity;
+using DataAccess.ViewModels.UserRole;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -65,7 +68,7 @@ namespace WebApplication.Controllers
 
         // GET:  User/Edit/Id
         [Authorize(Roles = "User_Edit")]
-        public IActionResult Edit(string id)
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
@@ -79,14 +82,27 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
             //ViewData["PhoneId"] = new SelectList(_context.Phone, "Id", "Id", contact.PhoneId);
-            return View(user);
+
+            var returnViewModel = ControllerGetEdit.CreateFrom(user);
+            returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
+
+            var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
+                .GetWorkPlaceRolesByUserId(user.Id);
+
+            returnViewModel.WorkPlaceRoles = applicationWorkPlaceRoles
+                .Select(x => new WorkPlaceRoleValues
+                {
+                    WorkPlaceId = x.WorkPlaceId,
+                    Name = x.WorkPlaceName
+                }).ToList();
+            return View(returnViewModel);
         }
 
         // POST:  User/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "User_Edit")]
-        public async Task<IActionResult> Edit(string  id, ApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(string id, ApplicationUser applicationUser)
         {
             if (id != applicationUser.Id)
             {
@@ -98,8 +114,8 @@ namespace WebApplication.Controllers
                 try
                 {
                     applicationUser.UserName = applicationUser.Email;
-                    await _datawork.ApplicationUsers.UpdateUser(applicationUser,_userManager);
-                    _datawork.Complete() ;
+                    await _datawork.ApplicationUsers.UpdateUser(applicationUser, _userManager);
+                    await _datawork.SaveChangesAsync();
                     TempData["StatusMessage"] = "Ο χρήστης ενημερώθηκε με επιτυχία.";
 
                 }

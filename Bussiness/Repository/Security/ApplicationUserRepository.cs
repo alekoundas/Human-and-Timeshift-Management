@@ -9,6 +9,7 @@ using Bussiness.Repository;
 using Bussiness.Repository.Interface;
 using DataAccess;
 using DataAccess.Models.Identity;
+using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,20 @@ namespace Business.Repository
         }
 
 
+
+        public async Task<ApplicationRole>GetRoleByWorkPlaceAndUser(string workPlaceId,string userId)
+        {
+            var filter = PredicateBuilder.New<ApplicationRole>();
+
+            var userRoles = await SecurityDbContext.UserRoles
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            foreach (var userRole in userRoles)
+                filter = filter.Or(x => x.Id == userRole.RoleId && x.WorkPlaceId == workPlaceId);
+
+            return await SecurityDbContext.Roles.FirstOrDefaultAsync(filter);
+        }
 
         public List<ApplicationUser> GetUsersByPredicate(string searchterm)
         {

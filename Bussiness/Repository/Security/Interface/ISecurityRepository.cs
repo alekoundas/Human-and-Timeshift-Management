@@ -22,7 +22,8 @@ namespace Bussiness.Repository.Security.Interface
         int CountAll();
 
         int Count(Expression<Func<TEntity, bool>> predicate);
-
+        Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+        TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate);
         TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);
 
         bool Any(Expression<Func<TEntity, bool>> predicate);

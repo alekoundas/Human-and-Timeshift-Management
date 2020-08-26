@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Archium.Security.Core.Repositories;
 using Business.Repository;
 using Bussiness.Repository.Security;
@@ -27,9 +28,9 @@ namespace Bussiness
         public IApplicationUserRepository ApplicationUsers { get; }
         public IApplicationUserRoleRepository ApplicationUserRoles { get; }
 
-        public int Complete()
+        public async Task<int> SaveChangesAsync()
         {
-            return _dbcontext.SaveChanges();
+            return await _dbcontext.SaveChangesAsync();
         }
 
         public void Dispose()

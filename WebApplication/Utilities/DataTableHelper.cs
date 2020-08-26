@@ -61,42 +61,46 @@ namespace WebApplication.Utilities
         public async Task<string> GetButtonForRoles(string controller, string permition, string userId)
         {
             var stringToReturn = "";
-
-            var roles = await _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
-
-            if (permition == "View")
+            if (controller != null)
             {
-                var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
-                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                    ? RoleViewCheckbox(true, userId, roleId)
-                    : RoleViewCheckbox(false, userId, roleId);
+
+
+                var roles = await _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
+
+                if (permition == "View")
+                {
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
+                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                        ? RoleViewCheckbox(true, userId, roleId)
+                        : RoleViewCheckbox(false, userId, roleId);
+                }
+
+                if (permition == "Edit")
+                {
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
+                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                        ? RoleEditCheckbox(true, userId, roleId)
+                            : RoleEditCheckbox(false, userId, roleId);
+                }
+
+                if (permition == "Create")
+                {
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
+                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                        ? RoleEditCheckbox(true, userId, roleId)
+                            : RoleEditCheckbox(false, userId, roleId);
+                }
+
+                if (permition == "Delete")
+                {
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
+                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                        ? RoleDeleteCheckbox(true, userId, roleId)
+                            : RoleDeleteCheckbox(false, userId, roleId);
+                }
+
+
             }
-
-            if (permition == "Edit")
-            {
-                var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
-                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                    ? RoleEditCheckbox(true, userId, roleId)
-                        : RoleEditCheckbox(false, userId, roleId);
-            }
-
-            if (permition == "Create")
-            {
-                var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
-                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                    ? RoleEditCheckbox(true, userId, roleId)
-                        : RoleEditCheckbox(false, userId, roleId);
-            }
-
-            if (permition == "Delete")
-            {
-                var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
-                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                    ? RoleDeleteCheckbox(true, userId, roleId)
-                        : RoleDeleteCheckbox(false, userId, roleId);
-            }
-
-
 
             return stringToReturn;
         }
@@ -234,7 +238,7 @@ namespace WebApplication.Utilities
                     "<div style='width:110px; white-space: nowrap;'>" +
                     "<center><p><b>Ρεπό</b></p></center>" +
                      "</div>";
-            else if(cellLeaves.Count()>0)
+            else if (cellLeaves.Count() > 0)
                 return
                     "<div style='width:110px; white-space: nowrap;'>" +
                     "<center><p><b>Άδεια</b></p></center>" +
