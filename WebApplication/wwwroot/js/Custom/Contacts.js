@@ -50,7 +50,6 @@ var LabelAttributes = (label, innerText) => {
 };
 
 var DivInputGroupElement = (name, labelText, className) => {
-
     var inputGroup = DivElement('input-group');
     inputGroup.append(LablelElement(labelText));
     inputGroup.appendChild(InputElement(name, className));

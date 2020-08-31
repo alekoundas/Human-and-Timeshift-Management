@@ -104,7 +104,7 @@
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title">Φιλτράρισμα αποτελεσμάτων με βάση συγκεκριμένα πόστα</h3>
+                <h3 class="box-title">Φιλτράρισμα αποτελεσμάτων εφαρρμογής με βάση συγκεκριμένα πόστα</h3>
             </div>
             <hr />
             <div class="box-body">
@@ -232,14 +232,13 @@
         $('#BoxWorkPlace').on('click', '.Select2UndoButton', e => {
             var num = e.target.id.split('_')[1];
             HandleSelect2State(num);
-            $('#WorkPlaceSelect2Num_' + num).select2('data', {
-                id: GetDatabaseValueId(num),
-                text: GetDatabaseValueName(num)
-            });
+            $('#WorkPlaceSelect2Num_' + num).select2('destroy');
+            $('#WorkPlaceSelect2Num_' + num).append(GetSelect2Option(num));
+            $('#WorkPlaceSelect2Num_' + num).val(GetDatabaseValueId(num));
+            $('#WorkPlaceSelect2Num_' + num).select2();
 
 
         })
-
 
         //Save WorkPlaces
         $('#BoxWorkPlace').on('click', '#ButtonSaveWorkPlaces', e => {
@@ -426,6 +425,7 @@
             });
         });
 
+        const GetSelect2Option = num => '<option value="' + GetDatabaseValueId(num) + '" selected="selected">' + GetDatabaseValueName(num) + '</option>';
 
 
         const NewSelect2HTML = () => '' +

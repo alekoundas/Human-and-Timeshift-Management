@@ -5,10 +5,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <div class="row">
     <div class="col-md-3"> </div>
     <div class="col-md-6">
@@ -17,6 +13,9 @@
 
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonCreateNew("Employee")
+                </div>
             </div>
             <hr />
             <div class="box-body table-responsive">

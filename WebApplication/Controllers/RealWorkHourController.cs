@@ -9,6 +9,7 @@ using DataAccess;
 using DataAccess.Models.Entity;
 using Bussiness;
 using DataAccess.ViewModels.RealWorkHours;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication.Controllers
 {
@@ -24,6 +25,7 @@ namespace WebApplication.Controllers
 
 
         // GET: RealWorkHours
+        [Authorize(Roles = "RealWorkhour_View")]
         public async Task<IActionResult> Index()
         {
             var baseDbContext = _context.RealWorkHours.Include(r => r.Employee).Include(r => r.TimeShift);
@@ -31,6 +33,8 @@ namespace WebApplication.Controllers
         }
 
         // GET: RealWorkHours/Details/5
+        [Authorize(Roles = "RealWorkhour_View")]
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -51,6 +55,8 @@ namespace WebApplication.Controllers
         }
 
         // GET: RealWorkHours/Create
+        [Authorize(Roles = "RealWorkhour_Create")]
+
         public IActionResult Create()
         {
             return View();
@@ -78,6 +84,8 @@ namespace WebApplication.Controllers
         }
 
         // GET: RealWorkHours/Edit/5
+        [Authorize(Roles = "RealWorkhour_Edit")]
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

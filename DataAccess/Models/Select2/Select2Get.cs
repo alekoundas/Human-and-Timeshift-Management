@@ -13,6 +13,9 @@ namespace DataAccess.Models.Select2
         [JsonProperty(PropertyName = "page", Required = Required.Default)]
         public int Page { get; set; }
 
+        [JsonProperty(PropertyName = "timeShiftId")]
+        public int? TimeShiftId { get; set; }
+
         [JsonProperty(PropertyName = "existingIds", Required = Required.Default)]
         public List<int> ExistingIds { get; set; }
 

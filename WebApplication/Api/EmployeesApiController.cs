@@ -90,11 +90,21 @@ namespace WebApplication.Api
             var employees = new List<Employee>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<Employee>();
+
+            
+
             var parentFilter = filter;
+
+            if (select2.TimeShiftId != null)
+                filter = filter.And(x => x.EmployeeWorkPlaces
+                .Any(y => y.WorkPlace.TimeShift
+                    .Any(z => z.Id == select2.TimeShiftId)));
+
 
             if (select2.ExistingIds?.Count > 0)
                 foreach (var employeeId in select2.ExistingIds)
                     filter = filter.And(x => x.Id != employeeId);
+
             if (select2.Search != null)
                 filter = filter.And(x =>
                    x.EmployeeWorkPlaces.Any(y =>
@@ -340,7 +350,7 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "ProjectionDifference")
                 {
-                    if (datatable.FilterByRealWorkHour == true || 
+                    if (datatable.FilterByRealWorkHour == true ||
                         (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
                         if (employee.RealWorkHours.Count() > 0)
                             foreach (var realWorkHour in employee.RealWorkHours)
@@ -352,8 +362,8 @@ namespace WebApplication.Api
                                 returnObjects.Add(expandoObj);
 
                             }
-                    
-                    if (datatable.FilterByWorkHour == true || 
+
+                    if (datatable.FilterByWorkHour == true ||
                         (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
                         if (employee.WorkHours.Count() > 0)
                             foreach (var workHour in employee.WorkHours)
@@ -364,7 +374,7 @@ namespace WebApplication.Api
                                 dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
                                 returnObjects.Add(expandoObj);
                             }
-                    
+
                 }
 
             }

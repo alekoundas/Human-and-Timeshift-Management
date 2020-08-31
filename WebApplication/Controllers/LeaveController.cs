@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Models.Entity;
 using Bussiness;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication.Controllers
 {
@@ -22,11 +23,13 @@ namespace WebApplication.Controllers
         }
 
         // GET: Leave
+        [Authorize(Roles = "Leave_View")]
         public async Task<IActionResult> Index()
         {
             var baseDbContext = _context.Leaves.Include(l => l.Employee);
             return View(await baseDbContext.ToListAsync());
         }
+        [Authorize(Roles = "Leave_View")]
 
         // GET: Leave/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -48,6 +51,7 @@ namespace WebApplication.Controllers
         }
 
         // GET: Leave/Create
+        [Authorize(Roles = "Leave_Create")]
         public IActionResult Create()
         {
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id");
@@ -70,6 +74,7 @@ namespace WebApplication.Controllers
         }
 
         // GET: Leave/Edit/5
+        [Authorize(Roles = "Leave_Edit")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

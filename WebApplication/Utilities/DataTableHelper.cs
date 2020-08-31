@@ -69,15 +69,17 @@ namespace WebApplication.Utilities
 
                 if (permition == "View")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
-                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    if (roleId != null)
+                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
                         ? RoleViewCheckbox(true, userId, roleId)
                         : RoleViewCheckbox(false, userId, roleId);
                 }
 
                 if (permition == "Edit")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    if(roleId!= null)
                     stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
                         ? RoleEditCheckbox(true, userId, roleId)
                             : RoleEditCheckbox(false, userId, roleId);
@@ -85,16 +87,18 @@ namespace WebApplication.Utilities
 
                 if (permition == "Create")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
-                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    if (roleId != null)
+                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
                         ? RoleEditCheckbox(true, userId, roleId)
                             : RoleEditCheckbox(false, userId, roleId);
                 }
 
                 if (permition == "Delete")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition).Id;
-                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    if (roleId != null)
+                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
                         ? RoleDeleteCheckbox(true, userId, roleId)
                             : RoleDeleteCheckbox(false, userId, roleId);
                 }
