@@ -101,7 +101,133 @@
 </div>
 
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="row">
+    <div class="col-md-1"> </div>
+    <div class="col-md-10">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["TitleDatatableWorkPlaces"]</h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Τίτλος</th>
+                            <th>Πελάτη</th>
+                            <th>Βρισκεται στα πόστα</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="true">Τίτλος</th>
+                            <th data-searchable="true">Πελάτη</th>
+                            <th data-searchable="true">Βρισκεται στα πόστα</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"> </div>
 </div>
+@* Add go to edit *@
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="~/js/Custom/Contacts.js"></script>
+
+    <script>
+        $('.Specialization_Select2').select2({
+            ajax: {
+                url: '/api/specializations/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
+        $('.Company_Select2').select2({
+            ajax: {
+                url: '/api/companies/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+    </script>
+
+    <script>
+        $('#WorkPlacesDatatable').DataTable({
+                serverSide: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/workplaces/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+
+                        data.predicate = 'EmployeeDetails';
+                        data.genericId =@Model.Id;
+
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                columns: [
+                    {
+                        data: "Title",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            //console.log(data);
+                            if (data.Title != null)
+                                return data.Title;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "CustomerFullName",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.CustomerFullName != null)
+                                return data.CustomerFullName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "IsInWorkPlace",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.IsInWorkPlace != null)
+                                return data.IsInWorkPlace;
+                            else
+                                return "";
+                        }
+                    }
+                ],
+                fnDrawCallback:  () =>
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    }),
+            });
+
+    </script>
+}

@@ -1,0 +1,55 @@
+﻿@model DataAccess.Models.Identity.ApplicationUser
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonBackToList("User")
+                </div>
+            </div>
+
+            <hr />
+
+            <form asp-controller="User" asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="UserName" class="control-label"></label>
+
+                        <div class="input-group">
+                            <input asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+
+                        <div class="input-group">
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+

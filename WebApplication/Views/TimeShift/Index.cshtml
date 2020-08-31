@@ -24,7 +24,7 @@
                 <table id="TimeShiftsDatatable" class="table table-bordered table-hover table-responsive">
                     <thead>
                         <tr>
-                            
+
                             <th>Τίτλος</th>
                             <th>Ημερομηνία έναρξης</th>
                             <th>Ημερομηνία λήξης</th>
@@ -52,70 +52,65 @@
     <script src="~/js/Custom/DatatableDeleteButton.js"></script>
     <script>
 
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-
-            var table = $('#TimeShiftsDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
-                    url: '/api/timeshifts/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        return JSON.stringify(data);
+        $('#TimeShiftsDatatable').DataTable({
+            serverSide: true,
+            dom: 'frtlp',
+            ajax: {
+                url: '/api/timeshifts/datatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[0, 'desc']],
+            columns: [
+                {
+                    data: "Title",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        console.log(data);
+                        if (data.Title != null)
+                            return data.Title;
+                        else
+                            return "";
                     }
                 },
-                order: [[0, 'desc']],
-                "columns": [
-                    {
-                        "data": "Title",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.Title != null)
-                                return data.Title;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "StartOn",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.StartOn != null)
-                                return data.StartOn;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "EndOn",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.EndOn != null)
-                                return data.EndOn;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Buttons",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
+                {
+                    data: "StartOn",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.StartOn != null)
+                            return data.StartOn;
+                        else
+                            return "";
                     }
-                ]
-            });
+                },
+                {
+                    data: "EndOn",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.EndOn != null)
+                            return data.EndOn;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Buttons",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.Buttons != null)
+                            return data.Buttons;
+                        else
+                            return "";
+                    }
+                }
+            ]
         });
     </script>
 }

@@ -76,8 +76,40 @@
     <div class="col-md-3"> </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+
+
+<div class="row">
+    <div class="col-md-1"> </div>
+    <div class="col-md-10">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Τίτλος</th>
+                            <th>Ημ.Δημιουργίας</th>
+                            <th>Βρισκεται στα πόστα</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="true">Τίτλος</th>
+                            <th data-searchable="true">Ημ.Δημιουργίας</th>
+                            <th data-searchable="true">Βρισκεται στα πόστα</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"> </div>
 </div>
 
 @section Scripts {
@@ -94,6 +126,79 @@
                     return query;
                 }
             }
+        });
+    </script>
+
+    <script>
+        $('#WorkPlacesDatatable').DataTable({
+                serverSide: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/workplaces/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+
+                        data.predicate = 'CustomerEdit';
+                        data.genericId =@Model.Id;
+
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                columns: [
+                    {
+                        data: "Title",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            //console.log(data);
+                            if (data.Title != null)
+                                return data.Title;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "CreatedOn",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.CreatedOn != null)
+                                return data.CreatedOn;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "IsInWorkPlace",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.IsInWorkPlace != null)
+                                return data.IsInWorkPlace;
+                            else
+                                return "";
+                        }
+                    }
+                ],
+                fnDrawCallback:  () =>
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    }),
+            });
+
+        $('#WorkPlacesDatatable').on('change', '.ToggleSliders', (element) => {
+            var apiUrl = element.target.getAttribute('urlattr');
+            $.ajax({
+                type: "GET",
+                url: apiUrl + element.target.checked,
+                dataType: "json",
+                success: response => {
+                    console.log('mmmkeyyyyy');
+                }
+            });
         });
     </script>
 }

@@ -112,9 +112,9 @@
     <script>
 
          $('#CompanyEmployeesDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
+                serverSide: true,
+                dom: 'frtlp',
+                ajax: {
                     url: '/api/employees/datatable',
                     type: 'POST',
                     contentType: "application/json",
@@ -127,11 +127,11 @@
                     }
                 },
                 order: [[0, 'desc']],
-                "columns": [
+                columns: [
                     {
-                        "data": "FirstName",
-                        "searchable": true,
-                        "orderable": true,
+                        data: "FirstName",
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             //console.log(data);
                             if (data.FirstName != null)
@@ -141,9 +141,9 @@
                         }
                     },
                     {
-                        "data": "LastName",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "LastName",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.LastName != null)
                                 return data.LastName;
@@ -152,9 +152,9 @@
                         }
                     },
                     {
-                        "data": "DateOfBirth",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "DateOfBirth",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.DateOfBirth != null)
                                 return data.DateOfBirth;
@@ -163,9 +163,9 @@
                         }
                     },
                     {
-                        "data": "Email",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Email",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Email != null)
                                 return data.Email;
@@ -174,9 +174,9 @@
                         }
                     },
                     {
-                        "data": "ErpCode",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "ErpCode",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.ErpCode != null)
                                 return data.ErpCode;
@@ -185,9 +185,9 @@
                         }
                     },
                     {
-                        "data": "Afm",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Afm",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Afm != null)
                                 return data.Afm;
@@ -196,9 +196,9 @@
                         }
                     },
                     {
-                        "data": "SocialSecurityNumber",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "SocialSecurityNumber",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.SocialSecurityNumber != null)
                                 return data.SocialSecurityNumber;
@@ -207,9 +207,9 @@
                         }
                     },
                     {
-                        "data": "ScpecializationName",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "ScpecializationName",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.ScpecializationName != null)
                                 return data.ScpecializationName;
@@ -218,9 +218,9 @@
                         }
                     },
                     {
-                        "data": "CompanyTitle",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "CompanyTitle",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.CompanyTitle != null)
                                 return data.CompanyTitle;
@@ -229,9 +229,9 @@
                         }
                     },
                     {
-                        "data": "IsInCompany",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "IsInCompany",
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.IsInCompany != null)
                                 return data.IsInCompany;
@@ -240,7 +240,7 @@
                         }
                     }
                 ],
-                "fnDrawCallback": function () {
+                fnDrawCallback: function () {
                     $('.ToggleSliders').bootstrapToggle({
                         on: 'Ναί',
                         off: 'Όχι'

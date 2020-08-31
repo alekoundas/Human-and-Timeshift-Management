@@ -186,7 +186,7 @@ namespace WebApplication.Api
 
         // POST: api/employees/datatable
         [HttpPost("datatable")]
-        public async Task<ActionResult<Employee>> datatable([FromBody] Datatable datatable)
+        public async Task<ActionResult<Employee>> Datatable([FromBody] Datatable datatable)
         {
 
             var total = await _baseDataWork.Employees.CountAllAsync();
@@ -202,10 +202,8 @@ namespace WebApplication.Api
             var employees = new List<Employee>();
 
             if (string.IsNullOrWhiteSpace(datatable.Predicate))
-            {
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
-            }
 
             if (datatable.Predicate == "CompanyEdit")
             {
@@ -283,7 +281,7 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "CompanyEdit")
                 {
-                    var apiUrl = UrlHelper.EmployeePerCompany(employee.Id, datatable.GenericId);
+                    var apiUrl = UrlHelper.EmployeeCompany(employee.Id, datatable.GenericId);
 
                     if (employee.Company != null)
                     {
@@ -299,7 +297,7 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "WorkPlaceEdit")
                 {
-                    var apiUrl = UrlHelper.EmployeePerWorkPlace(employee.Id, datatable.GenericId);
+                    var apiUrl = UrlHelper.EmployeeWorkPlace(employee.Id, datatable.GenericId);
 
                     if (employee.Company != null)
                         dictionary.Add("CompanyTitle", employee.Company.Title);

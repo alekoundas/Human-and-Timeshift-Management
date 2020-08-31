@@ -28,14 +28,14 @@
                     <thead>
                         <tr>
                             <th>Τίτλος</th>
-                            <th>Περιγραφή</th>
+                            <th>Πελάτης</th>
                             <th>Ενέργειες</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
                             <th data-searchable="true">Τίτλος</th>
-                            <th data-searchable="true">Περιγραφή</th>
+                            <th data-searchable="true">Πελάτης</th>
                             <th data-searchable="false">Ενέργειες</th>
                         </tr>
                     </tfoot>
@@ -49,59 +49,55 @@
 @section Scripts {
     <script>
 
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-
-            var table = $('#WorkPlacesDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
-                    url: '/api/workplaces/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        return JSON.stringify(data);
+        $('#WorkPlacesDatatable').DataTable({
+            serverSide: true,
+            dom: 'frtlp',
+            ajax: {
+                url: '/api/workplaces/datatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
+                    data.predicate = 'WorkPlaceIndex';
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[0, 'desc']],
+            columns: [
+                {
+                    data: "Title",
+                    searchable: true,
+                    orderable: true,
+                    ender: (a, b, data, d) => {
+                        console.log(data);
+                        if (data.Title != null)
+                            return data.Title;
+                        else
+                            return "";
                     }
                 },
-                order: [[0, 'desc']],
-                "columns": [
-                    {
-                        "data": "Title",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.Title != null)
-                                return data.Title;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Description",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Description != null)
-                                return data.Description;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Button",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
+                {
+                    data: "CustomerFullName",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.CustomerFullName != null)
+                            return data.CustomerFullName;
+                        else
+                            return "";
                     }
-                ]
-            });
+                },
+                {
+                    data: "Button",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.Buttons != null)
+                            return data.Buttons;
+                        else
+                            return "";
+                    }
+                }
+            ]
         });
     </script>
 }

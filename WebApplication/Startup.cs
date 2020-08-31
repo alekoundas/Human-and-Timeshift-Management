@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication
 {
@@ -57,6 +58,10 @@ namespace WebApplication
                 options.SlidingExpiration = true;
             });
 
+            //Enable TempData[""] from API
+            services.Configure<CookieTempDataProviderOptions>(options => {
+                options.Cookie.IsEssential = true;
+            });
             // using Microsoft.AspNetCore.HttpOverrides;
 
             //services.UseForwardedHeaders(new ForwardedHeadersOptions

@@ -80,10 +80,10 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
 
                     //RealWorkhour
-                    userManager.AddToRoleAsync(user, "RealWorkhour_View").Wait();
-                    userManager.AddToRoleAsync(user, "RealWorkhour_Create").Wait();
-                    userManager.AddToRoleAsync(user, "RealWorkhour_Edit").Wait();
-                    userManager.AddToRoleAsync(user, "RealWorkhour_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Create").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Delete").Wait();
 
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
@@ -151,10 +151,10 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
 
                     //RealWorkhour
-                    userManager.AddToRoleAsync(user, "RealWorkhour_View").Wait();
-                    userManager.AddToRoleAsync(user, "RealWorkhour_Create").Wait();
-                    userManager.AddToRoleAsync(user, "RealWorkhour_Edit").Wait();
-                    userManager.AddToRoleAsync(user, "RealWorkhour_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Create").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Delete").Wait();
 
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
@@ -438,34 +438,34 @@ namespace Business.Seed
             }
 
             //RealWorkhour
-            if (!roleManager.RoleExistsAsync("RealWorkhour_View").Result)
+            if (!roleManager.RoleExistsAsync("RealWorkHour_View").Result)
             {
                 ApplicationRole role = new ApplicationRole();
-                role.Name = "RealWorkhour_View";
+                role.Name = "RealWorkHour_View";
                 role.Controller = role.Name.Split('_')[0];
                 role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
-            if (!roleManager.RoleExistsAsync("RealWorkhour_Create").Result)
+            if (!roleManager.RoleExistsAsync("RealWorkHour_Create").Result)
             {
                 ApplicationRole role = new ApplicationRole();
-                role.Name = "RealWorkhour_Create";
+                role.Name = "RealWorkHour_Create";
                 role.Controller = role.Name.Split('_')[0];
                 role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
-            if (!roleManager.RoleExistsAsync("RealWorkhour_Edit").Result)
+            if (!roleManager.RoleExistsAsync("RealWorkHour_Edit").Result)
             {
                 ApplicationRole role = new ApplicationRole();
-                role.Name = "RealWorkhour_Edit";
+                role.Name = "RealWorkHour_Edit";
                 role.Controller = role.Name.Split('_')[0];
                 role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
-            if (!roleManager.RoleExistsAsync("RealWorkhour_Delete").Result)
+            if (!roleManager.RoleExistsAsync("RealWorkHour_Delete").Result)
             {
                 ApplicationRole role = new ApplicationRole();
-                role.Name = "RealWorkhour_Delete";
+                role.Name = "RealWorkHour_Delete";
                 role.Controller = role.Name.Split('_')[0];
                 role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;

@@ -94,6 +94,7 @@ namespace WebApplication.Controllers
             }
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);
             ViewData["Title"] = "Επεξεργασία υπαλλήλου";
+            ViewData["TitleDatatableWorkPlaces"] = "Συμβατά πόστα προς εργασία";
             return View(employee);
         }
 

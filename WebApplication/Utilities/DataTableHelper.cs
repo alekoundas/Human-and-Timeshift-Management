@@ -181,14 +181,14 @@ namespace WebApplication.Utilities
 
 
 
-        public string GetToggle(string baseRole, string apiUrl, string toggleState)
+        public string GetToggle(string baseRole, string apiUrl, string toggleState,bool isDisabled=false)
         {
             var stringToReturn = "";
             _httpContext = new HttpContextAccessor();
             var currentUserRoles = _httpContext.HttpContext.User.Claims
                 .Select(x => x.Value).ToList();
 
-            if (currentUserRoles.Contains(baseRole + "_Edit"))
+            if (currentUserRoles.Contains(baseRole + "_Edit")&& isDisabled == false)
                 stringToReturn += EditToggle(toggleState, apiUrl);
 
             else if (currentUserRoles.Contains(baseRole + "_View"))
