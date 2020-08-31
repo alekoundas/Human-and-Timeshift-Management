@@ -16,21 +16,10 @@
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">Βασικό μενού</li>
 
-            <!-- Company -->
-            <li class="treeview ">
-                <a href="#">
-                    <i class="fa fa-building-o"></i> <span>Εταιρίες</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    @Html.LinkButton("Company", "Index", "Εταιρίες","Company_View")
-                    @Html.LinkButton("Company", "Create", "Προσθήκη εταιρίας","Company_Create")
-                </ul>
-            </li>
+
 
             <!-- Customer -->
+            @if(Html.HasAnyChildButton("Customer")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa  fa-user-circle-o"></i> <span>Πελάτες</span>
@@ -43,9 +32,10 @@
                     @Html.LinkButton("Customer", "Create", "Προσθήκη πελάτη", "Customer_Create")
                 </ul>
             </li>
+            }
 
             <!-- WorkPlace -->
-
+            @if(Html.HasAnyChildButton("WorkPlace")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa fa-map-marker"></i> <span>Πόστα</span>
@@ -58,8 +48,10 @@
                     @Html.LinkButton("WorkPlace", "Create", "Προσθήκη Πόστου", "WorkPlace_Create")
                 </ul>
             </li>
+            }
 
             <!--TimeShift -->
+            @if(Html.HasAnyChildButton("TimeShift")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa fa-table"></i> <span>χρονοδιάγραμμα</span>
@@ -72,8 +64,10 @@
                     @Html.LinkButton("Timeshift", "Create", "Προσθήκη Χρονοδιαγράμματος", "TimeShift_Create")
                 </ul>
             </li>
+            }
 
             <!--RealWorkHour -->
+            @if(Html.HasAnyChildButton("RealWorkHour")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa fa-dashboard"></i> <span>Βάρδιες</span>
@@ -87,6 +81,7 @@
                     @Html.LinkButton("RealWorkhour", "CurrentDay", "Δηλωμένες βάρδιες ημέρας", "RealWorkHour_View")
                 </ul>
             </li>
+            }
 
 
 
@@ -94,7 +89,8 @@
             <!-- Employees -->
             <li class="header">Υπάλληλοι</li>
 
-            <!-- Employees -->
+            <!-- Employee -->
+            @if(Html.HasAnyChildButton("Employee")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa fa-users "></i> <span>Υπάλληλοι</span>
@@ -107,8 +103,11 @@
                     @Html.LinkButton("Employee", "Create", "Προσθήκη υπαλλήλου", "Employee_Create")
                 </ul>
             </li>
+            }
 
-            <!-- Leaves -->
+
+            <!-- Leave -->
+            @if(Html.HasAnyChildButton("Leave")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa fa-users "></i> <span>Άδειες</span>
@@ -121,8 +120,10 @@
                     @Html.LinkButton("Leave", "Create", "Προσθήκη άδειας", "Leave_Create")
                 </ul>
             </li>
+            }
 
             <!-- DayOff-->
+            @if(Html.HasAnyChildButton("DayOff")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa fa-users "></i> <span>Ρεπό</span>
@@ -134,7 +135,7 @@
                     @Html.LinkButton("TODO", "Index", "TODO")
                 </ul>
             </li>
-
+            }
 
 
             <!-- Prolictions -->
@@ -142,17 +143,6 @@
 
 
 
-            <li class="treeview-menu">
-                @Html.LinkButton("Projection", "Index", "Προβολη 1")
-            </li>
-
-            <li class="treeview-menu">
-                @Html.LinkButton("Projection", "Index", "Προβολη 2")
-            </li>
-
-            <li class="treeview-menu">
-                @Html.LinkButton("Projection", "Index", "Προβολη 3")
-            </li>
 
             <li class="treeview-menu">
                 @Html.LinkButton("Projection", "Difference", "Διαφορές", "ProjectionDifference_View")
@@ -163,6 +153,7 @@
             <!-- Lookups -->
             <li class="header">Lookups</li>
             <!-- Specialization -->
+            @if(Html.HasAnyChildButton("Specialization")){
             <li class="treeview ">
                 <a href="#">
                     <i class="fa fa-database"></i> <span>Ειδικότητες</span>
@@ -175,15 +166,16 @@
                     @Html.LinkButton("Specialization", "Create", "Προσθήκη ειδικότητας", "Specialization_Create")
                 </ul>
             </li>
+            }
 
 
+            <li class="header">Διαχείριση</li>
 
-            <li class="header">Ασφάλεια</li>
-
-            <!-- Specialization -->
+            <!-- User -->
+            @if(Html.HasAnyChildButton("User")){
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-lock"></i> <span>Διαχείριση</span>
+                    <i class="fa fa-lock"></i> <span>Χρήστες</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
@@ -194,29 +186,45 @@
 
                 </ul>
             </li>
+            }
 
+            <!-- Company -->
+            @if(Html.HasAnyChildButton("Company")){
+            <li class="treeview ">
+                <a href="#">
+                    <i class="fa fa-building-o"></i> <span>Εταιρίες</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    @Html.LinkButton("Company", "Index", "Εταιρίες","Company_View")
+                    @Html.LinkButton("Company", "Create", "Προσθήκη εταιρίας","Company_Create")
+                </ul>
+            </li>
+            }
 
             @* Register *@
             <!-- Register -->
             @*<li class="treeview ">
-            <a href="#">
-                <i class="fa fa-dashboard"></i> <span>εγγραφη</span>
-                <span class="pull-right-container">
-                    <i class="fa fa-angle-left pull-right"></i>
-                </span>
-            </a>
-            <ul class="treeview-menu">
-                @Html.LinkButton("Account", "Register", "Εγγραφή")
-                @Html.LinkButton("Account", "CreateUser", "Προσθήκη νέου χρήστη")
+                    <a href="#">
+                        <i class="fa fa-dashboard"></i> <span>εγγραφη</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @Html.LinkButton("Account", "Register", "Εγγραφή")
+                        @Html.LinkButton("Account", "CreateUser", "Προσθήκη νέου χρήστη")
 
-            </ul>
-        </li>*@
+                    </ul>
+                </li>*@
 
 
             @*<li class="header">LABELS</li>
-        <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
-        <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
-        <li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>*@
+                <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
+                <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
+                <li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>*@
         </ul>
     </section>
     <!-- /.sidebar -->
