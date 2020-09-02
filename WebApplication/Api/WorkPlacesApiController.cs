@@ -215,16 +215,15 @@ namespace WebApplication.Api
             var orderDirection = datatable.Order[0].Dir;
 
             var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
-            //includes.Add(x => x.Include(y => y.Specialization));
-
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
+            Expression<Func<WorkPlace, bool>> filter = x => true;
+
             var workPlaces = new List<WorkPlace>();
 
 
             if (datatable.Predicate == "WorkPlaceIndex")
             {
                 includes.Add(x => x.Include(y => y.Customer));
-                Expression<Func<WorkPlace, bool>> filter = x => true;
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
@@ -232,27 +231,35 @@ namespace WebApplication.Api
             if (datatable.Predicate == "CustomerEdit")
             {
                 includes.Add(x => x.Include(y => y.Customer));
-                Expression<Func<WorkPlace, bool>> filter = x => true;
+                 filter = x => true;
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }  
+            }
             if (datatable.Predicate == "EmployeeEdit")
             {
                 includes.Add(x => x.Include(y => y.Customer));
-                includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z=>z.Employee));
-                Expression<Func<WorkPlace, bool>> filter = x => x.Customer.Company!=null;
+                includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
+                 filter = x => x.Customer.Company != null;
 
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            } 
+            }
             if (datatable.Predicate == "EmployeeDetails")
             {
                 includes.Add(x => x.Include(y => y.Customer));
-                includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z=>z.Employee));
-                Expression<Func<WorkPlace, bool>> filter = x => 
-                x.EmployeeWorkPlaces.Any(y=>y.EmployeeId==datatable.GenericId);
+                includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
+                filter = x =>
+                x.EmployeeWorkPlaces.Any(y => y.EmployeeId == datatable.GenericId);
+
+                workPlaces = await _baseDataWork.WorkPlaces
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }
+            if (datatable.Predicate == "TimeShiftIndex")
+            {
+                includes.Add(x => x.Include(y => y.Customer).ThenInclude(z => z.Company));
+                filter = x => true;
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
@@ -272,7 +279,7 @@ namespace WebApplication.Api
             {
                 var expandoObj = expandoObject.GetCopyFrom<WorkPlace>(workplace);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                 if (datatable.Predicate == "WorkPlaceIndex")
+                if (datatable.Predicate == "WorkPlaceIndex")
                 {
                     dictionary.Add("Buttons", dataTableHelper.GetButtons(
                         "WorkPlace", "WorkPlaces", workplace.Id.ToString()));
@@ -300,7 +307,7 @@ namespace WebApplication.Api
 
                     dictionary.Add("CustomerFullName", workplace.Customer?.FullName);
 
-                    if (workplace.EmployeeWorkPlaces.Any(x=>x.EmployeeId== datatable.GenericId))
+                    if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                             "WorkPlace", apiUrl, "checked"));
                     else
@@ -316,13 +323,17 @@ namespace WebApplication.Api
 
                     dictionary.Add("CustomerFullName", workplace.Customer?.FullName);
 
-                    if (workplace.EmployeeWorkPlaces.Any(x=>x.EmployeeId== datatable.GenericId))
+                    if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "WorkPlace", apiUrl, "checked",true));
+                            "WorkPlace", apiUrl, "checked", true));
                     else
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "WorkPlace", apiUrl, "",true));
+                            "WorkPlace", apiUrl, "", true));
 
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "TimeShiftIndex")
+                {
                     returnObjects.Add(expandoObj);
                 }
 

@@ -3,8 +3,8 @@
 }
 
 <div class="row">
-    <div class="col-md-3"> </div>
-    <div class="col-md-6">
+    <div class="col-md-1"> </div>
+    <div class="col-md-10">
 
         <div class="box-header">
             <h3 class="box-title">@ViewData["Title"]</h3>
@@ -21,30 +21,49 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="TimeShiftsDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="WorkPlaceDatatable" class="table table-bordered table-hover table-responsive">
                     <thead>
                         <tr>
 
-                            <th>Τίτλος</th>
-                            <th>Ημερομηνία έναρξης</th>
-                            <th>Ημερομηνία λήξης</th>
-                            <th>Ενέργειες</th>
+                            <th></th>
+                            <th>Πόστο</th>
+                            <th>Πελάτης</th>
+                            <th>Εταιρία</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="true">Τίτλος</th>
-                            <th data-searchable="false">Ημερομηνία έναρξης</th>
-                            <th data-searchable="false">Ημερομηνία λήξης</th>
-                            <th data-searchable="false">Ενέργειες</th>
+                            <th></th>
+                            <th>Πόστο</th>
+                            <th>Πελάτης</th>
+                            <th>Εταιρία</th>
                         </tr>
                     </tfoot>
                 </table>
+                @*<table id="TimeShiftDatatable" class="table table-bordered table-hover table-responsive">
+                        <thead>
+                            <tr>
+
+                                <th>Τίτλος</th>
+                                <th>Ημερομηνία έναρξης</th>
+                                <th>Ημερομηνία λήξης</th>
+                                <th>Ενέργειες</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th data-searchable="true">Τίτλος</th>
+                                <th data-searchable="false">Ημερομηνία έναρξης</th>
+                                <th data-searchable="false">Ημερομηνία λήξης</th>
+                                <th data-searchable="false">Ενέργειες</th>
+                            </tr>
+                        </tfoot>
+                    </table>*@
             </div>
         </div>
     </div>
 
-    <div class="col-md-3"> </div>
+    <div class="col-md-1"> </div>
 
 </div>
 
@@ -52,25 +71,51 @@
     <script src="~/js/Custom/DatatableDeleteButton.js"></script>
     <script>
 
-        $('#TimeShiftsDatatable').DataTable({
+        const SetDetailsButtonOn = id => {
+            var detailButton = document.getElementById('DetailsButtonNum_' + id);
+            detailButton.classList.remove('btn-success');
+            detailButton.firstElementChild.classList.remove('fa-plus-circle');
+
+            detailButton.classList.add('btn-danger');
+            detailButton.firstElementChild.add('fa-minus-circle');
+        }
+
+        const SetDetailsButtonOff = id => {
+            var detailButton = document.getElementById('DetailsButtonNum_' + id);
+            detailButton.classList.remove('btn-danger');
+            detailButton.firstElementChild.classList.remove('fa-minus-circle');
+
+            detailButton.classList.add('btn-success');
+            detailButton.firstElementChild.classList.add('fa-plus-circle');
+        }
+
+
+        var table = $('#WorkPlaceDatatable').DataTable({
             serverSide: true,
             dom: 'frtlp',
             ajax: {
-                url: '/api/timeshifts/datatable',
+                url: '/api/workplaces/datatable',
                 type: 'POST',
                 contentType: "application/json",
                 data: (data, type, row, meta) => {
+                    data.predicate = 'TimeShiftIndex';
                     return JSON.stringify(data);
                 }
             },
-            order: [[0, 'desc']],
+            order: [[1, 'desc']],
             columns: [
+                {
+                    className: 'details-control',
+                    orderable: false,
+                    data: null,
+                    render: (a, b, data, d) =>  '<button id="DetailsButtonNum_' + data.Id + '" class="btn btn-circle btn-success DetailsButton"><i class="fa fa-plus-circle"></i></button>'
+                },
                 {
                     data: "Title",
                     searchable: true,
                     orderable: true,
                     render: (a, b, data, d) => {
-                        console.log(data);
+                        //console.log(data);
                         if (data.Title != null)
                             return data.Title;
                         else
@@ -78,39 +123,148 @@
                     }
                 },
                 {
-                    data: "StartOn",
-                    searchable: false,
-                    orderable: false,
+                    data: "Customer.fullName",
+                    searchable: true,
+                    orderable: true,
                     render: (a, b, data, d) => {
-                        if (data.StartOn != null)
-                            return data.StartOn;
+                        if (data.Customer != null)
+                            return data.Customer?.fullName;
                         else
                             return "";
                     }
                 },
                 {
-                    data: "EndOn",
+                    data: "Customer.company.title",
                     searchable: false,
                     orderable: false,
                     render: (a, b, data, d) => {
-                        if (data.EndOn != null)
-                            return data.EndOn;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "Buttons",
-                    searchable: false,
-                    orderable: false,
-                    render: (a, b, data, d) => {
-                        if (data.Buttons != null)
-                            return data.Buttons;
+                        if (data.Customer != null)
+                            if (data.Customer.company != null)
+                                return data.Customer.company.title;
+                            else
+                                return "";
                         else
                             return "";
                     }
                 }
             ]
         });
+        // Add event listener for opening and closing details
+        $('#WorkPlaceDatatable tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                DestroyTimeShiftDatatable(row.data().Id);
+                row.child.hide();
+                tr.removeClass('shown');
+                SetDetailsButtonOff(row.data().Id);
+            }
+            else {
+                // Open this row
+                row.child(format(row.data().Id)).show();
+                CreateTimeShiftDatatable(row.data().Id);
+                SetDetailsButtonOn(row.data().Id);
+                tr.addClass('shown');
+            }
+        });
+
+        const format = id => {
+            console.log(id);
+            return '<p>Χρονοδιαγράμματα πόστου</p>' +
+                '<div style="width:100%">' +
+                '<div style="float:left; width:2% ">&nbsp</div>' +
+                '<div style="float:left; width:95% ">' +
+                '<table id="TimeShiftsDatatableNum_' + id + '" class="table table-bordered table-hover table-responsive">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Τίτλος</th>' +
+                '<th>Μήνας</th>' +
+                '<th>Έτος</th>' +
+                '<th>Ενέργειες</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Τίτλος</th>' +
+                '<th>Μήνας</th>' +
+                '<th>Έτος</th>' +
+                '<th>Ενέργειες</th>' +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
+                '<div style="float:left; width:2% ">&nbsp</div>' +
+                '</div>';
+        };
+
+        const DestroyTimeShiftDatatable = id =>
+            $('#TimeShiftsDatatableNum_' + id).DataTable().destroy();
+
+        const CreateTimeShiftDatatable = id => {
+            $('#TimeShiftsDatatableNum_' + id).DataTable({
+                serverSide: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/timeshifts/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+                        data.predicate = 'TimeShiftIndex';
+                        data.GenericId = id;//WorkPlaceId
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                columns: [
+                    {
+                        data: "Title",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.Title != null)
+                                return data.Title;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Month",
+                        searchable: false,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.Month != null)
+                                return data.Month;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Year",
+                        searchable: false,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.Year != null)
+                                return data.Year;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Buttons",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null)
+                                return data.Buttons;
+                            else
+                                return "";
+                        }
+                    }
+                ]
+            });
+        }
     </script>
 }

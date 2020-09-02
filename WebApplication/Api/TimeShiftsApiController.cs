@@ -13,6 +13,9 @@ using System.Dynamic;
 using Bussiness.Service;
 using WebApplication.Utilities;
 using DataAccess.ViewModels;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
+using System.Linq.Dynamic.Core;
 
 namespace WebApplication.Api
 {
@@ -109,7 +112,7 @@ namespace WebApplication.Api
         }
 
 
-        
+
 
         // GET: api/timeshifts/select2
         [HttpGet("select2")]
@@ -120,7 +123,7 @@ namespace WebApplication.Api
 
             if (string.IsNullOrWhiteSpace(search))
             {
-                timeShifts= (List<TimeShift>)await _baseDataWork.TimeShifts
+                timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
                     .GetPaggingWithFilter(null, null, null, 10, page);
 
                 return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts));
@@ -134,35 +137,47 @@ namespace WebApplication.Api
 
         // POST: api/timeshifts/datatable
         [HttpPost("datatable")]
-        public async Task<ActionResult<TimeShift>> datatable([FromBody] Datatable datatable)
+        public async Task<ActionResult<TimeShift>> Datatable([FromBody] Datatable datatable)
         {
             var total = await _baseDataWork.TimeShifts.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var isDescending = datatable.Order[0].Dir == "desc";
+            var orderDirection = datatable.Order[0].Dir;
 
-            //TODO: order by
-            var timeShifts = await _baseDataWork.TimeShifts.GetWithPagging(null,
-                pageSize, pageIndex);
-
+            var includes = new List<Func<IQueryable<TimeShift>, IIncludableQueryable<TimeShift, object>>>();
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = MapResults(timeShifts);
+            Expression<Func<TimeShift, bool>> filter = x => true;
+
+            var timeShifts = new List<TimeShift>();
+
+
+            if (datatable.Predicate == "TimeShiftIndex")
+            {
+                filter = x => x.WorkPlaceId == datatable.GenericId;
+                timeShifts = await _baseDataWork.TimeShifts
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }
+
+            var mapedData = MapResults(timeShifts,datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<TimeShift> results)
+        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<TimeShift> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<TimeShift>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var result in results)
+            foreach (var timeShift in results)
             {
-                var expandoObj = expandoObject.GetCopyFrom<TimeShift>(result);
+                var expandoObj = expandoObject.GetCopyFrom<TimeShift>(timeShift);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("TimeShift",
-                    "TimeShifts", result.Id.ToString()));
+                if (datatable.Predicate == "TimeShiftIndex")
+                {
+                    dictionary.Add("Buttons", dataTableHelper.GetButtons("TimeShift",
+                        "TimeShifts", timeShift.Id.ToString()));
+                }
                 returnObjects.Add(expandoObj);
             }
 
@@ -172,5 +187,14 @@ namespace WebApplication.Api
         {
             return _context.TimeShifts.Any(e => e.Id == id);
         }
+
+        private Func<IQueryable<TimeShift>, IOrderedQueryable<TimeShift>> SetOrderBy(string columnName, string orderDirection)
+        {
+            if (columnName != "")
+                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+            else
+                return null;
+        }
+
     }
 }
