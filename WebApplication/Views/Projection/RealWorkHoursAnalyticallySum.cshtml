@@ -35,6 +35,16 @@
 
                     </div>
                 </div>
+                <div style="width:100%;">
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Τρόπος εμγάνισης χρόνου</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderHourChoice">
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
@@ -81,11 +91,15 @@
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
+        const GetSliderHourChoiceValue = () =>
+            document.getElementById('SliderHourChoice').checked != true;
+
         const GetStartOn = () =>
             new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
 
         const GetEndOn = () => {
+
             var date = new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
             date.setHours(23, 59, 59, 59);
@@ -104,6 +118,16 @@
     </script>
     <script>
 
+        $('#SliderHourChoice').bootstrapToggle({
+            on: 'HH:mm',
+            off: '%',
+            onstyle: 'primary',
+            offstyle:'primary'
+        });
+
+        $('.filterSlider').change(e =>
+            $('#RealWorkHoursAnalyticallySumDatatable').DataTable().ajax.reload());
+
         $('#WorkPlace_Select2').select2({
             ajax: {
                 url: '/api/workplaces/select2',
@@ -116,7 +140,7 @@
                 }
             }
         }).on('change', () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable().ajax.reload());
+            $('#RealWorkHoursAnalyticallySumDatatable').DataTable().ajax.reload());
 
 
         $('#SearchRangeInput').calentim({
@@ -129,6 +153,7 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
+            //oninit: () => AppendNewDataTableHTML();,
             onafterselect: () => {
                 DestroyDataTable();
                 DeleteDataTableHTML();
@@ -142,11 +167,11 @@
                         calentim.setAttribute('style', 'width: 400px;'))
         });
 
-        var DestroyDataTable = () => $('#EmployeesRealWorkHoursAnalytically')
+        var DestroyDataTable = () => $('#RealWorkHoursAnalyticallySumDatatable')
             .DataTable().destroy();
 
         var CreateDataTable = () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable({
+            $('#RealWorkHoursAnalyticallySumDatatable').DataTable({
                 serverSide: true,
                 colReorder: true,
                 dom: 'frtlp',
@@ -156,11 +181,12 @@
                     contentType: "application/json",
                     data: (data, type, row, meta) => {
 
-                        data.predicate = 'ProjectionRealWorkHoursAnalytically';
+                        data.predicate = 'ProjectionRealWorkHoursAnalyticallySum';
                         if (GetSelectedWorkPlaceId() != '')
                             data.genericId = GetSelectedWorkPlaceId();
                         data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
                         data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                        data.ShowHoursInPercentage = GetSliderHourChoiceValue();
                         return JSON.stringify(data);
                     }
                 },
@@ -191,6 +217,7 @@
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
                     'ErpCode')
             });
+           
             //Add days of month
             for (var i = 0; i < GetDaysDifferenceFromRange(); i++)
                 columns.push({
@@ -218,7 +245,7 @@
             return thElements;
         };
 
-        const CreateThElement = (date, dayState) =>
+        const CreateThElement = (date) =>
             '<th style="white-space: nowrap;">' +
             moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
             ' ' +
@@ -227,14 +254,16 @@
             moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
             '</th>';
 
+
+
         const DeleteDataTableHTML = () =>
-            document.getElementById('EmployeesRealWorkHoursAnalytically').remove();
+            document.getElementById('RealWorkHoursAnalyticallySumDatatable').remove();
 
         const AppendNewDataTableHTML = () => {
 
             document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
                 '<div class="box-body table-responsive">'+
-                    '<table id="EmployeesRealWorkHoursAnalytically" class="table table-bordered table-hover table-responsive">'+
+                    '<table id="RealWorkHoursAnalyticallySumDatatable" class="table table-bordered table-hover table-responsive">'+
                         '<thead>'+
                             '<tr>'+
                                 '<th>Όνομα</th>'+

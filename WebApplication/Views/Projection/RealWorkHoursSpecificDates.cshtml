@@ -25,16 +25,21 @@
                                 <select id="WorkPlace_Select2" style="width:70%"></select>
                             </div>
                         </div>
-
                     </div>
                     <div style="width:50%; float:left;">
-                        <label class="control-label">Χρονικό έυρος</label>
-                        <div class="input-group">
-                            <input id="SearchRangeInput" class="form-control" />
+                        <div style="width:80%; float:left;">
+                            <label class="control-label">Χρονικό έυρος</label>
                         </div>
-
+                        <div style="width:20%; float:left;">
+                            <button type="button" id="AppendCalentim" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                        </div>
+                        <div style="width:100%; float:left;">
+                        <div id="CalentimDiv"></div>
+                        </div>
                     </div>
                 </div>
+             
+
             </div>
         </div>
     </div>
@@ -61,7 +66,7 @@
 @section Scripts {
     <script>
 
-
+        var Count = 0;
         const ConvertDateForApi = timeStamp =>
             CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
@@ -81,11 +86,15 @@
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
+        const GetSliderHourChoiceValue = () =>
+            document.getElementById('SliderHourChoice').checked != true;
+
         const GetStartOn = () =>
             new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
 
         const GetEndOn = () => {
+
             var date = new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
             date.setHours(23, 59, 59, 59);
@@ -100,73 +109,6 @@
             newDate.setHours(23, 59, 59);
             return moment(newDate);
         }
-
-    </script>
-    <script>
-
-        $('#WorkPlace_Select2').select2({
-            ajax: {
-                url: '/api/workplaces/select2',
-                data: function (params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-                    return query;
-                }
-            }
-        }).on('change', () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable().ajax.reload());
-
-
-        $('#SearchRangeInput').calentim({
-            showTimePickers: false,
-            startOnMonday: true,
-            showFooter: false,
-            calendarCount: 1,
-            startDate:  Date.now(),
-            endDate:  Date.now(),
-            format: "DD/MM/YYYY",
-            dateSeparator: '/-/',
-            locale: "el",
-            onafterselect: () => {
-                DestroyDataTable();
-                DeleteDataTableHTML();
-                AppendNewDataTableHTML();
-                CreateDataTable();
-            },
-            onaftershow: () =>
-                //Fix Calentim width
-                [...document.getElementsByClassName('calentim-input')]
-                    .forEach((calentim) =>
-                        calentim.setAttribute('style', 'width: 400px;'))
-        });
-
-        var DestroyDataTable = () => $('#EmployeesRealWorkHoursAnalytically')
-            .DataTable().destroy();
-
-        var CreateDataTable = () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable({
-                serverSide: true,
-                colReorder: true,
-                dom: 'frtlp',
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'ProjectionRealWorkHoursAnalytically';
-                        if (GetSelectedWorkPlaceId() != '')
-                            data.genericId = GetSelectedWorkPlaceId();
-                        data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
-                        data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: CreateDatatableColumns(),
-            });
 
         const CreateDatatableColumns = () => {
             var columns = []
@@ -191,13 +133,20 @@
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
                     'ErpCode')
             });
-            //Add days of month
-            for (var i = 0; i < GetDaysDifferenceFromRange(); i++)
-                columns.push({
-                    "data": "Day_" + i,
-                    "searchable": false,
-                    "orderable": true
-                });
+            columns.push({
+                data: "ΑΦΜ",
+                searchable: false,
+                orderable: true,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'ΑΦΜ')
+            });
+            columns.push({
+                data: "Σήμερα",
+                searchable: false,
+                orderable: true,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'Σήμερα')
+            });
 
             return columns;
         }
@@ -208,39 +157,94 @@
                 return "";
         }
 
-        const GetDaysColumns = () => {
-            var thElements='';
-            for (var i = 0; i < GetDaysDifferenceFromRange(); i++) {
-                var colDate= GetStartOn();
-                colDate.setDate(colDate.getDate() + i);
-                thElements = thElements + CreateThElement(colDate);
+        $('#AppendCalentim').on('click', (e) => {
+            Count++;
+            AppendNewCalentimHTML(Count);
+            InitiateCalentim(Count);
+        });
+
+        $(document).on('click', '.DeleteCalentimButton',(e) =>
+            document.getElementById('CalnentimDivNum_' + e.target.id.split('_')[1])
+                .remove())
+    </script>
+    <script>
+
+        $('#WorkPlace_Select2').select2({
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
             }
-            return thElements;
-        };
+        }).on('change', () =>
+            $('#RealWorkHoursSpecificDatesDatatable').DataTable().ajax.reload());
 
-        const CreateThElement = (date, dayState) =>
-            '<th style="white-space: nowrap;">' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
-            ' ' +
-            date.getDate() +
-            ' ' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
-            '</th>';
+        const InitiateCalentim = num=>
+            $('#CalnentimNum_'+num).calentim({
+                showTimePickers: false,
+                startOnMonday: true,
+                showFooter: false,
+                calendarCount: 1,
+                //startDate:  Date.now(),
+                //endDate:  Date.now(),
+                format: "DD/MM/YYYY",
+                dateSeparator: '/-/',
+                locale: "el",
+                disableOnlyEnd: true,
+                disabledRanges: [
+                    {
+                        "start": moment("01/01/1920", "DD/MM/YYYY"),
+                        "end": moment("31/12/2050", "DD/MM/YYYY")
+                    }
+                ],
+                onaftershow: () =>
+                    //Fix Calentim width
+                    [...document.getElementsByClassName('calentim-input')]
+                        .forEach((calentim) =>
+                            calentim.setAttribute('style', 'width: 400px;'))
+            });
 
-        const DeleteDataTableHTML = () =>
-            document.getElementById('EmployeesRealWorkHoursAnalytically').remove();
 
-        const AppendNewDataTableHTML = () => {
+        $('#RealWorkHoursSpecificDatesDatatable').DataTable({
+                serverSide: true,
+                colReorder: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/employees/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
 
+                        data.predicate = 'ProjectionConcentric';
+                        if (GetSelectedWorkPlaceId() != '')
+                            data.genericId = GetSelectedWorkPlaceId();
+                        data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
+                        data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                        data.ShowHoursInPercentage = GetSliderHourChoiceValue();
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[1, 'desc']],
+                columns: CreateDatatableColumns()
+            });
+
+        
+
+        const AppendNewDataTableHTML = () => 
             document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
                 '<div class="box-body table-responsive">'+
-                    '<table id="EmployeesRealWorkHoursAnalytically" class="table table-bordered table-hover table-responsive">'+
+                    '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive">'+
                         '<thead>'+
                             '<tr>'+
                                 '<th>Όνομα</th>'+
                                 '<th>Επίθετο</th>'+
                                 '<th>Erp Code</th>'+
-                                GetDaysColumns()+
+                                '<th>ΑΦΜ</th>'+
+                                '<th>Σήμερα</th>'+
                             '</tr>'+
                         '</thead>'+
                         '<tfoot>'+
@@ -248,17 +252,31 @@
                                 '<th>Όνομα</th>'+
                                 '<th>Επίθετο</th>'+
                                 '<th>Erp Code</th>'+
-                                GetDaysColumns() +
+                                '<th>ΑΦΜ</th>'+
+                                '<th>Σήμερα</th>'+
                             '</tr>'+
                         '</tfoot>'+
                     '</table>'+
                 '</div>'+
                 '');
 
-        }
+           const AppendNewCalentimHTML = num => 
+               document.getElementById('CalentimDiv').insertAdjacentHTML('beforeend',''+
+                '<div  id="CalnentimDivNum_'+num+'">'+
+                    '<div style="width:70%;float:left">'+
+                        '<div class="input-group">'+
+                           '<input  id="CalnentimNum_' + num +'" class="form-control" />'+
+                        '</div>'+
+                    '</div>'+
+                    '<div style="width:30%; float:left">'+
+                   '<button type="button"  id="DeleteCalentimButtonNum_' + num + '" class="btn btn-danger DeleteCalentimButton"><i class="fa fa-trash DeleteCalentimButton" id="DeleteCalentimINum_' + num +'"></i></button>'+
+                    '</div>'+
+                '</div>'+
+                '');
+
+    
 
         $(document).ready(AppendNewDataTableHTML());
-        $(document).ready(CreateDataTable());
 
     </script>
 }

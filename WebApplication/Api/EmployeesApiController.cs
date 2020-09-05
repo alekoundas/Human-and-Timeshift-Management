@@ -271,7 +271,26 @@ namespace WebApplication.Api
                 employees = await _baseDataWork.Employees
                      .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
+            if (datatable.Predicate == "ProjectionRealWorkHoursAnalyticallySum")
+            {
+                Expression<Func<Employee, bool>> filter = x => true;
+                if (datatable.GenericId != 0)
+                    filter = x => x.EmployeeWorkPlaces
+                        .Any(y => y.WorkPlaceId == datatable.GenericId);
 
+                employees = await _baseDataWork.Employees
+                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }     
+            if (datatable.Predicate == "ProjectionPresenceDaily")
+            {
+                Expression<Func<Employee, bool>> filter = x => true;
+                if (datatable.GenericId != 0)
+                    filter = x => x.EmployeeWorkPlaces
+                        .Any(y => y.WorkPlaceId == datatable.GenericId);
+
+                employees = await _baseDataWork.Employees
+                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }
             var mapedData = MapResults(employees, datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, await mapedData, total));
@@ -399,49 +418,63 @@ namespace WebApplication.Api
                     var totalSeconds = await _baseDataWork.RealWorkHours
                             .GetEmployeeTotalSecondsFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
 
+                     var totalSecondsDay = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+                    
+                    var totalSecondsNight = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
                     if (datatable.ShowHoursInPercentage)
-                        dictionary.Add("TotalHours", totalSeconds / 60 / 60);
-                    else
-                        dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
-
-                    if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
                     {
-                        var daySeconds = await _baseDataWork.RealWorkHours
-                                 .GetEmployeeTotalSecondsForDay(employee.Id, datatable.StartOn);
-
-                        var nightSeconds = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsForNight(employee.Id, datatable.StartOn);
-                        if (datatable.ShowHoursInPercentage)
-                        {
-                            dictionary.Add("Day_0", daySeconds / 60 / 60);
-                            dictionary.Add("Night_0", nightSeconds / 60 / 60);
-                        }
-                        else
-                        {
-                            dictionary.Add("Day_0", ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
-                            dictionary.Add("Night_0", ((int)nightSeconds / 60 / 60).ToString() + ":" + ((int)nightSeconds / 60 % 60).ToString());
-                        }
+                        dictionary.Add("TotalHours", totalSeconds / 60 / 60);
+                        dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 60);
+                        dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 60);
                     }
                     else
-                        for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
-                        {
-                            var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
-                            var daySeconds = await _baseDataWork.RealWorkHours
-                                   .GetEmployeeTotalSecondsForDay(employee.Id, compareDate);
+                    {
+                        dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
+                    }
 
-                            var nightSeconds = await _baseDataWork.RealWorkHours
-                                .GetEmployeeTotalSecondsForNight(employee.Id, compareDate);
-                            if (datatable.ShowHoursInPercentage)
-                            {
-                                dictionary.Add("Day_" + i, daySeconds / 60 / 60);
-                                dictionary.Add("Night_" + i, nightSeconds / 60 / 60);
-                            }
-                            else
-                            {
-                                dictionary.Add("Day_" + i, ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
-                                dictionary.Add("Night_" + i, ((int)nightSeconds / 60 / 60).ToString() + ":" + ((int)nightSeconds / 60 % 60).ToString());
-                            }
-                        }
+                    //if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
+                    //{
+                    //    var daySeconds = await _baseDataWork.RealWorkHours
+                    //             .GetEmployeeTotalSecondsForDay(employee.Id, datatable.StartOn);
+
+                    //    var nightSeconds = await _baseDataWork.RealWorkHours
+                    //        .GetEmployeeTotalSecondsForNight(employee.Id, datatable.StartOn);
+                    //    if (datatable.ShowHoursInPercentage)
+                    //    {
+                    //        dictionary.Add("Day_0", daySeconds / 60 / 60);
+                    //        dictionary.Add("Night_0", nightSeconds / 60 / 60);
+                    //    }
+                    //    else
+                    //    {
+                    //        dictionary.Add("Day_0", ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
+                    //        dictionary.Add("Night_0", ((int)nightSeconds / 60 / 60).ToString() + ":" + ((int)nightSeconds / 60 % 60).ToString());
+                    //    }
+                    //}
+                    //else
+                    //    for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
+                    //    {
+                    //        var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
+                    //        var daySeconds = await _baseDataWork.RealWorkHours
+                    //               .GetEmployeeTotalSecondsForDay(employee.Id, compareDate);
+
+                    //        var nightSeconds = await _baseDataWork.RealWorkHours
+                    //            .GetEmployeeTotalSecondsForNight(employee.Id, compareDate);
+                    //        if (datatable.ShowHoursInPercentage)
+                    //        {
+                    //            dictionary.Add("Day_" + i, daySeconds / 60 / 60);
+                    //            dictionary.Add("Night_" + i, nightSeconds / 60 / 60);
+                    //        }
+                    //        else
+                    //        {
+                    //            dictionary.Add("Day_" + i, ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
+                    //            dictionary.Add("Night_" + i, ((int)nightSeconds / 60 / 60).ToString() + ":" + ((int)nightSeconds / 60 % 60).ToString());
+                    //        }
+                    //    }
                     returnObjects.Add(expandoObj);
 
                 }
@@ -457,10 +490,63 @@ namespace WebApplication.Api
                         for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
                         {
                             var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
-                            dictionary.Add("Day_" + i,await  dataTableHelper
+                            dictionary.Add("Day_" + i, await dataTableHelper
                                 .GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(
                                 _baseDataWork, compareDate, datatable, employee.Id));
                         }
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "ProjectionRealWorkHoursAnalyticallySum")
+                {
+                    var totalSeconds = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+
+                    if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
+                    {
+                        var daySeconds = await _baseDataWork.RealWorkHours
+                                 .GetEmployeeTotalSecondsForDay(employee.Id, datatable.StartOn);
+
+                        var nightSeconds = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsForNight(employee.Id, datatable.StartOn);
+
+                        if (datatable.ShowHoursInPercentage)
+                            dictionary.Add("Day_0", daySeconds / 60 / 60);
+                        else
+                            dictionary.Add("Day_0", ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
+                    }
+                    else
+                        for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
+                        {
+                            var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
+                            var daySeconds = await _baseDataWork.RealWorkHours
+                                   .GetEmployeeTotalSecondsForDay(employee.Id, compareDate);
+
+                            var nightSeconds = await _baseDataWork.RealWorkHours
+                                .GetEmployeeTotalSecondsForNight(employee.Id, compareDate);
+                            if (datatable.ShowHoursInPercentage)
+                                dictionary.Add("Day_" + i, daySeconds / 60 / 60);
+                            else
+                                dictionary.Add("Day_" + i, ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
+                        }
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "ProjectionPresenceDaily")
+                {
+                    var realWorkHours = await _baseDataWork.RealWorkHours
+                            .GetCurrentAssignedOnCell( DateTime.Now,employee.Id);
+
+                    var todayCell = "";
+                    foreach (var realWorkHour  in realWorkHours)
+                        todayCell += "<p style='white-space:nowrap;'>"+
+                            realWorkHour.StartOn.ToShortTimeString()+
+                            " - "+
+                            realWorkHour.EndOn.ToShortTimeString()+
+                            "</p></br>";
+                            dictionary.Add("Today", todayCell);
+
+
+                  
                     returnObjects.Add(expandoObj);
                 }
 
@@ -480,10 +566,5 @@ namespace WebApplication.Api
                 return null;
         }
 
-
-        private bool EmployeeExists(int id)
-        {
-            return _context.Employees.Any(e => e.Id == id);
-        }
     }
 }

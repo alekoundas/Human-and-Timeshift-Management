@@ -15,14 +15,13 @@
 
             <hr />
 
-
             <div class="box-body">
                 <div style="width:100%;">
                     <div style="width:50%; float:left;">
                         <div class="form-group">
-                            <label class="control-label">Πόστο</label>
+                            <label class="control-label">Υπάλληλος</label>
                             <div class="input-group" style="width:100%">
-                                <select id="WorkPlace_Select2" style="width:70%"></select>
+                                <select id="Employee_Select2" style="width:70%"></select>
                             </div>
                         </div>
 
@@ -35,6 +34,16 @@
 
                     </div>
                 </div>
+                <div style="width:100%;">
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Τρόπος εμγάνισης χρόνου</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderHourChoice">
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
@@ -61,7 +70,10 @@
 @section Scripts {
     <script>
 
-
+        const BuildSelect2Dto = (params) => ({
+            search: params.term,
+            page: params.page || 1
+        });
         const ConvertDateForApi = timeStamp =>
             CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
@@ -78,14 +90,18 @@
 
             return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
         }
-        const GetSelectedWorkPlaceId = () =>
-            document.getElementById('WorkPlace_Select2').value;
+        const GetSelectedEmployeeId = () =>
+            document.getElementById('Employee_Select2').value;
+
+        const GetSliderHourChoiceValue = () =>
+            document.getElementById('SliderHourChoice').checked != true;
 
         const GetStartOn = () =>
             new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
 
         const GetEndOn = () => {
+
             var date = new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
             date.setHours(23, 59, 59, 59);
@@ -104,19 +120,28 @@
     </script>
     <script>
 
-        $('#WorkPlace_Select2').select2({
-            ajax: {
-                url: '/api/workplaces/select2',
-                data: function (params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-                    return query;
+        $('#SliderHourChoice').bootstrapToggle({
+            on: 'HH:mm',
+            off: '%',
+            onstyle: 'primary',
+            offstyle:'primary'
+        });
+
+        $('.filterSlider').change(e =>
+            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+
+
+            $('#Employee_Select2' ).select2({
+                ajax: {
+                    type: "POST",
+                    url: '/api/employees/select2',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: (params) => JSON.stringify(BuildSelect2Dto(params))
                 }
-            }
-        }).on('change', () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable().ajax.reload());
+            }).on('change',()=>
+                $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+
 
 
         $('#SearchRangeInput').calentim({
@@ -129,6 +154,7 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
+            //oninit: () => AppendNewDataTableHTML();,
             onafterselect: () => {
                 DestroyDataTable();
                 DeleteDataTableHTML();
@@ -142,25 +168,26 @@
                         calentim.setAttribute('style', 'width: 400px;'))
         });
 
-        var DestroyDataTable = () => $('#EmployeesRealWorkHoursAnalytically')
+        var DestroyDataTable = () => $('#EmployeeRealHoursSumDatatable')
             .DataTable().destroy();
 
         var CreateDataTable = () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable({
+            $('#EmployeeRealHoursSumDatatable').DataTable({
                 serverSide: true,
                 colReorder: true,
                 dom: 'frtlp',
                 ajax: {
-                    url: '/api/employees/datatable',
+                    url: '/api/workplaces/datatable',
                     type: 'POST',
                     contentType: "application/json",
                     data: (data, type, row, meta) => {
 
-                        data.predicate = 'ProjectionRealWorkHoursAnalytically';
-                        if (GetSelectedWorkPlaceId() != '')
-                            data.genericId = GetSelectedWorkPlaceId();
+                        data.predicate = 'ProjectionEmployeeRealHoursSum';
+                        if (GetSelectedEmployeeId() != '')
+                            data.genericId = GetSelectedEmployeeId();
                         data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
                         data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                        data.ShowHoursInPercentage = GetSliderHourChoiceValue();
                         return JSON.stringify(data);
                     }
                 },
@@ -171,34 +198,33 @@
         const CreateDatatableColumns = () => {
             var columns = []
             columns.push({
-                data: "FirstName",
+                data: "Title",
                 searchable: false,
                 orderable: true,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'FirstName')
+                    'Title')
             });
             columns.push({
-                data: "LastName",
+                data: "",
                 searchable: false,
                 orderable: true,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'LastName')
+                    'TotalHours')
             });
             columns.push({
-                data: "ErpCode",
+                data: "TotalHoursDay",
                 searchable: false,
                 orderable: true,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ErpCode')
+                    'TotalHoursDay')
             });
-            //Add days of month
-            for (var i = 0; i < GetDaysDifferenceFromRange(); i++)
-                columns.push({
-                    "data": "Day_" + i,
-                    "searchable": false,
-                    "orderable": true
-                });
-
+            columns.push({
+                data: "TotalHoursNight",
+                searchable: false,
+                orderable: true,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'TotalHoursNight')
+            });
             return columns;
         }
         const RenderDataFromDatatable = (data, property) => {
@@ -208,47 +234,29 @@
                 return "";
         }
 
-        const GetDaysColumns = () => {
-            var thElements='';
-            for (var i = 0; i < GetDaysDifferenceFromRange(); i++) {
-                var colDate= GetStartOn();
-                colDate.setDate(colDate.getDate() + i);
-                thElements = thElements + CreateThElement(colDate);
-            }
-            return thElements;
-        };
-
-        const CreateThElement = (date, dayState) =>
-            '<th style="white-space: nowrap;">' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
-            ' ' +
-            date.getDate() +
-            ' ' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
-            '</th>';
 
         const DeleteDataTableHTML = () =>
-            document.getElementById('EmployeesRealWorkHoursAnalytically').remove();
+            document.getElementById('EmployeeRealHoursSumDatatable').remove();
 
         const AppendNewDataTableHTML = () => {
 
             document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
                 '<div class="box-body table-responsive">'+
-                    '<table id="EmployeesRealWorkHoursAnalytically" class="table table-bordered table-hover table-responsive">'+
+                    '<table id="EmployeeRealHoursSumDatatable" class="table table-bordered table-hover table-responsive">'+
                         '<thead>'+
                             '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                GetDaysColumns()+
+                                '<th>Πόστο</th>'+
+                                '<th>Σύνολο ώρες</th>'+
+                                '<th>Σύνολο ώρες μέρα</th>'+
+                                '<th>Σύνολο ώρες νύχτα</th>'+
                             '</tr>'+
                         '</thead>'+
                         '<tfoot>'+
                             '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                GetDaysColumns() +
+                                '<th>Πόστο</th>'+
+                                '<th>Σύνολο ώρες</th>'+
+                                '<th>Σύνολο ώρες μέρα</th>' +
+                                '<th>Σύνολο ώρες νύχτα</th>' +
                             '</tr>'+
                         '</tfoot>'+
                     '</table>'+

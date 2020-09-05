@@ -231,7 +231,7 @@ namespace WebApplication.Api
             if (datatable.Predicate == "CustomerEdit")
             {
                 includes.Add(x => x.Include(y => y.Customer));
-                 filter = x => true;
+                filter = x => true;
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
@@ -240,7 +240,7 @@ namespace WebApplication.Api
             {
                 includes.Add(x => x.Include(y => y.Customer));
                 includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
-                 filter = x => x.Customer.Company != null;
+                filter = x => x.Customer.Company != null;
 
 
                 workPlaces = await _baseDataWork.WorkPlaces
@@ -264,13 +264,22 @@ namespace WebApplication.Api
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
+            if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
+            {
+                filter = x => true;
+                if (datatable.GenericId != 0)
+                    filter = x => x.EmployeeWorkPlaces.Any(y => y.EmployeeId == datatable.GenericId);
 
-            var mapedData = MapResults(workPlaces, datatable);
+                workPlaces = await _baseDataWork.WorkPlaces
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }
+
+            var mapedData = await MapResults(workPlaces, datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<WorkPlace> results, Datatable datatable)
+        protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<WorkPlace> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<WorkPlace>(_securityDatawork);
@@ -334,6 +343,30 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "TimeShiftIndex")
                 {
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
+                {
+                    var totalSeconds = await _baseDataWork.RealWorkHours
+                           .GetEmployeeTotalSecondsFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn,workplace.Id);
+
+                    var totalSecondsDay = await _baseDataWork.RealWorkHours
+                           .GetEmployeeTotalSecondsDayFromRange( datatable.GenericId,datatable.StartOn, datatable.EndOn, workplace.Id);
+
+                    var totalSecondsNight = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsNightFromRange(datatable.GenericId,datatable.StartOn, datatable.EndOn, workplace.Id);
+                    if (datatable.ShowHoursInPercentage)
+                    {
+                        dictionary.Add("TotalHours", totalSeconds / 60 / 60);
+                        dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 60);
+                        dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 60);
+                    }
+                    else
+                    {
+                        dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
+                    }
                     returnObjects.Add(expandoObj);
                 }
 

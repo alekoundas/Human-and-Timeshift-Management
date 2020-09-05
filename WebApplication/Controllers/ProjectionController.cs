@@ -45,7 +45,7 @@ namespace WebApplication.Controllers
             return View();
         }
 
-        public IActionResult RealWorkHour()
+        public IActionResult RealWorkHoursSpecificDates()
         {
             ViewData["Title"] = "Επιλεγμένες ημερομηνίες";
             ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";

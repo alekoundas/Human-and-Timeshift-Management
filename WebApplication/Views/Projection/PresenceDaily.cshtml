@@ -1,0 +1,201 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
+
+            <hr />
+
+            <div class="box-body">
+                <div style="width:100%;">
+                    <div style="width:50%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Πόστο</label>
+                            <div class="input-group" style="width:100%">
+                                <select id="WorkPlace_Select2" style="width:70%"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+                <table id="PresenceDailyDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Erp Code</th>
+                            <th>ΑΦΜ</th>
+                            <th>Σήμερα</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Erp Code</th>
+                            <th>ΑΦΜ</th>
+                            <th>Σήμερα</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const GetSelectedWorkPlaceId = () =>
+            document.getElementById('WorkPlace_Select2').value;
+
+        const GetSliderWorkHourValue = () =>
+            document.getElementById('SliderWorkHour').checked == true;
+
+        const GetSliderRealWorkHourValue = () =>
+            document.getElementById('SliderRealWorkHour').checked == true;
+
+        const GetStartOn = () =>
+            moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm');
+
+        const GetEndOn = () => {
+
+            var date = new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+            date.setHours(23, 59, 59, 59);
+            return date
+        }
+
+        const setHoursToMax = date => {
+            var newDate = new Date(date);
+            newDate.setHours(23, 59, 59);
+            return moment(newDate);
+        }
+    </script>
+    <script>
+        $('#WorkPlace_Select2').select2({
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        }).on('change', () =>
+            $('#PresenceDailyDatatable').DataTable().ajax.reload());
+
+
+
+
+        $('#PresenceDailyDatatable').DataTable({
+            serverSide: true,
+            colReorder: true,
+            dom: 'frtlp',
+            ajax: {
+                url: '/api/employees/datatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
+
+                    data.predicate = 'ProjectionPresenceDaily';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.genericId = GetSelectedWorkPlaceId();
+
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[1, 'desc']],
+            columns: [
+                {
+                    data: "FirstName",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        //console.log(data);
+                        if (data.FirstName != null)
+                            return data.FirstName;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "LastName",
+                    searchable: false,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.LastName != null)
+                            return data.LastName;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "ErpCode",
+                    searchable: false,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.ErpCode != null)
+                            return data.ErpCode;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Afm",
+                    searchable: false,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.Afm != null)
+                            return data.Afm;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Today",
+                    searchable: false,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.Today != null)
+                            return data.Today;
+                        else
+                            return "";
+                    }
+                }
+            ]
+        });
+
+    </script>
+}
