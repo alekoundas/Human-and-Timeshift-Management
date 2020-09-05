@@ -77,7 +77,7 @@
             detailButton.firstElementChild.classList.remove('fa-plus-circle');
 
             detailButton.classList.add('btn-danger');
-            detailButton.firstElementChild.add('fa-minus-circle');
+            detailButton.firstElementChild.classList.add('fa-minus-circle');
         }
 
         const SetDetailsButtonOff = id => {
@@ -108,7 +108,7 @@
                     className: 'details-control',
                     orderable: false,
                     data: null,
-                    render: (a, b, data, d) =>  '<button id="DetailsButtonNum_' + data.Id + '" class="btn btn-circle btn-success DetailsButton"><i class="fa fa-plus-circle"></i></button>'
+                    render: (a, b, data, d) =>  '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn btn-circle btn-success DetailsButton"><i class="fa fa-plus-circle"></i></button>'
                 },
                 {
                     data: "Title",

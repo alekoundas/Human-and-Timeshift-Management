@@ -1,0 +1,309 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
+
+            <hr />
+
+
+            <div class="box-body">
+                <div style="width:100%;">
+                    <div style="width:50%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Πόστο</label>
+                            <div class="input-group" style="width:100%">
+                                <select id="WorkPlace_Select2" style="width:70%"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div style="width:50%; float:left;">
+                        <label class="control-label">Χρονικό έυρος</label>
+                        <div class="input-group">
+                            <input id="SearchRangeInput" class="form-control" />
+                        </div>
+
+                    </div>
+                </div>
+                <div style="width:100%;">
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Τρόπος εμγάνισης χρόνου</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderHourChoice">
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <hr />
+            <div id="DataTableDiv"></div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script>
+
+
+        const ConvertDateForApi = timeStamp =>
+            CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
+
+        CompleteTimeWithZerosForApiPost = date => {
+            var year = date.getFullYear();
+            var month = String((date.getMonth() + 1)).length == 1 ?
+                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+            var day = String(date.getDate()).length == 1 ?
+                '0' + date.getDate() : date.getDate();
+            var hour = String(date.getHours()).length == 1 ?
+                '0' + date.getHours() : date.getHours();
+            var min = String(date.getMinutes()).length == 1 ?
+                '0' + date.getMinutes() : date.getMinutes();
+
+            return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+        }
+        const GetSelectedWorkPlaceId = () =>
+            document.getElementById('WorkPlace_Select2').value;
+
+        const GetSliderHourChoiceValue = () =>
+            document.getElementById('SliderHourChoice').checked != true;
+
+        const GetStartOn = () =>
+            new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+
+        const GetEndOn = () => {
+
+            var date = new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+            date.setHours(23, 59, 59, 59);
+            return new Date(date);
+        }
+
+        const GetDaysDifferenceFromRange = () =>
+            Math.ceil(Math.abs(GetEndOn() - GetStartOn()) / (1000 * 60 * 60 * 24))
+
+        const setHoursToMax = date => {
+            var newDate = new Date(date);
+            newDate.setHours(23, 59, 59);
+            return moment(newDate);
+        }
+
+    </script>
+    <script>
+
+        $('#SliderHourChoice').bootstrapToggle({
+            on: 'HH:mm',
+            off: '%',
+            onstyle: 'primary',
+            offstyle:'primary'
+        });
+
+        $('.filterSlider').change(e =>
+            $('#EmployeesWorkHourConcentricDatatable').DataTable().ajax.reload());
+
+        $('#WorkPlace_Select2').select2({
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        }).on('change', () =>
+            $('#EmployeesWorkHourConcentricDatatable').DataTable().ajax.reload());
+
+
+        $('#SearchRangeInput').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showFooter: false,
+            calendarCount: 1,
+            startDate:  Date.now(),
+            endDate:  Date.now(),
+            format: "DD/MM/YYYY",
+            dateSeparator: '/-/',
+            locale: "el",
+            //oninit: () => AppendNewDataTableHTML();,
+            onafterselect: () => {
+                DestroyDataTable();
+                DeleteDataTableHTML();
+                AppendNewDataTableHTML();
+                CreateDataTable();
+            },
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        });
+
+        var DestroyDataTable = () => $('#EmployeesWorkHourConcentricDatatable')
+            .DataTable().destroy();
+
+        var CreateDataTable = () =>
+            $('#EmployeesWorkHourConcentricDatatable').DataTable({
+                serverSide: true,
+                colReorder: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/employees/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+
+                        data.predicate = 'ProjectionConcentric';
+                        if (GetSelectedWorkPlaceId() != '')
+                            data.genericId = GetSelectedWorkPlaceId();
+                        data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
+                        data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                        data.ShowHoursInPercentage = GetSliderHourChoiceValue();
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[1, 'desc']],
+                columns: CreateDatatableColumns(),
+            });
+
+        const CreateDatatableColumns = () => {
+            var columns = []
+            columns.push({
+                data: "FirstName",
+                searchable: false,
+                orderable: true,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'FirstName')
+            });
+            columns.push({
+                data: "LastName",
+                searchable: false,
+                orderable: true,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'LastName')
+            });
+            columns.push({
+                data: "ErpCode",
+                searchable: false,
+                orderable: true,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'ErpCode')
+            });
+            columns.push({
+                data: "TotalHours",
+                searchable: false,
+                orderable: true,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'TotalHours')
+            });
+            //Add days of month
+            for (var i = 0; i < GetDaysDifferenceFromRange(); i++)
+                columns.push({
+                    "data": "Day_" + i,
+                    "searchable": false,
+                    "orderable": true
+                }, {
+                    "data": "Night_" + i,
+                    "searchable": false,
+                    "orderable": true
+                });
+
+            return columns;
+        }
+        const RenderDataFromDatatable = (data, property) => {
+            if (data[property] != null)
+                return data[property];
+            else
+                return "";
+        }
+
+        const GetDaysColumns = () => {
+            var thElements='';
+            for (var i = 0; i < GetDaysDifferenceFromRange(); i++) {
+                var colDate= GetStartOn();
+                colDate.setDate(colDate.getDate() + i);
+                console.log(colDate);
+                thElements = thElements + CreateThElement(colDate,'Ημέρα');
+                thElements = thElements + CreateThElement(colDate,'Νύχτα');
+            }
+            return thElements;
+        };
+
+        const CreateThElement = (date, dayState) =>
+            '<th style="white-space: nowrap;">' +
+            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
+            ' ' +
+            date.getDate() +
+            ' ' +
+            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
+            ' - ' +
+            dayState +
+            '</th>';
+
+
+
+        const DeleteDataTableHTML = () =>
+            document.getElementById('EmployeesWorkHourConcentricDatatable').remove();
+
+        const AppendNewDataTableHTML = () => {
+
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
+                '<div class="box-body table-responsive">'+
+                    '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive">'+
+                        '<thead>'+
+                            '<tr>'+
+                                '<th>Όνομα</th>'+
+                                '<th>Επίθετο</th>'+
+                                '<th>Erp Code</th>'+
+                                '<th>Σύνολο ώρες</th>'+
+                                GetDaysColumns()+
+                            '</tr>'+
+                        '</thead>'+
+                        '<tfoot>'+
+                            '<tr>'+
+                                '<th>Όνομα</th>'+
+                                '<th>Επίθετο</th>'+
+                                '<th>Erp Code</th>'+
+                                '<th>Σύνολο ώρες</th>'+
+                                GetDaysColumns() +
+                            '</tr>'+
+                        '</tfoot>'+
+                    '</table>'+
+                '</div>'+
+                '');
+
+        }
+
+        $(document).ready(AppendNewDataTableHTML());
+        $(document).ready(CreateDataTable());
+
+    </script>
+}

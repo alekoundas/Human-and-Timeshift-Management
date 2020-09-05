@@ -13,5 +13,8 @@ namespace Bussiness.Repository.Base.Interface
         public bool AreDatesOverlaping(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
         public bool AreDatesOverlapingLeaves(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
         public bool AreDatesOverlapingDayOff(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
+        public Task<double> GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn);
+        public Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
+        public Task<double> GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
     }
 }

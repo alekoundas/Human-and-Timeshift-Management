@@ -65,5 +65,9 @@ namespace DataAccess.Models.Datatable
         public bool FilterByWorkHour { get; set; }
         [JsonProperty(PropertyName = "filterByRealWorkHour")]
         public bool FilterByRealWorkHour { get; set; }
+
+        //Concentric
+        [JsonProperty(PropertyName = "showHoursInPercentage")]
+        public bool ShowHoursInPercentage { get; set; }
     }
 }

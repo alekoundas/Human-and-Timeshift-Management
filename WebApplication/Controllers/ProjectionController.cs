@@ -25,5 +25,45 @@ namespace WebApplication.Controllers
             return View();
         }
 
+        public IActionResult Concentric()
+        {
+            ViewData["Title"] = "Συνγκεντρωτικό";
+            ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
+            return View();
+        }
+        public IActionResult RealWorkHoursAnalytically()
+        {
+            ViewData["Title"] = "Βάρδιες αναλυτικά";
+            ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
+            return View();
+        }
+
+        public IActionResult RealWorkHoursAnalyticallySum()
+        {
+            ViewData["Title"] = "Βάρδιες αναλυτικά σε ώρες ";
+            ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
+            return View();
+        }
+
+        //proj 4
+        public IActionResult RealWorkHour()
+        {
+            ViewData["Title"] = "Προβολή ώρες μήνα σύνολο";
+            ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
+            return View();
+        }
+        public IActionResult PresenceDaily()
+        {
+            ViewData["Title"] = "Παρουσίες ημέρας";
+            ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
+            return View();
+        } 
+        public IActionResult EmployeeRealHoursSum()
+        {
+            ViewData["Title"] = "Ώρες ανα εργαζόμενο";
+            ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
+            return View();
+        }
+
     }
 }

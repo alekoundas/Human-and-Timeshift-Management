@@ -107,6 +107,7 @@ namespace Business.Repository
 
             return await qry.ToListAsync();
         }
+      
 
     }
 }
