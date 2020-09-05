@@ -79,10 +79,10 @@ namespace WebApplication.Utilities
                 if (permition == "Edit")
                 {
                     var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
-                    if(roleId!= null)
-                    stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleEditCheckbox(true, userId, roleId)
-                            : RoleEditCheckbox(false, userId, roleId);
+                    if (roleId != null)
+                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                            ? RoleEditCheckbox(true, userId, roleId)
+                                : RoleEditCheckbox(false, userId, roleId);
                 }
 
                 if (permition == "Create")
@@ -181,14 +181,14 @@ namespace WebApplication.Utilities
 
 
 
-        public string GetToggle(string baseRole, string apiUrl, string toggleState,bool isDisabled=false)
+        public string GetToggle(string baseRole, string apiUrl, string toggleState, bool isDisabled = false)
         {
             var stringToReturn = "";
             _httpContext = new HttpContextAccessor();
             var currentUserRoles = _httpContext.HttpContext.User.Claims
                 .Select(x => x.Value).ToList();
 
-            if (currentUserRoles.Contains(baseRole + "_Edit")&& isDisabled == false)
+            if (currentUserRoles.Contains(baseRole + "_Edit") && isDisabled == false)
                 stringToReturn += EditToggle(toggleState, apiUrl);
 
             else if (currentUserRoles.Contains(baseRole + "_View"))
@@ -209,20 +209,8 @@ namespace WebApplication.Utilities
         {
             return "";
         }
-        public string GetCellBodyAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        public string GetTimeShiftEditCellBodyAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
-            //var skata = baseDatawork.Employees.Where(x =>
-            //    x.Id == employeeId &&
-            //    x.WorkHours.Any(y =>
-            //        y.TimeShiftId == datatable.GenericId &&
-            //        y.StartOn.Year == datatable.TimeShiftYear &&
-            //        y.StartOn.Month == datatable.TimeShiftMonth &&
-            //        (
-            //            y.StartOn.Day == dayOfMonth ||
-            //            y.EndOn.Day == dayOfMonth ||
-            //            (y.StartOn.Day < dayOfMonth && dayOfMonth < y.EndOn.Day)
-            //         )));
-
             //TODO :Async
             var cellWorkHours = baseDatawork.WorkHours.GetCurrentAssignedOnCell(
                 datatable.GenericId,
@@ -249,11 +237,9 @@ namespace WebApplication.Utilities
                      "</div>";
             else
             {
-
-
                 var startTimeSpan = String.Join("",
-        cellWorkHours.Select(x =>
-            SpanTimeValue(x.StartOn.ToShortTimeString())));
+                    cellWorkHours.Select(x =>
+                        SpanTimeValue(x.StartOn.ToShortTimeString())));
 
                 var endTimeSpan = String.Join("",
                     cellWorkHours.Select(x =>
@@ -274,6 +260,25 @@ namespace WebApplication.Utilities
                          FaIconAdd(dayOfMonth, "", employeeId);
             }
 
+        }
+        public async Task<string> GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(BaseDatawork baseDatawork, DateTime compareDate, Datatable datatable, int employeeId)
+        {
+            //TODO :Async
+            var cellRealWorkHours = await baseDatawork.RealWorkHours
+                .GetCurrentAssignedOnCell(compareDate, employeeId);
+
+            var cellBody = "";
+
+            foreach (var realWorkHour in cellRealWorkHours)
+            {
+                cellBody += "<p white-space: nowrap;'>" +
+                    realWorkHour.StartOn.ToShortTimeString() +
+                    " - " + 
+                    realWorkHour.EndOn.ToShortTimeString() +
+                    "</p></br>";
+            }
+
+            return cellBody;
         }
 
         private static string SpanTimeValue(string time)

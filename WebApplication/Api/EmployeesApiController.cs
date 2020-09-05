@@ -261,6 +261,16 @@ namespace WebApplication.Api
                 employees = await _baseDataWork.Employees
                      .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
+            if (datatable.Predicate == "ProjectionRealWorkHoursAnalytically")
+            {
+                Expression<Func<Employee, bool>> filter = x => true;
+                if (datatable.GenericId != 0)
+                    filter = x => x.EmployeeWorkPlaces
+                        .Any(y => y.WorkPlaceId == datatable.GenericId);
+
+                employees = await _baseDataWork.Employees
+                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }
 
             var mapedData = MapResults(employees, datatable);
 
@@ -332,7 +342,7 @@ namespace WebApplication.Api
 
                     for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
                         dictionary.Add("Day" + i,
-                            dataTableHelper.GetCellBodyAsync(_baseDataWork,
+                            dataTableHelper.GetTimeShiftEditCellBodyAsync(_baseDataWork,
                                 i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper
@@ -428,13 +438,30 @@ namespace WebApplication.Api
                             }
                             else
                             {
-
                                 dictionary.Add("Day_" + i, ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
                                 dictionary.Add("Night_" + i, ((int)nightSeconds / 60 / 60).ToString() + ":" + ((int)nightSeconds / 60 % 60).ToString());
                             }
                         }
                     returnObjects.Add(expandoObj);
 
+                }
+                else if (datatable.Predicate == "ProjectionRealWorkHoursAnalytically")
+                {
+                    if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
+                    {
+                        dictionary.Add("Day_0", await dataTableHelper
+                               .GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(
+                               _baseDataWork, datatable.StartOn, datatable, employee.Id));
+                    }
+                    else
+                        for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
+                        {
+                            var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
+                            dictionary.Add("Day_" + i,await  dataTableHelper
+                                .GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(
+                                _baseDataWork, compareDate, datatable, employee.Id));
+                        }
+                    returnObjects.Add(expandoObj);
                 }
 
             }

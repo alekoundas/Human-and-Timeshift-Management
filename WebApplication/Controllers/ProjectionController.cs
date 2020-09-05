@@ -33,22 +33,21 @@ namespace WebApplication.Controllers
         }
         public IActionResult RealWorkHoursAnalytically()
         {
-            ViewData["Title"] = "Βάρδιες αναλυτικά";
+            ViewData["Title"] = "Πραγματικές βάρδιες αναλυτικά";
             ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
             return View();
         }
 
         public IActionResult RealWorkHoursAnalyticallySum()
         {
-            ViewData["Title"] = "Βάρδιες αναλυτικά σε ώρες ";
+            ViewData["Title"] = "Πραγματικές βάρδιες αναλυτικά σε ώρες ";
             ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
             return View();
         }
 
-        //proj 4
         public IActionResult RealWorkHour()
         {
-            ViewData["Title"] = "Προβολή ώρες μήνα σύνολο";
+            ViewData["Title"] = "Επιλεγμένες ημερομηνίες";
             ViewData["Filter"] = "Προεραιτκά φίλτρα αναζήτησης";
             return View();
         }

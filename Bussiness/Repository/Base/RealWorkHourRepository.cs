@@ -43,6 +43,14 @@ namespace Bussiness.Repository.Base
                     .Where(y => y.IsDayOff)
                     .Any(y => y.Employee.Id == employeeId);
         }
+        public async Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId)
+        {
+            var filter = PredicateBuilder.New<RealWorkHour>();
+            filter = filter.And(x => x.EmployeeId == employeeId);
+            filter = filter.And(x => x.StartOn.Date == compareDate.Date);
+
+            return await Context.RealWorkHours.Where(filter).ToListAsync();
+        }
 
         public async Task<double> GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn)
         {
@@ -92,9 +100,9 @@ namespace Bussiness.Repository.Base
 
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
-            filter = filter.And(x =>  compareDate.Date == x.StartOn.Date );
+            filter = filter.And(x => compareDate.Date == x.StartOn.Date);
 
-            var   ddd =Context.RealWorkHours.First().StartOn.Date;
+            var ddd = Context.RealWorkHours.First().StartOn.Date;
             var sdafsdf = Context.RealWorkHours
                .Where(filter)
                .Select(x =>

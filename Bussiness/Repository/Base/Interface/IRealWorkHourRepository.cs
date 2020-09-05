@@ -16,5 +16,6 @@ namespace Bussiness.Repository.Base.Interface
         public Task<double> GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn);
         public Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
         public Task<double> GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
+        public Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId);
     }
 }
