@@ -7,7 +7,7 @@ namespace DataAccess.ViewModels
 {
     public class CompanyCreateViewModel
     {
-        public string AFM { get; set; }
+        public string Afm { get; set; }
         public string Description { get; set; }
         public string Title { get; set; }
 
@@ -17,7 +17,7 @@ namespace DataAccess.ViewModels
             return new Company()
             {
                 Title = viewModel.Title,
-                AFM = viewModel.AFM,
+                Afm = viewModel.Afm,
                 Description = viewModel.Description,
                 CreatedOn = DateTime.Now
             };

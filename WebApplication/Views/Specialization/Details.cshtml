@@ -13,7 +13,7 @@
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
-                    <button asp-controller="Specialization" asp-action="Index" class="btn btn-primary">Πίσω στην λίστα</button>
+                    @Html.ButtonBackToList("Specialization")
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
                 <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="Description" class="form-control" readonly="readonly" disabled />
+                        <textarea asp-for="Description" class="form-control" readonly="readonly" disabled ></textarea>
                     </div>
                 </div>
 

@@ -35,18 +35,17 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "WorkPlace_View")]
         public async Task<IActionResult> Details(int? id)
         {
-            ViewData["Title"] = "Προβολή πόστου";
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var workPlace = await _context.WorkPlaces
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (workPlace == null)
-            {
                 return NotFound();
-            }
+
+            ViewData["Title"] = "Προβολή πόστου";
+            ViewData["EmployeeDataTable"] = "Σύνολο υπαλλήλων";
 
             return View(workPlace);
         }
@@ -79,18 +78,17 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var workPlace = await _context.WorkPlaces
                 .Include(x=>x.Customer)
                 .FirstOrDefaultAsync(z=>z.Id==id);
+
             if (workPlace == null)
-            {
                 return NotFound();
-            }
+
             ViewData["Title"] = "Επεξεργασία πόστου";
+            ViewData["EmployeeDataTable"] = "Σύνολο υπαλλήλων";
             return View(workPlace);
         }
 

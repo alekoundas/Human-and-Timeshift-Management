@@ -13,6 +13,8 @@ using WebApplication.Utilities;
 using System.Dynamic;
 using Bussiness.Service;
 using DataAccess.Models.Select2;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Dynamic.Core;
 
 namespace WebApplication.Api
 {
@@ -44,9 +46,7 @@ namespace WebApplication.Api
             var specialization = await _context.Specializations.FindAsync(id);
 
             if (specialization == null)
-            {
                 return NotFound();
-            }
 
             return specialization;
         }
@@ -56,9 +56,7 @@ namespace WebApplication.Api
         public async Task<IActionResult> PutSpecialization(int id, Specialization specialization)
         {
             if (id != specialization.Id)
-            {
                 return BadRequest();
-            }
 
             _context.Entry(specialization).State = EntityState.Modified;
 
@@ -69,13 +67,9 @@ namespace WebApplication.Api
             catch (DbUpdateConcurrencyException)
             {
                 if (!SpecializationExists(id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
 
             return NoContent();
@@ -97,9 +91,7 @@ namespace WebApplication.Api
         {
             var specialization = await _context.Specializations.FindAsync(id);
             if (specialization == null)
-            {
                 return NotFound();
-            }
 
             _context.Specializations.Remove(specialization);
             await _context.SaveChangesAsync();
@@ -107,66 +99,89 @@ namespace WebApplication.Api
             return specialization;
         }
 
-        // GET: api/specializations
+        // GET: api/select2
         [HttpGet("select2")]
-        public async Task<ActionResult<Specialization>> select2(string search, int page)
+        public async Task<ActionResult<Specialization>> Select2(string search, int page)
         {
             var specializations = new List<Specialization>();
             var select2Helper = new Select2Helper();
             if (string.IsNullOrWhiteSpace(search))
             {
-                specializations = (List<Specialization>) await _baseDataWork
+                specializations = (List<Specialization>)await _baseDataWork
                     .Specializations
-                    .GetPaggingWithFilter(null, null, null,10, page);
+                    .GetPaggingWithFilter(null, null, null, 10, page);
 
                 return Ok(select2Helper.CreateSpecializationResponse(specializations));
             }
 
             specializations = (List<Specialization>)await _baseDataWork
                 .Specializations
-                .GetPaggingWithFilter(null, x => x.Name.Contains(search), null,10, page);
+                .GetPaggingWithFilter(null, x => x.Name.Contains(search), null, 10, page);
 
             return Ok(select2Helper.CreateSpecializationResponse(specializations));
         }
 
-        // POST: api/specializations
+        // POST: api/datatable
         [HttpPost("datatable")]
-        public async Task<ActionResult<Specialization>> datatable([FromBody] Datatable datatable)
+        public async Task<ActionResult<Specialization>> Datatable([FromBody] Datatable datatable)
         {
-            var total = await _baseDataWork.Employees.CountAllAsync();
+
+            var total = await _baseDataWork.Specializations.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var isDescending = datatable.Order[0].Dir == "desc";
+            var orderDirection = datatable.Order[0].Dir;
 
-            //TODO: order by
-            var specializations = await _baseDataWork.Specializations.GetWithPagging(null, pageSize, pageIndex);
+            var includes = new List<Func<IQueryable<Specialization>, IIncludableQueryable<Specialization, object>>>();
+            var specializations = new List<Specialization>();
+
+            if (datatable.Predicate == "SpecializationIndex")
+            {
+                specializations = await _baseDataWork.Specializations
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+            }
+
+            var mapedData = MapResults(specializations, datatable);
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = MapResults(specializations);
-
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Specialization> results)
+        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Specialization> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Specialization>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var result in results)
+            foreach (var specialization in results)
             {
-                var expandoObj = expandoObject.GetCopyFrom<Specialization>(result);
+                var expandoObj = expandoObject.GetCopyFrom<Specialization>(specialization);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("Specialization", "Specializations", result.Id.ToString()));
-                returnObjects.Add(expandoObj);
+
+                if (datatable.Predicate == "SpecializationIndex")
+                {
+
+                    dictionary.Add("Buttons", dataTableHelper.GetButtons("Specialization", "Specializations", specialization.Id.ToString()));
+                    returnObjects.Add(expandoObj);
+                }
             }
 
             return returnObjects;
+        }
+
+
+        private Func<IQueryable<Specialization>, IOrderedQueryable<Specialization>> SetOrderBy(string columnName, string orderDirection)
+        {
+            if (columnName != "")
+                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+            else
+                return null;
         }
 
         private bool SpecializationExists(int id)
         {
             return _context.Specializations.Any(e => e.Id == id);
         }
+
+
     }
 }

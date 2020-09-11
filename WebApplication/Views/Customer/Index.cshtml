@@ -9,9 +9,6 @@
     <div class="col-md-3"> </div>
     <div class="col-md-6">
 
-        <div class="box-header">
-            <h3 class="box-title">@ViewData["Title"]</h3>
-        </div>
 
         <div class="box box-danger" style="margin-top:5%;">
 
@@ -51,72 +48,76 @@
 </div>
 
 @section Scripts {
-        <script src="~/js/Custom/DatatableDeleteButton.js"> </script>
+    <script src="~/js/Custom/DatatableDeleteButton.js"></script>
     <script>
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
 
-            var table = $('#CustomersDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
-                    url: '/api/customers/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        return JSON.stringify(data);
+        $('#CustomersDatatable').DataTable({
+            serverSide: true,
+            responsive: true,
+            colReorder: true,
+            processing: true,
+            dom: 'Bfrtlp',
+            buttons: ['excel', 'print'],
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+            },
+            ajax: {
+                url: '/api/customers/datatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
+                    data.Predicate = 'CustomerIndex';
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[0, 'desc']],
+            columns: [
+                {
+                    data: "FirstName",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        console.log(data);
+                        if (data.FirstName != null)
+                            return data.FirstName;
+                        else
+                            return "";
                     }
                 },
-                order: [[0, 'desc']],
-                "columns": [
-                    {
-                        "data": "FirstName",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.FirstName != null)
-                                return data.FirstName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "LastName",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.LastName != null)
-                                return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Afm",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Afm != null)
-                                return data.Afm;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Buttons",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
+                {
+                    data: "LastName",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.LastName != null)
+                            return data.LastName;
+                        else
+                            return "";
                     }
-                ]
-            });
+                },
+                {
+                    data: "AFM",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.AFM != null)
+                            return data.AFM
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Buttons",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.Buttons != null)
+                            return data.Buttons;
+                        else
+                            return "";
+                    }
+                }
+            ]
         });
     </script>
 }

@@ -1,100 +1,107 @@
 ﻿@model DataAccess.ViewModels.User.ApplicationUserViewModel
 @{
-    ViewData["Title"] = "Χρήστες εφαρμογής";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="row">
-    <div class="col-sm-12">
-        <h2>@ViewData["Title"]</h2>
-    </div>
-</div>
-
 
 <div class="row">
-    <div class="col-sm-12">
-        <div class="card-box table-responsive">
-            <h4 class="m-t-0 header-title col-md-3"><b>Φακελοι Υποθεσης</b></h4>
-            <table id="usersDatatable" class="table table-bordered table-hover table-responsive">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+       
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @*@Html.ButtonCreateNew("ApplicationUser")*@
+                </div>
+            </div>
+            <hr />
+            <table id="UsersDatatable" class="table table-bordered table-hover table-responsive">
                 <thead>
                     <tr>
                         <th>UserName</th>
                         <th>Email</th>
-                        <th>Buttons</th>
+                        <th>Ενέργειες</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th data-searchable="true">UserName</th>
-                        <th data-searchable="true">Email</th>
-                        <th data-searchable="false">Buttons</th>
+                        <th>UserName</th>
+                        <th>Email</th>
+                        <th>Ενέργειες</th>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
 
+    <div class="col-md-3"> </div>
+
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-
-            var table = $('#usersDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
+           $('#UsersDatatable').DataTable({
+               serverSide: true,
+               responsive: true,
+               colReorder: true,
+               processing: true,
+               dom: 'Bfrtlp',
+               buttons: ['excel', 'print'],
+               language: {
+                   processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+               },
                 "ajax": {
-                    url: '/api/users/get',
+                    url: '/api/users/datatable',
                     type: 'POST',
                     contentType: "application/json",
-                    data: (data, type, row, meta)=> {
-                        data.predicate = "CaseIndex";
-                        console.log(data);
+                    data: (data, type, row, meta) => {
+                        data.predicate = "UserIndex";
                         return JSON.stringify(data);
                     }
                 },
-                order: [[1, 'desc']],
-                "columns": [
+                order: [[0, 'desc']],
+                columns: [
                     {
-                        "data": "UserName",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) =>{
+                        data: "UserName",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
                             if (data.UserName != null)
                                 return data.UserName;
-                            else 
+                            else
                                 return "";
                         }
 
                     },
                     {
-                        "data": "Email",
-                        "searchable": true,
-                        "orderable": true,
+                        data: "Email",
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             if (data.Email != null)
 
                                 return data.Email;
-                            else 
+                            else
                                 return "";
                         }
                     },
                     {
-                        "data": "Buttons",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Buttons",
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
-                            if (data.Buttons != null) 
+                            if (data.Buttons != null)
                                 return data.Buttons;
-                            else 
+                            else
                                 return "";
                         }
                     }
                 ]
             });
-        });
     </script>
 }
 

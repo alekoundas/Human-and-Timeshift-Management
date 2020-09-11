@@ -27,6 +27,8 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Index()
         {
             var baseDbContext = _context.Leaves.Include(l => l.Employee);
+            ViewData["Title"] = "Σύνολο αδειών";
+
             return View(await baseDbContext.ToListAsync());
         }
         [Authorize(Roles = "Leave_View")]
@@ -35,17 +37,17 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var leave = await _context.Leaves
-                .Include(l => l.Employee)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(x => x.Employee)
+                .Include(x => x.LeaveType)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (leave == null)
-            {
                 return NotFound();
-            }
+
+            ViewData["Title"] = "Προβολή άδειας";
 
             return View(leave);
         }
@@ -55,6 +57,8 @@ namespace WebApplication.Controllers
         public IActionResult Create()
         {
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id");
+            ViewData["Title"] = "Προσθήκη άδειας";
+
             return View();
         }
 
@@ -78,16 +82,19 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var leave = await _context.Leaves.FindAsync(id);
+            var leave = await _context.Leaves
+                .Include(x=>x.Employee)
+                .Include(x=>x.LeaveType)
+                .FirstOrDefaultAsync(x=>x.Id==id);
+            
             if (leave == null)
-            {
                 return NotFound();
-            }
+
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", leave.EmployeeId);
+            ViewData["Title"] ="Επεξεργασία άδειας";
+
             return View(leave);
         }
 

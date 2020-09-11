@@ -37,7 +37,7 @@
                     <div class="form-group">
                         <label asp-for="Description" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Description" class="form-control" />
+                            <textarea asp-for="Description" class="form-control"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title"></h3>
+                <h3 class="box-title">@ViewData["EmployeeDataTable"]</h3>
             </div>
             <hr />
             <div class="box-body table-responsive">
@@ -96,16 +96,16 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="true">Όνομα</th>
-                            <th data-searchable="true">Επίθετο</th>
-                            <th data-searchable="true">Ημερομηνία Γέν.</th>
-                            <th data-searchable="true">Email</th>
-                            <th data-searchable="true">ErpCode</th>
-                            <th data-searchable="true">ΑΦΜ</th>
-                            <th data-searchable="true">Αριθμ. Ταυτότητας</th>
-                            <th data-searchable="true">Ειδικότητα</th>
-                            <th data-searchable="true">Εταιρία</th>
-                            <th data-searchable="false">Εργαζόμενοι πόστου</th>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Ημερομηνία Γέν.</th>
+                            <th>Email</th>
+                            <th>ErpCode</th>
+                            <th>ΑΦΜ</th>
+                            <th>Αριθμ. Ταυτότητας</th>
+                            <th>Ειδικότητα</th>
+                            <th>Εταιρία</th>
+                            <th>Εργαζόμενοι πόστου</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -118,14 +118,18 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
 
-            var table = $('#WorkPlaceEmployeesDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
+             $('#WorkPlaceEmployeesDatatable').DataTable({
+                 serverSide: true,
+                 responsive: true,
+                 colReorder: true,
+                 processing: true,
+                 dom: 'Bfrtlp',
+                 buttons: ['excel', 'print'],
+                 language: {
+                     processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+                 },
+                ajax: {
                     url: '/api/employees/datatable',
                     type: 'POST',
                     contentType: "application/json",
@@ -138,11 +142,11 @@
                     }
                 },
                 order: [[0, 'desc']],
-                "columns": [
+                columns: [
                     {
-                        "data": "FirstName",
-                        "searchable": true,
-                        "orderable": true,
+                         data: "FirstName",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             console.log(data);
                             if (data.FirstName != null)
@@ -152,9 +156,9 @@
                         }
                     },
                     {
-                        "data": "LastName",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "LastName",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.LastName != null)
                                 return data.LastName;
@@ -163,9 +167,9 @@
                         }
                     },
                     {
-                        "data": "DateOfBirth",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "DateOfBirth",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.DateOfBirth != null)
                                 return data.DateOfBirth;
@@ -174,9 +178,9 @@
                         }
                     },
                     {
-                        "data": "Email",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "Email",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.Email != null)
                                 return data.Email;
@@ -185,9 +189,9 @@
                         }
                     },
                     {
-                        "data": "ErpCode",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "ErpCode",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.ErpCode != null)
                                 return data.ErpCode;
@@ -196,9 +200,9 @@
                         }
                     },
                     {
-                        "data": "Afm",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "Afm",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.Afm != null)
                                 return data.Afm;
@@ -207,9 +211,9 @@
                         }
                     },
                     {
-                        "data": "SocialSecurityNumber",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "SocialSecurityNumber",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.SocialSecurityNumber != null)
                                 return data.SocialSecurityNumber;
@@ -218,9 +222,9 @@
                         }
                     },
                     {
-                        "data": "ScpecializationName",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "ScpecializationName",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.ScpecializationName != null)
                                 return data.ScpecializationName;
@@ -229,9 +233,9 @@
                         }
                     },
                     {
-                        "data": "CompanyTitle",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "CompanyTitle",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.CompanyTitle != null)
                                 return data.CompanyTitle;
@@ -240,9 +244,9 @@
                         }
                     },
                     {
-                        "data": "IsInWorkPlace",
-                        "searchable": false,
-                        "orderable": false,
+                         data: "IsInWorkPlace",
+                         searchable: true,
+                         orderable: true,
                         render: (a, b, data, d) => {
                             if (data.IsInWorkPlace != null)
                                 return data.IsInWorkPlace;
@@ -251,15 +255,13 @@
                         }
                     }
                 ],
-                "fnDrawCallback": function () {
+                fnDrawCallback:  ()=> {
                     $('.ToggleSliders').bootstrapToggle({
                         on: 'Ναί',
                         off: 'Όχι'
                     });
                 },
             });
-        });
-
     </script>
 
     <script>
@@ -275,9 +277,7 @@
                 }
             });
         });
-    </script>
 
-    <script>
         $('.Customer_Select2').select2({
             ajax: {
                 url: '/api/customers/select2',

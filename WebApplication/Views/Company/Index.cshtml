@@ -11,14 +11,10 @@
     <div class="col-md-3"> </div>
     <div class="col-md-6">
 
-        <div class="box-header">
-            <h3 class="box-title">@ViewData["Title"]</h3>
-        </div>
-
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title">Διαθέσιμες εταιρίες συστήματος</h3>
+                <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
                     @Html.ButtonCreateNew("Company")
                 </div>
@@ -36,9 +32,9 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="true">Τίτλος</th>
-                            <th data-searchable="false">ΑΦΜ</th>
-                            <th data-searchable="false">Ενέργειες</th>
+                            <th>Τίτλος</th>
+                            <th>ΑΦΜ</th>
+                            <th>Ενέργειες</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -54,27 +50,32 @@
         <script src="~/js/Custom/DatatableDeleteButton.js"></script>
     <script>
 
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
 
-            var table = $('#CompaniesDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
+            $('#CompaniesDatatable').DataTable({
+                serverSide: true,
+                responsive: true,
+                colReorder: true,
+                processing: true,
+                dom: 'Bfrtlp',
+                buttons: ['excel', 'print'],
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+                },
+                ajax: {
                     url: '/api/companies/datatable',
                     type: 'POST',
                     contentType: "application/json",
                     data: (data, type, row, meta) => {
+                        data.Predicate = 'CompanyIndex';
                         return JSON.stringify(data);
                     }
                 },
                 order: [[0, 'desc']],
-                "columns": [
+                columns: [
                     {
-                        "data": "Title",
-                        "searchable": true,
-                        "orderable": true,
+                        data: "Title",
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             console.log(data);
                             if (data.Title != null)
@@ -84,20 +85,20 @@
                         }
                     },
                     {
-                        "data": "AFM",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Afm",
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
-                            if (data.AFM != null)
-                                return data.AFM;
+                            if (data.Afm != null)
+                                return data.Afm;
                             else
                                 return "";
                         }
                     },
                     {
-                        "data": "Buttons",
-                        "searchable": false,
-                        "orderable": false,
+                        data: "Buttons",
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             if (data.Buttons != null)
                                 return data.Buttons;
@@ -107,6 +108,5 @@
                     }
                 ]
             });
-        });
     </script>
 }

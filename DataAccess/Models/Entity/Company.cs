@@ -6,7 +6,7 @@ namespace DataAccess.Models.Entity
 {
     public class Company : BaseEntity
     {
-        public string AFM { get; set; }
+        public string Afm { get; set; }
         public string Description { get; set; }
         public string Title { get; set; }
 

@@ -36,18 +36,21 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var employee = await _context.Employees.Include(x => x.Company)
-                .Include(y => y.Contacts).FirstOrDefaultAsync(z => z.Id == id);
+            var employee = await _context.Employees
+                .Include(x => x.Company)
+                .Include(y => y.Contacts)
+                .Include(y => y.Specialization)
+                .FirstOrDefaultAsync(z => z.Id == id);
+
             if (employee == null)
-            {
                 return NotFound();
-            }
 
             ViewData["Title"] = "Προβολή υπαλλήλου";
+            ViewData["WorkPlaceDataTable"] = "Συμβατά πόστα προς εργασία";
+            ViewData["Contacts"] = "Eπαφές υπαλλήλου";
+
             return View(employee);
         }
 
@@ -85,8 +88,11 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees.Include(x => x.Company)
-                .Include(y => y.Contacts).FirstOrDefaultAsync(z => z.Id == id);
+            var employee = await _context.Employees
+                .Include(x => x.Company)
+                .Include(x => x.Specialization)
+                .Include(y => y.Contacts)
+                .FirstOrDefaultAsync(z => z.Id == id);
                 
             if (employee == null)
             {
@@ -94,7 +100,9 @@ namespace WebApplication.Controllers
             }
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);
             ViewData["Title"] = "Επεξεργασία υπαλλήλου";
-            ViewData["TitleDatatableWorkPlaces"] = "Συμβατά πόστα προς εργασία";
+            ViewData["WorkPlaceDataTable"] = "Συμβατά πόστα προς εργασία";
+            ViewData["Contacts"] = "Eπαφές υπαλλήλου";
+
             return View(employee);
         }
 

@@ -79,6 +79,12 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Leave_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
 
+                    //LeaveType
+                    userManager.AddToRoleAsync(user, "LeaveType_View").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Create").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Delete").Wait();
+
                     //RealWorkhour
                     userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Create").Wait();
@@ -87,7 +93,12 @@ namespace Business.Seed
 
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
-
+                    userManager.AddToRoleAsync(user, "ProjectionConcentric_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalytically_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalyticallySum_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursSpecificDates_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionPresenceDaily_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
                 }
             }
 
@@ -150,6 +161,12 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Leave_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
 
+                    //LeaveType
+                    userManager.AddToRoleAsync(user, "LeaveType_View").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Create").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Delete").Wait();
+
                     //RealWorkhour
                     userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Create").Wait();
@@ -158,6 +175,12 @@ namespace Business.Seed
 
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionConcentric_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalytically_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalyticallySum_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursSpecificDates_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionPresenceDaily_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
                 }
             }
         }
@@ -437,6 +460,40 @@ namespace Business.Seed
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
 
+            //LeaveType
+            if (!roleManager.RoleExistsAsync("LeaveType_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "LeaveType_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("LeaveType_Create").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "LeaveType_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("LeaveType_Edit").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "LeaveType_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("LeaveType_Delete").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "LeaveType_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
             //RealWorkhour
             if (!roleManager.RoleExistsAsync("RealWorkHour_View").Result)
             {
@@ -481,6 +538,61 @@ namespace Business.Seed
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             
             }
+            if (!roleManager.RoleExistsAsync("ProjectionConcentric_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "ProjectionConcentric_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+
+            }
+            if (!roleManager.RoleExistsAsync("ProjectionRealWorkHoursAnalytically_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "ProjectionRealWorkHoursAnalytically_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+
+            }
+            if (!roleManager.RoleExistsAsync("ProjectionRealWorkHoursAnalyticallySum_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "ProjectionRealWorkHoursAnalyticallySum_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+
+            }
+            if (!roleManager.RoleExistsAsync("ProjectionRealWorkHoursSpecificDates_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "ProjectionRealWorkHoursSpecificDates_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+
+            }
+            if (!roleManager.RoleExistsAsync("ProjectionPresenceDaily_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "ProjectionPresenceDaily_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+
+            }
+            if (!roleManager.RoleExistsAsync("ProjectionEmployeeRealHoursSum_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "ProjectionEmployeeRealHoursSum_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+
+            }
+
         }
     }
 }

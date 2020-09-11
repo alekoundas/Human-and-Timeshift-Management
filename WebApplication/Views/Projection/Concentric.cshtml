@@ -172,9 +172,12 @@
 
         var CreateDataTable = () =>
             $('#EmployeesWorkHourConcentricDatatable').DataTable({
-                serverSide: true,
-                colReorder: true,
-                dom: 'frtlp',
+            serverSide: true,
+            responsive: true,
+            colReorder: true,
+            processing: true,
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+              dom: 'Bfrtlp',
                 ajax: {
                     url: '/api/employees/datatable',
                     type: 'POST',

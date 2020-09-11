@@ -48,13 +48,11 @@ namespace WebApplication
                 .AddEntityFrameworkStores<SecurityDbContext>();
 
             //Redirect for account
-            //services.ConfigureApplicationCookie(options => options.LoginPath = "/Account/LogIn");
-            //services.ConfigureApplicationCookie(options => options.AccessDeniedPath = "/Account/LogInnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
             services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = "/Account/LogIn";
-                options.AccessDeniedPath = "/Account/LogInnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn";
-                options.ExpireTimeSpan = TimeSpan.FromHours(8);
+                options.AccessDeniedPath = "/Account/LogIn";
+                options.ExpireTimeSpan = TimeSpan.FromHours(9);
                 options.SlidingExpiration = true;
             });
 

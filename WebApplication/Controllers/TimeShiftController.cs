@@ -27,6 +27,8 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "TimeShift_View")]
         public IActionResult Index()
         {
+            ViewData["Title"] = "Σύνολο χρονοδιαγραμμάτων ";
+
             return View();
         }
 
@@ -43,6 +45,9 @@ namespace WebApplication.Controllers
 
             if (timeShift == null)
                 return NotFound();
+
+            ViewData["Title"] = "Προβολή χρονοδιαγράμματος ";
+            ViewData["WorkPlaceDataTable"] = "Σύνολο υπαλλήλων πόστου";
 
             return View(timeShift);
         }
@@ -77,10 +82,13 @@ namespace WebApplication.Controllers
 
             var timeShift = await _context.TimeShifts.Include(x=>x.WorkPlace)
                 .FirstOrDefaultAsync(z=>z.Id==id);
+
             if (timeShift == null)
-            {
                 return NotFound();
-            }
+
+            ViewData["Title"] = "Προβολή χρονοδιαγράμματος ";
+            ViewData["WorkPlaceDataTable"] = "Σύνολο υπαλλήλων πόστου";
+
             return View(timeShift);
         }
 

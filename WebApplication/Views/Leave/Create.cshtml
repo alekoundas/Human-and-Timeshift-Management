@@ -43,7 +43,15 @@
                 <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="Description" class="form-control" />
+                        <textarea asp-for="Description" class="form-control" ></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LeaveTypeId" class="control-label"></label>
+                    <div class="input-group" style="width:100%">
+                        <select class="LeaveType_Select2" asp-for="LeaveTypeId" style="width:70%"></select>
+                        <span asp-validation-for="LeaveTypeId" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -77,9 +85,6 @@
     <div class="col-md-3"> </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -108,6 +113,7 @@
             startOn: ConvertDateForApi(SetMinTime(GetInputValue('StartOn'))),
             endOn: ConvertDateForApi(SetMaxTime(GetInputValue('EndOn'))),
             description: GetDescription(),
+            leaveTypeId:GetSelect2LeaveTypeValue(),
             employeeIds:  GetAlreadyAppendedEmployeeIds()
         });
     </script>
@@ -160,6 +166,9 @@
 
         const GetSelect2EmployeeId = num =>
             document.getElementById('EmployeeSelect2Num_' + num).value;
+
+        const GetSelect2LeaveTypeValue = num =>
+            document.getElementById('LeaveTypeId' ).value;
 
         const GetAlreadyAppendedEmployeeIds = () =>
             [...document.getElementsByClassName('EmployeesSelect2')]
@@ -274,6 +283,18 @@
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
+        $('.LeaveType_Select2').select2({
+            ajax: {
+                url: '/api/leavetypes/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
         const EmployeeSelect2 = (num) => {
             $('#EmployeeSelect2Num_' + num).select2({
                 ajax: {
@@ -372,6 +393,8 @@
             HandleSubmitButton();
         });
 
+
+        //Save Leaves
         $('#SaveLeaves').on('click', (e) => {
             $.ajax({
                 type: "POST",

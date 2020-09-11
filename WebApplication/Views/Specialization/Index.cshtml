@@ -4,9 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
 <div class="row">
     <div class="col-md-3"> </div>
     <div class="col-md-6">
@@ -15,6 +13,9 @@
 
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonCreateNew("Specialization")
+                </div>
             </div>
             <hr />
             <div class="box-body table-responsive">
@@ -43,60 +44,62 @@
 </div>
 @section Scripts {
     <script>
-
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-
-            var table = $('#SpecializationDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
-                    url: '/api/specializations/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        return JSON.stringify(data);
+        $('#SpecializationDatatable').DataTable({
+            serverSide: true,
+            responsive: true,
+            colReorder: true,
+            processing: true,
+            dom: 'Bfrtlp',
+            buttons: ['copy', 'excel', 'print'],
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+            },
+            ajax: {
+                url: '/api/specializations/datatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
+                    data.Predicate = 'SpecializationIndex';
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[0, 'desc']],
+            columns: [
+                {
+                    data: "Name",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        console.log(data);
+                        if (data.Name != null)
+                            return data.Name;
+                        else
+                            return "";
                     }
                 },
-                order: [[0, 'desc']],
-                "columns": [
-                    {
-                        "data": "Name",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.Name != null)
-                                return data.Name;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Description",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Description != null)
-                                return data.Description;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Button",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
+                {
+                    data: "Description",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.Description != null)
+                            return data.Description;
+                        else
+                            return "";
                     }
-                ]
-            });
+                },
+                {
+                    data: "Button",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.Buttons != null)
+                            return data.Buttons;
+                        else
+                            return "";
+                    }
+                }
+            ]
         });
     </script>
 }

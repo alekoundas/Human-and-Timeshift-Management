@@ -69,5 +69,9 @@ namespace DataAccess.Models.Datatable
         //Concentric
         [JsonProperty(PropertyName = "showHoursInPercentage")]
         public bool ShowHoursInPercentage { get; set; }
+
+        //RealWorkHoursSpecificDates
+        [JsonProperty(PropertyName = "specificDates")]
+        public List<DateTime> SpecificDates { get; set; }
     }
 }

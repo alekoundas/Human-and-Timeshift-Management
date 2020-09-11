@@ -25,6 +25,24 @@ namespace WebApplication.Utilities
             pegination.More = true;
             return new Select2Response() { Results = results,Pagination = pegination };
         }
+           public Select2Response CreateLeaveTypeResponse(IEnumerable<LeaveType> leaveTypes)
+        {
+            var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
+            foreach (var result in leaveTypes)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.Name
+                });
+
+
+            pegination.More = true;
+            return new Select2Response() { Results = results,Pagination = pegination };
+        }
+
+    
 
         public Select2Response CreateCompaniesResponse(IEnumerable<Company> companies)
         {

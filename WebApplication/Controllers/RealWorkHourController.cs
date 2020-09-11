@@ -29,6 +29,8 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Index()
         {
             var baseDbContext = _context.RealWorkHours.Include(r => r.Employee).Include(r => r.TimeShift);
+            ViewData["Title"] = "Σύνολο πραγματικών βαρδιών";
+
             return View(await baseDbContext.ToListAsync());
         }
 
@@ -50,6 +52,8 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
+            ViewData["Title"] = "Σύνολο πραγματικών βαρδιών";
+
 
             return View(realWorkHour);
         }
@@ -59,6 +63,8 @@ namespace WebApplication.Controllers
 
         public IActionResult Create()
         {
+            ViewData["Title"] = "Προσθήκη πραγματικής βαρδιας";
+
             return View();
         }
 
@@ -132,18 +138,15 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var realWorkHour = await _context.RealWorkHours
                 .Include(r => r.Employee)
                 .Include(r => r.TimeShift)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (realWorkHour == null)
-            {
                 return NotFound();
-            }
 
             return View(realWorkHour);
         }
@@ -162,6 +165,7 @@ namespace WebApplication.Controllers
         [HttpGet, ActionName("CurrentDay")]
         public async Task<IActionResult> CurrentDay()
         {
+            ViewData["Title"] = "Σύνολο πραγματικών βαρδιών ημέρας";
             return View();
         }
 

@@ -42,7 +42,7 @@ namespace WebApplication.Controllers
             if (specialization == null)
                 return NotFound();
 
-            ViewData["Title"] = "Στοχοία ρόλου";
+            ViewData["Title"] = "Προβολή ρόλου";
             return View(specialization);
         }
 

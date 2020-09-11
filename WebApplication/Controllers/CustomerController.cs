@@ -10,6 +10,7 @@ using DataAccess.Models.Entity;
 using Bussiness;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using DataAccess.ViewModels.Customers;
 
 namespace WebApplication.Controllers
 {
@@ -35,20 +36,18 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "Customer_View")]
         public async Task<IActionResult> Details(int? id)
         {
-
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var customer = await _context.Customers.Include(x => x.Company)
                 .FirstOrDefaultAsync(z => z.Id == id);
+
             if (customer == null)
-            {
                 return NotFound();
-            }
 
             ViewData["Title"] = "Προβολή πελάτη ";
+            ViewData["WorkPlaceDataTable"] = "Σύνολο πόστων";
+
             return View(customer);
         }
 
@@ -63,12 +62,12 @@ namespace WebApplication.Controllers
         // POST: Customers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CustomerCreateViewModel customer)
+        public async Task<IActionResult> Create(Customer customer)
         {
             if (ModelState.IsValid)
             {
-                _baseDataWork.Customers.Add(
-                    CustomerCreateViewModel.CreateFrom(customer));
+                _baseDataWork.Customers.Add(customer);
+
                 await _baseDataWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -89,6 +88,7 @@ namespace WebApplication.Controllers
                 return NotFound();
 
             ViewData["Title"] = "Επεξεργασία πελάτη ";
+            ViewData["WorkPlaceDataTable"] = "Σύνολο πόστων";
 
             return View(customer);
         }
@@ -111,13 +111,9 @@ namespace WebApplication.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!CustomerExists(customer.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }

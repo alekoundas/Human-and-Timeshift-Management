@@ -1,13 +1,12 @@
 ﻿@model IEnumerable<DataAccess.Models.Entity.Employee>
 
 @{
-    ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row">
-    <div class="col-md-3"> </div>
-    <div class="col-md-6">
+    <div class="col-md-2"> </div>
+    <div class="col-md-8">
 
         <div class="box box-danger" style="margin-top:5%;">
 
@@ -37,160 +36,163 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="true">Όνομα</th>
-                            <th data-searchable="true">Επίθετο</th>
-                            <th data-searchable="true">Ημερομηνία Γέν.</th>
-                            <th data-searchable="true">Email</th>
-                            <th data-searchable="true">ErpCode</th>
-                            <th data-searchable="true">ΑΦΜ</th>
-                            <th data-searchable="true">Αριθμ. Ταυτότητας</th>
-                            <th data-searchable="true">Ειδικότητα</th>
-                            <th data-searchable="true">Εταιρία</th>
-                            <th data-searchable="false">Ενέργειες</th>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Ημερομηνία Γέν.</th>
+                            <th>Email</th>
+                            <th>ErpCode</th>
+                            <th>ΑΦΜ</th>
+                            <th>Αριθμ. Ταυτότητας</th>
+                            <th>Ειδικότητα</th>
+                            <th>Εταιρία</th>
+                            <th>Ενέργειες</th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
     </div>
-    <div class="col-md-3"> </div>
+    <div class="col-md-2"> </div>
 
 </div>
 <link href="~/css/Datatable/Datatable.css" rel="stylesheet" />
 @section Scripts {
     <script src="~/js/Custom/DatatableDeleteButton.js"></script>
+
     <script>
-
-        jQuery(function () {
-            var dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            var timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-
-            var table = $('#EmployeesDatatable').DataTable({
-                "serverSide": true,
-                "dom": 'frtlp',
-                "ajax": {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        return JSON.stringify(data);
+        $('#EmployeesDatatable').DataTable({
+            serverSide: true,
+            responsive: true,
+            colReorder: true,
+            processing: true,
+            dom: 'Bfrtlp',
+            buttons: ['excel', 'print'],
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+            },
+            ajax: {
+                url: '/api/employees/datatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
+                    data.Predicate='EmployeeIndex'
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[0, 'desc']],
+            columns: [
+                {
+                    data: "FirstName",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        console.log(data);
+                        if (data.FirstName != null)
+                            return data.FirstName;
+                        else
+                            return "";
                     }
                 },
-                order: [[0, 'desc']],
-                "columns": [
-                    {
-                        "data": "FirstName",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.FirstName != null)
-                                return data.FirstName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "LastName",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.LastName != null)
-                                return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "DateOfBirth",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.DateOfBirth != null)
-                                return data.DateOfBirth;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Email",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Email != null)
-                                return data.Email;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "ErpCode",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.ErpCode != null)
-                                return data.ErpCode;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Afm",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Afm != null)
-                                return data.Afm;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "SocialSecurityNumber",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.SocialSecurityNumber != null)
-                                return data.SocialSecurityNumber;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "ScpecializationName",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.ScpecializationName != null)
-                                return data.ScpecializationName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "CompanyTitle",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.CompanyTitle != null)
-                                return data.CompanyTitle;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Buttons",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
+                {
+                    data: "LastName",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.LastName != null)
+                            return data.LastName;
+                        else
+                            return "";
                     }
-                ]
-            });
+                },
+                {
+                    data: "DateOfBirth",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.DateOfBirth != null)
+                            return data.DateOfBirth;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Email",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.Email != null)
+                            return data.Email;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "ErpCode",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.ErpCode != null)
+                            return data.ErpCode;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Afm",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.Afm != null)
+                            return data.Afm;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "SocialSecurityNumber",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.SocialSecurityNumber != null)
+                            return data.SocialSecurityNumber;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "ScpecializationName",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.ScpecializationName != null)
+                            return data.ScpecializationName;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "CompanyTitle",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.CompanyTitle != null)
+                            return data.CompanyTitle;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Buttons",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.Buttons != null)
+                            return data.Buttons;
+                        else
+                            return "";
+                    }
+                }
+            ]
         });
     </script>
 }

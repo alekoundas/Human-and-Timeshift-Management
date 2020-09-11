@@ -8,7 +8,7 @@ using DataAccess;
 using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bussiness.Repository
+namespace Bussiness.Repository.Base
 {
     public class LeaveRepository : BaseRepository<Leave>, ILeaveRepository
     {

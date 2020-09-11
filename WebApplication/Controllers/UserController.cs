@@ -37,6 +37,8 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "User_View")]
         public IActionResult Index()
         {
+            ViewData["Title"] = "Σύνολο χρηστών ";
+
             return View();
         }
 
@@ -45,6 +47,8 @@ namespace WebApplication.Controllers
         public IActionResult Create()
         {
             var viewModel = new ApplicationUser();
+            ViewData["Title"] = "Προσθήκη χρήστη";
+
             return View(viewModel);
         }
 
@@ -78,9 +82,7 @@ namespace WebApplication.Controllers
             var user = _datawork.ApplicationUsers.Get(id.ToString());
             //var contact = await _datawork.Contact.FindAsync(id);
             if (user == null)
-            {
                 return NotFound();
-            }
             //ViewData["PhoneId"] = new SelectList(_context.Phone, "Id", "Id", contact.PhoneId);
 
             var returnViewModel = ControllerGetEdit.CreateFrom(user);
@@ -95,6 +97,9 @@ namespace WebApplication.Controllers
                     WorkPlaceId = x.WorkPlaceId,
                     Name = x.WorkPlaceName
                 }).ToList();
+
+            ViewData["Title"] = "Επεξεργασία χρήστη";
+
             return View(returnViewModel);
         }
 
@@ -134,6 +139,8 @@ namespace WebApplication.Controllers
         public IActionResult Details(string id)
         {
             var viewModel = _datawork.ApplicationUsers.Get(id);
+            ViewData["Title"] = "Προβολή χρήστη";
+
             return View(viewModel);
         }
 

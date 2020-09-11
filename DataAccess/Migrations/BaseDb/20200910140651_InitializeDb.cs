@@ -24,6 +24,21 @@ namespace DataAccess.Migrations.BaseDb
                 });
 
             migrationBuilder.CreateTable(
+                name: "LeaveTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeaveTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Specializations",
                 columns: table => new
                 {
@@ -46,10 +61,13 @@ namespace DataAccess.Migrations.BaseDb
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    DateOfBirth = table.Column<DateTime>(nullable: true),
-                    AFM = table.Column<string>(nullable: true),
+                    FirstName = table.Column<string>(nullable: false),
+                    LastName = table.Column<string>(nullable: false),
+                    AFM = table.Column<string>(nullable: false),
+                    Profession = table.Column<string>(nullable: true),
+                    Address = table.Column<string>(nullable: true),
+                    PostalCode = table.Column<string>(nullable: true),
+                    DOY = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     CompanyId = table.Column<int>(nullable: false)
                 },
@@ -74,10 +92,11 @@ namespace DataAccess.Migrations.BaseDb
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
                     DateOfBirth = table.Column<DateTime>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    ErpCode = table.Column<string>(nullable: true),
                     Afm = table.Column<string>(nullable: true),
                     SocialSecurityNumber = table.Column<string>(nullable: true),
+                    ErpCode = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    Address = table.Column<string>(nullable: true),
                     SpecializationId = table.Column<int>(nullable: false),
                     CompanyId = table.Column<int>(nullable: true)
                 },
@@ -148,6 +167,37 @@ namespace DataAccess.Migrations.BaseDb
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Leaves",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    StartOn = table.Column<DateTime>(nullable: false),
+                    EndOn = table.Column<DateTime>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    ApprovedBy = table.Column<string>(nullable: true),
+                    EmployeeId = table.Column<int>(nullable: false),
+                    LeaveTypeId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Leaves", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Leaves_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Leaves_LeaveTypes_LeaveTypeId",
+                        column: x => x.LeaveTypeId,
+                        principalTable: "LeaveTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -296,6 +346,16 @@ namespace DataAccess.Migrations.BaseDb
                 column: "WorkPlaceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Leaves_EmployeeId",
+                table: "Leaves",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Leaves_LeaveTypeId",
+                table: "Leaves",
+                column: "LeaveTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RealWorkHours_EmployeeId",
                 table: "RealWorkHours",
                 column: "EmployeeId");
@@ -335,10 +395,16 @@ namespace DataAccess.Migrations.BaseDb
                 name: "EmployeeWorkPlaces");
 
             migrationBuilder.DropTable(
+                name: "Leaves");
+
+            migrationBuilder.DropTable(
                 name: "RealWorkHours");
 
             migrationBuilder.DropTable(
                 name: "WorkHours");
+
+            migrationBuilder.DropTable(
+                name: "LeaveTypes");
 
             migrationBuilder.DropTable(
                 name: "Employees");

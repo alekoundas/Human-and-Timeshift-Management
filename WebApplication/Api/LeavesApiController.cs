@@ -9,6 +9,12 @@ using DataAccess;
 using DataAccess.Models.Entity;
 using Bussiness;
 using DataAccess.ViewModels.Leaves;
+using DataAccess.Models.Datatable;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Dynamic;
+using WebApplication.Utilities;
+using Bussiness.Service;
+using System.Linq.Dynamic.Core;
 
 namespace WebApplication.Api
 {
@@ -81,6 +87,7 @@ namespace WebApplication.Api
                         EndOn = apiLeave.EndOn,
                         Description = apiLeave.Description,
                         EmployeeId = id,
+                        LeaveTypeId=apiLeave.LeaveTypeId,
                         CreatedOn = DateTime.Now
                     }));
             await _context.SaveChangesAsync();
@@ -120,7 +127,62 @@ namespace WebApplication.Api
 
             return Ok(dataToReturn);
         }
+        // POST: api/datatable
+        [HttpPost("datatable")]
+        public async Task<ActionResult<Leave>> Datatable([FromBody] Datatable datatable)
+        {
 
+            var total = await _baseDataWork.Specializations.CountAllAsync();
+            var pageSize = datatable.Length;
+            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            var orderDirection = datatable.Order[0].Dir;
+
+            var includes = new List<Func<IQueryable<Leave>, IIncludableQueryable<Leave, object>>>();
+            var leaves = new List<Leave>();
+
+            if (datatable.Predicate == "LeaveIndex")
+            {
+                includes.Add(x => x.Include(y => y.LeaveType));
+                leaves = await _baseDataWork.Leaves
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+            }
+
+            var mapedData = MapResults(leaves, datatable);
+
+            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
+            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+        }
+
+        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Leave> results, Datatable datatable)
+        {
+            var expandoObject = new ExpandoCopier();
+            var dataTableHelper = new DataTableHelper<Leave>(_securityDatawork);
+            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+            foreach (var leaves in results)
+            {
+                var expandoObj = expandoObject.GetCopyFrom<Leave>(leaves);
+                var dictionary = (IDictionary<string, object>)expandoObj;
+
+                if (datatable.Predicate == "LeaveIndex")
+                {
+                    dictionary.Add("LeaveTypeName", leaves.LeaveType.Name);
+                    dictionary.Add("Buttons", dataTableHelper.GetButtons("Leave", "Leaves", leaves.Id.ToString()));
+                    returnObjects.Add(expandoObj);
+                }
+            }
+
+            return returnObjects;
+        }
+
+
+        private Func<IQueryable<Leave>, IOrderedQueryable<Leave>> SetOrderBy(string columnName, string orderDirection)
+        {
+            if (columnName != "")
+                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+            else
+                return null;
+        }
 
         private bool LeaveExists(int id)
         {

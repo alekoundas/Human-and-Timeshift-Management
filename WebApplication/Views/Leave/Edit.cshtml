@@ -1,55 +1,116 @@
 ﻿@model DataAccess.Models.Entity.Leave
 
 @{
-    ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
-
-<h4>Leave</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="StartOn" class="control-label"></label>
-                <input asp-for="StartOn" class="form-control" />
-                <span asp-validation-for="StartOn" class="text-danger"></span>
+    <div class="col-md-1"> </div>
+    <div class="col-md-8">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonBackToList("Leave")
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="EndOn" class="control-label"></label>
-                <input asp-for="EndOn" class="form-control" />
-                <span asp-validation-for="EndOn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CreatedOn" class="control-label"></label>
-                <input asp-for="CreatedOn" class="form-control" />
-                <span asp-validation-for="CreatedOn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
+
+            <hr />
+
+            <form asp-controller="Employee" asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="StartOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="StartOn" class="form-control" />
+                            <span asp-validation-for="StartOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="EndOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="EndOn" class="form-control" />
+                            <span asp-validation-for="EndOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <div class="input-group">
+                            <textarea asp-for="Description" class="form-control" ></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                  
+                    <div class="form-group">
+                        <label asp-for="EmployeeId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
+                                <option value="@Model.EmployeeId" selected="selected">@Model.Employee.FullName</option>
+                            </select>
+                            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LeaveTypeId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="LeaveType_Select2" asp-for="LeaveTypeId" style="width:50%">
+                                <option value="@Model.LeaveTypeId" selected="selected">@Model.LeaveType.Name</option>
+                            </select>
+                            <span asp-validation-for="LeaveTypeId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+        </div>
     </div>
+    <div class="col-md-1"> </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+
+    <script>
+        $('.LeaveType_Select2').select2({
+            ajax: {
+                url: '/api/leavetypes/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
+        $('.Employee_Select2').select2({
+            ajax: {
+                url: '/api/employees/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+    </script>
+
 }

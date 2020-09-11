@@ -228,6 +228,13 @@ namespace WebApplication.Api
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
+            if (datatable.Predicate == "CustomerDetails")
+            {
+                includes.Add(x => x.Include(y => y.Customer));
+
+                workPlaces = await _baseDataWork.WorkPlaces
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }
             if (datatable.Predicate == "CustomerEdit")
             {
                 includes.Add(x => x.Include(y => y.Customer));
@@ -250,8 +257,7 @@ namespace WebApplication.Api
             {
                 includes.Add(x => x.Include(y => y.Customer));
                 includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
-                filter = x =>
-                x.EmployeeWorkPlaces.Any(y => y.EmployeeId == datatable.GenericId);
+                filter = x => x.Customer.Company != null;
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
@@ -293,6 +299,20 @@ namespace WebApplication.Api
                     dictionary.Add("Buttons", dataTableHelper.GetButtons(
                         "WorkPlace", "WorkPlaces", workplace.Id.ToString()));
                     dictionary.Add("CustomerFullName", workplace.Customer?.FullName);
+                    returnObjects.Add(expandoObj);
+                }
+                if (datatable.Predicate == "CustomerDetails")
+                {
+                    var apiUrl = UrlHelper.CustomerWorkPlace(datatable.GenericId,
+                         workplace.Id);
+
+                    if (workplace.Customer != null)
+                        dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
+                            "WorkPlace", apiUrl, "checked",true));
+                    else
+                        dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
+                            "WorkPlace", apiUrl, "",true));
+
                     returnObjects.Add(expandoObj);
                 }
                 else if (datatable.Predicate == "CustomerEdit")

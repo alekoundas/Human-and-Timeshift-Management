@@ -48,9 +48,41 @@
                     </div>
 
                     <div class="form-group">
+                        <label asp-for="Profession" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Profession" class="form-control" />
+                            <span asp-validation-for="Profession" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Address" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Address" class="form-control" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PostalCode" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="PostalCode" class="form-control" />
+                            <span asp-validation-for="PostalCode" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DOY" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="DOY" class="form-control" />
+                            <span asp-validation-for="DOY" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label asp-for="Description" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Description" class="form-control" />
+                            <textarea asp-for="Description" class="form-control"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                     </div>
@@ -85,7 +117,7 @@
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title"></h3>
+                <h3 class="box-title">@ViewData["WorkPlaceDataTable"]</h3>
             </div>
             <hr />
             <div class="box-body table-responsive">

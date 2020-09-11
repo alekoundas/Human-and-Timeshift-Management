@@ -32,6 +32,7 @@ namespace Bussiness
         public ITimeShiftRepository TimeShifts { get; private set; }
         public IEmployeeWorkPlaceRepository EmployeeWorkPlaces { get; private set; }
         public ILeaveRepository Leaves { get; private set; }
+        public ILeaveTypeRepository LeaveTypes { get; private set; }
 
         public BaseDatawork(BaseDbContext baseDbContext)
         {
@@ -46,6 +47,7 @@ namespace Bussiness
             TimeShifts = new TimeShiftRepository(_dbcontext);
             EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
             Leaves = new LeaveRepository(_dbcontext);
+            LeaveTypes = new LeaveTypeRepository(_dbcontext);
         }
 
         public async Task<int> SaveChangesAsync()

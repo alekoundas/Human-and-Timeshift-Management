@@ -146,22 +146,22 @@
                 @Html.LinkButton("Projection", "Difference", "Διαφορές", "ProjectionDifference_View")
             </li>
             <li class="treeview-menu">
-                @Html.LinkButton("Projection", "Concentric", "Συγκεντρωτικό", "")
+                @Html.LinkButton("Projection", "Concentric", "Συγκεντρωτικό", "ProjectionConcentric_View")
             </li>
             <li class="treeview-menu">
-                @Html.LinkButton("Projection", "RealWorkHoursAnalytically", "Π. βάρδιες αναλυτικά", "")
+                @Html.LinkButton("Projection", "RealWorkHoursAnalytically", "Π. βάρδιες αναλυτικά", "ProjectionRealWorkHoursAnalytically_View")
             </li>
             <li class="treeview-menu">
-                @Html.LinkButton("Projection", "RealWorkHoursAnalyticallySum", "Π. βάρδιες αναλυτικά σε ώρες", "")
+                @Html.LinkButton("Projection", "RealWorkHoursAnalyticallySum", "Π. βάρδιες αναλυτικά σε ώρες", "ProjectionRealWorkHoursAnalyticallySum_View")
             </li>
             <li class="treeview-menu">
-                @Html.LinkButton("Projection", "RealWorkHoursSpecificDates", "Επιλεγμένες ημερομηνίες", "")
+                @Html.LinkButton("Projection", "RealWorkHoursSpecificDates", "Επιλεγμένες ημερομηνίες", "ProjectionRealWorkHoursSpecificDates_View")
             </li>
             <li class="treeview-menu">
-                @Html.LinkButton("Projection", "EmployeeRealHoursSum", "Ώρες ανα εργαζόμενο", "")
+                @Html.LinkButton("Projection", "EmployeeRealHoursSum", "Ώρες ανα εργαζόμενο", "ProjectionEmployeeRealHoursSum_View")
             </li>
             <li class="treeview-menu">
-                @Html.LinkButton("Projection", "PresenceDaily", "Παρουσίες ημέρας", "")
+                @Html.LinkButton("Projection", "PresenceDaily", "Παρουσίες ημέρας", "ProjectionPresenceDaily_View")
             </li>
 
 
@@ -180,6 +180,18 @@
                 <ul class="treeview-menu">
                     @Html.LinkButton("Specialization", "Index", "Ειδικότητες", "Specialization_View")
                     @Html.LinkButton("Specialization", "Create", "Προσθήκη ειδικότητας", "Specialization_Create")
+                </ul>
+            </li>
+            <li class="treeview ">
+                <a href="#">
+                    <i class="fa fa-database"></i> <span>Είδος άδειας</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    @Html.LinkButton("LeaveType", "Index", "Άδειες", "LeaveType_View")
+                    @Html.LinkButton("LeaveType", "Create", "Προσθήκη άδειας", "LeaveType_Create")
                 </ul>
             </li>
             }

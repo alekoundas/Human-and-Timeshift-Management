@@ -12,6 +12,8 @@ using Bussiness;
 using System.Dynamic;
 using Bussiness.Service;
 using DataAccess.Models.Datatable;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Dynamic.Core;
 
 namespace WebApplication.Api
 {
@@ -127,12 +129,13 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<Customer>> Datatable([FromBody] Datatable datatable)
         {
-
-            var total = await _baseDataWork.Employees.CountAllAsync();
+            var total = await _baseDataWork.Customers.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var isDescending = datatable.Order[0].Dir == "desc";
+            var orderDirection = datatable.Order[0].Dir;
+
+            var includes = new List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>();
             var customers = new List<Customer>();
 
             if (string.IsNullOrWhiteSpace(datatable.Predicate))
@@ -141,9 +144,10 @@ namespace WebApplication.Api
                 customers = await _baseDataWork.Customers.GetPaggingWithFilter(null, null, null, pageSize, pageIndex);
             }
 
-            if (datatable.Predicate == "CompanyEdit")
+            if (datatable.Predicate == "CustomerIndex")
             {
-
+                customers = await _baseDataWork.Customers
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
             }
 
 
@@ -167,6 +171,14 @@ namespace WebApplication.Api
             }
 
             return returnObjects;
+        }
+
+        private Func<IQueryable<Customer>, IOrderedQueryable<Customer>> SetOrderBy(string columnName, string orderDirection)
+        {
+             if (columnName != "")
+                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+            else
+                return null;
         }
 
         private bool CustomerExists(int id)

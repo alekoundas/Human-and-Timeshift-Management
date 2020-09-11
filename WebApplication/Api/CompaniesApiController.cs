@@ -160,19 +160,24 @@ namespace WebApplication.Controllers
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var isDescending = datatable.Order[0].Dir == "desc";
+            var orderDirection = datatable.Order[0].Dir;
 
+            var includes = new List<Func<IQueryable<Company>, IIncludableQueryable<Company, object>>>();
 
-            //TODO: order by
-            var companies = await _baseDataWork.Companies.GetWithPagging(SetOrderBy(columnName,isDescending), pageSize, pageIndex);
+            var companies = new List<Company>();
+            if (datatable.Predicate == "CompanyIndex")
+            {
+                companies = await _baseDataWork.Companies.GetWithPagging(SetOrderBy(columnName, orderDirection), pageSize, pageIndex);
+
+            }
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = MapResults(companies);
+            var mapedData = MapResults(companies, datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        private IEnumerable<ExpandoObject> MapResults(IEnumerable<Company> results)
+        private IEnumerable<ExpandoObject> MapResults(IEnumerable<Company> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Company>(_securityDatawork);
@@ -181,18 +186,24 @@ namespace WebApplication.Controllers
             {
                 var expandoObj = expandoObject.GetCopyFrom<Company>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("Company", "Companies", result.Id.ToString()));
+
+                if (datatable.Predicate == "CompanyIndex")
+                {
+                    dictionary.Add("Buttons", dataTableHelper.GetButtons("Company", "Companies", result.Id.ToString()));
+
+                }
+
                 returnObjects.Add(expandoObj);
             }
 
             return returnObjects;
         }
-        private Func<IQueryable<Company>, IOrderedQueryable<Company>> SetOrderBy(string collumnName, bool isDiscending)
+        private Func<IQueryable<Company>, IOrderedQueryable<Company>> SetOrderBy(string columnName, string orderDirection)
         {
-            if (isDiscending)
-                return x => x.OrderBy(collumnName+" DESC");
+            if (columnName != "")
+                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             else
-                return x => x.OrderBy(collumnName+" ASC");
+                return null;
         }
 
         private bool CompanyExists(int id)

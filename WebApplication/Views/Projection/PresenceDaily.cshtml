@@ -121,8 +121,11 @@
 
         $('#PresenceDailyDatatable').DataTable({
             serverSide: true,
+            responsive: true,
             colReorder: true,
-            dom: 'frtlp',
+            processing: true,
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+           dom: 'Bfrtlp',
             ajax: {
                 url: '/api/employees/datatable',
                 type: 'POST',

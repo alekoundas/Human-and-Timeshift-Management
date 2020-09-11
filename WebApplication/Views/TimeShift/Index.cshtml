@@ -74,19 +74,19 @@
         const SetDetailsButtonOn = id => {
             var detailButton = document.getElementById('DetailsButtonNum_' + id);
             detailButton.classList.remove('btn-success');
-            detailButton.firstElementChild.classList.remove('fa-plus-circle');
+            detailButton.firstElementChild.classList.remove('fa-plus');
 
             detailButton.classList.add('btn-danger');
-            detailButton.firstElementChild.classList.add('fa-minus-circle');
+            detailButton.firstElementChild.classList.add('fa-minus');
         }
 
         const SetDetailsButtonOff = id => {
             var detailButton = document.getElementById('DetailsButtonNum_' + id);
             detailButton.classList.remove('btn-danger');
-            detailButton.firstElementChild.classList.remove('fa-minus-circle');
+            detailButton.firstElementChild.classList.remove('fa-minus');
 
             detailButton.classList.add('btn-success');
-            detailButton.firstElementChild.classList.add('fa-plus-circle');
+            detailButton.firstElementChild.classList.add('fa-plus');
         }
 
 
@@ -108,7 +108,7 @@
                     className: 'details-control',
                     orderable: false,
                     data: null,
-                    render: (a, b, data, d) =>  '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn btn-circle btn-success DetailsButton"><i class="fa fa-plus-circle"></i></button>'
+                    render: (a, b, data, d) =>  '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>'
                 },
                 {
                     data: "Title",

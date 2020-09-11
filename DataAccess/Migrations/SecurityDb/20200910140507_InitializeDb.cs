@@ -16,7 +16,9 @@ namespace DataAccess.Migrations.SecurityDb
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
                     Controller = table.Column<string>(nullable: true),
-                    Permition = table.Column<string>(nullable: true)
+                    Permition = table.Column<string>(nullable: true),
+                    WorkPlaceName = table.Column<string>(nullable: true),
+                    WorkPlaceId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

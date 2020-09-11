@@ -14,7 +14,11 @@ namespace DataAccess.ViewModels.Leaves
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
 
+        [JsonProperty(PropertyName = "leaveTypeId", Required = Required.Default)]
+        public int LeaveTypeId { get; set; }
+
         [JsonProperty(PropertyName = "employeeIds", Required = Required.Default)]
         public List<int> EmployeeIds { get; set; }
+
     }
 }

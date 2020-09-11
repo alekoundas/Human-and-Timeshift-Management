@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApplication.Utilities;
+using System.Linq.Dynamic.Core;
 
 namespace WebApplication.Api.Security
 {
@@ -34,39 +35,57 @@ namespace WebApplication.Api.Security
             _userManager = userManager;
         }
 
-        [HttpPost("get")]
-        public async Task<ActionResult<ApplicationUser>> Get([FromBody] Datatable datatable)
+        [HttpPost("datatable")]
+        public async Task<ActionResult<ApplicationUser>> DataTable([FromBody] Datatable datatable)
         {
             var total = _securityDatawork.ApplicationUsers.CountAll();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var isDescending = datatable.Order[0].Dir == "desc";
+            var orderDirection = datatable.Order[0].Dir;
+
+            var applicationUsers = new List<ApplicationUser>();
 
             //TODO: order by
-            var applicationUsers = await _securityDatawork.ApplicationUsers.GetWithPagging(null, pageSize, pageIndex);
+            if (datatable.Predicate == "UserIndex")
+            {
+                applicationUsers = await _securityDatawork.ApplicationUsers.GetWithPagging(SetOrderBy(columnName, orderDirection), pageSize, pageIndex);
+
+            }
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = MapResults(applicationUsers);
+            var mapedData = MapResults(applicationUsers, datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<ApplicationUser> results)
+        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<ApplicationUser> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<ApplicationUser>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var result in results)
+            foreach (var user in results)
             {
-                var expandoObj = expandoObject.GetCopyFrom<ApplicationUser>(result);
+                var expandoObj = expandoObject.GetCopyFrom<ApplicationUser>(user);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("User","Users", result.Id));
-                returnObjects.Add(expandoObj);
+
+                if (datatable.Predicate == "UserIndex")
+                {
+                    dictionary.Add("Buttons", dataTableHelper.GetButtons("User", "Users", user.Id));
+                    returnObjects.Add(expandoObj);
+                }
             }
 
             return returnObjects;
+        }
+
+        private Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> SetOrderBy(string columnName, string orderDirection)
+        {
+            if (columnName != "")
+                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+            else
+                return null;
         }
 
     }
