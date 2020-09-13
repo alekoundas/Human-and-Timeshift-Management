@@ -14,6 +14,7 @@ using Bussiness.Service;
 using DataAccess.Models.Datatable;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
+using LinqKit;
 
 namespace WebApplication.Api
 {
@@ -107,22 +108,26 @@ namespace WebApplication.Api
         [HttpGet("select2")]
         public async Task<ActionResult<Customer>> select2(string search, int page)
         {
+
             var customers = new List<Customer>();
             var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<Customer>();
+            filter = filter.And(x => true);
+
             if (string.IsNullOrWhiteSpace(search))
-            {
-                customers = (List<Customer>)await _baseDataWork
-                    .Customers
+                customers = await _baseDataWork.Customers
                     .GetPaggingWithFilter(null, null, null, 10, page);
+            else
+            {
+                filter = filter.And(x => x.FirstName.Contains(search));
 
-                return Ok(select2Helper.CreateCustomersResponse(customers));
+                customers = await _baseDataWork.Customers
+                    .GetPaggingWithFilter(null, filter, null, 10, page);
             }
+            var total = await _baseDataWork.Customers.CountAllAsyncFiltered(filter);
+            var hasMore = (page * 10) < total;
 
-            customers = await _baseDataWork
-                .Customers
-                .GetPaggingWithFilter(null, x => x.FirstName.Contains(search) || x.LastName.Contains(search), null, 10, page);
-
-            return Ok(select2Helper.CreateCustomersResponse(customers));
+            return Ok(select2Helper.CreateCustomersResponse(customers, hasMore));
         }
 
         // POST: api/customers/datatable

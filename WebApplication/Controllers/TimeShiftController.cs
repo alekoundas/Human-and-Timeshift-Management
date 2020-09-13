@@ -27,7 +27,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "TimeShift_View")]
         public IActionResult Index()
         {
-            ViewData["Title"] = "Σύνολο χρονοδιαγραμμάτων ";
+            ViewData["Title"] = "Σύνολο χρονοδιαγραμμάτων ανα πόστο ";
 
             return View();
         }

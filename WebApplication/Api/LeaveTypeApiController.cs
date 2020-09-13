@@ -14,6 +14,7 @@ using Bussiness.Service;
 using System.Linq.Dynamic.Core;
 using Bussiness;
 using Microsoft.EntityFrameworkCore.Query;
+using LinqKit;
 
 namespace WebApplication.Api
 {
@@ -103,22 +104,25 @@ namespace WebApplication.Api
         [HttpGet("select2")]
         public async Task<ActionResult<LeaveType>> Select2(string search, int page)
         {
-            var leaveTypes = new List<LeaveType>();
+            var specializations = new List<LeaveType>();
             var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<LeaveType>();
+            filter = filter.And(x => true);
+
             if (string.IsNullOrWhiteSpace(search))
-            {
-                leaveTypes = (List<LeaveType>)await _baseDataWork
-                    .LeaveTypes
+                specializations = await _baseDataWork.LeaveTypes
                     .GetPaggingWithFilter(null, null, null, 10, page);
+            else
+            {
+                filter = filter.And(x => x.Name.Contains(search));
 
-                return Ok(select2Helper.CreateLeaveTypeResponse(leaveTypes));
+                specializations = await _baseDataWork.LeaveTypes
+                    .GetPaggingWithFilter(null, filter, null, 10, page);
             }
+            var total = await _baseDataWork.LeaveTypes.CountAllAsyncFiltered(filter);
+            var hasMore = (page * 10) < total;
 
-            leaveTypes = (List<LeaveType>)await _baseDataWork
-                .LeaveTypes
-                .GetPaggingWithFilter(null, x => x.Name.Contains(search), null, 10, page);
-
-            return Ok(select2Helper.CreateLeaveTypeResponse(leaveTypes));
+            return Ok(select2Helper.CreateLeaveTypeResponse(specializations, hasMore));
         }
 
         // POST: api/datatable

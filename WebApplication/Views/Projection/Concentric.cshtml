@@ -153,7 +153,6 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            //oninit: () => AppendNewDataTableHTML();,
             onafterselect: () => {
                 DestroyDataTable();
                 DeleteDataTableHTML();
@@ -253,7 +252,7 @@
         const DeleteDataTableHTML = () =>
             document.getElementById('EmployeesWorkHourConcentricDatatable').remove();
 
-        const AppendNewDataTableHTML = () => {
+        const AppendNewDataTableHTML = () => 
             document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
                 '<div class="box-body table-responsive">'+
                     '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive">'+
@@ -281,7 +280,7 @@
                 '</div>'+
                 '');
 
-    }
+    
 
         $(document).ready(AppendNewDataTableHTML());
         $(document).ready(CreateDataTable());

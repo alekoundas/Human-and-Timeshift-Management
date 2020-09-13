@@ -500,40 +500,17 @@
 
     <script>
         const AjaxPost = async (url, data) => {
-            var ajaxResponse = await $.ajax({
+            var ajaxResponse;
+            await $.ajax({
                 type: "POST",
                 async: true,
                 url: "/api/" + url,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json"
-            });
-            console.log(ajaxResponse);
+            }).done(response => ajaxResponse = response);
             return ajaxResponse;
         }
-
-        const GetWorkHourEmployeeIdsToDelete = workHourId =>
-            GetWorkHourSelect2Ids(workHourId).filter(select2Id =>
-                document.getElementById('EmployeeRowNum_' + select2Id)
-                    .style.opacity == '0.5')
-                .map(select2Id =>
-                    document.getElementById('EmployeesSelect2Num_' + workHourId +
-                        '_EmployeeNum_' + select2Id))
-                .map(select2 => select2.value);
-
-        const GetWorkHourEmployeeIds = workHourId =>
-            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' +
-                workHourId)]
-                .map(select2 => select2.value).filter(val => val != "");
-
-        const GetWorkHourSelect2Ids = workHourId =>
-            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' +
-                workHourId)]
-                .map(select2 => select2.id).map(id => id.split('_')[3]);
-
-        const GetAllWorkHourIds = () =>
-            [...document.getElementsByClassName('WorkHourDiv')]
-                .map(div => div.id.split('_')[1]);
 
         const GetDateInputValuesPerDay = workHourId => {
             var response = [];
@@ -733,12 +710,6 @@
             return response;
         };
 
-        const GetAlreadyAppendedEmployeeIdsPerWorkHour = (num) =>
-            [...document.getElementsByClassName(
-                'EmployeeSelect2WorkHourNum_' + num + '')]
-                .map((data) => data.value)
-                .filter((val) => val != "");
-
         const GetSliderCheckedEmployeeIds = () =>
             [...document.getElementsByClassName('ToggleSliders')]
                 .filter(slider => slider.checked)
@@ -755,6 +726,114 @@
                 return workHourEditButton.style.display == 'none' ? true : false;
             return false;
         }
+
+        //Employees AND Select2
+
+        SetSelect2DatabaseValue = (workHourId, num, employeeId) =>
+            document.getElementById('DatabaseEmployeesSelect2ValueNum_' + workHourId + '_EmployeeNum_' + num)
+                .value = employeeId;
+
+        SetSelect2DatabaseText = (workHourId, num, text) =>
+            document.getElementById('DatabaseEmployeesSelect2TextNum_' + workHourId + '_EmployeeNum_' + num)
+                .value = text;
+
+        GetSelect2DatabaseValue = (workHourId, num) =>
+            document.getElementById('DatabaseEmployeesSelect2ValueNum_' + workHourId + '_EmployeeNum_' + num) != null ?
+                document.getElementById('DatabaseEmployeesSelect2ValueNum_' + workHourId + '_EmployeeNum_' + num).value
+                :
+                '';
+
+        GetSelect2DatabaseText = (workHourId, num) =>
+            document.getElementById('DatabaseEmployeesSelect2TextNum_' + workHourId + '_EmployeeNum_' + num)
+                .value;
+
+        const GetAlreadyAppendedEmployeeIdsPerWorkHour = (num) =>
+            [...document.getElementsByClassName(
+                'EmployeeSelect2WorkHourNum_' + num + '')]
+                .map((data) => data.value)
+                .filter((val) => val != "");
+
+        const UndoAnyChangesMadeToEmployees = workHourId =>
+            GetWorkHourSelect2Ids(workHourId).forEach(id => {
+                var select2 = document.getElementById('EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + id);
+
+                if ([...select2.classList].includes('NewSelect2Append'))
+                    document.getElementById('EmployeeRowNum_' + id).remove();
+                else {
+                    var option = new Option(GetSelect2DatabaseText(workHourId, id),
+                        GetSelect2DatabaseValue(workHourId, id));
+
+                    option.selected = true;
+                    $(select2).append(option);
+                    $(select2).trigger("change");
+
+                    //Undo any TO DELETE select2 styles
+                    document.getElementById('EmployeeRowNum_' + id)
+                        .style.opacity = '1';
+                }
+
+            });
+
+        const SetSelect2OptionValue = (workHourId, num, value) =>
+            document.getElementById('EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num)
+                .firstChild.value = value;
+
+        const SetSelect2OptionText = (workHourId, num, text) =>
+            document.getElementById('EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num)
+                .firstChild.innerHTML = text;
+
+        const GetSelect2OptionValue = (workHourId, num) =>
+            $('#EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num).find(':selected').val();
+
+        const GetSelect2OptionText = (workHourId, num) =>
+            $('#EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num).find(':selected').html();
+
+
+        const HasSelect2ChangedValue = (workHourId, select2Id) =>
+            IsNewSelect2(workHourId, select2Id) != '' ?
+                GetSelect2OptionValue(workHourId, select2Id) !=
+                GetSelect2DatabaseValue(workHourId, select2Id)
+                :
+                false;
+
+        const IsNewSelect2 = (workHourId, select2Id) =>
+            GetSelect2DatabaseValue(workHourId, select2Id) == '';
+
+        const GetWorkHourEmployeeIdsToDeleteObj = workHourId => {
+            var response = { deleteIds: [], changedIds: [], addedIds: [] };
+
+            response.deleteIds = GetWorkHourSelect2Ids(workHourId)
+                .filter(select2Id =>
+                    document.getElementById('EmployeeRowNum_' + select2Id)
+                        .style.opacity == '0.5')
+                .map(select2Id =>
+                    document.getElementById('EmployeesSelect2Num_' + workHourId +
+                        '_EmployeeNum_' + select2Id).value);
+
+            response.changedIds = GetWorkHourSelect2Ids(workHourId)
+                .filter(select2Id => HasSelect2ChangedValue(workHourId, select2Id))
+                .map(select2Id => GetSelect2DatabaseValue(workHourId, select2Id));
+
+            response.addedIds = GetWorkHourSelect2Ids(workHourId)
+                .filter(select2Id => IsNewSelect2(workHourId, select2Id))
+                .map(select2Id => GetSelect2OptionValue(workHourId, select2Id));
+
+            return response;
+        }
+
+        const GetAllWorkHourIds = () =>
+            [...document.getElementsByClassName('WorkHourDiv')]
+                .map(div => div.id.split('_')[1]);
+
+        const GetWorkHourEmployeeIds = workHourId =>
+            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' +
+                workHourId)]
+                .map(select2 => select2.value).filter(val => val != "");
+
+        const GetWorkHourSelect2Ids = workHourId =>
+            [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' +
+                workHourId)]
+                .map(select2 => select2.id.split('_')[3]);
 
         //Calentim
         const SetCalentimInputValue = (workHourId, startTs, endTs) =>
@@ -1086,6 +1165,11 @@
                                 AppendPreloadedEmployeeToWorkHourToEditModal(num,
                                     ++WorkHourId, employeeId, response.results[0].text);
 
+                                //SetDatabase Values for Undo purposes
+                                SetSelect2DatabaseValue(num, WorkHourId, employeeId);
+                                SetSelect2DatabaseText(num, WorkHourId,
+                                    response.results[0].text);
+
                                 EmployeeSelect2(num, WorkHourId);  //set new Select2 instance
                             }));
                 }));
@@ -1094,8 +1178,10 @@
         });
 
         //Delete Workhour in modal
-        $('#EditWorkHour_Modal').on('click', '.WorkHourDeleteButton', (element) => {
-            var workHourId = element.target.getAttribute('workhourid')
+        $('#EditWorkHour_Modal').on('click', '.WorkHourDeleteButton', (e) => {
+            var workHourId = e.target.getAttribute('workhourid');
+            if (workHourId == null)
+                workHourId = e.target.parentElement.getAttribute('workhourid');
 
             AjaxPost('workhours/deleteBatch', BuildDeleteBatchWorkHourDto(workHourId))
                 .then(() => $('#WorkHourDivNum_' + workHourId).remove());
@@ -1107,6 +1193,9 @@
         //Append new Select2 Employees search for WorkHour
         $('#EditWorkHour_Modal').on('click', '.AppendEmployeeToWorkHourButton', (e) => {
             var currentWorkHourId = e.target.getAttribute('num');
+            if (currentWorkHourId == null)
+                currentWorkHourId = e.target.parentElement.getAttribute('num');
+
             WorkHourId++;
             AppendEmployeeToWorkHour(currentWorkHourId, WorkHourId)
             EmployeeSelect2(currentWorkHourId, WorkHourId);        //set new Select2 instance
@@ -1115,7 +1204,8 @@
         //Delete Employee from workhour
         $('#EditWorkHour_Modal').on('click', '.EmployeeSelect2DeleteButton', (e) => {
             var elemId = e.target.getAttribute('num');
-            var workHourId = e.target.getAttribute('workhourid');
+            if (elemId == null)
+                elemId = e.target.parentElement.getAttribute('num');
             var employeeRow = document.getElementById('EmployeeRowNum_' + elemId);
 
             if (employeeRow.className.includes('Preloaded'))
@@ -1135,6 +1225,9 @@
         //Edit WorkHour in modal
         $('#EditWorkHour_Modal').on('click', '.WorkHourEditButton', e => {
             var workHourId = e.target.getAttribute('workhourid');
+            if (workHourId == null)
+                workHourId = e.target.parentElement.getAttribute('workhourid');
+
             HandleWorkHourEditButton(workHourId);
             ValidateExistingErrorsOnWorkHours();
             HandleSubmitButton();
@@ -1143,6 +1236,10 @@
         //Undo edit WorkHour in modal
         $('#EditWorkHour_Modal').on('click', '.WorkHourUndoButton', e => {
             var workHourId = e.target.getAttribute('workhourid');
+            if (workHourId == null)
+                workHourId = e.target.parentElement.getAttribute('workhourid');
+
+            UndoAnyChangesMadeToEmployees(workHourId);
             HandleWorkHourEditButton(workHourId);
             UndoValues(workHourId);
             ValidateAppendedWorkHoursTimeRange(workHourId);
@@ -1152,27 +1249,32 @@
 
         //Save edited Date in modal
         $('#EditWorkHour_Modal').on('click', '.WorkHourSaveButton', e => {
+            var workHourId = e.target.getAttribute('workhourid');
+            if (workHourId == null)
+                workHourId = e.target.parentElement.getAttribute('workhourid');
+
             var PostWorkHoursEdit = [];
             var PostWorkHoursDelete = [];
-            var workHourId = e.target.getAttribute('workhourid')
             var dateInput = document.getElementById('CalentimInputNum_' + workHourId);
             var workHourId = dateInput.id.split('_')[1];
-            var employeeIdsToDelete = GetWorkHourEmployeeIdsToDelete(workHourId);
+            var employeeObj = GetWorkHourEmployeeIdsToDeleteObj(workHourId);
 
             SplitDateRangeInDates(CreateFakeInputWithDbDateRange(workHourId))
                 .forEach(response => {
                     //Fill array  with workHour delete
-                    employeeIdsToDelete.forEach(employeeId =>
-                        PostWorkHoursDelete.push(
-                            BuildDeleteWorkHourToDbDto(response.startTimestamp,
-                                response.endTimestamp, employeeId)));
+                    [...employeeObj.deleteIds.concat(employeeObj.changedIds)]
+                        .filter(employeeId => !employeeObj.addedIds.includes(employeeId))
+                        .forEach(employeeId =>
+                            PostWorkHoursDelete.push(
+                                BuildDeleteWorkHourToDbDto(response.startTimestamp,
+                                    response.endTimestamp, employeeId)));
 
                     SplitDateRangeInDates(CreateFakeInputWithEditedDateRange(response.workHourId))
                         .forEach(editResponse => {
                             //If user has edited date or added employees
                             GetWorkHourEmployeeIds(workHourId)
                                 .filter(employeeId =>
-                                    !employeeIdsToDelete.includes(employeeId))
+                                    !employeeObj.deleteIds.includes(employeeId))
                                 .forEach(employeeId =>
                                     PostWorkHoursEdit.push(BuildEditWorkHourToDbDto(
                                         response.startTimestamp,
@@ -1188,14 +1290,20 @@
             ButtonLoadingToggle("WorkHourSaveButton")
                 .then(async value => {
                     if (PostWorkHoursDelete.length > 0)
-                        return await AjaxPost('workhours/deleteEmployeeWorkhours', PostWorkHoursDelete);
+                        AjaxPost('workhours/deleteEmployeeWorkhours', PostWorkHoursDelete);
+                    return "loading";
                 })
                 .then(async value => {
                     if (PostWorkHoursEdit.length > 0)
-                        return await AjaxPost('workhours/editEmployeeWorkhours', PostWorkHoursEdit)
+                        AjaxPost('workhours/editEmployeeWorkhours', PostWorkHoursEdit)
+                    return "loading";
+
                 })
-                .then(response => ButtonLoadingToggle("WorkHourSaveButton"))
-                .catch(error => console.log(error));
+                .then(async value => {
+                    await ButtonLoadingToggle("WorkHourSaveButton");
+                    return "end loading";
+                })
+                .catch(error => console.log('ErrorToSendInTicket:' + error));
 
 
             //Change any values since date maybe edited
@@ -1236,7 +1344,6 @@
         $('#EditWorkHour_Modal').on('hidden.bs.modal', (e) => {
             $('.ElementToDeleteOnClose').remove();
             $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
-            //Datatable();
         })
     </script>
 
@@ -1295,7 +1402,10 @@
 
         //Append new Select2 Employees search for WorkHour
         $('#AddWorkHour_Modal').on('click', '.AppendEmployeeToWorkHourButton', (e) => {
-            var currentWorkHourId = e.target.getAttribute('num');
+            var currentWorkHourId = e.target.getAttribute('Num');
+            if (currentWorkHourId == null)
+                currentWorkHourId = e.target.parentElement.getAttribute('Num');
+
             WorkHourId++;
             AppendEmployeeToWorkHour(currentWorkHourId, WorkHourId)
             EmployeeSelect2(currentWorkHourId, WorkHourId);        //set new Select2 instance
@@ -1304,6 +1414,9 @@
         //Delete Workhour from modal
         $('#AddWorkHour_Modal').on('click', '.WorkHourDeleteButton', (e) => {
             var workHourId = e.target.getAttribute('workhourid');
+            if (workHourId == null)
+                workHourId = e.target.parentElement.getAttribute('workhourid');
+
             $('#WorkHourDivNum_' + workHourId).remove();
             ValidateExistingErrorsOnWorkHours();
             ValidateEmployeesWithRangeToWorkhour(workHourId);
@@ -1314,6 +1427,12 @@
         $('#AddWorkHour_Modal').on('click', '.EmployeeSelect2DeleteButton', (e) => {
             var elemId = e.target.getAttribute('num');
             var workHourId = e.target.getAttribute('workhourid');
+
+            if (elemId == null)
+                elemId = e.target.parentElement.getAttribute('num');
+            if (workHourId == null)
+                workHourId = e.target.parentElement.getAttribute('workhourid');
+
             $('#EmployeeRowNum_' + elemId).remove();
             if (!ValidateNullInputs(workHourId))
                 ValidateEmployeesWithRangeToWorkhour(workHourId);
@@ -1359,10 +1478,14 @@
 
             //Handle loading
             ButtonLoadingToggle("SaveWorkHours")
-                .then(async value => await AjaxPost('workhours/addEmployeeWorkhours', dataToPost))
+                .then(async value => {
+                    await AjaxPost('workhours/addEmployeeWorkhours', dataToPost);
+                    return "loading";
+                })
                 .then(response => {
                     ButtonLoadingToggle("SaveWorkHours");
                     $('#AddWorkHour_Modal').modal('hide');
+                    return "done";
                 });
 
         });
@@ -1370,8 +1493,6 @@
         //Cleanup on modal close
         $('#AddWorkHour_Modal').on('hidden.bs.modal', e => {
             $('.ElementToDeleteOnClose').remove();
-            //$('#EmployeesWorkhoursDatatable').DataTable().clear().destroy();
-            //Datatable();
             $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
 
             count = 0;
@@ -1611,18 +1732,17 @@
             },
             order: [[1, 'desc']],
             columns: CreateDatatableColumns(),
-            columnDefs: [ {
+            columnDefs: [{
                 targets: '_all',
-                render:  ( data, type, row )=> {
-                     if(type =='ExcelExport')
-        {
-        console.log(data);      
+                render: (data, type, row) => {
+                    if (type == 'ExcelExport') {
+                        console.log(data);
                         return data;
-        }
+                    }
                     else
-                        return  data;
-              }
-            } ],
+                        return data;
+                }
+            }],
             rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
                 for (var i = 1; i <= DateConstants().DaysInMonth; i++) {
                     row.querySelectorAll('td')[i + 3]
@@ -1688,29 +1808,29 @@
             });
             columns.push({
                 data: "FirstName",
-                searchable: false,
-                orderable: false,
+                searchable: true,
+                orderable: true,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
                     'FirstName')
             });
             columns.push({
                 data: "LastName",
-                searchable: false,
-                orderable: false,
+                searchable: true,
+                orderable: true,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
                     'LastName')
             });
             columns.push({
                 data: "ErpCode",
-                searchable: false,
-                orderable: false,
+                searchable: true,
+                orderable: true,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
                     'ErpCode')
             });
             //Add days of month
             for (var i = 1; i <= DateConstants().DaysInMonth; i++)
                 columns.push({
-                    data:"Day" + i,
+                    data: "Day" + i,
                     searchable: false,
                     orderable: false
                 });
@@ -1752,7 +1872,7 @@
                 '<span id="TotalHoursNum_' + workHourId + '"></span>' +
                 '</div>' +
                 '<div style="width: 15%; float: left;">' +
-                '<button class="btn btn-danger WorkHourDeleteButton" workhourid="' + workHourId + '"><i class="fa fa-trash-o WorkHourDeleteButton" workhourid="' + workHourId + '"></i></button>' +
+                '<button class="btn btn-danger WorkHourDeleteButton" workhourid="' + workHourId + '"><i class="fa fa-trash-o"></i></button>' +
                 '</div>' +
                 '</div>' +
                 '</div >' +
@@ -1779,7 +1899,7 @@
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
                 '<div style="width:  100%; max-width:450px;">' +
-                '<div  style="width: 15%; float: left;"><button class="btn btn-success AppendEmployeeToWorkHourButton" id="AppendEmployeeToWorkHourButtonNum_' + workHourId + '" Num="' + workHourId + '"><i class="fa fa-plus " Num="' + workHourId + '"></i><i class="fa fa-user " Num="' + workHourId + '"></i></button></div>' +
+                '<div  style="width: 15%; float: left;"><button class="btn btn-success AppendEmployeeToWorkHourButton" id="AppendEmployeeToWorkHourButtonNum_' + workHourId + '" Num="' + workHourId + '"><i class="fa fa-plus "></i><i class="fa fa-user "></i></button></div>' +
                 '<div  style="width: 20%; float: left;"><p> Υπάλληλοι:</p></div>' +
                 '</div >' +
                 '</div >' +
@@ -1819,10 +1939,10 @@
                 '<span id="TotalHoursNum_' + workHourId + '"></span>' +
                 '</div>' +
                 '<div style="width: 20%; float: left;">' +
-                '<button style="display: none; " class="btn btn-primary WorkHourSaveButton" id="WorkHourSaveButtonNum_' + workHourId + '" workhourid="' + workHourId + '" data-loading="<img style=\'height:15px; width:15px;\' src=\'/img/LoadingBox.gif\' alt=\'loading gif\'/>" data-reset="<i class=\'fa fa-floppy-o WorkHourSaveButton\' workhourid=\'' + workHourId + '\'></i>"><i class="fa fa-floppy-o WorkHourSaveButton" workhourid="' + workHourId + '"></i></button>' +
-                '<button style="display: none;" class="btn btn-primary WorkHourUndoButton" id="WorkHourUndoButtonNum_' + workHourId + '" workhourid="' + workHourId + '"><i class="fa fa-ban WorkHourUndoButton" workhourid="' + workHourId + '"></i></button>' +
-                '<button style="display: none;" class="btn btn-danger  WorkHourDeleteButton" id="WorkHourDeleteButtonNum_' + workHourId + '" workhourid="' + workHourId + '" ><i class="fa fa-trash-o WorkHourDeleteButton" workhourid="' + workHourId + '" ></i></button>' +
-                '<button class="btn btn-warning WorkHourEditButton" id="WorkHourEditButtonNum_' + workHourId + '" workhourid="' + workHourId + '"><i class="fa fa-pencil WorkHourEditButton" workhourid="' + workHourId + '"></i></button>' +
+                '<button style="display: none; " class="btn btn-primary WorkHourSaveButton" id="WorkHourSaveButtonNum_' + workHourId + '" workhourid="' + workHourId + '" data-loading="<img style=\'height:15px; width:15px;\' src=\'/img/LoadingBox.gif\' alt=\'loading gif\'/>" data-reset="<i class=\'fa fa-floppy-o\' ></i>"><i class="fa fa-floppy-o" ></i></button>' +
+                '<button style="display: none;" class="btn btn-primary WorkHourUndoButton" id="WorkHourUndoButtonNum_' + workHourId + '" workhourid="' + workHourId + '"><i class="fa fa-ban" ></i></button>' +
+                '<button style="display: none;" class="btn btn-danger  WorkHourDeleteButton" id="WorkHourDeleteButtonNum_' + workHourId + '" workhourid="' + workHourId + '" ><i class="fa fa-trash-o"  ></i></button>' +
+                '<button class="btn btn-warning WorkHourEditButton" id="WorkHourEditButtonNum_' + workHourId + '" workhourid="' + workHourId + '"><i class="fa fa-pencil " ></i></button>' +
                 '</div>' +
                 '</div>' +
                 '</div >' +
@@ -1849,7 +1969,7 @@
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
                 '<div style="width:  100%;">' +
-                '<div  style="width: 15%; float: left; "><button style="display:none;" class="btn btn-success AppendEmployeeToWorkHourButton" id="AppendEmployeeToWorkHourButtonNum_' + workHourId + '" Num="' + WorkHourId + '"><i class="fa fa-plus " Num="' + WorkHourId + '"></i><i class="fa fa-user " Num="' + WorkHourId + '"></i></button></div>' +
+                '<div  style="width: 15%; float: left; "><button style="display:none;" class="btn btn-success AppendEmployeeToWorkHourButton" id="AppendEmployeeToWorkHourButtonNum_' + workHourId + '" Num="' + WorkHourId + '"><i class="fa fa-plus"></i><i class="fa fa-user"></i></button></div>' +
                 '<div  style="width: 20%; float: left;"><p> Υπάλληλοι:</p></div>' +
                 '</div >' +
                 '</div >' +
@@ -1862,6 +1982,8 @@
                 '<div style="width: 100%;">' +
                 '<div style="width: 15%; float: left;">&nbsp;</div >' +
                 '<div style="width: 45%; float: left;">' +
+                '<input style="display:none;" id="DatabaseEmployeesSelect2ValueNum_' + workHourId + '_EmployeeNum_' + currNum + '" />' +
+                '<input style="display:none;" id="DatabaseEmployeesSelect2TextNum_' + workHourId + '_EmployeeNum_' + currNum + '" />' +
                 '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%" disabled>' +
                 '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
                 '</select >' +
@@ -1869,7 +1991,7 @@
                 '</div >' +
                 '<div style="width: 5%; float: left;">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;">' +
-                '<button  style="display:none;" class= "btn btn-danger EmployeeSelect2DeleteButton EmployeeSelect2DeleteButtonNum_' + workHourId + '" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
+                '<button  style="display:none;" class= "btn btn-danger EmployeeSelect2DeleteButton EmployeeSelect2DeleteButtonNum_' + workHourId + '" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user"></i></button >' +
                 '</div >' +
                 '</div >' +
                 '</div >'
@@ -1896,12 +2018,14 @@
                 '<div style="width: 100%;">' +
                 '<div style="width: 15%; float: left;">&nbsp;</div >' +
                 '<div style="width: 45%; float: left;">' +
-                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + '" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
+                '<input style="display:none;" id="DatabaseEmployeesSelect2ValueNum_' + workHourId + '_EmployeeNum_' + currNum + '" />' +
+                '<input style="display:none;" id="DatabaseEmployeesSelect2TextNum_' + workHourId + '_EmployeeNum_' + currNum + '" />' +
+                '<select class="EmployeeSelect2WorkHourNum_' + workHourId + ' NewSelect2Append" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
                 '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
                 '</div >' +
                 '<div style="width: 5%; float: left;">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;">' +
-                '<button class= "btn btn-danger EmployeeSelect2DeleteButton EmployeeSelect2DeleteButtonNum_' + workHourId + '" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user EmployeeDeleteButton" WorkHourId="' + workHourId + '" Num="' + currNum + '"></i></button >' +
+                '<button class= "btn btn-danger EmployeeSelect2DeleteButton EmployeeSelect2DeleteButtonNum_' + workHourId + '" WorkHourId="' + workHourId + '" Num="' + currNum + '"> <i class="fa fa-user"></i></button >' +
                 '</div >' +
                 '</div >' +
                 '</div >'

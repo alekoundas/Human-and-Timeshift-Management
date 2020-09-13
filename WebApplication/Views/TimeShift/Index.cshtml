@@ -6,14 +6,10 @@
     <div class="col-md-1"> </div>
     <div class="col-md-10">
 
-        <div class="box-header">
-            <h3 class="box-title">@ViewData["Title"]</h3>
-        </div>
-
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title">Διαθέσιμα χρονοδιαγράμματα συστήματος</h3>
+                <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
                     @Html.ButtonCreateNew("TimeShift")
                 </div>
@@ -40,25 +36,6 @@
                         </tr>
                     </tfoot>
                 </table>
-                @*<table id="TimeShiftDatatable" class="table table-bordered table-hover table-responsive">
-                        <thead>
-                            <tr>
-
-                                <th>Τίτλος</th>
-                                <th>Ημερομηνία έναρξης</th>
-                                <th>Ημερομηνία λήξης</th>
-                                <th>Ενέργειες</th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th data-searchable="true">Τίτλος</th>
-                                <th data-searchable="false">Ημερομηνία έναρξης</th>
-                                <th data-searchable="false">Ημερομηνία λήξης</th>
-                                <th data-searchable="false">Ενέργειες</th>
-                            </tr>
-                        </tfoot>
-                    </table>*@
             </div>
         </div>
     </div>

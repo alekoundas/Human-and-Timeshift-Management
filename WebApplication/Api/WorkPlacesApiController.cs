@@ -106,27 +106,60 @@ namespace WebApplication.Api
 
 
         // GET: api/workplaces/select2
+        [HttpPost("select2")]
+        public async Task<ActionResult<WorkPlace>> Select2([FromBody] Select2Get select2)
+        {
+            var workPlaces = new List<WorkPlace>();
+            var select2Helper = new Select2Helper();
+            var total = await _baseDataWork.WorkPlaces.CountAllAsync();
+            var hasMore = (select2.Page * 10) < total;
+
+            if (string.IsNullOrWhiteSpace(select2.Search))
+            {
+                workPlaces = (List<WorkPlace>)await _baseDataWork
+                     .WorkPlaces
+                     .GetPaggingWithFilter(null, null, null, 10, select2.Page);
+
+                return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
+            }
+
+            workPlaces = await _baseDataWork
+                .WorkPlaces
+                .GetPaggingWithFilter(null, x => x.Title.Contains(select2.Search), null, 10, select2.Page);
+
+            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
+        }
+        // GET: api/workplaces/select2
         [HttpGet("select2")]
         public async Task<ActionResult<WorkPlace>> Select2(string search, int page)
         {
             var workPlaces = new List<WorkPlace>();
             var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<WorkPlace>();
+            filter = filter.And(x => true);
+
+           
             if (string.IsNullOrWhiteSpace(search))
             {
                 workPlaces = (List<WorkPlace>)await _baseDataWork
                      .WorkPlaces
                      .GetPaggingWithFilter(null, null, null, 10, page);
 
-                return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
             }
+            else
+            {
 
+            filter = filter.And(x => x.Title.Contains(search));
             workPlaces = await _baseDataWork
                 .WorkPlaces
-                .GetPaggingWithFilter(null, x => x.Title.Contains(search), null, 10, page);
+                .GetPaggingWithFilter(null, filter, null, 10, page);
 
-            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
+            }
+            var total = await _baseDataWork.WorkPlaces.CountAllAsyncFiltered(filter);
+            var hasMore = (page * 10) < total;
+
+            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
         }
-
         // POST: api/workplaces/select2filtered
         [HttpPost("select2filtered")]
         public async Task<ActionResult<WorkPlace>> Select2Filtered([FromBody] Select2FilteredGet select2)
@@ -146,8 +179,10 @@ namespace WebApplication.Api
             workPlaces = await _baseDataWork
              .WorkPlaces
              .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+            var total = await _baseDataWork.WorkPlaces.CountAllAsyncFiltered(filter);
+            var hasMore = (select2.Page * 10) < total;
 
-            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces));
+            return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
         }
 
 

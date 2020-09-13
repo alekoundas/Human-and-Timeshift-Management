@@ -47,6 +47,9 @@ namespace DataAccess.Models.Datatable
 
         [JsonPropertyName("genericId")]
         public int GenericId { get; set; }
+       
+
+        //TimeShift
 
         [JsonPropertyName("timeShiftYear")]
         public int TimeShiftYear { get; set; }
@@ -73,5 +76,12 @@ namespace DataAccess.Models.Datatable
         //RealWorkHoursSpecificDates
         [JsonProperty(PropertyName = "specificDates")]
         public List<DateTime> SpecificDates { get; set; }
+
+        //RealWorkHour Index
+        [JsonProperty(PropertyName = "selectedYear")]
+        public int? SelectedYear { get; set; }
+
+        [JsonProperty(PropertyName = "selectedMonth")]
+        public int? SelectedMonth { get; set; }
     }
 }

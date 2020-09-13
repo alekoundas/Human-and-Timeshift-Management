@@ -16,6 +16,7 @@ using DataAccess.ViewModels;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using System.Linq.Dynamic.Core;
+using LinqKit;
 
 namespace WebApplication.Api
 {
@@ -116,23 +117,30 @@ namespace WebApplication.Api
 
         // GET: api/timeshifts/select2
         [HttpGet("select2")]
-        public async Task<ActionResult<TimeShift>> Select2(string search, int page)
+        public async Task<ActionResult<TimeShift>> Select2(string search, int page, int workPlaceId=0)
         {
             var timeShifts = new List<TimeShift>();
             var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<TimeShift>();
+            filter = filter.And(x => true);
+
+            if (workPlaceId != 0)
+                filter = filter.And(x => x.WorkPlaceId == workPlaceId);
 
             if (string.IsNullOrWhiteSpace(search))
             {
                 timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
-                    .GetPaggingWithFilter(null, null, null, 10, page);
-
-                return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts));
+                    .GetPaggingWithFilter(null, filter, null, 10, page);
             }
-
-            timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
-               .GetPaggingWithFilter(null, x => x.Title.Contains(search), null, 10, page);
-
-            return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts));
+            else
+            {
+                filter = filter.And(x => x.Title.Contains(search));
+                timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
+                   .GetPaggingWithFilter(null, filter, null, 10, page);
+            }
+            var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
+            var hasMore = (page * 10) < total;
+            return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts, hasMore));
         }
 
         // POST: api/timeshifts/datatable
@@ -159,7 +167,7 @@ namespace WebApplication.Api
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
 
-            var mapedData = MapResults(timeShifts,datatable);
+            var mapedData = MapResults(timeShifts, datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }

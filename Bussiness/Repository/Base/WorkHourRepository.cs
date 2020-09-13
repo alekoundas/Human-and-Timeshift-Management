@@ -24,7 +24,7 @@ namespace Bussiness.Repository.Base
             get { return Context as BaseDbContext; }
         }
 
-        public List<WorkHour> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId)
+        public List<WorkHour> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId)
         {
             return Context.WorkHours.Where(x =>
                    x.TimeShiftId == timeShiftId &&
@@ -33,6 +33,20 @@ namespace Bussiness.Repository.Base
                    (x.StartOn.Day <= day && day <= x.EndOn.Day) &&
                    x.Employee.Id == employeeId)
                 .ToList();
+        }
+        public async Task<List<WorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel)
+        {
+            var filter = PredicateBuilder.New<WorkHour>();
+
+            foreach (var employeeId in viewModel.EmployeeIds)
+                filter = filter.Or(x => x.EmployeeId == employeeId);
+
+            return await Context.WorkHours.Where(filter)
+                .Where(x =>
+                   x.TimeShiftId == viewModel.TimeShiftId && (
+                   x.StartOn.Day == viewModel.CellDay ||
+                   x.EndOn.Day == viewModel.CellDay))
+                .ToListAsync();
         }
 
         public bool IsDateOverlaping(WorkHoursApiViewModel workHour, int employeeId)
@@ -66,20 +80,7 @@ namespace Bussiness.Repository.Base
                   x.TimeShiftId == workHour.TimeShiftId &&
                   x.StartOn == workHour.StartOn && workHour.EndOn == x.EndOn);
         }
-        public async Task<List<WorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel)
-        {
-            var filter = PredicateBuilder.New<WorkHour>();
-
-            foreach (var employeeId in viewModel.EmployeeIds)
-                filter = filter.Or(x => x.EmployeeId == employeeId);
-
-            return await Context.WorkHours.Where(filter)
-                .Where(x =>
-                   x.TimeShiftId == viewModel.TimeShiftId && (
-                   x.StartOn.Day == viewModel.CellDay ||
-                   x.EndOn.Day == viewModel.CellDay))
-                .ToListAsync();
-        }
+      
 
     }
 }

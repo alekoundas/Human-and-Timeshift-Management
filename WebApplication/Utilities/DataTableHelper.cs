@@ -10,6 +10,7 @@ using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
+using LinqKit;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 
@@ -209,7 +210,7 @@ namespace WebApplication.Utilities
         {
             return "";
         }
-        public string GetTimeShiftEditCellBodyAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        public string GetTimeShiftEditCellBodyWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
             //TODO :Async
             var cellWorkHours = baseDatawork.WorkHours.GetCurrentAssignedOnCell(
@@ -261,9 +262,85 @@ namespace WebApplication.Utilities
             }
 
         }
+        public async Task<string> GetTimeShiftEditCellBodyRealWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        {
+            var compareMonth = 0;
+            var compareYear = 0;
+
+            if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
+            {
+                var timeShift = await baseDatawork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                compareMonth = timeShift.Month;
+                compareYear = timeShift.Year;
+            }
+            else
+            {
+                compareMonth = (int)datatable.SelectedMonth;
+                compareYear = (int)datatable.SelectedYear;
+            }
+
+            var cellRealWorkHours = await baseDatawork.RealWorkHours.GetCurrentAssignedOnCell(
+              datatable.GenericId,
+              compareYear,
+              compareMonth,
+              dayOfMonth,
+              employeeId);
+
+            var cellLeaves = baseDatawork.Leaves.GetCurrentAssignedOnCell(
+               compareYear,
+               compareMonth,
+               dayOfMonth,
+               employeeId);
+
+            //if (cellRealWorkHours.Any(x => x.IsDayOff))
+            //    return
+            //        "<div style='width:110px; white-space: nowrap;'>" +
+            //        "<center><p><b>Ρεπό</b></p></center>" +
+            //         "</div>";
+            //else 
+
+            if (cellLeaves.Count() > 0)
+                return
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                        "<center><p><b>Άδεια</b></p></center>" +
+                     "</div>";
+            else
+            {
+                var startTimeSpan = String.Join("",
+                    cellRealWorkHours.Select(x =>
+                        SpanTimeValue(x.StartOn.ToShortTimeString())));
+
+                var endTimeSpan = String.Join("",
+                    cellRealWorkHours.Select(x =>
+                        SpanTimeValue(x.EndOn.ToShortTimeString())));
+
+
+                return "<div style='width:110px; white-space: nowrap;'>" +
+                          "<div style='width:50px;display:block;  float: left;'>" +
+                          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
+                          startTimeSpan +
+                          "</div>" +
+                          "<div style='width:50px; display:block;  float: right; '>" +
+                          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
+                          endTimeSpan +
+                        "</div>" +
+                        (datatable.GenericId != 0 ?
+                            (cellRealWorkHours.Count() > 0 ?
+                                FaIconEdit(dayOfMonth, "green", employeeId,
+                                    datatable.GenericId, compareMonth,
+                                    compareYear) +
+                                FaIconAdd(dayOfMonth, "", employeeId,
+                                    compareMonth, compareYear)
+                                :
+                                FaIconAdd(dayOfMonth, "", employeeId,
+                                   compareMonth, compareYear))
+                            :
+                            "");
+            }
+        }
+
         public async Task<string> GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(BaseDatawork baseDatawork, DateTime compareDate, Datatable datatable, int employeeId)
         {
-            //TODO :Async
             var cellRealWorkHours = await baseDatawork.RealWorkHours
                 .GetCurrentAssignedOnCell(compareDate, employeeId);
 
@@ -273,7 +350,7 @@ namespace WebApplication.Utilities
             {
                 cellBody += "<p white-space: nowrap;'>" +
                     realWorkHour.StartOn.ToShortTimeString() +
-                    " - " + 
+                    " - " +
                     realWorkHour.EndOn.ToShortTimeString() +
                     "</p></br>";
             }
@@ -283,11 +360,11 @@ namespace WebApplication.Utilities
 
         private static string SpanTimeValue(string time)
             => @"<span>" + time + "</span></br>";
-        private static string FaIconEdit(int dayOfMonth, string color, int employeeid, int timeshiftid)
-          => @"<i class='fa fa-pencil hidden faIconEdit'   timeshiftid='" + timeshiftid + "' employeeid='" + employeeid + "' cellColor='" + color + "' dayOfMonth = '" + dayOfMonth + "'></i>";
+        private static string FaIconEdit(int dayOfMonth, string color, int employeeid, int timeshiftid, int month = 0, int year = 0)
+          => @"<i class='fa fa-pencil hidden faIconEdit'   timeshiftid='" + timeshiftid + "' employeeid='" + employeeid + "' cellColor='" + color + "'  dayOfMonth = '" + dayOfMonth + "' Month = '" + month + "' Year = '" + year + "'></i>";
 
-        private static string FaIconAdd(int dayOfMonth, string color, int employeeid)
-            => @"<i class='fa fa-plus hidden faIconAdd' employeeid='" + employeeid + "' cellColor=''" + color + "'' dayOfMonth = '" + dayOfMonth + "'></i>";
+        private static string FaIconAdd(int dayOfMonth, string color, int employeeid, int month = 0, int year = 0)
+            => @"<i class='fa fa-plus hidden faIconAdd' employeeid='" + employeeid + "' cellColor=''" + color + "'' dayOfMonth = '" + dayOfMonth + "' Month = '" + month + "' Year = '" + year + "'></i>";
 
         public string GetEmployeeCheckbox(Datatable datatable, int employeeId)
             => @"<input " +

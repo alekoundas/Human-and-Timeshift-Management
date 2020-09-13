@@ -15,7 +15,7 @@ using Bussiness.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
-
+using LinqKit;
 
 namespace WebApplication.Controllers
 {
@@ -117,19 +117,24 @@ namespace WebApplication.Controllers
         {
             var companies = new List<Company>();
             var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<Company>();
+            filter = filter.And(x => true);
 
             if (string.IsNullOrWhiteSpace(search))
-            {
-                companies = (List<Company>)await _baseDataWork.Companies
+                companies = await _baseDataWork.Companies
                     .GetPaggingWithFilter(null, null, null, 10, page);
+            else
+            {
+                filter = filter.And(x => x.Title.Contains(search));
 
-                return Ok(select2Helper.CreateCompaniesResponse(companies));
+                companies = await _baseDataWork.Companies
+                    .GetPaggingWithFilter(null, filter, null, 10, page);
             }
+            var total = await _baseDataWork.Companies.CountAllAsyncFiltered(filter);
+            var hasMore = (page * 10) < total;
 
-            companies = (List<Company>)await _baseDataWork.Companies
-               .GetPaggingWithFilter(null, x => x.Title.Contains(search), null, 10, page);
+            return Ok(select2Helper.CreateCompaniesResponse(companies, hasMore));
 
-            return Ok(select2Helper.CreateCompaniesResponse(companies));
         }
 
         [HttpGet("managecompanyemployees/{employeeId}/{companyId}/{toggleState}")]

@@ -53,6 +53,10 @@ namespace Bussiness.Repository
         {
             return await _set.CountAsync();
         }
+        public async Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> filter)
+        {
+            return await _set.Where(filter).CountAsync();
+        }
 
         public async Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,

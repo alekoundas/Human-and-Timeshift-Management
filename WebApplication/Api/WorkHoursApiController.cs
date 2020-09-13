@@ -168,8 +168,7 @@ namespace WebApplication.Api
 
                 workHour.EmployeeIds.ForEach(id =>
                 {
-                    if (_baseDataWork.WorkHours
-                    .IsDateOverlaping(workHour, id))
+                    if (_baseDataWork.WorkHours.IsDateOverlaping(workHour, id))
                         response.Add(new
                         {
                             employeeId = id,

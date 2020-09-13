@@ -1,4 +1,5 @@
-﻿const ButtonLoadingToggle = async (className) =>
+﻿const ButtonLoadingToggle = async className => {
+    var response = "";
     [...document.getElementsByClassName(className)].forEach(button => {
         var loading = button.dataset.loading;
         var reset = button.dataset.reset;
@@ -6,11 +7,13 @@
         if (button.classList.contains('loading')) {
             button.classList.remove('loading');
             button.innerHTML = reset;
-            return "reset";
+            response ="reset";
         }
         else {
             button.classList.add('loading');
             button.innerHTML = loading;
-            return "loading";
+            response ="loading";
         }
     });
+    return response;
+}

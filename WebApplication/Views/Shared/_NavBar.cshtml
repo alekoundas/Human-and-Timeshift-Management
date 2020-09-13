@@ -60,7 +60,7 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    @Html.LinkButton("Timeshift", "Index", "χρονοδιάγραμμα", "TimeShift_View")
+                    @Html.LinkButton("Timeshift", "Index", "Χρονοδιάγραμμα", "TimeShift_View")
                     @Html.LinkButton("Timeshift", "Create", "Προσθήκη Χρονοδιαγράμματος", "TimeShift_Create")
                 </ul>
             </li>
@@ -70,15 +70,15 @@
             @if(Html.HasAnyChildButton("RealWorkHour")){
             <li class="treeview ">
                 <a href="#">
-                    <i class="fa fa-dashboard"></i> <span>Βάρδιες</span>
+                    <i class="fa fa-dashboard"></i> <span>Πραγματικές βάρδιες</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    @Html.LinkButton("RealWorkhour", "Create", "Δήλωση νέας βάρδιας", "RealWorkHour_View")
-                    @Html.LinkButton("RealWorkhour", "Index", "Βάρδιες", "RealWorkHour_Create")
-                    @Html.LinkButton("RealWorkhour", "CurrentDay", "Δηλωμένες βάρδιες ημέρας", "RealWorkHour_View")
+                    @Html.LinkButton("RealWorkhour", "Create", "Δήλωση νέας π.βάρδιας", "RealWorkHour_View")
+                    @Html.LinkButton("RealWorkhour", "Index", "Π.Βάρδιες", "RealWorkHour_Create")
+                    @Html.LinkButton("RealWorkhour", "CurrentDay", "Δηλωμένες π.βάρδιες ημέρας", "RealWorkHour_View")
                 </ul>
             </li>
             }

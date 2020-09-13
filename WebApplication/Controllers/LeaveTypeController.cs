@@ -52,8 +52,8 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "LeaveType_Create")]
         public IActionResult Create()
         {
-            return View();
             ViewData["Title"] = "Προσθήκη είδους άδειας";
+            return View();
         }
 
         // POST: LeaveType/Create

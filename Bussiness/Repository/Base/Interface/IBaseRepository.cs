@@ -20,6 +20,7 @@ namespace Bussiness.Repository.Interface
 
 
         Task<int> CountAllAsync();
+        Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> filter);
 
         Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,

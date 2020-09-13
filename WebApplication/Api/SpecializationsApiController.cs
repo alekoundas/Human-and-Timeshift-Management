@@ -15,6 +15,7 @@ using Bussiness.Service;
 using DataAccess.Models.Select2;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
+using LinqKit;
 
 namespace WebApplication.Api
 {
@@ -105,20 +106,23 @@ namespace WebApplication.Api
         {
             var specializations = new List<Specialization>();
             var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<Specialization>();
+            filter = filter.And(x => true);
+
             if (string.IsNullOrWhiteSpace(search))
-            {
-                specializations = (List<Specialization>)await _baseDataWork
-                    .Specializations
+                specializations = await _baseDataWork.Specializations
                     .GetPaggingWithFilter(null, null, null, 10, page);
+            else
+            {
+                filter = filter.And(x => x.Name.Contains(search));
 
-                return Ok(select2Helper.CreateSpecializationResponse(specializations));
+                specializations = await _baseDataWork.Specializations
+                    .GetPaggingWithFilter(null, filter, null, 10, page);
             }
+            var total = await _baseDataWork.Specializations.CountAllAsyncFiltered(filter);
+            var hasMore = (page * 10) < total;
 
-            specializations = (List<Specialization>)await _baseDataWork
-                .Specializations
-                .GetPaggingWithFilter(null, x => x.Name.Contains(search), null, 10, page);
-
-            return Ok(select2Helper.CreateSpecializationResponse(specializations));
+            return Ok(select2Helper.CreateSpecializationResponse(specializations, hasMore));
         }
 
         // POST: api/datatable

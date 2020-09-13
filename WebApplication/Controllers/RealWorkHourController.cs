@@ -163,7 +163,7 @@ namespace WebApplication.Controllers
         }
         // POST: RealWorkHours/CurrentDay
         [HttpGet, ActionName("CurrentDay")]
-        public async Task<IActionResult> CurrentDay()
+        public IActionResult CurrentDay()
         {
             ViewData["Title"] = "Σύνολο πραγματικών βαρδιών ημέρας";
             return View();
