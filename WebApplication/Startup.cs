@@ -60,29 +60,15 @@ namespace WebApplication
             services.Configure<CookieTempDataProviderOptions>(options => {
                 options.Cookie.IsEssential = true;
             });
-            // using Microsoft.AspNetCore.HttpOverrides;
 
-            //services.UseForwardedHeaders(new ForwardedHeadersOptions
-            //{
-            //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            //});
 
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("el-GR");
-            //services.AddControllersWithViews();
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling =
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
             services.AddRazorPages();
-
-            //ignore nulls kai kala
-            //services.AddMvc()
-            //.AddJsonOptions(options =>
-            //{
-            //    options.JsonSerializerOptions.IgnoreNullValues = true;
-            //});
-
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
@@ -121,15 +107,12 @@ namespace WebApplication
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthentication();
 
             InitializeIdentityData.SeedData(userManager, roleManager);
 
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

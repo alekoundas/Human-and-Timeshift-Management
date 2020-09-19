@@ -14,9 +14,9 @@ namespace DataAccess.Migrations.BaseDb
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    AFM = table.Column<string>(nullable: true),
+                    Afm = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: true)
+                    Title = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,8 +89,8 @@ namespace DataAccess.Migrations.BaseDb
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
+                    FirstName = table.Column<string>(nullable: false),
+                    LastName = table.Column<string>(nullable: false),
                     DateOfBirth = table.Column<DateTime>(nullable: true),
                     Afm = table.Column<string>(nullable: true),
                     SocialSecurityNumber = table.Column<string>(nullable: true),
@@ -124,7 +124,7 @@ namespace DataAccess.Migrations.BaseDb
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    Title = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     CustomerId = table.Column<int>(nullable: true)
                 },
@@ -234,7 +234,7 @@ namespace DataAccess.Migrations.BaseDb
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    Title = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(nullable: false),
                     Month = table.Column<int>(nullable: false),
                     Year = table.Column<int>(nullable: false),
                     WorkPlaceId = table.Column<int>(nullable: false)

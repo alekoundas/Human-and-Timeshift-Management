@@ -68,9 +68,6 @@
 </div>
 
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     <script src="~/js/jQueryMonthPicker/MonthPicker.js"></script>
@@ -80,7 +77,7 @@
         $('.WorkPlace_Select2').select2({
             ajax: {
                 url: '/api/workplaces/select2',
-                data: function (params) {
+                data:  params =>{
                     var query = {
                         search: params.term,
                         page: params.page || 1

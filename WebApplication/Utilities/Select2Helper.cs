@@ -23,9 +23,9 @@ namespace WebApplication.Utilities
 
 
             pegination.More = hasMore;
-            return new Select2Response() { Results = results,Pagination = pegination };
+            return new Select2Response() { Results = results, Pagination = pegination };
         }
-           public Select2Response CreateLeaveTypeResponse(IEnumerable<LeaveType> leaveTypes, bool hasMore)
+        public Select2Response CreateLeaveTypeResponse(IEnumerable<LeaveType> leaveTypes, bool hasMore)
         {
             var results = new List<Select2Result>();
             var pegination = new Select2Pagination();
@@ -39,10 +39,10 @@ namespace WebApplication.Utilities
 
 
             pegination.More = hasMore;
-            return new Select2Response() { Results = results,Pagination = pegination };
+            return new Select2Response() { Results = results, Pagination = pegination };
         }
 
-    
+
 
         public Select2Response CreateCompaniesResponse(IEnumerable<Company> companies, bool hasMore)
         {
@@ -94,7 +94,7 @@ namespace WebApplication.Utilities
             return new Select2Response() { Results = results, Pagination = pegination };
         }
 
-        public Select2Response CreateEmployeesResponse(IEnumerable<Employee> workplaces,bool hasMore)
+        public Select2Response CreateEmployeesResponse(IEnumerable<Employee> workplaces, bool hasMore)
         {
             var results = new List<Select2Result>();
             var pegination = new Select2Pagination();
@@ -121,7 +121,8 @@ namespace WebApplication.Utilities
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
-                    Text = result.Title + " " +
+                    Text = result.WorkPlace.Title + " - " +
+                        result.Title + " " +
                         result.Month + "/" +
                         result.Month
                 });
@@ -130,7 +131,7 @@ namespace WebApplication.Utilities
             return new Select2Response() { Results = results, Pagination = pegination };
 
         }
-    }  
+    }
 
-    
+
 }

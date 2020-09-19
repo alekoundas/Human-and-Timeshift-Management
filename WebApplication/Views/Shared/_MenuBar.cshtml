@@ -1,5 +1,4 @@
-﻿<!-- Header Navbar: style can be found in header.less -->
-<nav class="navbar navbar-static-top">
+﻿<nav class="navbar navbar-static-top">
     <!-- Sidebar toggle button-->
     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
         <span class="sr-only">Toggle navigation</span>
@@ -10,53 +9,65 @@
 
     <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-            <!-- User Account: style can be found in dropdown.less -->
-            @* Modal *@
-            <li class="dropdown user user-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <img src="~/img/user2-160x160.jpg" class="user-image" alt="User Image">
-                </a>
-                <ul class="dropdown-menu">
-                    <!-- User image -->
-                    <li class="user-header">
-                        <img src="~/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                <!-- If user is Logged In we show diferent body in menu modal -->
+            @if (User.Identity.IsAuthenticated)
+            {
 
-                        <p>
-                            <small>Member since Nov. 2012</small>
-                        </p>
-                    </li>
-                    <!-- Menu Body -->
-                    <li class="user-body">
-                        <div class="row">
-                            <div class="col-xs-4 text-center">
-                                <p>Ονομα: @User.Identity.Name</p>
-                            </div>
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Sales</a>
-                            </div>
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Friends</a>
-                            </div>
+
+        <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-user" aria-hidden="true"></i>
+            </a>
+            <ul class="dropdown-menu">
+
+                <li class="user-header">
+                    <p style="text-align: center; vertical-align: middle; line-height: 30px; "><b>My</b>Services</p>
+                </li>
+                <li class="user-body">
+                    <div class="row">
+                        <div class=" text-center">
+                            <p>Oνοματεπώνυμο: @User.Identity.Name </p>
                         </div>
-                        <!-- /.row -->
-                    </li>
-                    <!-- Menu Footer-->
-                    <li class="user-footer">
-                        <div class="pull-left">
-                            <a href="/Settings/Profile" class="btn btn-default btn-flat">Profile</a>
+                        <div class=" text-center">
+                            <p>Email: @User.Identity.Name</p>
                         </div>
-                        <div class="pull-right">
-                            @if (User.Identity.IsAuthenticated) {@Html.LinkButton("Account", "Logout", "Αποσύνδεση") }
-                            @if (!User.Identity.IsAuthenticated) {@Html.LinkButton("Account", "Login", "Είσοδος") }
-                @*if (User.IsInRole("Admin"))
+                    </div>
+                </li>
+                <li class="user-footer">
+
+                    <div class="pull-right">
+                        <div class=" text-center">
+                            <b> @Html.LinkButton("Account", "Logout", "Αποσύνδεση")</b>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </li> 
+        
+        }
+                    else
                     {
-                        <li>Link show only to Admin </li>
-                    }
-                *@
-                        </div>
-                    </li>
-                </ul>
-            </li>
+
+
+        <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-sign-in" aria-hidden="true"></i>
+            </a>
+            <ul class="dropdown-menu">
+
+
+
+                <li class="user-body">
+                    @Html.LinkButton("Account", "Login", "Είσοδος")
+                   
+                </li>
+            </ul>
+        </li>
+                    
+                        }
+
+
+
             <!-- Control Sidebar Toggle Button -->
         </ul>
     </div>

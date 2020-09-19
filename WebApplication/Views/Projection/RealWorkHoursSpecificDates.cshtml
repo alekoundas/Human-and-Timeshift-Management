@@ -51,7 +51,7 @@
     <div class="col-md-12">
         <div class="box box-danger" style="margin-top:5%;">
             <div class="box-header">
-                <h3 class="box-title"></h3>
+                <h3 class="box-title">@ViewData["Title"]</h3>
             </div>
             <hr />
             <div id="AppendHere_Datatable"></div>
@@ -187,6 +187,8 @@
     <script>
 
         $('#WorkPlace_Select2').select2({
+            placeholder: "Επέλεξε πόστο",
+            allowClear: true,
             ajax: {
                 url: '/api/workplaces/select2',
                 data: function (params) {

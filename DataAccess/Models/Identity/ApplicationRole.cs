@@ -12,5 +12,7 @@ namespace DataAccess.Models.Identity
         public string Permition { get; set; }
         public string WorkPlaceName { get; set; }
         public string WorkPlaceId { get; set; }
+        public ICollection<ApplicationUserRole> EmployeeWorkPlaces { get; set; }
+
     }
 }

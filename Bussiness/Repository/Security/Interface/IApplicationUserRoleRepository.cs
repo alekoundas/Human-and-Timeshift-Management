@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Bussiness.Repository.Security.Interface
 {
-    public interface IApplicationUserRoleRepository : ISecurityRepository<IdentityUserRole<string>>
+    public interface IApplicationUserRoleRepository : ISecurityRepository<ApplicationUserRole>
     {
         Task<List<ApplicationRole>> GetRolesFormLoggedInUserEmail(UserManager<ApplicationUser> userManager, string userEmail);
         Task<List<ApplicationRole>> GetRolesFormUserId(string userId);
-        Task<List<IdentityUserRole<string>>> GetUserRolesToDelete(List<string> idsToDelete, string userId);
+        Task<List<ApplicationUserRole>> GetUserRolesToDelete(List<string> idsToDelete, string userId);
     }
 }

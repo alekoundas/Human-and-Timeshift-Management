@@ -19,6 +19,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="NPOI" Version="2.5.1" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.1" />
   </ItemGroup>
 
@@ -29,6 +30,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\css\LoadingIo\ldLoader\" />
     <Folder Include="wwwroot\js\jQueryMonthPicker\" />
+    <Folder Include="wwwroot\ExcelTemplates\" />
   </ItemGroup>
 
 </Project>

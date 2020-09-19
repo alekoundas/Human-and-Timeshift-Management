@@ -220,6 +220,16 @@ namespace WebApplication.Api
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
+            if (datatable.Predicate == "CompanyDetail")
+            {
+                includes.Add(x => x.Include(y => y.Company));
+
+                filter = filter.And(x =>
+                     x.CompanyId == datatable.GenericId || x.CompanyId == null);
+
+                employees = await _baseDataWork.Employees
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            }
             if (datatable.Predicate == "WorkPlaceEdit")
             {
                 includes.Add(x => x.Include(y => y.Company));
@@ -393,6 +403,22 @@ namespace WebApplication.Api
                     else
                         dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
                             "Employee", apiUrl, ""));
+
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "CompanyDetail")
+                {
+                    var apiUrl = UrlHelper.EmployeeCompany(employee.Id, datatable.GenericId);
+
+                    if (employee.Company != null)
+                    {
+                        dictionary.Add("CompanyTitle", employee.Company.Title);
+                        dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
+                            "Employee", apiUrl, "checked", true));
+                    }
+                    else
+                        dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
+                            "Employee", apiUrl, "", true));
 
                     returnObjects.Add(expandoObj);
                 }

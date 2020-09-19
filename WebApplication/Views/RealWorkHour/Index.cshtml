@@ -195,7 +195,9 @@
     <script>
 
         const GetDaysInMonth = () => {
-            if (GetTimeShiftFilterValue() == undefined || GetTimeShiftFilterValue() == '')
+            if ((GetTimeShiftFilterValue() == undefined ||
+                GetTimeShiftFilterValue() == '') &&
+                GetMonthFilterValue() == '')
                 return new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
             else
                 return new Date(GetMonthFilterValueYear(), GetMonthFilterValueMonth(), 0).getDate();
@@ -203,9 +205,9 @@
         }
         const GetColumnStartOn = () => {
             if (GetMonthFilterValue() == '')
-                return new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+                return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
             else
-                return new Date(GetMonthFilterValueYear(), GetMonthFilterValueMonth(), 1);
+                return new Date(GetMonthFilterValueYear(), GetMonthFilterValueMonth() - 1, 1);
 
         }
         const FindHourDifference = (startTs, endTs) => {
@@ -510,19 +512,22 @@
     <!--///////////////////////////////////////-->
 
     <script>
+
         //Datatable Filters
         GetMonthFilterValue = () =>
             document.getElementById('MonthFilter').value;
 
         GetMonthFilterValueMonth = () =>
             document.getElementById('MonthFilter').value.split('/')[0];
+
         GetMonthFilterValueYear = () =>
             document.getElementById('MonthFilter').value.split('/')[1];
+
         GetWorkPlaceFilterValue = () =>
             $('#WorkPlace_Select2').find(':selected').val()
+
         GetTimeShiftFilterValue = () =>
             $('#TimeShift_Select2').find(':selected').val()
-
 
         const AjaxPost = async (url, data) => {
             var ajaxResponse;
@@ -823,14 +828,14 @@
         const HasSelect2ChangedValue = (workHourId, select2Id) =>
             IsNewSelect2(workHourId, select2Id) != '' ?
                 GetSelect2OptionValue(workHourId, select2Id) !=
-                    GetSelect2DatabaseValue(workHourId, select2Id)
+                GetSelect2DatabaseValue(workHourId, select2Id)
                 :
                 false;
 
         const IsNewSelect2 = (workHourId, select2Id) =>
             GetSelect2DatabaseValue(workHourId, select2Id) == '';
-               
-            
+
+
 
         const GetWorkHourEmployeeIdsToDeleteObj = workHourId => {
             var response = { deleteIds: [], changedIds: [], addedIds: [] };
@@ -1602,6 +1607,8 @@
 
         //TimeShift Filter
         $('#TimeShift_Select2').select2({
+            placeholder: "Επέλεξε χρονοδιάγραμμα",
+            allowClear: true,
             ajax: {
                 url: '/api/timeshifts/select2',
                 data: params => {
@@ -1615,14 +1622,15 @@
             }
         }).on('change', () => {
             $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
-            $.get('/api/timeshifts/' + GetTimeShiftFilterValue(), response => {
-                document.getElementById('MonthFilter').value =
-                    response.month + '/' + response.year;
-                DestroyDataTable();
-                DeleteDataTableHTML();
-                AppendNewDataTableHTML();
-                InitDatatable();
-            });
+            if (GetTimeShiftFilterValue() != undefined && GetTimeShiftFilterValue() != '')
+                $.get('/api/timeshifts/' + GetTimeShiftFilterValue(), response => {
+                    document.getElementById('MonthFilter').value =
+                        response.month + '/' + response.year;
+                    DestroyDataTable();
+                    DeleteDataTableHTML();
+                    AppendNewDataTableHTML();
+                    InitDatatable();
+                });
         });
 
         //Month Filter
@@ -1706,13 +1714,15 @@
 
         //Calentim
         var Calentim = (currentDate, workHourId, dbStartDate, dbEndDate) => {
-            //$("#CallendarButtonNum_" + workHourId).data("calentim").destroy();
             var setStartDate = currentDate;
             var setEndDate = currentDate;
+
             if (dbStartDate != undefined)
                 setStartDate = dbStartDate;
+
             if (dbEndDate != undefined)
                 setEndDate = dbEndDate;
+
             $('#CalentimButtonNum_' + workHourId).calentim({
                 dateSeparator: '/-/',
                 startDate: new Date(setStartDate),
@@ -1953,8 +1963,10 @@
 
     <!--    Html Append -->
     <script>
+
         var DestroyDataTable = () => $('#EmployeesWorkhoursDatatable')
             .DataTable().destroy();
+
         const DeleteDataTableHTML = () =>
             document.getElementById('EmployeesWorkhoursDatatable').remove();
 

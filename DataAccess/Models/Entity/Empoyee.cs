@@ -9,9 +9,11 @@ namespace DataAccess.Models.Entity
     public class Employee : BaseEntity
     {
         [Display(Name = "Όνομα")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string FirstName { get; set; }
 
         [Display(Name = "Επίθετο")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string LastName { get; set; }
 
         [Display(Name = "Ημερομηνίαα Γέννησης")]

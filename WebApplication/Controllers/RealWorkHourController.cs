@@ -30,6 +30,7 @@ namespace WebApplication.Controllers
         {
             var baseDbContext = _context.RealWorkHours.Include(r => r.Employee).Include(r => r.TimeShift);
             ViewData["Title"] = "Σύνολο πραγματικών βαρδιών";
+            ViewData["Filter"] = "Φίλτρα αναζήτησης";
 
             return View(await baseDbContext.ToListAsync());
         }
@@ -73,19 +74,29 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RealWorkHourCreateViewModel viewModel)
         {
+            var changeCount = 0;
             if (ModelState.IsValid)
             {
                 viewModel.Employees.ForEach(x =>
                 {
+                    changeCount++;
                     var realWorkHour = RealWorkHourCreateViewModel
                         .CreateFrom(viewModel);
 
                     realWorkHour.EmployeeId = x.Id;
                     _baseDataWork.RealWorkHours.Add(realWorkHour);
                 });
-                await _baseDataWork.SaveChangesAsync();
+               var state =  await _baseDataWork.SaveChangesAsync();
+                if(state>0)
+                    TempData["StatusMessage"] = "Aποθηκεύτηκαν με επιτυχία "+ 
+                        changeCount + 
+                        " νέες πραγματικές βάρδιες";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Οι αλλαγές ΔΕΝ αποθηκεύτηκαν.";
+
                 return RedirectToAction(nameof(Index));
             }
+            TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν συμπληρώθηκαν τα απαραίτητα παιδία.";
             return View();
         }
 

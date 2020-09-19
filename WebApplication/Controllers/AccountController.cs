@@ -58,7 +58,9 @@ namespace WebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(viewModel.Email);
+                var user = await _userManager.FindByEmailAsync(viewModel.LoginUserNameOrEmail);
+                if (user == null)
+                    user = await _userManager.FindByNameAsync(viewModel.LoginUserNameOrEmail);
                 if (user != null)
                 {
                     var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, lockoutOnFailure: true);
@@ -68,7 +70,7 @@ namespace WebApplication.Controllers
                         var customClaims = new List<Claim>();
                         try
                         {
-                            roles = await _datawork.ApplicationUserRoles.GetRolesFormLoggedInUserEmail(_userManager, viewModel.Email);
+                            roles = await _datawork.ApplicationUserRoles.GetRolesFormLoggedInUserEmail(_userManager, viewModel.LoginUserNameOrEmail);
                         }
                         catch (Exception /*ex*/)
                         {
@@ -139,10 +141,11 @@ namespace WebApplication.Controllers
         public IActionResult Logout()
         {
             _signInManager.SignOutAsync();
-            ViewBag.Title = "Αποσυνδεθήκατε με επιτυχία";
-            return View();
+            TempData["StatusMessage"] = "Αποσυνδεθήκατε με επιτυχία.";
+            return RedirectToAction("Index", "Home");
         }
 
 
     }
 }
+//TempData["StatusMessage"] = "Το χρονοδιάγραμμα δημιουργήθηκε με επιτυχία.";

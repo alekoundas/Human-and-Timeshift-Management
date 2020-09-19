@@ -8,20 +8,22 @@ namespace DataAccess.ViewModels.View.Account
 {
     public class LoginViewModel
     {
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        [Display(Name = "Email ή username")]
+        public string LoginUserNameOrEmail { get; set; }
 
-            [Required]
-            [DataType(DataType.Password)]
-            public string Password { get; set; }
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        [Display(Name = "Κωδικός")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
 
-            [Display(Name = "Remember me?")]
-            public bool RememberMe { get; set; }
 
-            public string ReturnUrl { get; set; }
+        [Display(Name = "Remember me?")]
+        public bool RememberMe { get; set; }
 
-            [TempData]
-            public string ErrorMessage { get; set; }
+        public string ReturnUrl { get; set; }
+
+        [TempData]
+        public string ErrorMessage { get; set; }
     }
 }

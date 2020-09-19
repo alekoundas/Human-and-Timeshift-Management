@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DataAccess
 {
-    public class SecurityDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+    public class SecurityDbContext : IdentityDbContext<ApplicationUser, 
+        ApplicationRole, string,IdentityUserClaim<string>, ApplicationUserRole, 
+        IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public SecurityDbContext(DbContextOptions<SecurityDbContext> options)
         : base(options)

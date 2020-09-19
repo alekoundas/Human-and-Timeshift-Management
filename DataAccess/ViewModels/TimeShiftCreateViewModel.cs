@@ -7,16 +7,17 @@ namespace DataAccess.ViewModels
 {
     public class TimeShiftCreateViewModel
     {
-        [Required]
+        [Display(Name = "Τίτλος")]
         public string Title { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public int Month { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public int Year { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        [Display(Name = "Πόστο")]
         public int WorkPlaceId { get; set; }
 
         public static TimeShift CreateFrom(TimeShiftCreateViewModel viewModel)

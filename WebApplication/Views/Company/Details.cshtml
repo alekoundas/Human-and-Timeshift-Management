@@ -38,14 +38,7 @@
                 <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
                     <div class="input-group">
-                        <textarea asp-for="Description" class="form-control" readonly="readonly" disabled ></textarea>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="CreatedOn" class="control-label"></label>
-                    <div class="input-group">
-                        <input asp-for="CreatedOn" class="form-control" readonly="readonly" disabled />
+                        <textarea asp-for="Description" class="form-control" readonly="readonly" disabled></textarea>
                     </div>
                 </div>
 
@@ -55,6 +48,168 @@
     <div class="col-md-3"> </div>
 </div>
 
+<div class="row">
+    <div class="col-md-1"> </div>
+    <div class="col-md-10">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["EmployeeDataTable"]</h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="CompanyEmployeesDatatable" class="table table-bordered table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Email</th>
+                            <th>ErpCode</th>
+                            <th>ΑΦΜ</th>
+                            <th>Ειδικότητα</th>
+                            <th>Εταιρία</th>
+                            <th>Εργαζόμενοι εταιρίας</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-searchable="true">Όνομα</th>
+                            <th data-searchable="true">Επίθετο</th>
+                            <th data-searchable="true">Email</th>
+                            <th data-searchable="true">ErpCode</th>
+                            <th data-searchable="true">ΑΦΜ</th>
+                            <th data-searchable="true">Ειδικότητα</th>
+                            <th data-searchable="true">Εταιρία</th>
+                            <th data-searchable="false">Εργαζόμενοι εταιρίας</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"> </div>
+</div>
 
 
 
+@section Scripts {
+
+    <script>
+         $('#CompanyEmployeesDatatable').DataTable({
+                serverSide: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/employees/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+
+                        data.predicate = 'CompanyDetail';
+                        data.genericId =@Model.Id;
+
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[0, 'desc']],
+                columns: [
+                    {
+                        data: "FirstName",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            //console.log(data);
+                            if (data.FirstName != null)
+                                return data.FirstName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "LastName",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.LastName != null)
+                                return data.LastName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Email",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Email != null)
+                                return data.Email;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "ErpCode",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.ErpCode != null)
+                                return data.ErpCode;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Afm",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Afm != null)
+                                return data.Afm;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "ScpecializationName",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.ScpecializationName != null)
+                                return data.ScpecializationName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "CompanyTitle",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.CompanyTitle != null)
+                                return data.CompanyTitle;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "IsInCompany",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.IsInCompany != null)
+                                return data.IsInCompany;
+                            else
+                                return "";
+                        }
+                    }
+                ],
+                fnDrawCallback: function () {
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    });
+                },
+            });
+    </script>
+}

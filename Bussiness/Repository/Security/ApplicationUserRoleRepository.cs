@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bussiness.Repository.Security
 {
-    public class ApplicationUserRoleRepository : SecurityRepository<IdentityUserRole<string>>, IApplicationUserRoleRepository
+    public class ApplicationUserRoleRepository : SecurityRepository<ApplicationUserRole>, IApplicationUserRoleRepository
     {
         public ApplicationUserRoleRepository(SecurityDbContext dbContext) : base(dbContext)
         {
@@ -24,10 +24,13 @@ namespace Bussiness.Repository.Security
             get { return Context as SecurityDbContext; }
         }
 
-        public async Task<List<ApplicationRole>> GetRolesFormLoggedInUserEmail(UserManager<ApplicationUser> userManager, string userEmail)
+        public async Task<List<ApplicationRole>> GetRolesFormLoggedInUserEmail(UserManager<ApplicationUser> userManager, string userNameOrEmail)
         {
-            var loggedInUserId = userManager.FindByEmailAsync(userEmail)
-                .Result.Id.ToString();
+            var loggedInUserId = userManager.FindByEmailAsync(userNameOrEmail)
+                .Result?.Id.ToString();
+            if (loggedInUserId ==null)
+                loggedInUserId = userManager.FindByNameAsync(userNameOrEmail)
+               .Result?.Id.ToString();
 
             var userRoles = await SecurityDbContext.UserRoles
                 .Where(x => x.UserId == loggedInUserId)
@@ -41,9 +44,9 @@ namespace Bussiness.Repository.Security
                 return new List<ApplicationRole>();
         }
 
-        public async Task<List<IdentityUserRole<string>>> GetUserRolesToDelete(List<string> idsToDelete, string userId)
+        public async Task<List<ApplicationUserRole>> GetUserRolesToDelete(List<string> idsToDelete, string userId)
         {
-            var filterUserRole = PredicateBuilder.New<IdentityUserRole<string>>();
+            var filterUserRole = PredicateBuilder.New<ApplicationUserRole>();
             var filterRole = PredicateBuilder.New<ApplicationRole>();
             //filterRole = filterRole.And(x => );
 

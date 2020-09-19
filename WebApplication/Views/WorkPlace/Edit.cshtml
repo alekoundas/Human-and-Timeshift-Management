@@ -84,11 +84,9 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Ημερομηνία Γέν.</th>
                             <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
-                            <th>Αριθμ. Ταυτότητας</th>
                             <th>Ειδικότητα</th>
                             <th>Εταιρία</th>
                             <th>Εργαζόμενοι πόστου</th>
@@ -98,11 +96,9 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Ημερομηνία Γέν.</th>
                             <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
-                            <th>Αριθμ. Ταυτότητας</th>
                             <th>Ειδικότητα</th>
                             <th>Εταιρία</th>
                             <th>Εργαζόμενοι πόστου</th>
@@ -167,17 +163,6 @@
                         }
                     },
                     {
-                         data: "DateOfBirth",
-                         searchable: true,
-                         orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.DateOfBirth != null)
-                                return data.DateOfBirth;
-                            else
-                                return "";
-                        }
-                    },
-                    {
                          data: "Email",
                          searchable: true,
                          orderable: true,
@@ -206,17 +191,6 @@
                         render: (a, b, data, d) => {
                             if (data.Afm != null)
                                 return data.Afm;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "SocialSecurityNumber",
-                         searchable: true,
-                         orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.SocialSecurityNumber != null)
-                                return data.SocialSecurityNumber;
                             else
                                 return "";
                         }

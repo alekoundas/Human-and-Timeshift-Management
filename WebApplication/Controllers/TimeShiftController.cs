@@ -10,6 +10,7 @@ using DataAccess.Models.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Bussiness;
 using DataAccess.ViewModels;
+using System.Globalization;
 
 namespace WebApplication.Controllers
 {
@@ -56,6 +57,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "TimeShift_Create")]
         public IActionResult Create()
         {
+            ViewData["Title"] = "Προσθήκη χρονοδιαγράμματος ";
             return View();
         }
 
@@ -66,9 +68,32 @@ namespace WebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(TimeShiftCreateViewModel.CreateFrom(timeShift));
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var timeShiftExists = _baseDataWork.TimeShifts
+                    .Where(x => x.WorkPlaceId == timeShift.WorkPlaceId)
+                    .Where(y => y.Year == timeShift.Year)
+                    .Where(y => y.Month == timeShift.Month).Any();
+                if (!timeShiftExists)
+                {
+
+                    var newTimeShift = TimeShiftCreateViewModel.CreateFrom(timeShift);
+                    newTimeShift.Title = timeShift.Year + " " +
+                        CultureInfo.CreateSpecificCulture("el-GR").DateTimeFormat.GetMonthName(timeShift.Month);
+
+                    if (timeShift.Title?.Length > 0)
+                        newTimeShift.Title = newTimeShift.Title +
+                            " (" +
+                            timeShift.Title +
+                            ")";
+
+                    _context.Add(newTimeShift);
+                    var status = await _context.SaveChangesAsync();
+                    if (status > 0)
+                        TempData["StatusMessage"] = "Το χρονοδιάγραμμα δημιουργήθηκε με επιτυχία.";
+                    else
+                        TempData["StatusMessage"] = "Ωχ! Το χρονοδιάγραμμα Δεν δημιουργήθηκε.";
+                    return RedirectToAction(nameof(Index));
+                }
+                TempData["StatusMessage"] = "Ωχ! Το χρονοδιάγραμμα φαίνεται να υπάρχει ήδη.";
             }
             return View(timeShift);
         }
@@ -80,8 +105,8 @@ namespace WebApplication.Controllers
             if (id == null)
                 return NotFound();
 
-            var timeShift = await _context.TimeShifts.Include(x=>x.WorkPlace)
-                .FirstOrDefaultAsync(z=>z.Id==id);
+            var timeShift = await _context.TimeShifts.Include(x => x.WorkPlace)
+                .FirstOrDefaultAsync(z => z.Id == id);
 
             if (timeShift == null)
                 return NotFound();

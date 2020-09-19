@@ -49,9 +49,7 @@ namespace WebApplication.Api
             var timeShift = await _context.TimeShifts.FindAsync(id);
 
             if (timeShift == null)
-            {
                 return NotFound();
-            }
 
             return timeShift;
         }
@@ -122,6 +120,9 @@ namespace WebApplication.Api
             var timeShifts = new List<TimeShift>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<TimeShift>();
+            var includes = new List<Func<IQueryable<TimeShift>, IIncludableQueryable<TimeShift, object>>>();
+
+            includes.Add(x => x.Include(y => y.WorkPlace));
             filter = filter.And(x => true);
 
             if (workPlaceId != 0)
@@ -130,13 +131,13 @@ namespace WebApplication.Api
             if (string.IsNullOrWhiteSpace(search))
             {
                 timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
-                    .GetPaggingWithFilter(null, filter, null, 10, page);
+                    .GetPaggingWithFilter(null, filter, includes, 10, page);
             }
             else
             {
                 filter = filter.And(x => x.Title.Contains(search));
                 timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
-                   .GetPaggingWithFilter(null, filter, null, 10, page);
+                   .GetPaggingWithFilter(null, filter, includes, 10, page);
             }
             var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
             var hasMore = (page * 10) < total;

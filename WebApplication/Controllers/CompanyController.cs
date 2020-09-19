@@ -37,18 +37,17 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var company = await _context.Companies
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (company == null)
-            {
-                return NotFound();
-            }
 
-            ViewData["Title"] = "Προβολη εταιρίας "+company.Title;
+            if (company == null)
+                return NotFound();
+
+            ViewData["Title"] = "Προβολη εταιρίας ";
+            ViewData["EmployeeDataTable"] = "Σύνολο  υπαλλήλων";
+
             return View(company);
         }
 
@@ -81,16 +80,14 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
-            {
                 return NotFound();
-            }
+
             ViewData["Title"] = "Επεξεργασία εταιρίας ";
+            ViewData["EmployeeDataTable"] = "Σύνολο  υπαλλήλων";
             return View(company);
         }
 
@@ -100,9 +97,7 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int id,  Company company)
         {
             if (id != company.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {

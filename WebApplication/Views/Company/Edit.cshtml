@@ -66,7 +66,7 @@
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title"></h3>
+                <h3 class="box-title">@ViewData["EmployeeDataTable"]</h3>
             </div>
             <hr />
             <div class="box-body table-responsive">
@@ -76,11 +76,9 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Ημερομηνία Γέν.</th>
                             <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
-                            <th>Αριθμ. Ταυτότητας</th>
                             <th>Ειδικότητα</th>
                             <th>Εταιρία</th>
                             <th>Εργαζόμενοι εταιρίας</th>
@@ -90,11 +88,9 @@
                         <tr>
                             <th data-searchable="true">Όνομα</th>
                             <th data-searchable="true">Επίθετο</th>
-                            <th data-searchable="true">Ημερομηνία Γέν.</th>
                             <th data-searchable="true">Email</th>
                             <th data-searchable="true">ErpCode</th>
                             <th data-searchable="true">ΑΦΜ</th>
-                            <th data-searchable="true">Αριθμ. Ταυτότητας</th>
                             <th data-searchable="true">Ειδικότητα</th>
                             <th data-searchable="true">Εταιρία</th>
                             <th data-searchable="false">Εργαζόμενοι εταιρίας</th>
@@ -152,17 +148,6 @@
                         }
                     },
                     {
-                        data: "DateOfBirth",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.DateOfBirth != null)
-                                return data.DateOfBirth;
-                            else
-                                return "";
-                        }
-                    },
-                    {
                         data: "Email",
                         searchable: false,
                         orderable: false,
@@ -191,17 +176,6 @@
                         render: (a, b, data, d) => {
                             if (data.Afm != null)
                                 return data.Afm;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "SocialSecurityNumber",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.SocialSecurityNumber != null)
-                                return data.SocialSecurityNumber;
                             else
                                 return "";
                         }

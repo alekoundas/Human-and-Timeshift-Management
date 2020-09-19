@@ -75,15 +75,11 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var user = _datawork.ApplicationUsers.Get(id.ToString());
-            //var contact = await _datawork.Contact.FindAsync(id);
             if (user == null)
                 return NotFound();
-            //ViewData["PhoneId"] = new SelectList(_context.Phone, "Id", "Id", contact.PhoneId);
 
             var returnViewModel = ControllerGetEdit.CreateFrom(user);
             returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
@@ -110,9 +106,7 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(string id, ApplicationUser applicationUser)
         {
             if (id != applicationUser.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {

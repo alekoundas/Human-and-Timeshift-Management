@@ -51,9 +51,9 @@ namespace WebApplication.Api.Security
             if (userRoleToAdd != null)
                 return BadRequest();
 
-            _securityDbContext.UserRoles.Add(new IdentityUserRole<string>()
+            _securityDbContext.UserRoles.Add(new ApplicationUserRole()
             {
-                UserId = userId,
+                ApplicationUserId = userId,
                 RoleId = roleId
             });
             await _securityDbContext.SaveChangesAsync();
@@ -87,7 +87,7 @@ namespace WebApplication.Api.Security
                             .GetRoleByWorkPlaceAndUser(workPlaceValue.ExistingWorkPlaceId, viewModel.UserId);
                         var existingUserRole = await _securityDatawork.ApplicationUserRoles
                             .FirstOrDefaultAsync(x => x.RoleId == existingRole.Id && x.UserId == viewModel.UserId);
-                        var newUserRole = new IdentityUserRole<string>();
+                        var newUserRole = new ApplicationUserRole();
 
                         _securityDatawork.ApplicationUserRoles.Remove(existingUserRole);
                         await _securityDatawork.SaveChangesAsync();
@@ -101,7 +101,7 @@ namespace WebApplication.Api.Security
                     }
                     else
                     {
-                        _securityDatawork.ApplicationUserRoles.Add(new IdentityUserRole<string>
+                        _securityDatawork.ApplicationUserRoles.Add(new ApplicationUserRole
                         {
                             UserId = viewModel.UserId,
                             RoleId = newRole.Id
@@ -129,7 +129,7 @@ namespace WebApplication.Api.Security
                     _securityDatawork.ApplicationRoles.Add(role);
                     await _securityDatawork.SaveChangesAsync();
 
-                    _securityDatawork.ApplicationUserRoles.Add(new IdentityUserRole<string>
+                    _securityDatawork.ApplicationUserRoles.Add(new ApplicationUserRole
                     {
                         UserId = viewModel.UserId,
                         RoleId = role.Id

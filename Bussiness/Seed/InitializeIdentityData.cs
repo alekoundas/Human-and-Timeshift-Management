@@ -23,8 +23,10 @@ namespace Business.Seed
             {
                 ApplicationUser user = new ApplicationUser
                 {
-                    UserName = "Admin@Admin",
-                    Email = "Admin@Admin"
+                    UserName = "Admin",
+                    Email = "Admin@Admin.gr",
+                    FirstName= "Admin",
+                    LastName = "User"
                 };
 
                 IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd").Result;
@@ -105,9 +107,13 @@ namespace Business.Seed
 
             if (userManager.FindByNameAsync("SuperAdmin").Result == null)
             {
-                ApplicationUser user = new ApplicationUser();
-                user.UserName = "Super@Admin";
-                user.Email = "Super@Admin";
+                ApplicationUser user = new ApplicationUser
+                {
+                    UserName = "SuperAdmin",
+                    Email = "Super@Admin.gr",
+                    FirstName = "Super",
+                    LastName = "User"
+                };
 
                 IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd").Result;
 
