@@ -10,12 +10,8 @@ namespace DataAccess.ViewModels.Customers
     public class CreateCustomer
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
-        [Display(Name = "Όνομα")]
-        public string FirstName { get; set; }
-
-        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
-        [Display(Name = "Επίθετο")]
-        public string LastName { get; set; }
+        [Display(Name = "Επωνυμία")]
+        public string ΙdentifyingΝame { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "ΑΦΜ")]
@@ -49,8 +45,7 @@ namespace DataAccess.ViewModels.Customers
         {
             return new Customer()
             {
-                FirstName = viewModel.FirstName,
-                LastName = viewModel.LastName,
+                ΙdentifyingΝame = viewModel.ΙdentifyingΝame,
                 AFM = viewModel.AFM,
                 Address=viewModel.Address,
                 PostalCode=viewModel.PostalCode,

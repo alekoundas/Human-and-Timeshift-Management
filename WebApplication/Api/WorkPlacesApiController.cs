@@ -333,7 +333,7 @@ namespace WebApplication.Api
                 {
                     dictionary.Add("Buttons", dataTableHelper.GetButtons(
                         "WorkPlace", "WorkPlaces", workplace.Id.ToString()));
-                    dictionary.Add("CustomerFullName", workplace.Customer?.FullName);
+                    dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
                     returnObjects.Add(expandoObj);
                 }
                 if (datatable.Predicate == "CustomerDetails")
@@ -369,7 +369,7 @@ namespace WebApplication.Api
                     var apiUrl = UrlHelper.EmployeeWorkPlace(datatable.GenericId,
                         workplace.Id);
 
-                    dictionary.Add("CustomerFullName", workplace.Customer?.FullName);
+                    dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
 
                     if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -385,7 +385,7 @@ namespace WebApplication.Api
                     var apiUrl = UrlHelper.EmployeeWorkPlace(datatable.GenericId,
                         workplace.Id);
 
-                    dictionary.Add("CustomerFullName", workplace.Customer?.FullName);
+                    dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
 
                     if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(

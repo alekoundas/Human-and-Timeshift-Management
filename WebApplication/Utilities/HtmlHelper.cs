@@ -40,6 +40,24 @@ namespace WebApplication.Utilities
             return new HtmlString("");
         }
 
+        public static IHtmlContent ButtonGoToEdit(this IHtmlHelper html, string controller)
+        {
+            var link = "href=/" + controller + "/Index";
+            if (IsOkToShow(controller + "_Edit"))
+                return new HtmlString("<a " + link + " class='button'> <button class='btn btn-primary'>Επεξεργασία</button> </a>");
+
+            return new HtmlString("");
+        }
+
+        public static IHtmlContent ButtonImport(this IHtmlHelper html, string controller)
+        {
+            var onClick = "onclick = \"$('#ImportModal').modal('show')\"";
+            if (IsOkToShow(controller + "_Create"))
+                return new HtmlString("<a " + onClick + " class='button'> <button class='btn btn-primary'>Import</button> </a>");
+
+            return new HtmlString("");
+        }
+
         public static bool HasAnyChildButton(this IHtmlHelper html, string controller)
         {
             if (IsOkToShow(controller + "_View") || IsOkToShow(controller + "_Create"))

@@ -44,18 +44,24 @@ namespace Bussiness.Repository
             return await qry.ToListAsync();
         }
 
-        public IEnumerable<TEntity> GetAllWithoutPaging()
+        public async Task<List<TEntity>> GetAllAsync()
         {
-            return _set.ToList();
+            return await _set.ToListAsync();
         }
+
+        public async Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector)
+        {
+            return await _set.Select(selector).ToListAsync();
+        }
+
 
         public async Task<int> CountAllAsync()
         {
             return await _set.CountAsync();
         }
-        public async Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> filter)
+        public async Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> selector)
         {
-            return await _set.Where(filter).CountAsync();
+            return await _set.Where(selector).CountAsync();
         }
 
         public async Task<List<TEntity>> GetPaggingWithFilter(
@@ -82,7 +88,7 @@ namespace Bussiness.Repository
             return await qry.ToListAsync();
         }
 
-    
+
 
 
         public int Count(Expression<Func<TEntity, bool>> predicate)
@@ -145,6 +151,7 @@ namespace Bussiness.Repository
             return _set.Where(expression);
         }
 
+       
     }
 }
 

@@ -15,6 +15,7 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
                     @Html.ButtonBackToList("Employee")
+                    @Html.ButtonGoToEdit("Employee")
                 </div>
             </div>
 
@@ -115,14 +116,14 @@
                 <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive">
                     <thead>
                         <tr>
-                            <th>Τίτλος</th>
+                            <th>Επωνυμία</th>
                             <th>Πελάτη</th>
                             <th>Βρισκεται στα πόστα</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
-                            <th>Τίτλος</th>
+                            <th>Επωνυμία</th>
                             <th>Πελάτη</th>
                             <th>Βρισκεται στα πόστα</th>
                         </tr>
@@ -178,12 +179,12 @@
                         }
                     },
                     {
-                        data: "CustomerFullName",
+                        data: "IdentifyingName",
                         searchable: true,
                         orderable: true,
                         render: (a, b, data, d) => {
-                            if (data.CustomerFullName != null)
-                                return data.CustomerFullName;
+                            if (data.IdentifyingName != null)
+                                return data.IdentifyingName;
                             else
                                 return "";
                         }

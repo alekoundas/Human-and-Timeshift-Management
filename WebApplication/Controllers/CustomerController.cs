@@ -11,11 +11,16 @@ using Bussiness;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using DataAccess.ViewModels.Customers;
+using WebApplication.Utilities;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using OfficeOpenXml;
 
 namespace WebApplication.Controllers
 {
     public class CustomerController : Controller
     {
+        private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         public CustomerController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
@@ -118,6 +123,110 @@ namespace WebApplication.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(customer);
+        }
+
+        [HttpGet]
+        public ActionResult DownloadExcelTemplate()
+        {
+            var excelColumns = new List<string>(new string[] {
+                "ΙdentifyingΝame",
+                "AFM",
+                "Profession",
+                "Address",
+                "PostalCode",
+                "DOY",
+                "Description",
+                "CompanyId" });
+
+            var excelPackage = new ExcelHelper(_context)
+                .CreateNewExcel("Customers")
+                .AddSheet<Employee>(excelColumns)
+                .CompleteExcel();
+
+
+            byte[] reportBytes;
+            using (var package = excelPackage)
+            {
+                reportBytes = package.GetAsByteArray();
+            }
+
+            return File(reportBytes, XlsxContentType, "Customers.xlsx");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> DownloadExcelWithData()
+        {
+            var excelColumns = new List<string>(new string[] {
+                "ΙdentifyingΝame",
+                "AFM",
+                "Profession",
+                "Address",
+                "PostalCode",
+                "DOY",
+                "Description",
+                "CompanyId" });
+
+            var customer = await _baseDataWork.Customers.GetAllAsync();
+
+            var excelPackage = new ExcelHelper(_context)
+                .CreateNewExcel("Customers")
+                .AddSheet(excelColumns, customer)
+                .CompleteExcel();
+
+
+            byte[] reportBytes;
+            using (var package = excelPackage)
+            {
+                reportBytes = package.GetAsByteArray();
+            }
+
+            return File(reportBytes, XlsxContentType, "Employees.xlsx");
+        }
+        [HttpPost]
+        public async Task<ActionResult> Import(IFormFile ImportExcel)
+        {
+            if (ImportExcel == null)
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
+            else
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    var customers = new List<Customer>();
+                    var customer = new Customer();
+                    await ImportExcel.CopyToAsync(stream);
+                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
+                    {
+
+                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
+                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
+                            {
+                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
+                                    if (worksheet.Cells[1, j].Value.ToString().Contains("Id"))//Filter integers
+                                        customer
+                                          .GetType()
+                                      .GetProperty(worksheet.Cells[1, j].Value.ToString())
+                                      .SetValue(customer, Int32.Parse(worksheet.Cells[i, j].Value?.ToString()), null);
+                                    else
+                                        customer
+                                            .GetType()
+                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
+                                        .SetValue(customer, worksheet.Cells[i, j].Value?.ToString(), null);
+
+                                customer.CreatedOn = DateTime.Now;
+                                customers.Add(customer);
+                                customer = new Customer();
+                            }
+                    }
+                    _baseDataWork.Customers.AddRange(customers);
+                    var status = await _baseDataWork.SaveChangesAsync();
+                    if (status > 0)
+                        TempData["StatusMessage"] = customers.Count +
+                        " εγγραφές προστέθηκαν με επιτυχία";
+                    else
+                        TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+                }
+
+
+            return View("Index");
         }
 
         private bool CustomerExists(int id)

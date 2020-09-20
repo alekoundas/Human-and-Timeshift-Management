@@ -70,7 +70,7 @@ namespace WebApplication.Utilities
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
-                    Text = result.FirstName + " " + result.LastName
+                    Text = result.ΙdentifyingΝame
                 });
 
             pegination.More = hasMore;

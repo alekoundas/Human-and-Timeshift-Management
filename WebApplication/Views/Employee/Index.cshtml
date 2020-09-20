@@ -14,6 +14,7 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
                     @Html.ButtonCreateNew("Employee")
+                    @Html.ButtonImport("Employee")
                 </div>
             </div>
             <hr />
@@ -51,122 +52,123 @@
     <div class="col-md-2"> </div>
 
 </div>
-<link href="~/css/Datatable/Datatable.css" rel="stylesheet" />
-@section Scripts {
-    <script src="~/js/Custom/DatatableDeleteButton.js"></script>
+<partial name="_ImportModal" model='new {Entity = "Employee" }'>
 
-    <script>
-        $('#EmployeesDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            colReorder: true,
-            processing: true,
-            dom: 'Bfrtlp',
-            buttons: ['excel', 'print'],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-            ajax: {
-                url: '/api/employees/datatable',
-                type: 'POST',
-                contentType: "application/json",
-                data: (data, type, row, meta) => {
-                    data.Predicate='EmployeeIndex'
-                    return JSON.stringify(data);
-                }
-            },
-            order: [[0, 'desc']],
-            columns: [
-                {
-                    data: "FirstName",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        console.log(data);
-                        if (data.FirstName != null)
-                            return data.FirstName;
-                        else
-                            return "";
+    @section Scripts {
+        <script src="~/js/Custom/DatatableDeleteButton.js"></script>
+
+        <script>
+            $('#EmployeesDatatable').DataTable({
+                serverSide: true,
+                responsive: true,
+                colReorder: true,
+                processing: true,
+                dom: 'Bfrtlp',
+                buttons: ['excel', 'print'],
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+                },
+                ajax: {
+                    url: '/api/employees/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+                        data.Predicate = 'EmployeeIndex'
+                        return JSON.stringify(data);
                     }
                 },
-                {
-                    data: "LastName",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.LastName != null)
-                            return data.LastName;
-                        else
-                            return "";
+                order: [[0, 'desc']],
+                columns: [
+                    {
+                        data: "FirstName",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.FirstName != null)
+                                return data.FirstName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "LastName",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.LastName != null)
+                                return data.LastName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Email",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.Email != null)
+                                return data.Email;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "ErpCode",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.ErpCode != null)
+                                return data.ErpCode;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Afm",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.Afm != null)
+                                return data.Afm;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "ScpecializationName",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.ScpecializationName != null)
+                                return data.ScpecializationName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "CompanyTitle",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.CompanyTitle != null)
+                                return data.CompanyTitle;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Buttons",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null)
+                                return data.Buttons;
+                            else
+                                return "";
+                        }
                     }
-                },
-                {
-                    data: "Email",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.Email != null)
-                            return data.Email;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "ErpCode",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.ErpCode != null)
-                            return data.ErpCode;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "Afm",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.Afm != null)
-                            return data.Afm;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "ScpecializationName",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.ScpecializationName != null)
-                            return data.ScpecializationName;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "CompanyTitle",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.CompanyTitle != null)
-                            return data.CompanyTitle;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "Buttons",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.Buttons != null)
-                            return data.Buttons;
-                        else
-                            return "";
-                    }
-                }
-            ]
-        });
-    </script>
-}
+                ]
+            });
+        </script>
+    }

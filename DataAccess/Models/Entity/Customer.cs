@@ -9,13 +9,10 @@ namespace DataAccess.Models.Entity
 {
     public class Customer : BaseEntity
     {
-        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
-        [Display(Name = "Όνομα")]
-        public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
-        [Display(Name = "Επίθετο")]
-        public string LastName { get; set; }
+        [Display(Name = "Επωνυμία")]
+        public string ΙdentifyingΝame { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "ΑΦΜ")]
@@ -46,8 +43,5 @@ namespace DataAccess.Models.Entity
 
         public ICollection<WorkPlace> WorkPlaces { get; set; }
 
-
-        [NotMapped]
-        public string FullName { get => FirstName + LastName; }
     }
 }

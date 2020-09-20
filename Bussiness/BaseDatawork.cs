@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,7 +58,6 @@ namespace Bussiness
 
         public void Update<TEntity>(TEntity model)
         {
-
             _dbcontext.Entry(model).State = EntityState.Modified;
         }
 
@@ -76,16 +76,16 @@ namespace Bussiness
                 (startOn < x.StartOn && x.EndOn < endOn));
 
 
-            await _dbcontext.WorkHours.Include(x=>x.Employee)
+            await _dbcontext.WorkHours.Include(x => x.Employee)
                 .Where(WorkHourFilter)
                 .Where(x => x.Employee.Id == employeeId)?
                 .ForEachAsync(y =>
                     response.Add(new ApiLeavesHasOverlapResponse
                     {
                         Id = y.Id,
-                        EmployeeId =y.Employee.Id,
+                        EmployeeId = y.Employee.Id,
                         GivenEmployeeId = employeeId,
-                        TypeOf = y.IsDayOff?"DayOff":"WorkHour"
+                        TypeOf = y.IsDayOff ? "DayOff" : "WorkHour"
                     })
                 );
 
@@ -105,6 +105,7 @@ namespace Bussiness
             return response;
         }
 
+  
         private Func<T, bool> GetDateOverlapFilter<T>(DateTime startOn, DateTime endOn) =>
              x =>
                  ((DateTime)x.GetType().GetProperty("StartOn").GetValue(x) <= startOn && startOn <= (DateTime)x.GetType().GetProperty("EndOn").GetValue(x)) ||

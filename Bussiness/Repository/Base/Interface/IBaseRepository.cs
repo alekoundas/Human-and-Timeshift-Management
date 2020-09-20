@@ -21,6 +21,7 @@ namespace Bussiness.Repository.Interface
 
         Task<int> CountAllAsync();
         Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> filter);
+        Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector);
 
         Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
@@ -31,6 +32,7 @@ namespace Bussiness.Repository.Interface
 
 
         Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter);
+        Task<List<TEntity>> GetAllAsync();
         int Count(Expression<Func<TEntity, bool>> predicate);
 
         TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);

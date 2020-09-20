@@ -1,27 +1,31 @@
 ﻿$(() => {
     $('#UploadExcel').on('click', () => {
+        var fdata = new FormData();
         var fileExtension = ['xls', 'xlsx'];
-        var filename = $('#fileupload').val();
-        if (filename.length == 0) {
-            alert("Please select a file.");
+        //var filename = $('#ImportExcel').val();
+        var input = document.getElementById('ImportExcel');
+
+        var fileUpload = $('#ImportExcel').get(0);
+        var files = fileUpload.files;
+
+        if (input.value.length == 0) {
+            alert("Παρακαλώ επέλεξε αρχείο.");
             return false;
         }
         else {
-            var extension = filename.replace(/^.*\./, '');
+            var extension = input.value.replace(/^.*\./, '');
             if ($.inArray(extension, fileExtension) == -1) {
-                alert("Please select only excel files.");
+                alert("Μονο αρχεια excel ειναι επιτρεπτα.");
                 return false;
             }
         }
-        var fdata = new FormData();
-        var fileUpload = $("#fileupload").get(0);
-        var files = fileUpload.files;
         fdata.append(files[0].name, files[0]);
+
         $.ajax({
-            type: "POST",
-            url: "/Home/Import",
+            type: 'POST',
+            url: '/' + document.getElementById('ImportExcel').dataset.AjaxUrl+'/Import',
             beforeSend: (xhr) => {
-                xhr.setRequestHeader("XSRF-TOKEN",
+                xhr.setRequestHeader('XSRF-TOKEN',
                     $('input:hidden[name="__RequestVerificationToken"]').val());
             },
             data: fdata,
@@ -39,13 +43,4 @@
             }
         });
     })
-
-    $('#btnExport').on('click', () => {
-        var fileExtension = ['xls', 'xlsx'];
-        var filename = $('#fileupload').val();
-        if (filename.length == 0) {
-            alert("Please select a file then Import");
-            return false;
-        }
-    });
 });

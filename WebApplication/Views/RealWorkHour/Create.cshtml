@@ -114,40 +114,6 @@
                 HideSaveButton() : ShowSaveButton();
 
         }
-        //const HandleSubmitButton = (responses) => {
-        //    if (responses == undefined) {
-        //        var startOn = document.getElementById('StartOn').value;
-        //        var endOn = document.getElementById('EndOn').value;
-        //        var employeeSelect2CurrentErrorCount = 0
-        //        var employeeIds = GetAlreadyAppendedEmployeeIds();
-        //        employeeIds.forEach(id => {
-        //            if (window.getComputedStyle(
-        //                document.getElementById('EmployeesSelect2ErrorSpanNum_' + GetSelect2NumBySelectedEmployeeId(id)))
-        //                .display !== "none")
-        //                employeeSelect2CurrentErrorCount++;
-        //        })
-
-        //        //Check if we have selected employees
-        //        if (employeeSelect2CurrentErrorCount == 0 &&
-        //            employeeIds.length > 0 && startOn != '' && endOn != '')
-        //            document.getElementById('SubmitButton').disabled = false;
-        //        else
-        //            document.getElementById('SubmitButton').disabled = true;
-        //    }
-        //    else {
-        //        var errorCount = 0;
-        //        responses.forEach((response) =>
-        //            !response.isSuccessful ? errorCount++ : errorCount);
-
-        //        if (errorCount > 0 || responses.length == 0)
-        //            document.getElementById('SubmitButton').disabled = true;
-        //        else
-        //            //if (GetAlreadyAppendedEmployeeIds().length > 0)
-        //            document.getElementById('SubmitButton').disabled = false;
-        //    }
-        //}
-
-
 
         const HandleTimeRangeSpan = (response) => {
             if (response != undefined) {
@@ -373,7 +339,7 @@
                 '<div style="width: 100%;">' +
                 '<div style="width: 15%; float: left;">&nbsp;</div>' +
                 '<div style="width: 50%; float: left;">' +
-                '<select class="EmployeesSelect2" id="EmployeesSelect2Num_' + Count + '" name="Employees['+Count+'].Id" style="width:100%"></select>' +
+                '<select class="EmployeesSelect2" id="EmployeesSelect2Num_' + Count + '" name="Employees['+Count+']" style="width:100%"></select>' +
                 '<span style="display:none;"id="EmployeesSelect2ErrorSpanNum_' + Count + '" class="text-danger EmployeeSelect2ErrorSpan"></span>' +
                 '<span style="display:none;"id="EmployeesSelect2WarningSpanNum_' + Count + '" class="text-danger EmployeeSelect2WarningSpan"></span>' +
                 '</div>' +

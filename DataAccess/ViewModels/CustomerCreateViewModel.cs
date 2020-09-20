@@ -7,8 +7,7 @@ namespace DataAccess.ViewModels
 {
     public class CustomerCreateViewModel
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string ΙdentifyingΝame { get; set; }
         public string AFM { get; set; }
         public string Description { get; set; }
         public int? CompanyId { get; set; }
@@ -20,8 +19,7 @@ namespace DataAccess.ViewModels
         {
             return new Customer()
             {
-                FirstName = viewModel.FirstName,
-                LastName = viewModel.LastName,
+                ΙdentifyingΝame = viewModel.ΙdentifyingΝame,
                 AFM = viewModel.AFM,
                 Description = viewModel.Description,
                 CompanyId = (int)viewModel.CompanyId,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using DataAccess.Models.Entity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DataAccess.ViewModels.RealWorkHours
 {
@@ -18,8 +19,7 @@ namespace DataAccess.ViewModels.RealWorkHours
         public DateTime EndOn { get; set; }
 
         [Display(Name = "Υπάλληλοι")]
-        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό.")]
-        public List<Employee> Employees { get; set; }
+        public List<int> Employees { get; set; }
 
         [Display(Name = "Χρονοδιάγραμμα")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό.")]

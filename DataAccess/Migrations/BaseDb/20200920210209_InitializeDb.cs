@@ -61,8 +61,7 @@ namespace DataAccess.Migrations.BaseDb
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    FirstName = table.Column<string>(nullable: false),
-                    LastName = table.Column<string>(nullable: false),
+                    ΙdentifyingΝame = table.Column<string>(nullable: false),
                     AFM = table.Column<string>(nullable: false),
                     Profession = table.Column<string>(nullable: true),
                     Address = table.Column<string>(nullable: true),

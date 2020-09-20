@@ -45,11 +45,8 @@ namespace WebApplication.Api
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
-
             if (customer == null)
-            {
                 return NotFound();
-            }
 
             return customer;
         }
@@ -119,7 +116,7 @@ namespace WebApplication.Api
                     .GetPaggingWithFilter(null, null, null, 10, page);
             else
             {
-                filter = filter.And(x => x.FirstName.Contains(search));
+                filter = filter.And(x => x.ΙdentifyingΝame.Contains(search));
 
                 customers = await _baseDataWork.Customers
                     .GetPaggingWithFilter(null, filter, null, 10, page);

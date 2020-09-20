@@ -77,13 +77,13 @@ namespace WebApplication.Controllers
             var changeCount = 0;
             if (ModelState.IsValid)
             {
-                viewModel.Employees.ForEach(x =>
+                viewModel.Employees.ForEach(id =>
                 {
                     changeCount++;
                     var realWorkHour = RealWorkHourCreateViewModel
                         .CreateFrom(viewModel);
 
-                    realWorkHour.EmployeeId = x.Id;
+                    realWorkHour.EmployeeId = id;
                     _baseDataWork.RealWorkHours.Add(realWorkHour);
                 });
                var state =  await _baseDataWork.SaveChangesAsync();

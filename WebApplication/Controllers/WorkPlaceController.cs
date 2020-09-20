@@ -10,11 +10,16 @@ using DataAccess.Models.Entity;
 using Bussiness;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using WebApplication.Utilities;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using OfficeOpenXml;
 
 namespace WebApplication.Controllers
 {
     public class WorkPlaceController : Controller
     {
+        private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         public WorkPlaceController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
@@ -118,6 +123,99 @@ namespace WebApplication.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(workPlace);
+        }
+
+        [HttpGet]
+        public ActionResult DownloadExcelTemplate()
+        {
+            var excelColumns = new List<string>(new string[] {
+                "Title",
+                "Description",
+                "CustomerId" });
+
+            var excelPackage = new ExcelHelper(_context)
+                .CreateNewExcel("WorkPlaces")
+                .AddSheet<Employee>(excelColumns)
+                .CompleteExcel();
+
+
+            byte[] reportBytes;
+            using (var package = excelPackage)
+            {
+                reportBytes = package.GetAsByteArray();
+            }
+
+            return File(reportBytes, XlsxContentType, "WorkPlaces.xlsx");
+        }
+        [HttpGet]
+        public async Task<ActionResult> DownloadExcelWithData()
+        {
+            var excelColumns = new List<string>(new string[] {
+                "Title",
+                "Description",
+                "CustomerId" });
+
+            var workPlace = await _baseDataWork.WorkPlaces.GetAllAsync();
+
+            var excelPackage = new ExcelHelper(_context)
+                .CreateNewExcel("WorkPlaces")
+                .AddSheet(excelColumns, workPlace)
+                .CompleteExcel();
+
+
+            byte[] reportBytes;
+            using (var package = excelPackage)
+            {
+                reportBytes = package.GetAsByteArray();
+            }
+
+            return File(reportBytes, XlsxContentType, "WorkPlaces.xlsx");
+        }
+        [HttpPost]
+        public async Task<ActionResult> Import(IFormFile ImportExcel)
+        {
+            if (ImportExcel == null)
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
+            else
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    var workPlaces = new List<WorkPlace>();
+                    var workPlace = new WorkPlace();
+                    await ImportExcel.CopyToAsync(stream);
+                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
+                    {
+
+                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
+                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
+                            {
+                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
+                                    if (worksheet.Cells[1, j].Value.ToString().Contains("Id"))//Filter integers
+                                        workPlace
+                                          .GetType()
+                                      .GetProperty(worksheet.Cells[1, j].Value.ToString())
+                                      .SetValue(workPlace, Int32.Parse(worksheet.Cells[i, j].Value?.ToString()), null);
+                                    else
+                                        workPlace
+                                            .GetType()
+                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
+                                        .SetValue(workPlace, worksheet.Cells[i, j].Value?.ToString(), null);
+
+                                workPlace.CreatedOn = DateTime.Now;
+                                workPlaces.Add(workPlace);
+                                workPlace = new WorkPlace();
+                            }
+                    }
+                    _baseDataWork.WorkPlaces.AddRange(workPlaces);
+                    var status = await _baseDataWork.SaveChangesAsync();
+                    if (status > 0)
+                        TempData["StatusMessage"] = workPlaces.Count +
+                        " εγγραφές προστέθηκαν με επιτυχία";
+                    else
+                        TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+                }
+
+
+            return View("Index");
         }
 
 

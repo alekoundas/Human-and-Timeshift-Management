@@ -16,6 +16,7 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
                     @Html.ButtonCreateNew("WorkPlace")
+                    @Html.ButtonImport("WorkPlace")
                 </div>
             </div>
             <hr />
@@ -43,58 +44,59 @@
     <div class="col-md-3"> </div>
 
 </div>
-@section Scripts {
-    <script>
+<partial name="_ImportModal" model='new {Entity = "WorkPlace" }'>
+    @section Scripts {
+        <script>
 
-        $('#WorkPlacesDatatable').DataTable({
-            serverSide: true,
-            dom: 'frtlp',
-            ajax: {
-                url: '/api/workplaces/datatable',
-                type: 'POST',
-                contentType: "application/json",
-                data: (data, type, row, meta) => {
-                    data.predicate = 'WorkPlaceIndex';
-                    return JSON.stringify(data);
-                }
-            },
-            order: [[0, 'desc']],
-            columns: [
-                {
-                    data: "Title",
-                    searchable: true,
-                    orderable: true,
-                    ender: (a, b, data, d) => {
-                        console.log(data);
-                        if (data.Title != null)
-                            return data.Title;
-                        else
-                            return "";
+            $('#WorkPlacesDatatable').DataTable({
+                serverSide: true,
+                dom: 'frtlp',
+                ajax: {
+                    url: '/api/workplaces/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+                        data.predicate = 'WorkPlaceIndex';
+                        return JSON.stringify(data);
                     }
                 },
-                {
-                    data: "CustomerFullName",
-                    searchable: false,
-                    orderable: false,
-                    render: (a, b, data, d) => {
-                        if (data.CustomerFullName != null)
-                            return data.CustomerFullName;
-                        else
-                            return "";
+                order: [[0, 'desc']],
+                columns: [
+                    {
+                        data: "Title",
+                        searchable: true,
+                        orderable: true,
+                        ender: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.Title != null)
+                                return data.Title;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "CustomerFullName",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.CustomerFullName != null)
+                                return data.CustomerFullName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Button",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null)
+                                return data.Buttons;
+                            else
+                                return "";
+                        }
                     }
-                },
-                {
-                    data: "Button",
-                    searchable: false,
-                    orderable: false,
-                    render: (a, b, data, d) => {
-                        if (data.Buttons != null)
-                            return data.Buttons;
-                        else
-                            return "";
-                    }
-                }
-            ]
-        });
-    </script>
-}
+                ]
+            });
+        </script>
+    }

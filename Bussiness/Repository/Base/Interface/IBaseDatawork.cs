@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 
 namespace Business.Repository.Interface
 {
@@ -9,7 +10,6 @@ namespace Business.Repository.Interface
     {
         Task<int> SaveChangesAsync();
         void Update<TEntity>(TEntity model);
-
 
     }
 }

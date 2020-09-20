@@ -17,6 +17,7 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
                     @Html.ButtonCreateNew("Company")
+                    @Html.ButtonImport("Company")
                 </div>
             </div>
             <hr />
@@ -45,10 +46,11 @@
     <div class="col-md-3"> </div>
 
 </div>
+<partial name="_ImportModal" model='new {Entity = "Company" }'>
 
-@section Scripts {
+    @section Scripts {
         <script src="~/js/Custom/DatatableDeleteButton.js"></script>
-    <script>
+        <script>
 
 
             $('#CompaniesDatatable').DataTable({
@@ -108,5 +110,5 @@
                     }
                 ]
             });
-    </script>
-}
+        </script>
+    }

@@ -48,7 +48,7 @@
                             <select class="Customer_Select2" asp-for="CustomerId" style="width:70%">
                                 @if (Model.Customer != null)
                                 {
-                                    <option value="@Model.CustomerId" selected="selected">@Model.Customer.FirstName  @Model.Customer.LastName </option>
+                                    <option value="@Model.CustomerId" selected="selected">@Model.Customer.ΙdentifyingΝame</option>
                                 }
                             </select>
                             <span asp-validation-for="CustomerId" class="text-danger"></span>

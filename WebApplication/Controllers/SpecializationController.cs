@@ -19,11 +19,13 @@ using NPOI.XSSF.UserModel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using WebApplication.Utilities;
+using OfficeOpenXml;
 
 namespace WebApplication.Controllers
 {
     public class SpecializationController : Controller
     {
+        private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         private HostingEnvironment _hostingEnvironment;
@@ -123,126 +125,84 @@ namespace WebApplication.Controllers
             return View(specialization);
         }
 
-
-        //public ActionResult Download()
-        //{
-        //    string Files = "wwwroot/ExcelTemplates/SpecializationTemplate.xlsx";
-        //    byte[] fileBytes = System.IO.File.ReadAllBytes(Files);
-        //    System.IO.File.WriteAllBytes(Files, fileBytes);
-        //    MemoryStream ms = new MemoryStream(fileBytes);
-        //    return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, "employee.xlsx");
-        //}
-        public async Task<ActionResult> DownloadAsync()
+        [HttpGet]
+        public async Task<ActionResult> DownloadExcelTemplate()
         {
-            var excelHelper = new ExcelHelper();
+            var excelColumns = new List<string>(new string[] { "Name", "Description" });
+
+            var excelPackage = new ExcelHelper(_context)
+                .CreateNewExcel("Specializations")
+                .AddSheet<Specialization>(excelColumns)
+                .CompleteExcel();
 
 
-            //var workbook = excelHelper.CreateNewExcel()
-            //            .AddSheet("Specializations",
-            //                new List<string>(new string[] { "Name", "Description" }))
-            //            .Workbook
-                      
-            //          ;
-            
-
-                    HSSFWorkbook workbook = new HSSFWorkbook();
-            HSSFFont myFont = (HSSFFont)workbook.CreateFont();
-            myFont.FontHeightInPoints = 11;
-            myFont.FontName = "Tahoma";
-
-
-            // Defining a border
-            HSSFCellStyle borderedCellStyle = (HSSFCellStyle)workbook.CreateCellStyle();
-            borderedCellStyle.SetFont(myFont);
-            borderedCellStyle.BorderLeft = BorderStyle.Medium;
-            borderedCellStyle.BorderTop = BorderStyle.Medium;
-            borderedCellStyle.BorderRight = BorderStyle.Medium;
-            borderedCellStyle.BorderBottom = BorderStyle.Medium;
-            borderedCellStyle.VerticalAlignment = VerticalAlignment.Center;
-
-            ISheet Sheet = workbook.CreateSheet("Report");
-            //Creat The Headers of the excel
-            IRow HeaderRow = Sheet.CreateRow(0);
-
-            //Create The Actual Cells
-            excelHelper.CreateCell(HeaderRow, 0, "Batch Name", borderedCellStyle);
-            excelHelper.CreateCell(HeaderRow, 1, "RuleID", borderedCellStyle);
-            excelHelper.CreateCell(HeaderRow, 2, "Rule Type", borderedCellStyle);
-            excelHelper.CreateCell(HeaderRow, 3, "Code Message Type", borderedCellStyle);
-            excelHelper.CreateCell(HeaderRow, 4, "Severity", borderedCellStyle);
-
-
-            string fileName = "SpecializationTemplate.xlsx";
-            string folderPath = "wwwroot/ExcelTemplates";
-            string datafile = Path.Combine(folderPath, fileName);
-            FileStream file = new FileStream(datafile, FileMode.CreateNew);
-            workbook.Write(file);
-
-            var memoryStream = new MemoryStream();
-            using (var fileStream = new FileStream(Path.Combine(folderPath, fileName), FileMode.Open))
+            byte[] reportBytes;
+            using (var package = excelPackage)
             {
-                await fileStream.CopyToAsync(memoryStream);
+                reportBytes = package.GetAsByteArray();
             }
-            memoryStream.Position = 0;
-            return File(memoryStream, 
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName);
+
+            return File(reportBytes, XlsxContentType, "Specializations.xlsx");
         }
-        public ActionResult Import()
+        [HttpGet]
+        public async Task<ActionResult> DownloadExcelWithData()
         {
-            IFormFile file = Request.Form.Files[0];
-            string folderName = "UploadExcel";
-            string webRootPath = _hostingEnvironment.ContentRootPath;
-            string newPath = Path.Combine(webRootPath, folderName);
-            StringBuilder sb = new StringBuilder();
-            if (!Directory.Exists(newPath))
-                Directory.CreateDirectory(newPath);
-            if (file.Length > 0)
+            var excelColumns = new List<string>(new string[] { "Name", "Description" });
+            var specialization = await _baseDataWork.Specializations.GetAllAsync();
+
+            var excelPackage = new ExcelHelper(_context)
+                .CreateNewExcel("Specializations")
+                .AddSheet(excelColumns, specialization)
+                .CompleteExcel();
+
+
+            byte[] reportBytes;
+            using (var package = excelPackage)
             {
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
-                ISheet sheet;
-                string fullPath = Path.Combine(newPath, file.FileName);
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    file.CopyTo(stream);
-                    stream.Position = 0;
-                    if (sFileExtension == ".xls")
-                    {
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-                    }
-                    else
-                    {
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-                    }
-                    IRow headerRow = sheet.GetRow(0); //Get Header Row
-                    int cellCount = headerRow.LastCellNum;
-                    sb.Append("<table class='table table-bordered'><tr>");
-                    for (int j = 0; j < cellCount; j++)
-                    {
-                        NPOI.SS.UserModel.ICell cell = headerRow.GetCell(j);
-                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-                        sb.Append("<th>" + cell.ToString() + "</th>");
-                    }
-                    sb.Append("</tr>");
-                    sb.AppendLine("<tr>");
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-                    {
-                        IRow row = sheet.GetRow(i);
-                        if (row == null) continue;
-                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-                        for (int j = row.FirstCellNum; j < cellCount; j++)
-                        {
-                            if (row.GetCell(j) != null)
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
-                        }
-                        sb.AppendLine("</tr>");
-                    }
-                    sb.Append("</table>");
-                }
+                reportBytes = package.GetAsByteArray();
             }
-            return this.Content(sb.ToString());
+
+            return File(reportBytes, XlsxContentType, "Specializations.xlsx");
+        }
+        [HttpPost]
+        public async Task<ActionResult> Import(IFormFile ImportExcel)
+        {
+            if (ImportExcel == null)
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
+            else
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    var specializations = new List<Specialization>();
+                    var specialization = new Specialization();
+                    await ImportExcel.CopyToAsync(stream);
+                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
+                    {
+
+                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
+                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
+                            {
+                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
+                                    specialization
+                                        .GetType()
+                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
+                                        .SetValue(specialization, worksheet.Cells[i, j].Value?.ToString(), null);
+
+                                specialization.CreatedOn = DateTime.Now;
+                                specializations.Add(specialization);
+                                specialization = new Specialization();
+                            }
+                    }
+                    _baseDataWork.Specializations.AddRange(specializations);
+                    var status = await _baseDataWork.SaveChangesAsync();
+                    if (status > 0)
+                        TempData["StatusMessage"] = specializations.Count +
+                        " εγγραφές προστέθηκαν με επιτυχία";
+                    else
+                        TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+                }
+
+
+            return View("Index");
         }
         private bool SpecializationExists(int id)
         {
@@ -250,3 +210,4 @@ namespace WebApplication.Controllers
         }
     }
 }
+
