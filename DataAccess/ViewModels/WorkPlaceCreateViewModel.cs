@@ -8,9 +8,12 @@ namespace DataAccess.ViewModels
 {
     public class WorkPlaceCreateViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        [Display(Name = "Τίτλος")]
         public string Title { get; set; }
+        [Display(Name = "Περιγραφή")]
         public string Description { get; set; }
+        [Display(Name = "Πελάτης")]
         public int? CustomerId { get; set; }
 
 

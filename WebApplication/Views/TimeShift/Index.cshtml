@@ -93,7 +93,7 @@
                     searchable: true,
                     orderable: true,
                     render: (a, b, data, d) => {
-                        //console.log(data);
+                        console.log(data);
                         if (data.Title != null)
                             return data.Title;
                         else
@@ -101,12 +101,12 @@
                     }
                 },
                 {
-                    data: "Customer.fullName",
+                    data: "ΙdentifyingΝame",
                     searchable: true,
                     orderable: true,
                     render: (a, b, data, d) => {
-                        if (data.Customer != null)
-                            return data.Customer?.fullName;
+                        if (data.ΙdentifyingΝame != null)
+                            return data.ΙdentifyingΝame;
                         else
                             return "";
                     }
@@ -117,8 +117,8 @@
                     orderable: false,
                     render: (a, b, data, d) => {
                         if (data.Customer != null)
-                            if (data.Customer.company != null)
-                                return data.Customer.company.title;
+                            if (data.Customer?.company != null)
+                                return data.Customer.company?.title;
                             else
                                 return "";
                         else

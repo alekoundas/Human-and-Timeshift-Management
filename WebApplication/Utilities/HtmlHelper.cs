@@ -40,9 +40,9 @@ namespace WebApplication.Utilities
             return new HtmlString("");
         }
 
-        public static IHtmlContent ButtonGoToEdit(this IHtmlHelper html, string controller)
+        public static IHtmlContent ButtonGoToEdit(this IHtmlHelper html, string controller, int id)
         {
-            var link = "href=/" + controller + "/Index";
+            var link = "href=/" + controller + "/Edit/" + id;
             if (IsOkToShow(controller + "_Edit"))
                 return new HtmlString("<a " + link + " class='button'> <button class='btn btn-primary'>Επεξεργασία</button> </a>");
 

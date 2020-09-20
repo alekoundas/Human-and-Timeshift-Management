@@ -1612,8 +1612,7 @@
         }
 
         //Calentim
-        var Calentim = (currentDate, workHourId, dbStartDate, dbEndDate) => {
-            //$("#CallendarButtonNum_" + workHourId).data("calentim").destroy();
+        var CalentimEdit = (currentDate, workHourId, dbStartDate, dbEndDate) => {
             var setStartDate = currentDate;
             var setEndDate = currentDate;
             if (dbStartDate != undefined)
@@ -1632,27 +1631,10 @@
                 minuteSteps: 15,
                 showHeader: false,
                 showButtons: true,
+                singleDate: true,//Only diff between 2 calentims
                 locale: "el",
                 target: $("#CalentimInputNum_" + workHourId),
                 showOn: "right",
-                rangeOrientation: "vertical",
-                ranges: [
-                    {
-                        title: "Χτές και ημέρα κελιού",
-                        startDate: moment(currentDate).subtract(1, 'days'),
-                        endDate: moment(currentDate)
-                    },
-                    {
-                        title: "Ημέρα κελιού",
-                        startDate: moment(currentDate),
-                        endDate: moment(currentDate)
-                    },
-                    {
-                        title: "Ημέρα κελιού και άυριο",
-                        startDate: moment(currentDate),
-                        endDate: moment(currentDate).add(1, 'days')
-                    }
-                ],
                 disabledRanges: [
                     {
                         start: moment("01/01/1700", "DD/MM/YYYY"),//Earliest date in docs
@@ -1687,7 +1669,86 @@
                     //Fix Calentim width
                     [...document.getElementsByClassName('calentim-input')]
                         .forEach((calentim) =>
-                            calentim.setAttribute('style', 'width: 600px;'))
+                            calentim.setAttribute('style', 'width: 400px;'))
+            })
+        };
+
+        var Calentim = (currentDate, workHourId, dbStartDate, dbEndDate) => {
+            //$("#CallendarButtonNum_" + workHourId).data("calentim").destroy();
+            var setStartDate = currentDate;
+            var setEndDate = currentDate;
+            if (dbStartDate != undefined)
+                setStartDate = dbStartDate;
+            if (dbEndDate != undefined)
+                setEndDate = dbEndDate;
+            $('#CalentimButtonNum_' + workHourId).calentim({
+                dateSeparator: '/-/',
+                startDate: new Date(setStartDate),
+                endDate: new Date(setEndDate),
+                startOnMonday: true,
+                dontPrefixHours: false,
+                format: "DD/MM/YYYY HH:mm",
+                hourFormat: 24,
+                calendarCount: 1,
+                minuteSteps: 15,
+                showHeader: false,
+                showButtons: true,
+                locale: "el",
+                target: $("#CalentimInputNum_" + workHourId),
+                showOn: "right",
+                //rangeOrientation: "vertical",
+                //ranges: [
+                //    {
+                //        title: "Χτές και ημέρα κελιού",
+                //        startDate: moment(currentDate).subtract(1, 'days'),
+                //        endDate: moment(currentDate)
+                //    },
+                //    {
+                //        title: "Ημέρα κελιού",
+                //        startDate: moment(currentDate),
+                //        endDate: moment(currentDate)
+                //    },
+                //    {
+                //        title: "Ημέρα κελιού και άυριο",
+                //        startDate: moment(currentDate),
+                //        endDate: moment(currentDate).add(1, 'days')
+                //    }
+                //],
+                disabledRanges: [
+                    {
+                        start: moment("01/01/1700", "DD/MM/YYYY"),//Earliest date in docs
+                        end: moment(currentDate).set('date', 0)
+                    },
+                    {
+                        start: moment(currentDate).add(1, 'month').set('date', 1),
+                        end: moment("31/12/4000", "DD/MM/YYYY")//Latest date in docs
+                    }],
+                onbeforehide: () => {
+
+                    //Handle Loading
+                    ButtonLoadingToggle("SaveWorkHours")
+                        .then(() => {
+                            HandleConvertAndSetCalentimInputValue(workHourId);
+                            HandleWorkHourSpan(workHourId);
+                            if (IsEdit())
+                                HandleShowWorkHourRangeToModal(workHourId, true);
+                            else
+                                HandleShowWorkHourRangeToModal(workHourId);
+
+                            if (!ValidateNullInputs(workHourId)) {
+                                ValidateAppendedWorkHoursTimeRange(workHourId);
+                                ValidateExistingErrorsOnWorkHours();
+                                ValidateWorkHourDateOutOfRange(workHourId);
+                                ValidateEmployeesWithRangeToWorkhour(workHourId);
+                            }
+                        })
+                        .then(() => ButtonLoadingToggle("SaveWorkHours"));
+                },
+                onaftershow: () =>
+                    //Fix Calentim width
+                    [...document.getElementsByClassName('calentim-input')]
+                        .forEach((calentim) =>
+                            calentim.setAttribute('style', 'width: 400px;'))
             })
         };
 

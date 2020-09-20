@@ -398,6 +398,7 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "TimeShiftIndex")
                 {
+                    dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
                     returnObjects.Add(expandoObj);
                 }
                 else if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
