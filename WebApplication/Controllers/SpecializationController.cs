@@ -128,41 +128,62 @@ namespace WebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult> DownloadExcelTemplate()
         {
-            var excelColumns = new List<string>(new string[] { "Name", "Description" });
+            var errors = new List<string>();
+            var excelColumns = new List<string>(new string[] {
+                "Name",
+                "Description" });
 
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("Specializations")
-                .AddSheet<Specialization>(excelColumns)
-                .CompleteExcel();
+            var excelPackage = (await (new ExcelHelper(_context)
+                 .CreateNewExcel("LeaveTypes"))
+                 .AddSheetAsync<Specialization>(excelColumns))
+                 .CompleteExcel(out errors);
 
 
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "Specializations.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "Specializations.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
         [HttpGet]
         public async Task<ActionResult> DownloadExcelWithData()
         {
-            var excelColumns = new List<string>(new string[] { "Name", "Description" });
+            var errors = new List<string>();
             var specialization = await _baseDataWork.Specializations.GetAllAsync();
+            var excelColumns = new List<string>(new string[] { 
+                "Name",
+                "Description" });
 
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("Specializations")
-                .AddSheet(excelColumns, specialization)
-                .CompleteExcel();
+            var excelPackage = (await (new ExcelHelper(_context)
+                .CreateNewExcel("LeaveTypes"))
+                .AddSheetAsync<Specialization>(excelColumns, specialization))
+                .CompleteExcel(out errors);
 
-
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "Specializations.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "Specializations.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
         [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImportExcel)

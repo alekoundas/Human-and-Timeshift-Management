@@ -435,6 +435,8 @@ namespace WebApplication.Api
         {
             if (columnName != "")
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+            //else if(columnName == "IsInWorkPlace")
+                //return x => x.OrderBy(x=>x. + " " + orderDirection.ToUpper());
             else
                 return null;
         }

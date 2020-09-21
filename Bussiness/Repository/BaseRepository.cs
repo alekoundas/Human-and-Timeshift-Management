@@ -51,7 +51,7 @@ namespace Bussiness.Repository
 
         public async Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector)
         {
-            return await _set.Select(selector).ToListAsync();
+            return (List<TResult>)await _set.Select(selector).ToListAsync();
         }
 
 
@@ -151,7 +151,7 @@ namespace Bussiness.Repository
             return _set.Where(expression);
         }
 
-       
+
     }
 }
 

@@ -121,7 +121,7 @@
                  colReorder: true,
                  processing: true,
                  dom: 'Bfrtlp',
-                 buttons: ['excel', 'print'],
+                 buttons: ['excel', 'pdf', 'print'],
                  language: {
                      processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
                  },
@@ -197,8 +197,8 @@
                     },
                     {
                          data: "ScpecializationName",
-                         searchable: true,
-                         orderable: true,
+                         searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.ScpecializationName != null)
                                 return data.ScpecializationName;
@@ -208,8 +208,8 @@
                     },
                     {
                          data: "CompanyTitle",
-                         searchable: true,
-                         orderable: true,
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.CompanyTitle != null)
                                 return data.CompanyTitle;
@@ -219,8 +219,8 @@
                     },
                     {
                          data: "IsInWorkPlace",
-                         searchable: true,
-                         orderable: true,
+                        searchable: false,
+                        orderable: false,
                         render: (a, b, data, d) => {
                             if (data.IsInWorkPlace != null)
                                 return data.IsInWorkPlace;

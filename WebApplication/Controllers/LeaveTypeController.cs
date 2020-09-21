@@ -122,48 +122,66 @@ namespace WebApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult DownloadExcelTemplate()
+        public async Task<ActionResult> DownloadExcelTemplate()
         {
+            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                 "Name",
                 "Description" });
 
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("LeaveTypes")
-                .AddSheet<LeaveType>(excelColumns)
-                .CompleteExcel();
+            var excelPackage = (await (new ExcelHelper(_context)
+            .CreateNewExcel("LeaveTypes"))
+            .AddSheetAsync<LeaveType>(excelColumns))
+            .CompleteExcel(out errors);
 
 
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "LeaveTypes.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "LeaveTypes.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
         [HttpGet]
         public async Task<ActionResult> DownloadExcelWithData()
         {
+            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                "Name",
                 "Description" });
 
-            var employee = await _baseDataWork.LeaveTypes.GetAllAsync();
-
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("LeaveTypes")
-                .AddSheet(excelColumns, employee)
-                .CompleteExcel();
+            var leaveTypes = await _baseDataWork.LeaveTypes.GetAllAsync();
 
 
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            var excelPackage = (await (new ExcelHelper(_context)
+           .CreateNewExcel("LeaveTypes"))
+           .AddSheetAsync<LeaveType>(excelColumns, leaveTypes))
+           .CompleteExcel(out errors);
+
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "LeaveTypes.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "LeaveTypes.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
         [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImportExcel)

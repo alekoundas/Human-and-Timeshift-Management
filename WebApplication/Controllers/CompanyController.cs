@@ -99,7 +99,7 @@ namespace WebApplication.Controllers
         // POST: Companies/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,  Company company)
+        public async Task<IActionResult> Edit(int id, Company company)
         {
             if (id != company.Id)
                 return NotFound();
@@ -125,41 +125,64 @@ namespace WebApplication.Controllers
 
         public async Task<ActionResult> DownloadExcelTemplate()
         {
-            var excelColumns = new List<string>(new string[] { "Title","Afm", "Description" });
+            var errors = new List<string>();
+            var excelColumns = new List<string>(new string[] {
+                "Title",
+                "Afm",
+                "Description" });
 
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("Companies")
-                .AddSheet<Company>(excelColumns)
-                .CompleteExcel();
+            var excelPackage = (await (new ExcelHelper(_context)
+               .CreateNewExcel("Companies"))
+               .AddSheetAsync<Company>(excelColumns))
+               .CompleteExcel(out errors);
 
-
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "Companies.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "Companies.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
 
         public async Task<ActionResult> DownloadExcelWithData()
         {
-            var excelColumns = new List<string>(new string[] { "Title", "Afm", "Description" });
+            var errors = new List<string>();
             var companies = await _baseDataWork.Companies.GetAllAsync();
+            var excelColumns = new List<string>(new string[] {
+                "Title",
+                "Afm",
+                "Description" });
 
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("Companies")
-                .AddSheet(excelColumns, companies)
-                .CompleteExcel();
 
+            var excelPackage = (await (new ExcelHelper(_context)
+             .CreateNewExcel("Companies"))
+             .AddSheetAsync<Company>(excelColumns, companies))
+             .CompleteExcel(out errors);
 
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "Companies.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "Companies.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
         public async Task<ActionResult> Import(IFormFile ImportExcel)
         {

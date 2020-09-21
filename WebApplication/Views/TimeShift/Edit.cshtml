@@ -310,6 +310,18 @@
             return hasError;
         };
 
+        const ValidateCalentimDateIsNotRange = workHourId => {
+            GetCalentimInputValue(workHourId)[0];
+            GetCalentimInputValue(workHourId)[1];
+
+            var hourDiff = FindHourDifference(GetCalentimInputValue(workHourId)[0],
+                GetCalentimInputValue(workHourId)[1]);
+
+            if (hourDiff > 24 || hourDiff < -24 )
+                HandleWorkHourSpan(workHourId, 'Η ημερομηνία στην επεξεργασία δεν επιτρέπει πάνω απο 1 ημέρα!');
+            return hasError;
+        };
+
         const AreDatesOverlaping = (baseDate, checkDate) => {
             if (baseDate.length > 0 && toString.call(baseDate[0]) === "[object Array]") {
                 for (var i = 0; i < baseDate.length; i++)
@@ -1056,6 +1068,7 @@
         }
 
         const HandleConvertAndSetCalentimInputValue = workHourId => {
+
             var dateRange = GetCalentimInputValue(workHourId)
             var startTs = moment(dateRange[0], 'DD/MM/YYYY HH:mm').valueOf();
             var endTs = moment(dateRange[1], 'DD/MM/YYYY HH:mm').valueOf();
@@ -1148,7 +1161,7 @@
                     AppendNewWorkHourToEditModal(WorkHourId, workHour.WorkHourId);
 
                     //set new Calentim instance
-                    Calentim(CelentimDate, WorkHourId, workHour.startOn,
+                    CalentimEdit(CelentimDate, WorkHourId, workHour.startOn,
                         workHour.endOn);
                     HandleConvertAndSetCalentimInputValue(WorkHourId);
 
@@ -1613,6 +1626,7 @@
 
         //Calentim
         var CalentimEdit = (currentDate, workHourId, dbStartDate, dbEndDate) => {
+            //$("#CallendarButtonNum_" + workHourId).data("calentim").destroy();
             var setStartDate = currentDate;
             var setEndDate = currentDate;
             if (dbStartDate != undefined)
@@ -1631,7 +1645,6 @@
                 minuteSteps: 15,
                 showHeader: false,
                 showButtons: true,
-                singleDate: true,//Only diff between 2 calentims
                 locale: "el",
                 target: $("#CalentimInputNum_" + workHourId),
                 showOn: "right",
@@ -1645,7 +1658,6 @@
                         end: moment("31/12/4000", "DD/MM/YYYY")//Latest date in docs
                     }],
                 onbeforehide: () => {
-
                     //Handle Loading
                     ButtonLoadingToggle("SaveWorkHours")
                         .then(() => {
@@ -1661,9 +1673,13 @@
                                 ValidateExistingErrorsOnWorkHours();
                                 ValidateWorkHourDateOutOfRange(workHourId);
                                 ValidateEmployeesWithRangeToWorkhour(workHourId);
+                                ValidateCalentimDateIsNotRange(workHourId);//only diff from bellow calentim
                             }
                         })
                         .then(() => ButtonLoadingToggle("SaveWorkHours"));
+                },
+                onafterselect: () => {
+
                 },
                 onaftershow: () =>
                     //Fix Calentim width

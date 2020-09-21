@@ -25,7 +25,6 @@ namespace DataAccess.Models.Identity
 
         [Display(Name = "Φύλο")]
         public bool Gender { get; set; }
-
         public ICollection<ApplicationUserRole> EmployeeWorkPlaces { get; set; }
 
     }

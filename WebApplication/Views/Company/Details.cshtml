@@ -76,14 +76,14 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="true">Όνομα</th>
-                            <th data-searchable="true">Επίθετο</th>
-                            <th data-searchable="true">Email</th>
-                            <th data-searchable="true">ErpCode</th>
-                            <th data-searchable="true">ΑΦΜ</th>
-                            <th data-searchable="true">Ειδικότητα</th>
-                            <th data-searchable="true">Εταιρία</th>
-                            <th data-searchable="false">Εργαζόμενοι εταιρίας</th>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>Email</th>
+                            <th>ErpCode</th>
+                            <th>ΑΦΜ</th>
+                            <th>Ειδικότητα</th>
+                            <th>Εταιρία</th>
+                            <th>Εργαζόμενοι εταιρίας</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -99,8 +99,15 @@
 
     <script>
          $('#CompanyEmployeesDatatable').DataTable({
-                serverSide: true,
-                dom: 'frtlp',
+             serverSide: true,
+             responsive: true,
+             colReorder: true,
+             processing: true,
+             dom: 'Bfrtlp',
+             buttons: ['excel', 'pdf', 'print'],
+             language: {
+                 processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+             },
                 ajax: {
                     url: '/api/employees/datatable',
                     type: 'POST',
@@ -129,8 +136,8 @@
                     },
                     {
                         data: "LastName",
-                        searchable: false,
-                        orderable: false,
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             if (data.LastName != null)
                                 return data.LastName;
@@ -140,8 +147,8 @@
                     },
                     {
                         data: "Email",
-                        searchable: false,
-                        orderable: false,
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             if (data.Email != null)
                                 return data.Email;
@@ -151,8 +158,8 @@
                     },
                     {
                         data: "ErpCode",
-                        searchable: false,
-                        orderable: false,
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             if (data.ErpCode != null)
                                 return data.ErpCode;
@@ -162,8 +169,8 @@
                     },
                     {
                         data: "Afm",
-                        searchable: false,
-                        orderable: false,
+                        searchable: true,
+                        orderable: true,
                         render: (a, b, data, d) => {
                             if (data.Afm != null)
                                 return data.Afm;

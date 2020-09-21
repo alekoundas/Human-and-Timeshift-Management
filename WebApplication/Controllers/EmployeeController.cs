@@ -29,7 +29,7 @@ namespace WebApplication.Controllers
         }
 
         // GET: Employee
-        [Authorize(Roles ="Employee_View")]
+        [Authorize(Roles = "Employee_View")]
         public IActionResult Index()
         {
             ViewData["Title"] = "Σύνολο υπαλλήλων";
@@ -96,7 +96,7 @@ namespace WebApplication.Controllers
                 .Include(x => x.Specialization)
                 .Include(y => y.Contacts)
                 .FirstOrDefaultAsync(z => z.Id == id);
-                
+
             if (employee == null)
                 return NotFound();
 
@@ -129,42 +129,52 @@ namespace WebApplication.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
             return View(employee);
         }
 
         [HttpGet]
-        public ActionResult DownloadExcelTemplate()
+        public async Task<ActionResult> DownloadExcelTemplate()
         {
-            var excelColumns = new List<string>(new string[] { 
+            var errors = new List<string>();
+            var excelColumns = new List<string>(new string[] {
                 "FirstName",
-                "LastName", 
-                "Afm", 
+                "LastName",
+                "Afm",
                 "SocialSecurityNumber",
-                "ErpCode", 
-                "Email", 
+                "ErpCode",
+                "Email",
                 "Address",
                 "SpecializationId",
                 "CompanyId" });
 
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("Employees")
-                .AddSheet<Employee>(excelColumns)
-                .CompleteExcel();
 
+            var excelPackage = (await (new ExcelHelper(_context)
+             .CreateNewExcel("Employees"))
+             .AddSheetAsync<Employee>(excelColumns))
+             .CompleteExcel(out errors);
 
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "Employees.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "Employees.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
 
         [HttpGet]
         public async Task<ActionResult> DownloadExcelWithData()
         {
+            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                 "FirstName",
                 "LastName",
@@ -178,19 +188,26 @@ namespace WebApplication.Controllers
 
             var employee = await _baseDataWork.Employees.GetAllAsync();
 
-            var excelPackage = new ExcelHelper(_context)
-                .CreateNewExcel("Employees")
-                .AddSheet(excelColumns, employee)
-                .CompleteExcel();
+            var excelPackage = (await (new ExcelHelper(_context)
+                .CreateNewExcel("Employees"))
+                .AddSheetAsync<Employee>(excelColumns, employee))
+                .CompleteExcel(out errors);
 
-
-            byte[] reportBytes;
-            using (var package = excelPackage)
+            if (errors.Count == 0)
             {
-                reportBytes = package.GetAsByteArray();
+                byte[] reportBytes;
+                using (var package = excelPackage)
+                {
+                    reportBytes = package.GetAsByteArray();
+                    return File(reportBytes, XlsxContentType, "Employees.xlsx");
+                }
             }
-
-            return File(reportBytes, XlsxContentType, "Employees.xlsx");
+            else
+            {
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
+                    string.Join("", errors);
+                return View();
+            }
         }
         [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImportExcel)
