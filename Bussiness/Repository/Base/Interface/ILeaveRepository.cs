@@ -9,6 +9,6 @@ namespace Bussiness.Repository.Base.Interface
 {
     public interface ILeaveRepository : IBaseRepository<Leave>
     {
-        List<Leave> GetCurrentAssignedOnCell(int year, int month, int day, int employeeId);
+        Task<List<Leave>> GetCurrentAssignedOnCell(int year, int month, int day, int employeeId);
     }
 }

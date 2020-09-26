@@ -12,7 +12,6 @@ using Bussiness;
 using System.Dynamic;
 using Bussiness.Service;
 using WebApplication.Utilities;
-using DataAccess.ViewModels;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using System.Linq.Dynamic.Core;
@@ -120,6 +119,7 @@ namespace WebApplication.Api
             var timeShifts = new List<TimeShift>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<TimeShift>();
+            filter = filter.And(await GetUserRoleFiltersAsync());
             var includes = new List<Func<IQueryable<TimeShift>, IIncludableQueryable<TimeShift, object>>>();
 
             includes.Add(x => x.Include(y => y.WorkPlace));
@@ -205,5 +205,21 @@ namespace WebApplication.Api
                 return null;
         }
 
+        private async Task<Expression<Func<TimeShift, bool>>> GetUserRoleFiltersAsync()
+        {
+            //Get WorkPlaceId from user roles
+            var workPlaceIds = HttpContext.User.Claims
+                .Where(x => x.Value.Contains("Specific_WorkPlace"))
+                .Select(y => Int32.Parse(y.Value.Split("_")[2]));
+
+            var filter = PredicateBuilder.New<TimeShift>();
+            foreach (var workPlaceId in workPlaceIds)
+                filter = filter.Or(x => x.WorkPlaceId == workPlaceId);
+
+            if (workPlaceIds.Count() == 0)
+                filter = filter.And(x => true);
+
+            return filter;
+        }
     }
 }

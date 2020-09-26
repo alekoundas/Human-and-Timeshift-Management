@@ -297,7 +297,7 @@
     <script>
 
         //WorkPlaces Select2
-        const WorkPlaceSelect2 = Select2Count => {
+        const WorkPlaceSelect2 = Select2Count =>
             $('#WorkPlaceSelect2Num_' + Select2Count).select2({
                 ajax: {
                     type: "POST",
@@ -306,16 +306,8 @@
                     dataType: "json",
                     data: params => JSON.stringify(BuildSelect2DtoNum(params))
                 }
-            }).on('change', (e) => {
-                //ButtonLoadingToggle("SaveWorkHours").then(() => {
-                //    if (!ValidateNullInputs(workHourId))
-                //        ValidateEmployeesWithRangeToWorkhour(workHourId);
-                //})
-                //    .then(() => ButtonLoadingToggle("SaveWorkHours"))
-
-                //HandleSubmitButton();
             });
-        }
+        
 
         jQuery(function () {
             console.log(WorkPlaceRoleIds);

@@ -34,7 +34,7 @@ namespace WebApplication.Utilities
             this.ExcelPackage = new ExcelPackage();
             this.ExcelPackage.Workbook.Properties.Author = "PureMethod";
             this.ExcelPackage.Workbook.Properties.Title = fileName;
-            this.ExcelPackage.Workbook.Properties.Subject = fileName + " data exported from database";
+            this.ExcelPackage.Workbook.Properties.Subject = fileName + "δεδομένα απο την βάση";
             this.ExcelPackage.Workbook.Properties.Created = DateTime.Now;
 
             return this;
@@ -83,7 +83,7 @@ namespace WebApplication.Utilities
         private async Task GetLookUpAsync(string colTitle, ExcelWorksheet worksheet, int colCount)
         {
             var colData = await GetLookUpDataAsync(colTitle);
-            var dd = worksheet.Cells[2, colCount, 100, colCount].DataValidation.AddListDataValidation() as ExcelDataValidationList;
+            var dd = worksheet.Cells[2, colCount, 50000, colCount].DataValidation.AddListDataValidation() as ExcelDataValidationList;
             dd.AllowBlank = false;
             if (colData.Count > 0)
                 foreach (var response in colData)

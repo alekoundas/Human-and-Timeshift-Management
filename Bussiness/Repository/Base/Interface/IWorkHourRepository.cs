@@ -10,7 +10,7 @@ namespace Bussiness.Repository.Base.Interface
 {
     public interface IWorkHourRepository : IBaseRepository<WorkHour>
     {
-        List<WorkHour> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId);
+        Task<List<WorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId);
         bool IsDateOverlaping(WorkHoursApiViewModel workHour,int employeeId);
         bool IsDateOverlaping(HasOverlapRangeWorkHoursApiViewModel workHour,int employeeId);
         bool HasExactDate(WorkHoursApiViewModel workHour);

@@ -122,6 +122,47 @@ namespace WebApplication.Api
         }
 
 
+        // POST: api/workhours/employeebelongstoworkhour
+        [HttpPost("employeebelongstoworkhour")]
+        public async Task<ActionResult<WorkHour>> EmployeeBelongsToWorkHour([FromBody] WorkHoursApiViewModel workHour)
+        {
+            var filter = PredicateBuilder.New<WorkHour>();
+            filter = filter.And(x => x.StartOn == workHour.StartOn);
+            filter = filter.And(x => x.EndOn == workHour.EndOn);
+            filter = filter.And(x => x.TimeShiftId == workHour.TimeShiftId);
+
+            if (workHour.EmployeeIds != null)
+            {
+                List<object> response = new List<object>();
+                workHour.EmployeeIds.ForEach(id =>
+                {
+                    
+                    if (_baseDataWork.WorkHours.Where(filter).Any(x=>x.EmployeeId== id))
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 1,
+                            errorType= "warning",
+                            errorValue = "Η ώρα δήλωσης αντιστοιχεί στις βάρδιες του υπαλλήλου"
+                        });
+                    else
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 0,
+                            errorType= "warning",
+                            errorValue = "Δεν βρέθηκε η ώρα δήλωσης στις βάρδιες του υπαλλήλου"
+
+                        });
+
+                });
+                return Ok(response);
+            }
+
+
+            return Ok(new {value = "Δεν δόθηκαν υπάλληλοι" });
+        }
+
         // POST: api/workhours/hasoverlap
         [HttpPost("hasoverlap")]
         public async Task<ActionResult<WorkHour>> HasOverlap([FromBody] WorkHoursApiViewModel workHour)

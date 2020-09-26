@@ -61,7 +61,7 @@ namespace WebApplication.Api
 
             _baseDataWork.EmployeeWorkPlaces.RemoveRange(employeeWorkplaces);
             _baseDataWork.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
+            var sdfsdf = await _context.SaveChangesAsync();
 
             return employee;
         }
@@ -470,8 +470,8 @@ namespace WebApplication.Api
 
                     for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
                         dictionary.Add("Day" + i,
-                            dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork,
-                                i, datatable, employee.Id));
+                            await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(
+                                _baseDataWork,i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper
                         .GetEmployeeCheckbox(datatable, employee.Id));
@@ -485,7 +485,7 @@ namespace WebApplication.Api
 
                     for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
                         dictionary.Add("Day" + i,
-                            dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork,
+                           await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork,
                                 i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper

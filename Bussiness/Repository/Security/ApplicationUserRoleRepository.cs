@@ -59,7 +59,7 @@ namespace Bussiness.Repository.Security
                 foreach (var idToDelete in idsToDelete)
                     filterRole = filterRole.Or(x => x.WorkPlaceId == idToDelete &&
                     x.Id == userRole.RoleId &&
-                    x.Name== "Specific_WorkPlace"
+                    x.Name.Contains( "Specific_WorkPlace")
                     );
 
             var roles = await SecurityDbContext.Roles

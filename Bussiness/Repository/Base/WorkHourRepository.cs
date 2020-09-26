@@ -24,15 +24,15 @@ namespace Bussiness.Repository.Base
             get { return Context as BaseDbContext; }
         }
 
-        public List<WorkHour> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId)
+        public async  Task<List<WorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId)
         {
-            return Context.WorkHours.Where(x =>
+            return await Context.WorkHours.Where(x =>
                    x.TimeShiftId == timeShiftId &&
                    x.StartOn.Year == year &&
                    x.StartOn.Month == month &&
                    (x.StartOn.Day <= day && day <= x.EndOn.Day) &&
                    x.Employee.Id == employeeId)
-                .ToList();
+                .ToListAsync();
         }
         public async Task<List<WorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel)
         {

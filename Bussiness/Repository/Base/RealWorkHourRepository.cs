@@ -31,10 +31,11 @@ namespace Bussiness.Repository.Base
 
             filter = filter.And(x => x.StartOn.Year == year);
             filter = filter.And(x => x.StartOn.Month == month);
-            filter = filter.And(x => x.StartOn.Day== day);
+            filter = filter.And(x => x.StartOn.Day <= day && day <= x.EndOn.Day);
 
 
             return await Context.RealWorkHours.Where(filter).ToListAsync();
+
         }
         public async Task<List<RealWorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel)
         {

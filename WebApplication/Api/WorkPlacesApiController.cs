@@ -17,6 +17,8 @@ using DataAccess.Models.Select2;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
+using DataAccess.Models.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebApplication.Api
 {
@@ -28,7 +30,7 @@ namespace WebApplication.Api
         private BaseDatawork _baseDataWork;
         private readonly SecurityDataWork _securityDatawork;
 
-        public WorkPlacesApiController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
+        public WorkPlacesApiController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext, UserManager<ApplicationUser> userManager)
         {
             _context = BaseDbContext;
             _baseDataWork = new BaseDatawork(BaseDbContext);
@@ -113,19 +115,20 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var total = await _baseDataWork.WorkPlaces.CountAllAsync();
             var hasMore = (select2.Page * 10) < total;
+            var filter = PredicateBuilder.New<WorkPlace>();
+            filter = filter.And(await GetUserRoleFiltersAsync());
+
 
             if (string.IsNullOrWhiteSpace(select2.Search))
-            {
                 workPlaces = (List<WorkPlace>)await _baseDataWork
                      .WorkPlaces
-                     .GetPaggingWithFilter(null, null, null, 10, select2.Page);
+                     .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
 
-                return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
-            }
 
+            filter = filter.And(x => x.Title.Contains(select2.Search));
             workPlaces = await _baseDataWork
                 .WorkPlaces
-                .GetPaggingWithFilter(null, x => x.Title.Contains(select2.Search), null, 10, select2.Page);
+                .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
 
             return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
         }
@@ -136,23 +139,20 @@ namespace WebApplication.Api
             var workPlaces = new List<WorkPlace>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(x => true);
+            filter = filter.And(await GetUserRoleFiltersAsync());
 
-           
+
             if (string.IsNullOrWhiteSpace(search))
-            {
                 workPlaces = (List<WorkPlace>)await _baseDataWork
                      .WorkPlaces
-                     .GetPaggingWithFilter(null, null, null, 10, page);
-
-            }
+                     .GetPaggingWithFilter(null, filter, null, 10, page);
             else
             {
 
-            filter = filter.And(x => x.Title.Contains(search));
-            workPlaces = await _baseDataWork
-                .WorkPlaces
-                .GetPaggingWithFilter(null, filter, null, 10, page);
+                filter = filter.And(x => x.Title.Contains(search));
+                workPlaces = await _baseDataWork
+                    .WorkPlaces
+                    .GetPaggingWithFilter(null, filter, null, 10, page);
 
             }
             var total = await _baseDataWork.WorkPlaces.CountAllAsyncFiltered(filter);
@@ -167,7 +167,7 @@ namespace WebApplication.Api
             var workPlaces = new List<WorkPlace>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(x => true);
+            filter = filter.And(await GetUserRoleFiltersAsync());
 
             if (select2.ExistingIds?.Count > 0)
                 foreach (var workPlaceId in select2.ExistingIds)
@@ -251,7 +251,8 @@ namespace WebApplication.Api
 
             var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            Expression<Func<WorkPlace, bool>> filter = x => true;
+            var filter = PredicateBuilder.New<WorkPlace>();
+            filter = filter.And(await GetUserRoleFiltersAsync());
 
             var workPlaces = new List<WorkPlace>();
 
@@ -273,7 +274,6 @@ namespace WebApplication.Api
             if (datatable.Predicate == "CustomerEdit")
             {
                 includes.Add(x => x.Include(y => y.Customer));
-                filter = x => true;
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
@@ -282,7 +282,7 @@ namespace WebApplication.Api
             {
                 includes.Add(x => x.Include(y => y.Customer));
                 includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
-                filter = x => x.Customer.Company != null;
+                filter = filter.And(x => x.Customer.Company != null);
 
 
                 workPlaces = await _baseDataWork.WorkPlaces
@@ -292,7 +292,7 @@ namespace WebApplication.Api
             {
                 includes.Add(x => x.Include(y => y.Customer));
                 includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
-                filter = x => x.Customer.Company != null;
+                filter = filter.And(x => x.Customer.Company != null);
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
@@ -300,16 +300,14 @@ namespace WebApplication.Api
             if (datatable.Predicate == "TimeShiftIndex")
             {
                 includes.Add(x => x.Include(y => y.Customer).ThenInclude(z => z.Company));
-                filter = x => true;
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
             if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
             {
-                filter = x => true;
                 if (datatable.GenericId != 0)
-                    filter = x => x.EmployeeWorkPlaces.Any(y => y.EmployeeId == datatable.GenericId);
+                    filter = filter.And(x => x.EmployeeWorkPlaces.Any(y => y.EmployeeId == datatable.GenericId));
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
@@ -343,10 +341,10 @@ namespace WebApplication.Api
 
                     if (workplace.Customer != null)
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "WorkPlace", apiUrl, "checked",true));
+                            "WorkPlace", apiUrl, "checked", true));
                     else
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "WorkPlace", apiUrl, "",true));
+                            "WorkPlace", apiUrl, "", true));
 
                     returnObjects.Add(expandoObj);
                 }
@@ -404,13 +402,13 @@ namespace WebApplication.Api
                 else if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
                 {
                     var totalSeconds = await _baseDataWork.RealWorkHours
-                           .GetEmployeeTotalSecondsFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn,workplace.Id);
+                           .GetEmployeeTotalSecondsFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn, workplace.Id);
 
                     var totalSecondsDay = await _baseDataWork.RealWorkHours
-                           .GetEmployeeTotalSecondsDayFromRange( datatable.GenericId,datatable.StartOn, datatable.EndOn, workplace.Id);
+                           .GetEmployeeTotalSecondsDayFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn, workplace.Id);
 
                     var totalSecondsNight = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsNightFromRange(datatable.GenericId,datatable.StartOn, datatable.EndOn, workplace.Id);
+                            .GetEmployeeTotalSecondsNightFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn, workplace.Id);
                     if (datatable.ShowHoursInPercentage)
                     {
                         dictionary.Add("TotalHours", totalSeconds / 60 / 60);
@@ -431,12 +429,28 @@ namespace WebApplication.Api
             return returnObjects;
         }
 
+        private async Task<Expression<Func<WorkPlace, bool>>> GetUserRoleFiltersAsync()
+        {
+            //Get WorkPlaceId from user roles
+            var workPlaceIds = HttpContext.User.Claims
+                .Where(x => x.Value.Contains("Specific_WorkPlace"))
+                .Select(y => Int32.Parse(y.Value.Split("_")[2]));
+
+            var filter = PredicateBuilder.New<WorkPlace>();
+            foreach (var workPlaceId in workPlaceIds)
+                filter = filter.Or(x => x.Id == workPlaceId);
+
+            if(workPlaceIds.Count()==0)
+                filter = filter.And(x => true);
+
+            return filter;
+        }
         private Func<IQueryable<WorkPlace>, IOrderedQueryable<WorkPlace>> SetOrderBy(string columnName, string orderDirection)
         {
             if (columnName != "")
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             //else if(columnName == "IsInWorkPlace")
-                //return x => x.OrderBy(x=>x. + " " + orderDirection.ToUpper());
+            //return x => x.OrderBy(x=>x. + " " + orderDirection.ToUpper());
             else
                 return null;
         }

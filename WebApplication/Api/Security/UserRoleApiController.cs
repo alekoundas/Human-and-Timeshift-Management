@@ -53,8 +53,9 @@ namespace WebApplication.Api.Security
 
             _securityDbContext.UserRoles.Add(new ApplicationUserRole()
             {
-                ApplicationUserId = userId,
-                RoleId = roleId
+                UserId= userId,
+                RoleId = roleId,
+                
             });
             await _securityDbContext.SaveChangesAsync();
 
@@ -115,13 +116,13 @@ namespace WebApplication.Api.Security
                 }
                 else
                 {
+                    //Create Role then
                     var workPlace = await _baseDataWork.WorkPlaces
                     .FirstOrDefaultAsync(x => x.Id == workPlaceValue.NewWorkPlaceId);
 
-                    //remove existing role if any
                     var role = new ApplicationRole()
                     {
-                        Name = "Specific_WorkPlace",
+                        Name = "Specific_WorkPlace_"+ workPlaceValue.NewWorkPlaceId.ToString(),
                         WorkPlaceId = workPlaceValue.NewWorkPlaceId.ToString(),
                         WorkPlaceName = workPlace.Title
                     };

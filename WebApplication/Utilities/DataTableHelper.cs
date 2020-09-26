@@ -210,17 +210,18 @@ namespace WebApplication.Utilities
         {
             return "";
         }
-        public string GetTimeShiftEditCellBodyWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
+        public async Task<string> GetTimeShiftEditCellBodyWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
-            //TODO :Async
-            var cellWorkHours = baseDatawork.WorkHours.GetCurrentAssignedOnCell(
+            var strToReturn = "";
+
+            var cellWorkHours = await baseDatawork.WorkHours.GetCurrentAssignedOnCell(
                 datatable.GenericId,
                 datatable.TimeShiftYear,
                 datatable.TimeShiftMonth,
                 dayOfMonth,
                 employeeId);
 
-            var cellLeaves = baseDatawork.Leaves.GetCurrentAssignedOnCell(
+            var cellLeaves = await baseDatawork.Leaves.GetCurrentAssignedOnCell(
                datatable.TimeShiftYear,
                datatable.TimeShiftMonth,
                dayOfMonth,
@@ -238,27 +239,67 @@ namespace WebApplication.Utilities
                      "</div>";
             else
             {
-                var startTimeSpan = String.Join("",
-                    cellWorkHours.Select(x =>
-                        SpanTimeValue(x.StartOn.ToShortTimeString())));
+                foreach (var cellWorkHour in cellWorkHours)
+                {
+                    var celStartOn = cellWorkHour.StartOn;
+                    if (celStartOn.Day != dayOfMonth)
+                        celStartOn = new DateTime(
+                            cellWorkHour.StartOn.Year,
+                            cellWorkHour.StartOn.Month,
+                            cellWorkHour.StartOn.Day,
+                            0,
+                            0,
+                            0,
+                            0);
 
-                var endTimeSpan = String.Join("",
-                    cellWorkHours.Select(x =>
-                        SpanTimeValue(x.EndOn.ToShortTimeString())));
+                    var celEndOn = cellWorkHour.EndOn;
+                    if (celEndOn.Day != dayOfMonth)
+                        celEndOn = new DateTime(
+                                cellWorkHour.EndOn.Year,
+                                cellWorkHour.EndOn.Month,
+                                cellWorkHour.EndOn.Day,
+                                23,
+                                59,
+                                0,
+                                0);
+                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
+                        celStartOn.ToShortTimeString() +
+                  "</div>";
 
-                return "<div style='width:110px; white-space: nowrap;'>" +
-                          "<div style='width:50px;display:block;  float: left;'>" +
-                          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
-                          startTimeSpan +
-                          "</div>" +
-                          "<div style='width:50px; display:block;  float: right; '>" +
-                          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
-                          endTimeSpan +
-                        "</div>" +
-                         (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
+                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
+                        celEndOn.ToShortTimeString() +
+                     "</div></div>";
+
+                }
+
+                strToReturn += "</div>" +
+                      (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
                             datatable.GenericId) :
                             "") +
                          FaIconAdd(dayOfMonth, "", employeeId);
+
+                return strToReturn;
+                //var startTimeSpan = String.Join("",
+                //    cellWorkHours.Select(x =>
+                //        SpanTimeValue(x.StartOn.ToShortTimeString())));
+
+                //var endTimeSpan = String.Join("",
+                //    cellWorkHours.Select(x =>
+                //        SpanTimeValue(x.EndOn.ToShortTimeString())));
+
+                //return "<div style='width:110px; white-space: nowrap;'>" +
+                //          "<div style='width:50px;display:block;  float: left;'>" +
+                //          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
+                //          startTimeSpan +
+                //          "</div>" +
+                //          "<div style='width:50px; display:block;  float: right; '>" +
+                //          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
+                //          endTimeSpan +
+                //        "</div>" +
+                //         (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
+                //            datatable.GenericId) :
+                //            "") +
+                //         FaIconAdd(dayOfMonth, "", employeeId);
             }
 
         }
@@ -266,6 +307,7 @@ namespace WebApplication.Utilities
         {
             var compareMonth = 0;
             var compareYear = 0;
+            var strToReturn = "";
 
             if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
             {
@@ -286,7 +328,7 @@ namespace WebApplication.Utilities
               dayOfMonth,
               employeeId);
 
-            var cellLeaves = baseDatawork.Leaves.GetCurrentAssignedOnCell(
+            var cellLeaves = await baseDatawork.Leaves.GetCurrentAssignedOnCell(
                compareYear,
                compareMonth,
                dayOfMonth,
@@ -306,25 +348,38 @@ namespace WebApplication.Utilities
                      "</div>";
             else
             {
-                var startTimeSpan = String.Join("",
-                    cellRealWorkHours.Select(x =>
-                        SpanTimeValue(x.StartOn.ToShortTimeString())));
+                foreach (var cellWorkHour in cellRealWorkHours)
+                {
+                    var celStartOn = cellWorkHour.StartOn;
+                    if (celStartOn.Day != dayOfMonth)
+                        celStartOn = new DateTime(
+                            cellWorkHour.StartOn.Year,
+                            cellWorkHour.StartOn.Month,
+                            cellWorkHour.StartOn.Day,
+                            0,
+                            0,
+                            0,
+                            0);
 
-                var endTimeSpan = String.Join("",
-                    cellRealWorkHours.Select(x =>
-                        SpanTimeValue(x.EndOn.ToShortTimeString())));
+                    var celEndOn = cellWorkHour.EndOn;
+                    if (celEndOn.Day != dayOfMonth)
+                        celEndOn = new DateTime(
+                                cellWorkHour.EndOn.Year,
+                                cellWorkHour.EndOn.Month,
+                                cellWorkHour.EndOn.Day,
+                                23,
+                                59,
+                                0,
+                                0);
+                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
+                        celStartOn.ToShortTimeString() +
+                  "</div>";
 
-
-                return "<div style='width:110px; white-space: nowrap;'>" +
-                          "<div style='width:50px;display:block;  float: left;'>" +
-                          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
-                          startTimeSpan +
-                          "</div>" +
-                          "<div style='width:50px; display:block;  float: right; '>" +
-                          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
-                          endTimeSpan +
-                        "</div>" +
-                        (datatable.GenericId != 0 ?
+                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
+                        celEndOn.ToShortTimeString() +
+                     "</div></div>";
+                }
+                    strToReturn += (datatable.GenericId != 0 ?
                             (cellRealWorkHours.Count() > 0 ?
                                 FaIconEdit(dayOfMonth, "green", employeeId,
                                     datatable.GenericId, compareMonth,
@@ -336,6 +391,29 @@ namespace WebApplication.Utilities
                                    compareMonth, compareYear))
                             :
                             "");
+
+                return strToReturn;
+                //"<div style='width:110px; white-space: nowrap;'>" +
+                //          "<div style='width:50px;display:block;  float: left;'>" +
+                //          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
+                //          startTimeSpan +
+                //          "</div>" +
+                //          "<div style='width:50px; display:block;  float: right; '>" +
+                //          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
+                //          endTimeSpan +
+                //        "</div>" +
+                //        (datatable.GenericId != 0 ?
+                //            (cellRealWorkHours.Count() > 0 ?
+                //                FaIconEdit(dayOfMonth, "green", employeeId,
+                //                    datatable.GenericId, compareMonth,
+                //                    compareYear) +
+                //                FaIconAdd(dayOfMonth, "", employeeId,
+                //                    compareMonth, compareYear)
+                //                :
+                //                FaIconAdd(dayOfMonth, "", employeeId,
+                //                   compareMonth, compareYear))
+                //            :
+                //            "");
             }
         }
 
@@ -381,14 +459,6 @@ namespace WebApplication.Utilities
 
         private static string CurrentDayFaIconEdit(int employeeId)
            => @"<i class='fa fa-pencil faIconEdit' employeeid='" + employeeId + "'></i>";
-
-
-
-
-
-
-
-
 
     }
 }

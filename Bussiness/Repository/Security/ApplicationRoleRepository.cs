@@ -35,9 +35,9 @@ namespace Bussiness.Repository.Security
                 .Where(x => x.UserId == userId).ToListAsync();
 
             foreach (var userRole in userRoles)
-                filter = filter.Or(x => x.Id == userRole.RoleId );
+                filter = filter.Or(x => x.Id == userRole.RoleId);
 
-            filter = filter.And(x => x.Name == "Specific_WorkPlace");
+            filter = filter.And(x => x.Name.Contains("Specific_WorkPlace"));
 
             return SecurityDbContext.Roles
                 .Where(filter)

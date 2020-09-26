@@ -10,7 +10,7 @@ namespace DataAccess.Models.Entity
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Τίτλος")]
-        public string  Title { get; set; }
+        public string Title { get; set; }
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Μήνας")]
         public int Month { get; set; }
@@ -27,6 +27,17 @@ namespace DataAccess.Models.Entity
 
 
         [NotMapped]
-        public int DaysInMonth { get => DateTime.DaysInMonth(Year,Month);  }
+        public int DaysInMonth
+        {
+            get
+            {
+                return Year == 0 || Month == 0 ?
+                     0
+                :
+                    DateTime.DaysInMonth(Year, Month);
+
+            }
+            set { }
+        }
     }
 }

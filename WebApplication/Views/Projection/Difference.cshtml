@@ -70,6 +70,7 @@
                             <th></th>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>ΑΦΜ</th>
                             <th>Βάρδια χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
                         </tr>
@@ -79,6 +80,7 @@
                             <th></th>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>ΑΦΜ</th>
                             <th>Βάρδια Χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
                         </tr>
@@ -89,9 +91,6 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -219,11 +218,22 @@
                 },
                 {
                     data: "LastName",
-                    searchable: false,
+                    searchable: true,
                     orderable: true,
                     render: (a, b, data, d) => {
                         if (data.LastName != null)
                             return data.LastName;
+                        else
+                            return "";
+                    }
+                },
+                {
+                    data: "Afm",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.Afm != null)
+                            return data.Afm;
                         else
                             return "";
                     }

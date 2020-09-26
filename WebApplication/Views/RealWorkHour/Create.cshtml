@@ -91,10 +91,11 @@
             startOn: TimeConverter(startDate),
             endOn: TimeConverter(endDate)
         });
-        const BuildHasOverlapRealWorkHourDto = (startDate, endDate, employeeIds) => ({
+        const BuildValidateWorkHourDto = (startDate, endDate, employeeIds) => ({
             employeeIds: employeeIds,
             startOn: TimeConverter(startDate),
-            endOn: TimeConverter(endDate)
+            endOn: TimeConverter(endDate),
+            timeShiftId: document.getElementById('TimeShiftId').value //for "belongs" only
         });
         const BuildSelect2Dto = (params) => ({
             timeShiftId: document.getElementById('TimeShiftId').value,
@@ -127,6 +128,45 @@
                 document.getElementById('TimeRangeSpan').style.display = 'none';
         };
 
+        const HandleEmployeeSelect2Span = response => {
+            if (response != undefined) {
+
+                var num = GetSelect2NumBySelectedEmployeeId(response.employeeId);
+
+                var errorSpan = document
+                    .getElementById('EmployeesSelect2ErrorSpanNum_' + num);
+
+                var warningSpan = document.
+                    getElementById('EmployeesSelect2WarningSpanNum_' + num);
+
+                if (response.errorType == 'error') {
+
+                    errorSpan.innerHTML = response.errorValue;
+                    errorSpan.style.display = '';
+                }
+                else if (response.errorType == 'warning') {
+                    if (!warningSpan.innerHTML.includes(response.errorValue)) {
+                        warningSpan.innerHTML += response.errorValue;
+                        warningSpan.classList = [];
+                        warningSpan.style.display = '';
+                    }
+                }
+            }
+            else {
+
+                [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
+                    .forEach(span => {
+                        span.style.display = 'none';
+                        span.innerHTML = '';
+                    });
+                [...document.getElementsByClassName('EmployeeSelect2WarningSpan')]
+                    .forEach(span => {
+                        span.style.display = 'none';
+                        span.innerHTML = '';
+                    });
+            }
+        };
+
 
     </script>
 
@@ -145,7 +185,25 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 data: JSON.stringify(
-                    BuildHasOverlapRealWorkHourDto(startOn, endOn, employeeIds))
+                    BuildValidateWorkHourDto(startOn, endOn, employeeIds))
+            }).done((data) => {
+                ShowResultPerEmployeeDropdown(data);
+                HandleSubmitButton();
+            });
+        };
+
+        const ValidateEmployeesWithRangeToWorkHour = () => {
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+            var employeeIds = GetAlreadyAppendedEmployeeIds();
+
+            $.ajax({
+                type: "POST",
+                url: '/api/workhours/employeebelongstoworkhour',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildValidateWorkHourDto(startOn, endOn, employeeIds))
             }).done((data) => {
                 ShowResultPerEmployeeDropdown(data);
                 HandleSubmitButton();
@@ -185,37 +243,7 @@
             button.disabled = false;
 
         }
-        const HandleEmployeeSelect2Span = response => {
-            if (response != undefined) {
 
-                var num = GetSelect2NumBySelectedEmployeeId(response.employeeId);
-
-                var errorSpan = document
-                    .getElementById('EmployeesSelect2ErrorSpanNum_' + num);
-
-                var warningSpan = document.
-                    getElementById('EmployeesSelect2WarningSpanNum_' + num);
-
-                if (response.errorType == 'error') {
-
-                    errorSpan.innerHTML = response.errorValue;
-                    errorSpan.style.display = '';
-                }
-                else if (response.errorType == 'warning') {
-                    if (!warningSpan.innerHTML.includes(response.errorValue)) {
-                        warningSpan.innerHTML += response.errorValue;
-                        warningSpan.style.display = '';
-                    }
-                }
-            }
-            else {
-
-                [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
-                    .forEach(span => span.style.display = 'none');
-                [...document.getElementsByClassName('EmployeeSelect2WarningSpan')]
-                    .forEach(span => span.style.display = 'none');
-            }
-        };
 
         const ShowResultPerEmployeeDropdown = responses =>
             responses.forEach(response =>
@@ -264,6 +292,7 @@
                 var hasLaterDate = 0;
                 if (startDate > endDate)
                     hasLaterDate = 1;
+
                 setTimeout(() => {
                     OnGoingTimeChanges--;
 
@@ -280,9 +309,11 @@
                             AppendDateRangeToDateInputs(startDate, endDate, hasLaterDate);
                             HandleTimeRangeSpan(data);
                             ValidateEmployeesWithRangeToRealWorkhour();
+                            ValidateEmployeesWithRangeToWorkHour();
                         });
 
                 }, 800);
+
                 HandleTimeRangeSpan();
             }
         });
@@ -300,6 +331,7 @@
             }).on('change', (e) => {
                 HandleEmployeeSelect2Span();
                 ValidateEmployeesWithRangeToRealWorkhour();
+                ValidateEmployeesWithRangeToWorkHour();
                 HandleSubmitButton();
             });
         }
@@ -339,7 +371,7 @@
                 '<div style="width: 100%;">' +
                 '<div style="width: 15%; float: left;">&nbsp;</div>' +
                 '<div style="width: 50%; float: left;">' +
-                '<select class="EmployeesSelect2" id="EmployeesSelect2Num_' + Count + '" name="Employees['+Count+']" style="width:100%"></select>' +
+                '<select class="EmployeesSelect2" id="EmployeesSelect2Num_' + Count + '" name="Employees[' + Count + ']" style="width:100%"></select>' +
                 '<span style="display:none;"id="EmployeesSelect2ErrorSpanNum_' + Count + '" class="text-danger EmployeeSelect2ErrorSpan"></span>' +
                 '<span style="display:none;"id="EmployeesSelect2WarningSpanNum_' + Count + '" class="text-danger EmployeeSelect2WarningSpan"></span>' +
                 '</div>' +

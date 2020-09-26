@@ -36,6 +36,7 @@
                         <label asp-for="Year" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="Year" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="Year" class="form-control hidden" />
                             <span asp-validation-for="Year" class="text-danger"></span>
                         </div>
                     </div>
@@ -44,6 +45,7 @@
                         <label asp-for="Month" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="Month" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="Month" class="form-control hidden" />
                             <span asp-validation-for="Month" class="text-danger"></span>
                         </div>
                     </div>
@@ -52,6 +54,7 @@
                         <label asp-for="WorkPlaceId" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="WorkPlace.Title" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="WorkPlaceId" class="form-control hidden" />
                         </div>
                     </div>
 

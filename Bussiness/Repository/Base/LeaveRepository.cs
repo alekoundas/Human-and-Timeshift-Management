@@ -21,14 +21,14 @@ namespace Bussiness.Repository.Base
             get { return Context as BaseDbContext; }
         }
 
-        public  List<Leave> GetCurrentAssignedOnCell( int year, int month, int day, int employeeId)
+        public  async Task<List<Leave>> GetCurrentAssignedOnCell( int year, int month, int day, int employeeId)
         {
-            return  Context.Leaves.Where(x =>
+            return  await Context.Leaves.Where(x =>
                    x.StartOn.Year == year &&
                    x.StartOn.Month == month &&
                    (x.StartOn.Day <= day && day <= x.EndOn.Day) &&
                    x.Employee.Id == employeeId)
-                .ToList();
+                .ToListAsync();
         }
     }
 }
