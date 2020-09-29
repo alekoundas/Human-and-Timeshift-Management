@@ -16,7 +16,7 @@ namespace Archium.Security.Core.Repositories
            Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> orderingInfo,
            int pageSize = 10,
            int pageIndex = 1);
-        Task<ApplicationUser> UpdateUser(ApplicationUser applicationUser, UserManager<ApplicationUser> userManager);
+       
 
         Task<ApplicationRole> GetRoleByWorkPlaceAndUser(string workPlaceId, string employeeId);
 

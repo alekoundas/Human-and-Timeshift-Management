@@ -42,12 +42,14 @@ namespace DataAccess.Models.Datatable
         [JsonPropertyName("predicate")]
         public string Predicate { get; set; }
 
-        [JsonPropertyName("applicationUserId")]
-        public string ApplicationUserId { get; set; }
-
         [JsonPropertyName("genericId")]
         public int GenericId { get; set; }
-       
+
+
+        //User
+        [JsonPropertyName("userId")]
+        public string UserId { get; set; }
+
 
         //TimeShift
 

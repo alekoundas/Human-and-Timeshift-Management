@@ -9,9 +9,11 @@ namespace DataAccess.ViewModels
     public class EmployeeCreateViewModel
     {
         [Display(Name = "Όνομα")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string FirstName { get; set; }
 
         [Display(Name = "Επίθετο")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string LastName { get; set; }
 
         [Display(Name = "Ημερομηνίαα Γέννησης")]
@@ -32,7 +34,7 @@ namespace DataAccess.ViewModels
 
 
         [Display(Name = "Ειδικότητα")]
-        public int SpecializationId { get; set; }
+        public int? SpecializationId { get; set; }
         public Specialization Specialization { get; set; }
 
 

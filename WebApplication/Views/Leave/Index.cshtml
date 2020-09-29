@@ -23,6 +23,7 @@
                 <table id="LeaveDatatable" class="table table-bordered table-hover table-responsive">
                     <thead>
                         <tr>
+                            <th>Υπάλληλος</th>
                             <th>Έναρξη</th>
                             <th>Λήξη</th>
                             <th>Εγκρίθηκε από</th>
@@ -32,6 +33,7 @@
                     </thead>
                     <tfoot>
                         <tr>
+                            <th>Υπάλληλος</th>
                             <th>Έναρξη</th>
                             <th>Λήξη</th>
                             <th>Εγκρίθηκε από</th>
@@ -68,16 +70,28 @@
                     return JSON.stringify(data);
                 }
             },
-            order: [[0, 'desc']],
+            order: [[1, 'desc']],
             columns: [
+                {
+                    data: "EmployeeFullName",
+                    searchable: false,
+                    orderable: false,
+                    className: "dt-nowrap",
+                    render: (a, b, data, d) => {
+                        //console.log(data);
+                        if (data.EmployeeFullName!= null)
+                            return data.EmployeeFullName;
+                        else
+                            return "";
+                    }
+                },
                 {
                     data: "StartOn",
                     searchable: true,
                     orderable: true,
                     render: (a, b, data, d) => {
-                        //console.log(data);
                         if (data.StartOn != null)
-                            return data.StartOn;
+                            return moment(new Date(data.StartOn)).format('DD/MM/YYYY');
                         else
                             return "";
                     }
@@ -88,7 +102,7 @@
                     orderable: true,
                     render: (a, b, data, d) => {
                         if (data.EndOn != null)
-                            return data.EndOn;
+                            return moment(new Date(data.EndOn)).format('DD/MM/YYYY');
                         else
                             return "";
                     }

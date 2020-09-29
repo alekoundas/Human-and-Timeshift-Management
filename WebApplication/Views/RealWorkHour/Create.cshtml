@@ -147,7 +147,6 @@
                 else if (response.errorType == 'warning') {
                     if (!warningSpan.innerHTML.includes(response.errorValue)) {
                         warningSpan.innerHTML += response.errorValue;
-                        warningSpan.classList = [];
                         warningSpan.style.display = '';
                     }
                 }
@@ -216,6 +215,24 @@
     <!--///////////////////////////////////////-->
 
     <script>
+        const TimeConverter = (ticks, hasLaterDate) => {
+            var date = new Date(ticks);
+            var year = date.getFullYear();
+            var month = String((date.getMonth() + 1)).length == 1 ?
+                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+            var day = String(date.getDate()).length == 1 ?
+                '0' + date.getDate() : date.getDate();
+            var hour = String(date.getHours()).length == 1 ?
+                '0' + date.getHours() : date.getHours();
+            var min = String(date.getMinutes()).length == 1 ?
+                '0' + date.getMinutes() : date.getMinutes();
+
+            if (hasLaterDate)
+                day++;
+            var time = year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+            return time;
+        }
+
         const GetSelect2NumBySelectedEmployeeId = employeeId =>
             [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
                 .filter(span =>
@@ -259,23 +276,7 @@
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
-        const TimeConverter = (ticks, hasLaterDate) => {
-            var date = new Date(ticks);
-            var year = date.getFullYear();
-            var month = String((date.getMonth() + 1)).length == 1 ?
-                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
-            var day = String(date.getDate()).length == 1 ?
-                '0' + date.getDate() : date.getDate();
-            var hour = String(date.getHours()).length == 1 ?
-                '0' + date.getHours() : date.getHours();
-            var min = String(date.getMinutes()).length == 1 ?
-                '0' + date.getMinutes() : date.getMinutes();
 
-            if (hasLaterDate)
-                day++;
-            var time = year + '-' + month + '-' + day + 'T' + hour + ':' + min;
-            return time;
-        }
 
         var OnGoingTimeChanges = 0;
         $("#TimeRange").calentim({
@@ -284,8 +285,6 @@
             hourFormat: 24,
             minuteSteps: 15,
             locale: "el",
-            //startEmpty: Date().Now,
-            //endEmpty: Date().Now,
             format: "hh:mm",
             ontimechange: (calentim, startDate, endDate) => {
                 OnGoingTimeChanges++;
@@ -305,6 +304,7 @@
                             data: JSON.stringify(
                                 BuildHasOverlapWorkHourDto(startDate, endDate))
                         }).done((data) => {
+
                             HandleEmployeeSelect2Span();
                             AppendDateRangeToDateInputs(startDate, endDate, hasLaterDate);
                             HandleTimeRangeSpan(data);
@@ -371,9 +371,9 @@
                 '<div style="width: 100%;">' +
                 '<div style="width: 15%; float: left;">&nbsp;</div>' +
                 '<div style="width: 50%; float: left;">' +
-                '<select class="EmployeesSelect2" id="EmployeesSelect2Num_' + Count + '" name="Employees[' + Count + ']" style="width:100%"></select>' +
-                '<span style="display:none;"id="EmployeesSelect2ErrorSpanNum_' + Count + '" class="text-danger EmployeeSelect2ErrorSpan"></span>' +
-                '<span style="display:none;"id="EmployeesSelect2WarningSpanNum_' + Count + '" class="text-danger EmployeeSelect2WarningSpan"></span>' +
+                '<select class="EmployeesSelect2" id="EmployeesSelect2Num_' + Count + '" name="Employees[' + Count + ']" style="width:100%">   </select>' +
+                '<span style="display:none;" id="EmployeesSelect2ErrorSpanNum_' + Count + '" class="text-danger EmployeeSelect2ErrorSpan">     </span>' +
+                '<span style="display:none;" id="EmployeesSelect2WarningSpanNum_' + Count + '" class="text-warning EmployeeSelect2WarningSpan">   </span>' +
                 '</div>' +
                 '<div style="width: 5%; float: left;">&nbsp;</div>' +
                 '<div style="width: 10%; float: left;">' +

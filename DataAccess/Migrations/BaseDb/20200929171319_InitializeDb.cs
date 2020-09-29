@@ -96,7 +96,7 @@ namespace DataAccess.Migrations.BaseDb
                     ErpCode = table.Column<string>(nullable: true),
                     Email = table.Column<string>(nullable: true),
                     Address = table.Column<string>(nullable: true),
-                    SpecializationId = table.Column<int>(nullable: false),
+                    SpecializationId = table.Column<int>(nullable: true),
                     CompanyId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -113,7 +113,7 @@ namespace DataAccess.Migrations.BaseDb
                         column: x => x.SpecializationId,
                         principalTable: "Specializations",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(

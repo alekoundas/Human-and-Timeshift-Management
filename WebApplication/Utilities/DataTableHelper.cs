@@ -65,16 +65,19 @@ namespace WebApplication.Utilities
             if (controller != null)
             {
 
-
+                var isDisabled = true;
                 var roles = await _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
+
+                if (roles.Any(x => x.Name == "User_Edit"))
+                    isDisabled = false;
 
                 if (permition == "View")
                 {
                     var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
                     if (roleId != null)
                         stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleViewCheckbox(true, userId, roleId)
-                        : RoleViewCheckbox(false, userId, roleId);
+                        ? RoleCheckbox(true, userId, roleId, isDisabled)
+                            : RoleCheckbox(false, userId, roleId, isDisabled);
                 }
 
                 if (permition == "Edit")
@@ -82,8 +85,8 @@ namespace WebApplication.Utilities
                     var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
                     if (roleId != null)
                         stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                            ? RoleEditCheckbox(true, userId, roleId)
-                                : RoleEditCheckbox(false, userId, roleId);
+                            ? RoleCheckbox(true, userId, roleId, isDisabled)
+                                : RoleCheckbox(false, userId, roleId, isDisabled);
                 }
 
                 if (permition == "Create")
@@ -91,8 +94,8 @@ namespace WebApplication.Utilities
                     var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
                     if (roleId != null)
                         stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleEditCheckbox(true, userId, roleId)
-                            : RoleEditCheckbox(false, userId, roleId);
+                        ? RoleCheckbox(true, userId, roleId, isDisabled)
+                            : RoleCheckbox(false, userId, roleId, isDisabled);
                 }
 
                 if (permition == "Delete")
@@ -100,8 +103,8 @@ namespace WebApplication.Utilities
                     var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
                     if (roleId != null)
                         stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleDeleteCheckbox(true, userId, roleId)
-                            : RoleDeleteCheckbox(false, userId, roleId);
+                        ? RoleCheckbox(true, userId, roleId, isDisabled)
+                            : RoleCheckbox(false, userId, roleId, isDisabled);
                 }
 
 
@@ -119,50 +122,70 @@ namespace WebApplication.Utilities
         private static string DeleteButton(string controller, string id)
             => @"<a ><i urlAttr='/api/" + controller + "/" + id + "' class='fa fa-trash-o DatatableDeleteButton' ></i></a>";
 
-        public string RoleViewCheckbox(bool isChecked, string userId, string roleId)
+
+
+        public string RoleCheckbox(bool isChecked, string userId, string roleId, bool isDisabled = false)
           =>
               "<div class='input-group-prepend'>" +
                 "<div class='input-group-text'>" +
                     "<input " +
                         "type='checkbox' " +
                         "aria-label='Checkbox for following text input'" +
-                        "id='PermitionRoleCheckbox_View'class='PermitionCheckbox'" +
+                        "class='PermitionCheckbox'" +
                         "UserId='" + userId + "'" +
                         "RoleId='" + roleId + "'" +
-                        (isChecked == true ? "checked" : "") +
+                        (isChecked == true ? " checked " : "") +
+                        (isDisabled == true ? " disabled " : "") +
                     ">" +
                 "</div>" +
               "</div>";
 
-        private string RoleEditCheckbox(bool isChecked, string userId, string roleId)
-            =>
-              "<div class='input-group-prepend'>" +
-                "<div class='input-group-text'>" +
-                    "<input " +
-                        "type='checkbox' " +
-                        "aria-label='Checkbox for following text input'" +
-                        "id='PermitionRoleCheckbox_Edit'class='PermitionCheckbox'" +
-                        "UserId='" + userId + "'" +
-                        "RoleId='" + roleId + "'" +
-                        (isChecked == true ? "checked" : "") +
-                    ">" +
-                "</div>" +
-              "</div>";
 
-        private string RoleCreateCheckbox(bool isChecked, string userId, string roleId)
-            =>
-              "<div class='input-group-prepend'>" +
-                "<div class='input-group-text'>" +
-                    "<input " +
-                        "type='checkbox' " +
-                        "aria-label='Checkbox for following text input'" +
-                        "id='PermitionRoleCheckbox_Create'class='PermitionCheckbox'" +
-                        "UserId='" + userId + "'" +
-                        "RoleId='" + roleId + "'" +
-                        (isChecked == true ? "checked" : "") +
-                    ">" +
-                "</div>" +
-              "</div>";
+
+        //public string RoleViewCheckbox(bool isChecked, string userId, string roleId)
+        //  =>
+        //      "<div class='input-group-prepend'>" +
+        //        "<div class='input-group-text'>" +
+        //            "<input " +
+        //                "type='checkbox' " +
+        //                "aria-label='Checkbox for following text input'" +
+        //                "id='PermitionRoleCheckbox_View'class='PermitionCheckbox'" +
+        //                "UserId='" + userId + "'" +
+        //                "RoleId='" + roleId + "'" +
+        //                (isChecked == true ? "checked" : "") +
+        //            ">" +
+        //        "</div>" +
+        //      "</div>";
+
+        //private string RoleEditCheckbox(bool isChecked, string userId, string roleId)
+        //    =>
+        //      "<div class='input-group-prepend'>" +
+        //        "<div class='input-group-text'>" +
+        //            "<input " +
+        //                "type='checkbox' " +
+        //                "aria-label='Checkbox for following text input'" +
+        //                "id='PermitionRoleCheckbox_Edit'class='PermitionCheckbox'" +
+        //                "UserId='" + userId + "'" +
+        //                "RoleId='" + roleId + "'" +
+        //                (isChecked == true ? "checked" : "") +
+        //            ">" +
+        //        "</div>" +
+        //      "</div>";
+
+        //private string RoleCreateCheckbox(bool isChecked, string userId, string roleId)
+        //    =>
+        //      "<div class='input-group-prepend'>" +
+        //        "<div class='input-group-text'>" +
+        //            "<input " +
+        //                "type='checkbox' " +
+        //                "aria-label='Checkbox for following text input'" +
+        //                "id='PermitionRoleCheckbox_Create'class='PermitionCheckbox'" +
+        //                "UserId='" + userId + "'" +
+        //                "RoleId='" + roleId + "'" +
+        //                (isChecked == true ? "checked" : "") +
+        //            ">" +
+        //        "</div>" +
+        //      "</div>";
 
         private string RoleDeleteCheckbox(bool isChecked, string userId, string roleId)
              =>
@@ -272,34 +295,21 @@ namespace WebApplication.Utilities
 
                 }
 
-                strToReturn += "</div>" +
-                      (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
-                            datatable.GenericId) :
-                            "") +
-                         FaIconAdd(dayOfMonth, "", employeeId);
+
+                _httpContext = new HttpContextAccessor();
+                var currentUserRoles = _httpContext.HttpContext.User.Claims
+                    .Select(x => x.Value).ToList();
+
+                strToReturn += "</div>";
+
+                if (currentUserRoles.Contains("TimeShift_View"))
+                    strToReturn += FaIconAdd(dayOfMonth, "", employeeId);
+
+                if (currentUserRoles.Contains("TimeShift_Edit"))
+                    if (cellWorkHours.Count() > 0)
+                        strToReturn += FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId);
 
                 return strToReturn;
-                //var startTimeSpan = String.Join("",
-                //    cellWorkHours.Select(x =>
-                //        SpanTimeValue(x.StartOn.ToShortTimeString())));
-
-                //var endTimeSpan = String.Join("",
-                //    cellWorkHours.Select(x =>
-                //        SpanTimeValue(x.EndOn.ToShortTimeString())));
-
-                //return "<div style='width:110px; white-space: nowrap;'>" +
-                //          "<div style='width:50px;display:block;  float: left;'>" +
-                //          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
-                //          startTimeSpan +
-                //          "</div>" +
-                //          "<div style='width:50px; display:block;  float: right; '>" +
-                //          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
-                //          endTimeSpan +
-                //        "</div>" +
-                //         (cellWorkHours.Count() > 0 ? FaIconEdit(dayOfMonth, "green", employeeId,
-                //            datatable.GenericId) :
-                //            "") +
-                //         FaIconAdd(dayOfMonth, "", employeeId);
             }
 
         }
@@ -334,12 +344,6 @@ namespace WebApplication.Utilities
                dayOfMonth,
                employeeId);
 
-            //if (cellRealWorkHours.Any(x => x.IsDayOff))
-            //    return
-            //        "<div style='width:110px; white-space: nowrap;'>" +
-            //        "<center><p><b>Ρεπό</b></p></center>" +
-            //         "</div>";
-            //else 
 
             if (cellLeaves.Count() > 0)
                 return
@@ -379,41 +383,40 @@ namespace WebApplication.Utilities
                         celEndOn.ToShortTimeString() +
                      "</div></div>";
                 }
-                    strToReturn += (datatable.GenericId != 0 ?
-                            (cellRealWorkHours.Count() > 0 ?
-                                FaIconEdit(dayOfMonth, "green", employeeId,
-                                    datatable.GenericId, compareMonth,
-                                    compareYear) +
-                                FaIconAdd(dayOfMonth, "", employeeId,
-                                    compareMonth, compareYear)
-                                :
-                                FaIconAdd(dayOfMonth, "", employeeId,
-                                   compareMonth, compareYear))
-                            :
-                            "");
-
-                return strToReturn;
-                //"<div style='width:110px; white-space: nowrap;'>" +
-                //          "<div style='width:50px;display:block;  float: left;'>" +
-                //          (!String.IsNullOrEmpty(startTimeSpan) ? "<span>Έναρξη</span></br>" : "") +
-                //          startTimeSpan +
-                //          "</div>" +
-                //          "<div style='width:50px; display:block;  float: right; '>" +
-                //          (!String.IsNullOrEmpty(endTimeSpan) ? "<span>Λήξη</span></br>" : "") +
-                //          endTimeSpan +
-                //        "</div>" +
-                //        (datatable.GenericId != 0 ?
-                //            (cellRealWorkHours.Count() > 0 ?
-                //                FaIconEdit(dayOfMonth, "green", employeeId,
-                //                    datatable.GenericId, compareMonth,
-                //                    compareYear) +
-                //                FaIconAdd(dayOfMonth, "", employeeId,
-                //                    compareMonth, compareYear)
-                //                :
-                //                FaIconAdd(dayOfMonth, "", employeeId,
-                //                   compareMonth, compareYear))
+                //strToReturn += (datatable.GenericId != 0 ?
+                //        (cellRealWorkHours.Count() > 0 ?
+                //            FaIconEdit(dayOfMonth, "green", employeeId,
+                //                datatable.GenericId, compareMonth,
+                //                compareYear) +
+                //            FaIconAdd(dayOfMonth, "", employeeId,
+                //                compareMonth, compareYear)
                 //            :
-                //            "");
+                //            FaIconAdd(dayOfMonth, "", employeeId,
+                //               compareMonth, compareYear))
+                //        :
+                //        "");
+
+                //return strToReturn;
+
+
+
+                _httpContext = new HttpContextAccessor();
+                var currentUserRoles = _httpContext.HttpContext.User.Claims
+                    .Select(x => x.Value).ToList();
+
+                if (datatable.GenericId != 0)
+                {
+                    if (currentUserRoles.Contains("TimeShift_View"))
+                        strToReturn += FaIconAdd(dayOfMonth, "", employeeId,
+                            compareMonth, compareYear);
+
+                    if (currentUserRoles.Contains("TimeShift_Edit"))
+                        if (cellRealWorkHours.Count() > 0)
+                            strToReturn += FaIconEdit(dayOfMonth, "green", employeeId,
+                                   datatable.GenericId, compareMonth, compareYear);
+                }
+                return strToReturn;
+
             }
         }
 

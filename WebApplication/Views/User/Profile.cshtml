@@ -22,15 +22,22 @@
 
             <form asp-controller="User" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="text" asp-for="Id" class="hidden" disabled />
 
                 <div class="box-body">
 
                     <div class="form-group">
                         <label asp-for="Email" class="control-label"></label>
                         <div class="input-group">
-                            <input type="text" asp-for="Email" class="form-control" disabled />
+                            <input type="text" asp-for="Email" class="form-control" readonly />
                             <span asp-validation-for="Email" aria-label="Email" placeholder="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="UserName" class="control-label"></label>
+                        <div class="input-group">
+                            <input type="text" asp-for="UserName" class="form-control" readonly />
+                            <span asp-validation-for="UserName" aria-label="Email" placeholder="Email" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -84,44 +91,32 @@
     </div>
     <div class="col-md-1"> </div>
     <div class="col-md-4">
-        <div class="row">
-            <div class="box box-danger" style="margin-top:5%;">
 
-                <div class="box-header">
-                    <h3 class="box-title">Φιλτράρισμα αποτελεσμάτων εφαρρμογής με βάση συγκεκριμένα πόστα</h3>
-                </div>
-                <hr />
-                <div class="box-body">
-                    <div style="width:100%;" id="BoxWorkPlace">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">Φιλτράρισμα αποτελεσμάτων εφαρρμογής με βάση συγκεκριμένα πόστα</h3>
+            </div>
+            <hr />
+            <div class="box-body">
+                <div style="width:100%;" id="BoxWorkPlace">
+                    @if (User.IsInRole("User_Edit"))
+                    {
                         <div style="width:100%; float:left;">
                             Προσθήκη πόστου
                             <button id="ButtonAddWorkPlace" class="btn btn-success"><i class="fa fa-plus"></i></button>
                         </div>
+                    }
 
-                        <div style="width:100%; float:left;" id="DivToAppendSelect2"></div>
-
+                    <div style="width:100%; float:left;" id="DivToAppendSelect2"></div>
+                    @if (User.IsInRole("User_Edit"))
+                    {
                         <div class="form-group pull-right">
                             <button @*style="display:none;"*@ value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveWorkPlaces">Αποθήκευση</button>
                         </div>
-                    </div>
+                    }
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="box box-danger" style="margin-top:5%;">
-
-                <div class="box-header">
-                    <h3 class="box-title">Επαναφορά κωδικού χρήστη</h3>
-                </div>
-                <hr />
-                <div class="box-body">
-                    <h4 class="box-body">Στο επόμενο login που θα κανει ο χρήστης θα του ζητηθεί να αλλάξει κωδικό</h4>
-                    <div style="display: flex; justify-content: center; align-items: center;">
-                        <button class="btn btn-warning" id="UserPasswordReset">Επαναφορά κωδικού</button>
-
-                    </div>
-                </div>
-
             </div>
         </div>
 
@@ -265,22 +260,7 @@
 
         });
 
-        //Password Reset
-        $('#UserPasswordReset').on("click", e => {
-            var userId = document.getElementById('Id').value;
-            var apiUrl = "/api/users/resetpassword/" + userId;
 
-            $.ajax({
-                url: apiUrl,
-                type: "POST",
-                success: function (data, textStatus, jqXHR) {
-                    console.log('success');
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.log('error');
-                }
-            });
-        });
         const HandleSelect2State = workPlaceId => {
             var editButton = document
                 .getElementById('Select2EditButtonNum_' + workPlaceId);
@@ -344,7 +324,7 @@
                     contentType: "application/json",
                     data: (data, type, row, meta) => {
                         data.userId = '@Model.Id';
-                        data.Predicate='UserEdit'
+                        data.Predicate='UserProfile';
                         return JSON.stringify(data);
                     }
                 },
@@ -413,8 +393,6 @@
 
 
     <script>
-       
-
         $('#rolesDatatable').on("change", ".PermitionCheckbox", (data) => {
             var userId = data.target.attributes['userid'].nodeValue;
             var roleId = data.target.attributes['roleid'].nodeValue;
@@ -423,6 +401,8 @@
             if (data.target.checked)
                 apiUrl = "/api/userrole/add/" + userId + "/" + roleId;
 
+            var userId = data.target.attributes['userid'].nodeValue;
+            var roleId = data.target.attributes['roleid'].nodeValue;
             $.ajax({
                 url: apiUrl,
                 type: "POST",
@@ -462,11 +442,15 @@
             '</div >' +
             '<div style="width: 5%; float: left;">&nbsp;</div >' +
             '<div style="width: 20%; float: left;">' +
-            '<button style="display:none;" class= "btn btn-primary Select2UndoButton" id="Select2UndoButtonNum_' + Select2Count + '"> <i class="fa fa-pencil Select2UndoButton" id="Select2UndoFafaNum_' + Select2Count + '"></i></button >' +
-            '<button class= "btn btn-warning Select2EditButton" id="Select2EditButtonNum_' + Select2Count + '"> <i class="fa fa-pencil Select2EditButton" id="Select2EditFafaNum_' + Select2Count + '"></i></button >' +
-            '<button style="display:none;" class= "btn btn-danger Select2DeleteButton" id="Select2DeleteButtonNum_' + Select2Count + '"> <i class="fa fa-trash Select2DeleteButton" id="Select2DeleteFafaNum_' + Select2Count + '"></i></button >' +
+                GetHtmlButtons()+
             '</div >' +
             '</div >';
+
+        const GetHtmlButtons = () => '' +
+            '<button style="display:none;" class= "btn btn-primary Select2UndoButton" id="Select2UndoButtonNum_' + Select2Count + '"> <i class="fa fa-pencil Select2UndoButton" id="Select2UndoFafaNum_' + Select2Count + '"></i></button >' +
+            '<button class= "btn btn-warning Select2EditButton" id="Select2EditButtonNum_' + Select2Count + '"> <i class="fa fa-pencil Select2EditButton" id="Select2EditFafaNum_' + Select2Count + '"></i></button >' +
+            '<button style="display:none;" class= "btn btn-danger Select2DeleteButton" id="Select2DeleteButtonNum_' + Select2Count + '"> <i class="fa fa-trash Select2DeleteButton" id="Select2DeleteFafaNum_' + Select2Count + '"></i></button >';
+
 
     </script>
 

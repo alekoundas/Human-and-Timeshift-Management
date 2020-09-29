@@ -47,7 +47,10 @@ namespace DataAccess.Migrations.SecurityDb
                     FirstName = table.Column<string>(nullable: false),
                     LastName = table.Column<string>(nullable: false),
                     DateOfBirth = table.Column<DateTime>(nullable: true),
-                    Gender = table.Column<bool>(nullable: false)
+                    Gender = table.Column<bool>(nullable: false),
+                    HasToChangePassword = table.Column<bool>(nullable: false),
+                    IsEmployee = table.Column<bool>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {

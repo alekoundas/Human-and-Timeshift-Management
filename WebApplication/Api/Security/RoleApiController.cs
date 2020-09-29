@@ -8,6 +8,7 @@ using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Identity;
+using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Utilities;
@@ -25,20 +26,46 @@ namespace WebApplication.Api.Security
             _securityDatawork = new SecurityDataWork(securityDbContext);
         }
 
-        // GET: api/role/get>
-        [HttpPost("get")]
-        public async Task<ActionResult<ApplicationRole>> Get([FromBody] Datatable datatable)
+        // POST: api/role/DataTable>
+        [HttpPost("datatable")]
+        public async Task<ActionResult<ApplicationRole>> DataTable([FromBody] Datatable datatable)
         {
-            var total = _securityDatawork.ApplicationUsers.CountAll();
+            var total = await _securityDatawork.ApplicationRoles.CountAllAsync();
+            var pageSize = datatable.Length;
+            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            var orderDirection = datatable.Order[0].Dir;
+            var filter = PredicateBuilder.New<ApplicationRole>();
+            filter = filter.And(x => true);
 
-            var applicationRoles = await _securityDatawork.ApplicationRoles.GetAvailableControllers();
+            var applicationRoles = new List<string>();
+
+
+            //var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
+            //var mappedData = MapResults(applicationRoles, datatable.ApplicationUserId);
+
+
+
+
+            if (datatable.Predicate == "UserEdit")
+            {
+                applicationRoles = await _securityDatawork.ApplicationRoles.GetAvailableControllers();
+            }
+            if (datatable.Predicate == "UserProfile")
+            {
+                applicationRoles = await _securityDatawork.ApplicationRoles.GetAvailableControllers();
+            }
+
+
+            var mapedData = MapResults(applicationRoles, datatable);
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mappedData = MapResults(applicationRoles, datatable.ApplicationUserId);
+            return Ok(dataTableHelper.CreateResponse(datatable, await mapedData, total));
 
-            return Ok(dataTableHelper.CreateResponse(datatable, mappedData, total));
+
+
         }
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<string> results, string userId)
+        protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<string> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<string>(_securityDatawork);
@@ -47,13 +74,30 @@ namespace WebApplication.Api.Security
             {
                 var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Name", result);
-                dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", userId));
-                dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", userId));
-                dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", userId));
-                dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", userId));
-                returnObjects.Add(expandoObj);
+
+
+                if (datatable.Predicate == "UserEdit")
+                {
+                    dictionary.Add("Name", result);
+                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId));
+                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId));
+                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId));
+                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId));
+                    returnObjects.Add(expandoObj);
+
+                }
+                else if (datatable.Predicate == "UserProfile")
+                {
+                    dictionary.Add("Name", result);
+                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId));
+                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId));
+                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId));
+                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId));
+                    returnObjects.Add(expandoObj);
+                }
             }
+
+
 
             return returnObjects;
         }

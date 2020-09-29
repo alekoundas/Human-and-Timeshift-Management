@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20200921164313_InitializeDb")]
+    [Migration("20200929171319_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,7 +165,7 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("SocialSecurityNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SpecializationId")
+                    b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -439,9 +439,7 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasOne("DataAccess.Models.Entity.Specialization", "Specialization")
                         .WithMany()
-                        .HasForeignKey("SpecializationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SpecializationId");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkPlace", b =>

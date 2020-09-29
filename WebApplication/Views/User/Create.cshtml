@@ -1,7 +1,5 @@
-﻿@model DataAccess.Models.Identity.ApplicationUser
-
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@model DataAccess.ViewModels.ApplicationUsers.ApplicationUserCreate
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row">
@@ -88,8 +86,8 @@
         $('#Gender').bootstrapToggle({
             on: 'Άνδρας',
             off: 'Γυναίκα',
-            onstyle:'primary',
-            offstyle:'primary'
+            onstyle: 'primary',
+            offstyle: 'primary'
         });
 
 

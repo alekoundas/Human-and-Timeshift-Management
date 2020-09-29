@@ -41,11 +41,20 @@ namespace WebApplication
             services.AddDbContext<SecurityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options=> options.ClaimsIdentity.UserIdClaimType = "UserID")
                 .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<SecurityDbContext>();
+
+            services.Configure<IdentityOptions>(opts => {
+                opts.Password.RequiredLength = 8;
+                opts.Password.RequireNonAlphanumeric = true;
+                opts.Password.RequireLowercase = true;
+                opts.Password.RequireUppercase = true;
+                opts.Password.RequireDigit = true;
+            });
+
 
             //Redirect for account
             services.ConfigureApplicationCookie(options =>

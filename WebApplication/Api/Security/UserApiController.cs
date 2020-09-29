@@ -35,7 +35,24 @@ namespace WebApplication.Api.Security
             _userManager = userManager;
         }
 
-        [HttpPost("datatable")]
+        [HttpPost("resetpassword/{userId}")]
+        public async Task<ActionResult<ApplicationUser>> ResetPassword(string userId)
+        {
+            var user = await _securityDatawork.ApplicationUsers
+                   .FirstOrDefaultAsync(x => x.Id == userId);
+
+
+            user.HasToChangePassword = true;
+
+            var status = await _userManager.UpdateAsync(user);
+            //if (!status.Succeeded)
+            //{
+            //}
+
+            return Ok(new { });
+        }
+
+         [HttpPost("datatable")]
         public async Task<ActionResult<ApplicationUser>> DataTable([FromBody] Datatable datatable)
         {
             var total = _securityDatawork.ApplicationUsers.CountAll();

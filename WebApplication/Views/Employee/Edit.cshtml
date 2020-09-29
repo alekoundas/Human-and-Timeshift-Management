@@ -83,8 +83,11 @@
                     <div class="form-group">
                         <label asp-for="SpecializationId" class="control-label"></label>
                         <div class="input-group"style="width:100%">
-                            <select class="Specialization_Select2" asp-for="CompanyId" style="width:50%">
-                                <option value="@Model.SpecializationId" selected="selected">@Model.Specialization.Name</option>
+                            <select class="Specialization_Select2" asp-for="SpecializationId" style="width:50%">
+                                @if(Model.Specialization!=null)
+                                {
+                                    <option value="@Model.SpecializationId" selected="selected">@Model.Specialization.Name</option>
+                                }
                             </select>
                             <span asp-validation-for="SpecializationId" class="text-danger"></span>
                         </div>
@@ -93,8 +96,11 @@
                     <div class="form-group">
                         <label asp-for="CompanyId" class="control-label"></label>
                         <div class="input-group"style="width:100%">
-                            <select class="Company_Select2" asp-for="SpecializationId" style="width:50%">
+                            <select class="Company_Select2" asp-for="CompanyId" style="width:50%">
+                                @if (Model.CompanyId != null)
+                                {
                                 <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>
+                                }
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>
@@ -203,6 +209,7 @@
 
     <script>
         $('.Specialization_Select2').select2({
+            allowClear: true,
             ajax: {
                 url: '/api/specializations/select2',
                 data: function (params) {
@@ -216,6 +223,7 @@
         });
 
         $('.Company_Select2').select2({
+            allowClear: true,
             ajax: {
                 url: '/api/companies/select2',
                 data: function (params) {

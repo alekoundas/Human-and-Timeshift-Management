@@ -163,7 +163,7 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("SocialSecurityNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SpecializationId")
+                    b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -437,9 +437,7 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasOne("DataAccess.Models.Entity.Specialization", "Specialization")
                         .WithMany()
-                        .HasForeignKey("SpecializationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SpecializationId");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkPlace", b =>

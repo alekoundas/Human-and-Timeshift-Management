@@ -26,7 +26,8 @@ namespace Business.Seed
                     UserName = "Admin",
                     Email = "Admin@Admin.gr",
                     FirstName= "Admin",
-                    LastName = "User"
+                    LastName = "User",
+                    HasToChangePassword=false
                 };
 
                 IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd").Result;
@@ -112,7 +113,9 @@ namespace Business.Seed
                     UserName = "SuperAdmin",
                     Email = "Super@Admin.gr",
                     FirstName = "Super",
-                    LastName = "User"
+                    LastName = "User",
+                    HasToChangePassword = false
+
                 };
 
                 IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd").Result;

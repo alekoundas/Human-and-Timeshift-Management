@@ -1,4 +1,7 @@
-﻿<nav class="navbar navbar-static-top">
+﻿@using Microsoft.AspNetCore.Identity
+@using DataAccess.Models.Identity
+@using System.Security.Claims;
+<nav class="navbar navbar-static-top">
     <!-- Sidebar toggle button-->
     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
         <span class="sr-only">Toggle navigation</span>
@@ -9,66 +12,54 @@
 
     <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-                <!-- If user is Logged In we show diferent body in menu modal -->
+            <!-- If user is Logged In we show diferent body in menu modal -->
             @if (User.Identity.IsAuthenticated)
             {
+            <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                </a>
+                <ul class="dropdown-menu">
 
-
-        <li class="dropdown user user-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-user" aria-hidden="true"></i>
-            </a>
-            <ul class="dropdown-menu">
-
-                <li class="user-header">
-                    <p style="text-align: center; vertical-align: middle; line-height: 30px; "><b>My</b>Services</p>
-                </li>
-                <li class="user-body">
-                    <div class="row">
-                        <div class=" text-center">
-                            <p>Oνοματεπώνυμο: @User.Identity.Name </p>
+                    <li class="user-header">
+                        <p style="text-align: center; vertical-align: middle; line-height: 30px; "><b>My</b>Services</p>
+                    </li>
+                    <li class="user-body">
+                        <div class="row">
+                            <div class=" text-center">
+                                <p>Oνοματεπώνυμο: @User.Identity.Name </p>
+                            </div>
+                            <div class=" text-center">
+                                <p>Email: @User.Identity.Name</p>
+                            </div>
                         </div>
-                        <div class=" text-center">
-                            <p>Email: @User.Identity.Name</p>
+                    </li>
+                    <li class="user-footer">
+
+                        <div class="pull-right">
+                            <div class=" text-center">
+                                <b> @Html.LinkButton("User", "Profile/"+  Context.User.FindFirstValue("UserID"), "Προφίλ")</b>
+                                <b> @Html.LinkButton("Account", "Logout", "Αποσύνδεση")</b>
+                            </div>
                         </div>
-                    </div>
-                </li>
-                <li class="user-footer">
+                    </li>
+                </ul>
+            </li>
+            }
+            else
+            {
+            <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="user-body">
+                        @Html.LinkButton("Account", "Login", "Είσοδος")
 
-                    <div class="pull-right">
-                        <div class=" text-center">
-                            <b> @Html.LinkButton("Account", "Logout", "Αποσύνδεση")</b>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </li> 
-        
-        }
-                    else
-                    {
-
-
-        <li class="dropdown user user-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-sign-in" aria-hidden="true"></i>
-            </a>
-            <ul class="dropdown-menu">
-
-
-
-                <li class="user-body">
-                    @Html.LinkButton("Account", "Login", "Είσοδος")
-                   
-                </li>
-            </ul>
-        </li>
-                    
-                        }
-
-
-
-            <!-- Control Sidebar Toggle Button -->
+                    </li>
+                </ul>
+            </li>
+            }
         </ul>
     </div>
 </nav>

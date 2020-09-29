@@ -7,10 +7,7 @@ namespace DataAccess.Models.Identity
 {
     public class ApplicationUserRole : IdentityUserRole<string>
     {
-        public string ApplicationUserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
-
-        public string ApplicationRoleId { get; set; }
-        public ApplicationRole ApplicationRole { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
+        public virtual ApplicationRole ApplicationRole { get; set; }
     }
 }

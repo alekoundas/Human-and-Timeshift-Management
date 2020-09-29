@@ -117,18 +117,7 @@ namespace Business.Repository
         //    return result.Succeeded ? applicationUser : null;
         //}
 
-        public async Task< ApplicationUser> UpdateUser(ApplicationUser applicationUser, UserManager<ApplicationUser> userManager)
-        {
-            ApplicationUser entityToUpdate = await SecurityDbContext.Users.FirstOrDefaultAsync(x=>x.Id==applicationUser.Id);
-
-            entityToUpdate.Email = applicationUser.Email;
-            entityToUpdate.UserName = applicationUser.UserName;
-            //entityToUpdate.Profile.FirstName = applicationUser.Profile.FirstName;
-            //entityToUpdate.Profile.LastName = applicationUser.Profile.LastName;
-
-            var update = await userManager.UpdateAsync(entityToUpdate);
-            return update.Succeeded ? entityToUpdate : null;
-        }
+      
 
         //public ApplicationUser FindUserById(int id)
         //{

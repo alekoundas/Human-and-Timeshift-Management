@@ -16,7 +16,7 @@ namespace DataAccess.Models.Entity
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string LastName { get; set; }
 
-        [Display(Name = "Ημερομηνίαα Γέννησης")]
+        [Display(Name = "Ημερομηνία Γέννησης")]
         public DateTime? DateOfBirth { get; set; }
 
         [Display(Name = "ΑΦΜ")]
@@ -34,7 +34,7 @@ namespace DataAccess.Models.Entity
 
 
         [Display(Name = "Ειδικότητα")]
-        public int SpecializationId { get; set; }
+        public int? SpecializationId { get; set; }
         public Specialization Specialization { get; set; }
 
 

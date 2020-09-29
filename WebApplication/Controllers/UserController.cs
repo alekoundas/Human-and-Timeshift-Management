@@ -7,7 +7,8 @@ using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models;
 using DataAccess.Models.Identity;
-using DataAccess.ViewModels.UserRole;
+using DataAccess.ViewModels.ApplicationUserRoles;
+using DataAccess.ViewModels.ApplicationUsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -46,23 +47,68 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "User_Create")]
         public IActionResult Create()
         {
-            var viewModel = new ApplicationUser();
             ViewData["Title"] = "Προσθήκη χρήστη";
 
+            return View();
+        }
+
+        // GET: Account/ChangePassword
+        [HttpGet]
+        public async Task<IActionResult> ChangePassword(string userId, string returnUrl)
+        {
+            var viewModel = new ApplicationUserChangePassword();
+            viewModel.UserId = userId;
+            viewModel.ReturnUrl = returnUrl ?? Url.Content("~/");
+
+            ViewData["Title"] = "Υποχρεωτική αλλαγή κωδικού!";
+            ViewData["Details"] = "Βρίσκεστε εδώ διότι είναι το πρώτο σας Login στην  εφαρμογή, ή κάποιος διαχειριστής ζήτησε επαναφορά του κωδικού σας";
             return View(viewModel);
         }
+
+        // POST: Account/ChangePassword
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ApplicationUserChangePassword viewModel)
+        {
+            if (viewModel.Password1 == viewModel.Password2)
+            {
+                var user = await _datawork.ApplicationUsers
+                    .FirstOrDefaultAsync(x => x.Id == viewModel.UserId);
+
+                if (user == null)
+                {
+                    TempData["StatusMessage"] = "Ωχ! Ο κωδικός του χρήστη δεν ενημερώθηκε";
+                    return Redirect(Url.Content("~/"));//Go to Home
+                }
+
+                user.HasToChangePassword = false;
+                user.PasswordHash = _userManager.PasswordHasher
+                    .HashPassword(user, viewModel.Password1);
+
+                var status = await _userManager.UpdateAsync(user);
+                if (!status.Succeeded)
+                {
+                    TempData["StatusMessage"] = "Ωχ! Ο κωδικός του χρήστη δεν ενημερώθηκε";
+                    return Redirect(Url.Content("~/"));//Go to Home
+                }
+            }
+
+            TempData["StatusMessage"] = "Ο κωδικός του χρήστη ενημερώθηκε με επιτυχία";
+            return RedirectToAction("Login", "Account");
+        }
+
 
         // POST:  User/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "User_Create")]
-        public async Task<IActionResult> Create(ApplicationUser viewModel)
+        public async Task<IActionResult> Create(ApplicationUserCreate viewModel)
         {
             if (ModelState.IsValid)
             {
-                var result = await _userManager.CreateAsync(viewModel, "P@ssw0rd");
+                var user = ApplicationUserCreate.CreateFrom(viewModel);
+                var result = await _userManager.CreateAsync(user, "@TempPass1");
                 if (result.Succeeded)
-                    TempData["StatusMessage"] = "Ο χρήστης δημιουργήθηκε με επιτυχία. Κωδικός: P@ssw0rd .";
+                    TempData["StatusMessage"] = "Ο χρήστης δημιουργήθηκε με επιτυχία. Κωδικός: @TempPass1 .";
                 else
                     TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν δημιουργήθηκε.";
                 return RedirectToAction(nameof(Index));
@@ -81,7 +127,7 @@ namespace WebApplication.Controllers
             if (user == null)
                 return NotFound();
 
-            var returnViewModel = ControllerGetEdit.CreateFrom(user);
+            var returnViewModel = ApplicationUsersEdit.CreateFrom(user);
             returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
 
             var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
@@ -95,6 +141,34 @@ namespace WebApplication.Controllers
                 }).ToList();
 
             ViewData["Title"] = "Επεξεργασία χρήστη";
+
+            return View(returnViewModel);
+        }
+        // GET:  User/Profile/Id
+        //[Authorize(Roles = "User_Edit")]
+        public async Task<IActionResult> Profile(string id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var user = _datawork.ApplicationUsers.Get(id.ToString());
+            if (user == null)
+                return NotFound();
+
+            var returnViewModel = ApplicationUsersEdit.CreateFrom(user);
+            returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
+
+            var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
+                .GetWorkPlaceRolesByUserId(user.Id);
+
+            returnViewModel.WorkPlaceRoles = applicationWorkPlaceRoles
+                .Select(x => new WorkPlaceRoleValues
+                {
+                    WorkPlaceId = x.WorkPlaceId,
+                    Name = x.WorkPlaceName
+                }).ToList();
+
+            ViewData["Title"] = "Προφίλ χρήστη";
 
             return View(returnViewModel);
         }
@@ -113,8 +187,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     applicationUser.UserName = applicationUser.Email;
-                    await _datawork.ApplicationUsers.UpdateUser(applicationUser, _userManager);
-                    await _datawork.SaveChangesAsync();
+                     await _userManager.UpdateAsync(applicationUser);
                     TempData["StatusMessage"] = "Ο χρήστης ενημερώθηκε με επιτυχία.";
 
                 }

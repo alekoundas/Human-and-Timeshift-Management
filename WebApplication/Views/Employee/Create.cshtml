@@ -43,7 +43,7 @@
                     <div class="form-group">
                         <label asp-for="DateOfBirth" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="DateOfBirth" class="form-control" />
+                            <input asp-for="DateOfBirth" type="text" class="form-control" />
                             <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                         </div>
                     </div>
@@ -112,7 +112,7 @@
                             </div>
                             <div class="row" id="ContactInput" style="width:100%"></div>
                         </div>
-                    </div>  
+                    </div>
 
                     <div class="form-group pull-right">
                         <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
@@ -140,6 +140,7 @@
 
     <script>
         $('.Specialization_Select2').select2({
+            allowClear: true,
             ajax: {
                 url: '/api/specializations/select2',
                 data: function (params) {
@@ -154,6 +155,7 @@
     </script>
     <script>
         $('.Company_Select2').select2({
+            allowClear: true,
             ajax: {
                 url: '/api/companies/select2',
                 data: function (params) {
@@ -165,6 +167,26 @@
                 }
             }
         });
+    </script>
+    <script>
+        $('#DateOfBirth').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showHeader: true,
+            showButtons: true,
+            singleDate: true,
+            startDate: Date.now(),
+            endDate: Date.now(),
+            format: "DD/MM/YYYY",
+            calendarCount: 1,
+            locale: "el",
+            showOn: "right",
+                 onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        })
     </script>
 
 }

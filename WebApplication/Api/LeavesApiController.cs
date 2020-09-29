@@ -85,6 +85,7 @@ namespace WebApplication.Api
                     {
                         StartOn = apiLeave.StartOn,
                         EndOn = apiLeave.EndOn,
+                        ApprovedBy=apiLeave.ApprovedBy,
                         Description = apiLeave.Description,
                         EmployeeId = id,
                         LeaveTypeId=apiLeave.LeaveTypeId,
@@ -144,6 +145,7 @@ namespace WebApplication.Api
             if (datatable.Predicate == "LeaveIndex")
             {
                 includes.Add(x => x.Include(y => y.LeaveType));
+                includes.Add(x => x.Include(y => y.Employee));
                 leaves = await _baseDataWork.Leaves
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
             }
@@ -166,6 +168,7 @@ namespace WebApplication.Api
 
                 if (datatable.Predicate == "LeaveIndex")
                 {
+                    dictionary.Add("EmployeeFullName", leaves.Employee.FullName);
                     dictionary.Add("LeaveTypeName", leaves.LeaveType.Name);
                     dictionary.Add("Buttons", dataTableHelper.GetButtons("Leave", "Leaves", leaves.Id.ToString()));
                     returnObjects.Add(expandoObj);

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using DataAccess.Models.Identity;
 
-namespace DataAccess.ViewModels.UserRole
+namespace DataAccess.ViewModels.ApplicationUsers
 {
-    public class ControllerGetEdit : ApplicationUser
+    public class ApplicationUsersEdit : ApplicationUser
     {
         public List<WorkPlaceRoleValues> WorkPlaceRoles { get; set; }
 
-        public static ControllerGetEdit CreateFrom(ApplicationUser user) =>
-            new ControllerGetEdit()
+        public static ApplicationUsersEdit CreateFrom(ApplicationUser user) =>
+            new ApplicationUsersEdit()
             {
                 Id = user.Id,
                 Email = user.Email,

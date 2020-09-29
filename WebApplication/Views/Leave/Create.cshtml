@@ -41,9 +41,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label asp-for="ApprovedBy" class="control-label"></label>
+                    <div class="input-group">
+                        <textarea asp-for="ApprovedBy" class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
                     <div class="input-group">
-                        <textarea asp-for="Description" class="form-control" ></textarea>
+                        <textarea asp-for="Description" class="form-control"></textarea>
                     </div>
                 </div>
 
@@ -112,9 +119,10 @@
         const BuildSaveToDbDto = () => ({
             startOn: ConvertDateForApi(SetMinTime(GetInputValue('StartOn'))),
             endOn: ConvertDateForApi(SetMaxTime(GetInputValue('EndOn'))),
+            approvedBy: GetApprovedBy(),
             description: GetDescription(),
-            leaveTypeId:GetSelect2LeaveTypeValue(),
-            employeeIds:  GetAlreadyAppendedEmployeeIds()
+            leaveTypeId: GetSelect2LeaveTypeValue(),
+            employeeIds: GetAlreadyAppendedEmployeeIds()
         });
     </script>
 
@@ -158,6 +166,9 @@
         const GetDescription = () =>
             document.getElementById('Description').value;
 
+        const GetApprovedBy= () =>
+            document.getElementById('ApprovedBy').value;
+
         const GetInputValueSplited = id =>
             document.getElementById(id).value.split('/-/');
 
@@ -168,7 +179,7 @@
             document.getElementById('EmployeeSelect2Num_' + num).value;
 
         const GetSelect2LeaveTypeValue = num =>
-            document.getElementById('LeaveTypeId' ).value;
+            document.getElementById('LeaveTypeId').value;
 
         const GetAlreadyAppendedEmployeeIds = () =>
             [...document.getElementsByClassName('EmployeesSelect2')]
@@ -318,7 +329,7 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            oninit: () => SetInputValue('StartOn',GetInitDate()),
+            oninit: () => SetInputValue('StartOn', GetInitDate()),
             onbeforehide: () => {
                 var date = GetInputValueSplited('StartOn');
                 SetInputValue('StartOn', date[0]);

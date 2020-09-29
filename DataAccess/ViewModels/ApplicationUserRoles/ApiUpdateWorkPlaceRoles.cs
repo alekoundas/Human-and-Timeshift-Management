@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.UserRole
+namespace DataAccess.ViewModels.ApplicationUserRoles
 {
     public class ApiUpdateWorkPlaceRoles
     {

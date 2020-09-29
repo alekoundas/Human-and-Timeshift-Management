@@ -51,11 +51,14 @@ namespace WebApplication.Controllers
             return View(viewModel);
         }
 
+     
+
         // POST: Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(viewModel.LoginUserNameOrEmail);
@@ -63,6 +66,11 @@ namespace WebApplication.Controllers
                     user = await _userManager.FindByNameAsync(viewModel.LoginUserNameOrEmail);
                 if (user != null)
                 {
+                    //Check if user needs to change password
+                    if (user.HasToChangePassword)
+                    {
+                      return  RedirectToAction("ChangePassword", "User", new { userId = user.Id, returnUrl = viewModel.ReturnUrl });
+                    }
                     var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, lockoutOnFailure: true);
                     if (result.Succeeded)
                     {
@@ -78,8 +86,13 @@ namespace WebApplication.Controllers
                             throw;
                         }
 
+                        //Add roles from db
                         foreach (var role in roles)
                             customClaims.Add(new Claim(ClaimTypes.Role as string, role.Name));
+
+                        customClaims.Add(new Claim(ClaimTypes.Name as string, user.FirstName));
+                        customClaims.Add(new Claim(ClaimTypes.Email as string, user.Email));
+                        customClaims.Add(new Claim("UserID", user.Id));
 
                         var claimsIdentity = new ClaimsIdentity(customClaims,
                             CookieAuthenticationDefaults.AuthenticationScheme);

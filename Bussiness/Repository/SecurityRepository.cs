@@ -61,6 +61,11 @@ namespace Bussiness.Repository
             return _set.Count(predicate);
         }
 
+        public async Task<int> CountAllAsync()
+        {
+            return await _set.CountAsync();
+        }
+
         public TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate)
         {
             return _set.FirstOrDefault(predicate);

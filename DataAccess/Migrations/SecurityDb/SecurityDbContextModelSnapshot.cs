@@ -80,11 +80,20 @@ namespace DataAccess.Migrations.SecurityDb
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Gender")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasToChangePassword")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsEmployee")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")

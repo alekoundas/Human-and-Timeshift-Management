@@ -378,7 +378,7 @@ namespace WebApplication.Api
                 var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                dictionary.Add("ScpecializationName", employee.Specialization.Name);
+                dictionary.Add("ScpecializationName", employee.Specialization?.Name);
 
                 if (datatable.Predicate == "EmployeeIndex")
                 {
@@ -544,7 +544,7 @@ namespace WebApplication.Api
                             {
                                 expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
                                 dictionary = (IDictionary<string, object>)expandoObj;
-                                dictionary.Add("ScpecializationName", employee.Specialization.Name);
+                                dictionary.Add("ScpecializationName", employee.Specialization?.Name);
                                 dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
                                 returnObjects.Add(expandoObj);
 
@@ -557,7 +557,7 @@ namespace WebApplication.Api
                             {
                                 expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
                                 dictionary = (IDictionary<string, object>)expandoObj;
-                                dictionary.Add("ScpecializationName", employee.Specialization.Name);
+                                dictionary.Add("ScpecializationName", employee.Specialization?.Name);
                                 dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
                                 returnObjects.Add(expandoObj);
                             }
