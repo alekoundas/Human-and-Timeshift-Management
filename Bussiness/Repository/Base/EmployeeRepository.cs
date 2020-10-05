@@ -30,8 +30,9 @@ namespace Business.Repository
             Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderingInfo,
             DateTime startOn,
             DateTime endOn,
+            Expression<Func<Employee, bool>> filter,
             int workPlaceId = 0,
-            int pageSize = 10,
+            int pageSize = 10, 
             int pageIndex = 1)
         {
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
@@ -40,7 +41,6 @@ namespace Business.Repository
             includes.Add(x => x.Include(y => y.WorkHours).ThenInclude(z => z.TimeShift));
             includes.Add(x => x.Include(y => y.Specialization));
 
-            var filter = PredicateBuilder.New<Employee>();
             filter = filter.And(x =>
                    x.RealWorkHours.Any(y =>
                          (y.StartOn <= startOn && startOn <= y.EndOn) ||
@@ -99,13 +99,13 @@ namespace Business.Repository
                         (z.StartOn <= startOn && startOn <= z.EndOn) ||
                         (z.StartOn <= endOn && endOn <= z.EndOn) ||
                         (startOn < z.StartOn && z.EndOn < endOn))
-                            //.Where(y => !workHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn))
+                            .Where(y => !workHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn))
                             .ToList(),
                 WorkHours = x.WorkHours.Where(z =>
                         (z.StartOn <= startOn && startOn <= z.EndOn) ||
                         (z.StartOn <= endOn && endOn <= z.EndOn) ||
                         (startOn < z.StartOn && z.EndOn < endOn))
-                            //.Where(y => !realWorkHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn) && y.IsDayOff == false)
+                            .Where(y => !realWorkHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn) && y.IsDayOff == false)
                             .ToList(),
                 Specialization = x.Specialization
             });

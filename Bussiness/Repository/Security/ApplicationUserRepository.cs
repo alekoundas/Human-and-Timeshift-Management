@@ -20,7 +20,7 @@ namespace Business.Repository
     {
         protected readonly SecurityDbContext _dbContext;
 
-        public ApplicationUserRepository( SecurityDbContext dbContext) : base(dbContext)
+        public ApplicationUserRepository(SecurityDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }
@@ -41,23 +41,22 @@ namespace Business.Repository
             int pageIndex = 1)
         {
             if (orderingInfo == null)
-            {
                 return await SecurityDbContext
                     .Users
                     .Skip((pageIndex - 1) * pageSize)
                     .Take(pageSize).ToListAsync();
-            }
 
             var query = (IQueryable<ApplicationUser>)orderingInfo(SecurityDbContext.Users);
 
-            query = query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+            if (pageSize != -1)
+                query = query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return await query.ToListAsync();
         }
 
 
 
-        public async Task<ApplicationRole>GetRoleByWorkPlaceAndUser(string workPlaceId,string userId)
+        public async Task<ApplicationRole> GetRoleByWorkPlaceAndUser(string workPlaceId, string userId)
         {
             var filter = PredicateBuilder.New<ApplicationRole>();
 
@@ -117,7 +116,7 @@ namespace Business.Repository
         //    return result.Succeeded ? applicationUser : null;
         //}
 
-      
+
 
         //public ApplicationUser FindUserById(int id)
         //{

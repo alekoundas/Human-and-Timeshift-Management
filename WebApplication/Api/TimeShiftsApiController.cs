@@ -129,7 +129,7 @@ namespace WebApplication.Api
 
             if (predicate == "RealWorkHourCreate")
             {
-                    filter = filter.And(x => x.Month==DateTime.Now.Month);
+                filter = filter.And(x => x.Month == DateTime.Now.Month);
             }
             else
             {
@@ -137,17 +137,17 @@ namespace WebApplication.Api
                     filter = filter.And(x => x.WorkPlaceId == workPlaceId);
             }
 
-                if (string.IsNullOrWhiteSpace(search))
-                {
-                    timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
-                        .GetPaggingWithFilter(null, filter, includes, 10, page);
-                }
-                else
-                {
-                    filter = filter.And(x => x.Title.Contains(search));
-                    timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
-                       .GetPaggingWithFilter(null, filter, includes, 10, page);
-                }
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
+                    .GetPaggingWithFilter(null, filter, includes, 10, page);
+            }
+            else
+            {
+                filter = filter.And(x => x.Title.Contains(search));
+                timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
+                   .GetPaggingWithFilter(null, filter, includes, 10, page);
+            }
             var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
             var hasMore = (page * 10) < total;
             return Ok(select2Helper.CreateTimeShiftsResponse(timeShifts, hasMore));
@@ -172,14 +172,14 @@ namespace WebApplication.Api
 
             if (datatable.Predicate == "TimeShiftIndex")
             {
-                filter = filter.And( x => x.WorkPlaceId == datatable.GenericId);
+                filter = filter.And(x => x.WorkPlaceId == datatable.GenericId);
                 timeShifts = await _baseDataWork.TimeShifts
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
 
             var mapedData = MapResults(timeShifts, datatable);
 
-            var total = await  _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
+            var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 

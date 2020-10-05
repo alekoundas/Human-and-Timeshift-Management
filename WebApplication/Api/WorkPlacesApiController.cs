@@ -251,6 +251,7 @@ namespace WebApplication.Api
             var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             var filter = PredicateBuilder.New<WorkPlace>();
+            filter = filter.And(await GetUserRoleFiltersAsync());
             filter = filter.And(GetSearchFilter(datatable));
 
             var workPlaces = new List<WorkPlace>();
@@ -478,6 +479,7 @@ namespace WebApplication.Api
 
             return filter;
         }
+
 
         private bool WorkPlaceExists(int id)
         {

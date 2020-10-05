@@ -307,8 +307,8 @@ namespace WebApplication.Api
             {
                 employees = await _baseDataWork.Employees
                     .ProjectionDifference(SetOrderBy(columnName, orderDirection),
-                    datatable.StartOn, datatable.EndOn,
-                    datatable.GenericId, pageSize, pageIndex);
+                    datatable.StartOn, datatable.EndOn, filter,
+                    datatable.GenericId,pageSize, pageIndex);
             }
             if (datatable.Predicate == "ProjectionConcentric")
             {

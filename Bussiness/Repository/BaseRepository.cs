@@ -83,7 +83,8 @@ namespace Bussiness.Repository
             if (orderingInfo != null)
                 qry = orderingInfo(qry);
 
-            qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+            if (pageSize != -1)
+                qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return await qry.ToListAsync();
         }

@@ -5,51 +5,51 @@
 
 
 <div class="row">
-        <div class="col-md-3"> </div>
-        <div class="col-md-6">
-            <div class="box box-danger" style="margin-top:5%;">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
 
-                <div class="box-header">
-                    <h3 class="box-title">@ViewData["Filter"]</h3>
-                </div>
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
 
-                <hr />
+            <hr />
 
 
-                <div class="box-body">
-                    <div style="width:100%;">
-                        <div style="width:50%; float:left;">
-                            <div class="form-group">
-                                <label class="control-label">Πόστο</label>
-                                <div class="input-group" style="width:100%">
-                                    <select id="WorkPlace_Select2" style="width:70%"></select>
-                                </div>
+            <div class="box-body">
+                <div style="width:100%;">
+                    <div style="width:50%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Πόστο</label>
+                            <div class="input-group" style="width:100%">
+                                <select id="WorkPlace_Select2" style="width:70%"></select>
                             </div>
-                        </div>
-                        <div style="width:50%; float:left;">
-                            <div class="form-group">
-                                <label class="control-label">Χρονοδιάγραμμα</label>
-                                <div class="input-group" style="width:100%">
-                                    <select id="TimeShift_Select2" style="width:70%"></select>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="width:50%; float:left;">
-                            <label class="control-label">Μήνας</label>
-                            <div class="input-group">
-                                <input id="MonthFilter" class="form-control" />
-                            </div>
-
                         </div>
                     </div>
+                    <div style="width:50%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Χρονοδιάγραμμα</label>
+                            <div class="input-group" style="width:100%">
+                                <select id="TimeShift_Select2" style="width:70%"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width:50%; float:left;">
+                        <label class="control-label">Μήνας</label>
+                        <div class="input-group">
+                            <input id="MonthFilter" class="form-control" />
+                        </div>
 
-
-
+                    </div>
                 </div>
+
+
+
             </div>
         </div>
-        <div class="col-md-3"> </div>
     </div>
+    <div class="col-md-3"> </div>
+</div>
 
 
 <div class="row">
@@ -553,7 +553,8 @@
             var CurrentDateDaysDiff = FindDaysDifference(startDate.valueOf(),
                 endDate.valueOf());
 
-            for (var i = 0; i < CurrentDateDaysDiff; i++) {
+            //Edit handles single dates only
+            if (IsEdit()) {
 
                 endDate.setDate(startDate.getDate());
                 endDate.setMonth(startDate.getMonth());
@@ -569,6 +570,24 @@
 
                 startDate.setDate(startDate.getDate() + 1);
             }
+            else
+
+                for (var i = 0; i < CurrentDateDaysDiff; i++) {
+
+                    endDate.setDate(startDate.getDate());
+                    endDate.setMonth(startDate.getMonth());
+                    endDate.setFullYear(startDate.getFullYear());
+                    if (startDate.valueOf() > endDate.valueOf())
+                        endDate.setDate(startDate.getDate() + 1);
+
+                    response.push({
+                        startTimestamp: startDate.valueOf(),
+                        endTimestamp: endDate.valueOf(),
+                        workHourId: dateInput.id.split('_')[1]
+                    });
+
+                    startDate.setDate(startDate.getDate() + 1);
+                }
             return response;
         }
 
@@ -1708,6 +1727,7 @@
             responsive: true,
             colReorder: true,
             processing: true,
+            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
             iDisplayLength: 150,
             dom: 'Bfrtlp',
             //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
@@ -1852,32 +1872,32 @@
         const DeleteDataTableHTML = () =>
             document.getElementById('EmployeesWorkHourConcentricDatatable').remove();
 
-           const AppendNewDataTableHTML = () => 
-            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
-                '<div class="box-body table-responsive">'+
-                    '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive">'+
-                        '<thead>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                '<th>Σύνολο ώρες</th>'+
-                                '<th>Σύνολο ώρες Μέρα</th>'+
-                                '<th>Σύνολο ώρες Νύχτα</th>'+
-                            '</tr>'+
-                        '</thead>'+
-                        '<tfoot>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                '<th>Σύνολο ώρες</th>'+
-                                '<th>Σύνολο ώρες Μέρα</th>'+
-                                '<th>Σύνολο ώρες Νύχτα</th>'+
-                            '</tr>'+
-                        '</tfoot>'+
-                    '</table>'+
-                '</div>'+
+        const AppendNewDataTableHTML = () =>
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive">' +
+                '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                '<th>Σύνολο ώρες</th>' +
+                '<th>Σύνολο ώρες Μέρα</th>' +
+                '<th>Σύνολο ώρες Νύχτα</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                '<th>Σύνολο ώρες</th>' +
+                '<th>Σύνολο ώρες Μέρα</th>' +
+                '<th>Σύνολο ώρες Νύχτα</th>' +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
                 '');
 
         AppendNewWorkHourToAddModal = (workHourId) =>

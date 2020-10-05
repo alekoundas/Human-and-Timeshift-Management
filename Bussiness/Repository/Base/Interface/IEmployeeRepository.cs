@@ -15,6 +15,7 @@ namespace Business.Repository.Interface
             Func<IQueryable<Employee>, IOrderedQueryable<Employee>> orderingInfo,
             DateTime startOn,
             DateTime endOn,
+            Expression<Func<Employee, bool>> filter,
             int workPlaceId = 0,
             int pageSize = 10,
             int pageIndex = 1);

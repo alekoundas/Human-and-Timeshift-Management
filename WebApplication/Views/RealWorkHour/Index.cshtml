@@ -619,6 +619,24 @@
             var CurrentDateDaysDiff = FindDaysDifference(startDate.valueOf(),
                 endDate.valueOf());
 
+            //Edit handles single dates only
+            if (IsEdit()) {
+
+                endDate.setDate(startDate.getDate());
+                endDate.setMonth(startDate.getMonth());
+                endDate.setFullYear(startDate.getFullYear());
+                if (startDate.valueOf() > endDate.valueOf())
+                    endDate.setDate(startDate.getDate() + 1);
+
+                response.push({
+                    startTimestamp: startDate.valueOf(),
+                    endTimestamp: endDate.valueOf(),
+                    workHourId: dateInput.id.split('_')[1]
+                });
+
+                startDate.setDate(startDate.getDate() + 1);
+            }
+            else
             for (var i = 0; i < CurrentDateDaysDiff; i++) {
 
                 endDate.setDate(startDate.getDate());
@@ -1800,11 +1818,11 @@
                                 HandleShowWorkHourRangeToModal(workHourId);
 
                             //if (!ValidateNullInputs(workHourId)) {
-                                ValidateAppendedWorkHoursTimeRange(workHourId);
-                                ValidateExistingErrorsOnWorkHours();
-                                ValidateWorkHourDateOutOfRange(workHourId);
-                                ValidateEmployeesWithRangeToWorkhour(workHourId);
-                                ValidateCalentimDateIsNotRange(workHourId);//only diff from bellow calentim
+                            ValidateAppendedWorkHoursTimeRange(workHourId);
+                            ValidateExistingErrorsOnWorkHours();
+                            ValidateWorkHourDateOutOfRange(workHourId);
+                            ValidateEmployeesWithRangeToWorkhour(workHourId);
+                            ValidateCalentimDateIsNotRange(workHourId);//only diff from bellow calentim
                             //}
                         })
                         .then(() => ButtonLoadingToggle("SaveWorkHours"));
@@ -1914,6 +1932,7 @@
             serverSide: true,
             responsive: true,
             processing: true,
+            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
             iDisplayLength: 150,
             colReorder: {
                 fixedColumnsLeft: 3

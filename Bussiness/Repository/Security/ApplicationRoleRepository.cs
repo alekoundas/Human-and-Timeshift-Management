@@ -34,11 +34,14 @@ namespace Bussiness.Repository.Security
             var userRoles = await SecurityDbContext.UserRoles
                 .Where(x => x.UserId == userId).ToListAsync();
 
-            foreach (var userRole in userRoles)
-                filter = filter.Or(x => x.Id == userRole.RoleId);
+            //So filter stays false and dont get anything
+            if (userRoles.Count > 0)
+            {
+                foreach (var userRole in userRoles)
+                    filter = filter.Or(x => x.Id == userRole.RoleId);
 
-            filter = filter.And(x => x.Name.Contains("Specific_WorkPlace"));
-
+                filter = filter.And(x => x.Name.Contains("Specific_WorkPlace"));
+            }
             return SecurityDbContext.Roles
                 .Where(filter)
                 .ToList();
