@@ -10,10 +10,7 @@ namespace DataAccess.Models.Entity
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Είδος άδειας")]
         public string Name { get; set; }
-        //public string Name {
-        //    get { return Name + " - Άδεια"; }
-        //    set { Name= value; }
-        //}
+       
 
         [Display(Name = "Περιγραφή")]
         public string Description { get; set; }

@@ -93,6 +93,8 @@ namespace WebApplication.Controllers
                         customClaims.Add(new Claim(ClaimTypes.Name as string, user.FirstName));
                         customClaims.Add(new Claim(ClaimTypes.Email as string, user.Email));
                         customClaims.Add(new Claim("UserID", user.Id));
+                        customClaims.Add(new Claim("FirstName", user.FirstName));
+                        customClaims.Add(new Claim("LastName", user.LastName));
 
                         var claimsIdentity = new ClaimsIdentity(customClaims,
                             CookieAuthenticationDefaults.AuthenticationScheme);

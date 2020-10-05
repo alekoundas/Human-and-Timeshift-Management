@@ -243,7 +243,6 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<WorkPlace>> Datatable([FromBody] Datatable datatable)
         {
-            var total = await _baseDataWork.WorkPlaces.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
@@ -252,7 +251,7 @@ namespace WebApplication.Api
             var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(await GetUserRoleFiltersAsync());
+            filter = filter.And(GetSearchFilter(datatable));
 
             var workPlaces = new List<WorkPlace>();
 
@@ -315,6 +314,7 @@ namespace WebApplication.Api
 
             var mapedData = await MapResults(workPlaces, datatable);
 
+            var total = _baseDataWork.WorkPlaces.Where(filter).Count();
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
@@ -453,6 +453,30 @@ namespace WebApplication.Api
             //return x => x.OrderBy(x=>x. + " " + orderDirection.ToUpper());
             else
                 return null;
+        }
+
+        private Expression<Func<WorkPlace, bool>> GetSearchFilter(Datatable datatable)
+        {
+            var filter = PredicateBuilder.New<WorkPlace>();
+            if (datatable.Search.Value != null)
+            {
+                foreach (var column in datatable.Columns)
+                {
+                    if (column.Data == "Title")
+                        filter = filter.Or(x => x.Title.Contains(datatable.Search.Value));
+                    if (column.Data == "Description")
+                        filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
+                    if (column.Data == "ΙdentifyingΝame")
+                        filter = filter.Or(x => x.Customer.ΙdentifyingΝame.Contains(datatable.Search.Value));
+                    if (column.Data == "Customer.company.title")
+                        filter = filter.Or(x => x.Customer.Company.Title.Contains(datatable.Search.Value));
+                }
+
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
         }
 
         private bool WorkPlaceExists(int id)

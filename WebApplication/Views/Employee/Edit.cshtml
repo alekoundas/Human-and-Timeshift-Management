@@ -179,7 +179,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Τίτλος</th>
@@ -241,8 +241,11 @@
         $('#WorkPlacesDatatable').DataTable({
             serverSide: true,
             responsive: true,
-            colReorder: true,
             processing: true,
+             iDisplayLength: 150,
+            colReorder: {
+                fixedColumnsLeft: 1
+            },
             dom: 'Bfrtlp',
             buttons: ['excel', 'pdf', 'print'],
             language: {

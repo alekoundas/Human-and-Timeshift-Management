@@ -16,7 +16,7 @@
 
             <div class="box-body table-responsive">
 
-                <table id="EmployeesCurrentDayDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="EmployeesCurrentDayDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Επιλογή</th>
@@ -219,7 +219,11 @@
             $('#EmployeesCurrentDayDatatable').DataTable({
                 serverSide: true,
                 responsive: true,
-                colReorder: true,
+                processing: true,
+                iDisplayLength: 150,
+                colReorder: {
+                    fixedColumnsLeft: 3
+                },
                 dom: 'frtlp',
                 ajax: {
                     url: '/api/employees/datatable',

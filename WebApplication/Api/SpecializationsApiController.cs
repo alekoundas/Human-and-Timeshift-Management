@@ -16,6 +16,7 @@ using DataAccess.Models.Select2;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
 using LinqKit;
+using System.Linq.Expressions;
 
 namespace WebApplication.Api
 {
@@ -130,11 +131,13 @@ namespace WebApplication.Api
         public async Task<ActionResult<Specialization>> Datatable([FromBody] Datatable datatable)
         {
 
-            var total = await _baseDataWork.Specializations.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
+
+            var filter = PredicateBuilder.New<Specialization>();
+            filter = filter.And(GetSearchFilter(datatable));
 
             var includes = new List<Func<IQueryable<Specialization>, IIncludableQueryable<Specialization, object>>>();
             var specializations = new List<Specialization>();
@@ -142,11 +145,12 @@ namespace WebApplication.Api
             if (datatable.Predicate == "SpecializationIndex")
             {
                 specializations = await _baseDataWork.Specializations
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
 
             var mapedData = MapResults(specializations, datatable);
 
+            var total = await _baseDataWork.Specializations.CountAllAsyncFiltered(filter);
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
@@ -179,6 +183,25 @@ namespace WebApplication.Api
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             else
                 return null;
+        }
+        private Expression<Func<Specialization, bool>> GetSearchFilter(Datatable datatable)
+        {
+            var filter = PredicateBuilder.New<Specialization>();
+            if (datatable.Search.Value != null)
+            {
+                foreach (var column in datatable.Columns)
+                {
+                    if (column.Data == "Name")
+                        filter = filter.Or(x => x.Name.Contains(datatable.Search.Value));
+                    if (column.Data == "Description")
+                        filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
+                }
+
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
         }
 
         private bool SpecializationExists(int id)

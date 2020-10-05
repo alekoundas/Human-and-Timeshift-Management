@@ -202,8 +202,8 @@
         }).on('change', () =>
             $('#RealWorkHoursSpecificDatesDatatable').DataTable().ajax.reload());
 
-        const InitiateCalentim = num=>
-            $('#CalnentimNum_'+num).calentim({
+        const InitiateCalentim = num =>
+            $('#CalnentimNum_' + num).calentim({
                 showTimePickers: false,
                 startOnMonday: true,
                 showFooter: false,
@@ -228,11 +228,14 @@
             });
 
         var CreateDataTable = () =>
-        $('#RealWorkHoursSpecificDatesDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            colReorder: true,
-            processing: true,
+            $('#RealWorkHoursSpecificDatesDatatable').DataTable({
+                serverSide: true,
+                responsive: true,
+                processing: true,
+                iDisplayLength: 150,
+                colReorder: {
+                    fixedColumnsLeft: 2
+                },
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 dom: 'Bfrtlp',
                 ajax: {
@@ -256,43 +259,43 @@
 
 
         const AppendNewDataTableHTML = () =>
-            document.getElementById('AppendHere_Datatable').insertAdjacentHTML('beforeend',''+
-                '<div class="box-body table-responsive" id="DatatableDiv">'+
-                    '<table id="RealWorkHoursSpecificDatesDatatable" class="table table-bordered table-hover table-responsive">'+
-                        '<thead>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                '<th>ΑΦΜ</th>'+
-                                GetDaysColumns()+
-                            '</tr>'+
-                        '</thead>'+
-                        '<tfoot>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                '<th>ΑΦΜ</th>'+
-                                GetDaysColumns()+
-                            '</tr>'+
-                        '</tfoot>'+
-                    '</table>'+
-                '</div>'+
+            document.getElementById('AppendHere_Datatable').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive" id="DatatableDiv">' +
+                '<table id="RealWorkHoursSpecificDatesDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                '<th>ΑΦΜ</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                '<th>ΑΦΜ</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
                 '');
 
-           const AppendNewCalentimHTML = num =>
-               document.getElementById('CalentimDiv').insertAdjacentHTML('beforeend',''+
-                '<div  id="CalnentimDivNum_'+num+'">'+
-                    '<div style="width:70%;float:left">'+
-                        '<div class="input-group">'+
-                           '<input  id="CalnentimNum_' + num +'" class="form-control CalentimInputs" />'+
-                        '</div>'+
-                    '</div>'+
-                    '<div style="width:30%; float:left">'+
-                   '<button type="button"  id="DeleteCalentimButtonNum_' + num + '" class="btn btn-danger DeleteCalentimButton"><i class="fa fa-trash DeleteCalentimButton" id="DeleteCalentimINum_' + num +'"></i></button>'+
-                    '</div>'+
-                '</div>'+
+        const AppendNewCalentimHTML = num =>
+            document.getElementById('CalentimDiv').insertAdjacentHTML('beforeend', '' +
+                '<div  id="CalnentimDivNum_' + num + '">' +
+                '<div style="width:70%;float:left">' +
+                '<div class="input-group">' +
+                '<input  id="CalnentimNum_' + num + '" class="form-control CalentimInputs" />' +
+                '</div>' +
+                '</div>' +
+                '<div style="width:30%; float:left">' +
+                '<button type="button"  id="DeleteCalentimButtonNum_' + num + '" class="btn btn-danger DeleteCalentimButton"><i class="fa fa-trash DeleteCalentimButton" id="DeleteCalentimINum_' + num + '"></i></button>' +
+                '</div>' +
+                '</div>' +
                 '');
 
 

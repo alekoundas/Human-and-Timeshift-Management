@@ -79,7 +79,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="WorkPlaceEmployeesDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="WorkPlaceEmployeesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Όνομα</th>
@@ -113,13 +113,16 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-    <script>
+<script>
 
              $('#WorkPlaceEmployeesDatatable').DataTable({
                  serverSide: true,
                  responsive: true,
-                 colReorder: true,
                  processing: true,
+             iDisplayLength: 150,
+                 colReorder: {
+                     fixedColumnsLeft: 2
+                 },
                  dom: 'Bfrtlp',
                  buttons: ['excel', 'pdf', 'print'],
                  language: {
@@ -236,7 +239,7 @@
                     });
                 },
             });
-    </script>
+</script>
 
     <script>
         $('#WorkPlaceEmployeesDatatable').on('change', '.ToggleSliders', (element) => {

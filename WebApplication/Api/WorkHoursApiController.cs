@@ -11,6 +11,7 @@ using DataAccess.ViewModels.View;
 using Bussiness;
 using DataAccess.ViewModels.WorkHours;
 using LinqKit;
+using DataAccess.ViewModels.RealWorkHours;
 
 namespace WebApplication.Api
 {
@@ -201,7 +202,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOverlapRange")]
-        public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<HasOverlapRangeWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
         {
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
@@ -215,6 +216,38 @@ namespace WebApplication.Api
                             employeeId = id,
                             isSuccessful = 0,
                             value = "Ο χρήστης αυτός έχει ήδη δηλωθεί για αυτές τις ώρες"
+                        });
+                    else
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 1,
+                            value = ""
+
+                        });
+
+                });
+            }
+            return Ok(response);
+
+        }
+
+        // POST: api/workhours/hasoverlap
+        [HttpPost("HasOvertime")]
+        public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<ApiWorkHoursHasOvertimeRange> workHours)
+        {
+            List<object> response = new List<object>();
+            foreach (var workHour in workHours)
+            {
+
+                workHour.EmployeeIds.ForEach(id =>
+                {
+                    if (_baseDataWork.WorkHours.IsDateOvertime(workHour, id))
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 0,
+                            value = "Ο υπάππηλος έχει ήδη μια βάρδια με λιγότερο απο 8 ώρες διαφορά"
                         });
                     else
                         response.Add(new

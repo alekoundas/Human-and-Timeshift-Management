@@ -21,7 +21,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="SpecializationDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="SpecializationDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Όνομα</th>
@@ -54,8 +54,9 @@
             $('#SpecializationDatatable').DataTable({
                 serverSide: true,
                 responsive: true,
-                colReorder: true,
                 processing: true,
+                colReorder: false,
+                iDisplayLength: 150,
                 dom: 'Bfrtlp',
                 buttons: ['copy', 'excel', 'print'],
                 language: {

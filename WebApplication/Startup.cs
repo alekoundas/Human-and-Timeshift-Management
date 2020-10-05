@@ -41,7 +41,11 @@ namespace WebApplication
             services.AddDbContext<SecurityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options=> options.ClaimsIdentity.UserIdClaimType = "UserID")
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options => {
+                options.ClaimsIdentity.UserIdClaimType = "UserID";
+                //options.ClaimsIdentity.RoleClaimType= "FirstName";
+                //options.ClaimsIdentity.RoleClaimType= "LastName";
+            })
                 .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()

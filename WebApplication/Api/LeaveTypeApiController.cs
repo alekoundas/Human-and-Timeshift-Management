@@ -15,6 +15,7 @@ using System.Linq.Dynamic.Core;
 using Bussiness;
 using Microsoft.EntityFrameworkCore.Query;
 using LinqKit;
+using System.Linq.Expressions;
 
 namespace WebApplication.Api
 {
@@ -130,11 +131,12 @@ namespace WebApplication.Api
         public async Task<ActionResult<LeaveType>> Datatable([FromBody] Datatable datatable)
         {
 
-            var total = await _baseDataWork.Specializations.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
+            var filter = PredicateBuilder.New<LeaveType>();
+            filter = filter.And(GetSearchFilter(datatable));
 
             var includes = new List<Func<IQueryable<LeaveType>, IIncludableQueryable<LeaveType, object>>>();
             var leaveTypes = new List<LeaveType>();
@@ -142,11 +144,12 @@ namespace WebApplication.Api
             if (datatable.Predicate == "LeaveTypeIndex")
             {
                 leaveTypes = await _baseDataWork.LeaveTypes
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
 
             var mapedData = MapResults(leaveTypes, datatable);
 
+            var total = await _baseDataWork.LeaveTypes.CountAllAsyncFiltered(filter);
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
@@ -179,7 +182,25 @@ namespace WebApplication.Api
             else
                 return null;
         }
+        private Expression<Func<LeaveType, bool>> GetSearchFilter(Datatable datatable)
+        {
+            var filter = PredicateBuilder.New<LeaveType>();
+            if (datatable.Search.Value != null)
+            {
+                foreach (var column in datatable.Columns)
+                {
+                    if (column.Data == "Name")
+                        filter = filter.Or(x => x.Name.Contains(datatable.Search.Value));
+                    if (column.Data == "Description")
+                        filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
+                }
 
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
+        }
 
         private bool LeaveTypeExists(int id)
         {

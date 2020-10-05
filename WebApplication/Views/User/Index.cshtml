@@ -14,11 +14,11 @@
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
-                    @*@Html.ButtonCreateNew("ApplicationUser")*@
+                    @Html.ButtonCreateNew("User")
                 </div>
             </div>
             <hr />
-            <table id="UsersDatatable" class="table table-bordered table-hover table-responsive">
+            <table id="UsersDatatable" class="table table-bordered table-hover table-responsive stripe">
                 <thead>
                     <tr>
                         <th>UserName</th>
@@ -44,64 +44,65 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-           $('#UsersDatatable').DataTable({
-               serverSide: true,
-               responsive: true,
-               colReorder: true,
-               processing: true,
-               dom: 'Bfrtlp',
-               buttons: ['excel', 'pdf', 'print'],
-               language: {
-                   processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-               },
-                "ajax": {
-                    url: '/api/users/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        data.predicate = "UserIndex";
-                        return JSON.stringify(data);
+        $('#UsersDatatable').DataTable({
+            serverSide: true,
+            responsive: true,
+            processing: true,
+            colReorder: false,
+            iDisplayLength: 150,
+            dom: 'Bfrtlp',
+            buttons: ['excel', 'pdf', 'print'],
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+            },
+            "ajax": {
+                url: '/api/users/datatable',
+                type: 'POST',
+                contentType: "application/json",
+                data: (data, type, row, meta) => {
+                    data.predicate = "UserIndex";
+                    return JSON.stringify(data);
+                }
+            },
+            order: [[0, 'desc']],
+            columns: [
+                {
+                    data: "UserName",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.UserName != null)
+                            return data.UserName;
+                        else
+                            return "";
+                    }
+
+                },
+                {
+                    data: "Email",
+                    searchable: true,
+                    orderable: true,
+                    render: (a, b, data, d) => {
+                        if (data.Email != null)
+
+                            return data.Email;
+                        else
+                            return "";
                     }
                 },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "UserName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.UserName != null)
-                                return data.UserName;
-                            else
-                                return "";
-                        }
-
-                    },
-                    {
-                        data: "Email",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.Email != null)
-
-                                return data.Email;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Buttons",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
+                {
+                    data: "Buttons",
+                    searchable: false,
+                    orderable: false,
+                    render: (a, b, data, d) => {
+                        if (data.Buttons != null)
+                            return data.Buttons;
+                        else
+                            return "";
                     }
-                ]
-            });
+                }
+            ]
+        });
     </script>
 }
 

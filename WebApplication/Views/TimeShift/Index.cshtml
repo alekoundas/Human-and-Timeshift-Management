@@ -18,7 +18,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="WorkPlaceDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="WorkPlaceDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
 
@@ -71,8 +71,11 @@
         var table = $('#WorkPlaceDatatable').DataTable({
             serverSide: true,
             responsive: true,
-            colReorder: true,
             processing: true,
+            iDisplayLength: 150,
+            colReorder: {
+                fixedColumnsLeft: 2
+            },
             dom: 'Bfrtlp',
             language: {
                 processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
@@ -92,7 +95,7 @@
                     className: 'details-control',
                     orderable: false,
                     data: null,
-                    render: (a, b, data, d) =>  '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>'
+                    render: (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>'
                 },
                 {
                     data: "Title",
@@ -193,6 +196,7 @@
                 colReorder: true,
                 processing: true,
                 dom: 'Bfrtlp',
+                iDisplayLength: 150,
                 language: {
                     processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
                 },

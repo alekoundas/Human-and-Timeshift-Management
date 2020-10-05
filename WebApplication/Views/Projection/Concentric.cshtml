@@ -122,7 +122,7 @@
             on: 'HH:mm',
             off: '%',
             onstyle: 'primary',
-            offstyle:'primary'
+            offstyle: 'primary'
         });
 
         $('.filterSlider').change(e =>
@@ -150,8 +150,8 @@
             startOnMonday: true,
             showFooter: false,
             calendarCount: 1,
-            startDate:  Date.now(),
-            endDate:  Date.now(),
+            startDate: Date.now(),
+            endDate: Date.now(),
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
@@ -173,12 +173,15 @@
 
         var CreateDataTable = () =>
             $('#EmployeesWorkHourConcentricDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            colReorder: true,
-            processing: true,
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-              dom: 'Bfrtlp',
+                serverSide: true,
+                responsive: true,
+                processing: true,
+                iDisplayLength: 150,
+                colReorder: {
+                    fixedColumnsLeft: 2
+                },
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                dom: 'Bfrtlp',
                 ajax: {
                     url: '/api/employees/datatable',
                     type: 'POST',
@@ -254,35 +257,35 @@
         const DeleteDataTableHTML = () =>
             document.getElementById('EmployeesWorkHourConcentricDatatable').remove();
 
-        const AppendNewDataTableHTML = () => 
-            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
-                '<div class="box-body table-responsive">'+
-                    '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive">'+
-                        '<thead>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                '<th>Σύνολο ώρες</th>'+
-                                '<th>Σύνολο ώρες Μέρα</th>'+
-                                '<th>Σύνολο ώρες Νύχτα</th>'+
-                            '</tr>'+
-                        '</thead>'+
-                        '<tfoot>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                '<th>Σύνολο ώρες</th>'+
-                                '<th>Σύνολο ώρες Μέρα</th>'+
-                                '<th>Σύνολο ώρες Νύχτα</th>'+
-                            '</tr>'+
-                        '</tfoot>'+
-                    '</table>'+
-                '</div>'+
+        const AppendNewDataTableHTML = () =>
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive">' +
+                '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                '<th>Σύνολο ώρες</th>' +
+                '<th>Σύνολο ώρες Μέρα</th>' +
+                '<th>Σύνολο ώρες Νύχτα</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                '<th>Σύνολο ώρες</th>' +
+                '<th>Σύνολο ώρες Μέρα</th>' +
+                '<th>Σύνολο ώρες Νύχτα</th>' +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
                 '');
 
-    
+
 
         $(document).ready(AppendNewDataTableHTML());
         $(document).ready(CreateDataTable());

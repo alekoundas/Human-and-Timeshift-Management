@@ -22,7 +22,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="CustomersDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="CustomersDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Επωνυμία</th>
@@ -54,8 +54,11 @@
             $('#CustomersDatatable').DataTable({
                 serverSide: true,
                 responsive: true,
-                colReorder: true,
                 processing: true,
+                iDisplayLength: 150,
+                colReorder: {
+                    fixedColumnsLeft: 1
+                },
                 dom: 'Bfrtlp',
                 buttons: ['excel', 'print'],
                 language: {

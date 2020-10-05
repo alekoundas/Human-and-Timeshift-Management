@@ -63,7 +63,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Επιλογή</th>
@@ -1539,7 +1539,7 @@
         //Month Filter
         $('#MonthFilter').MonthPicker({
             Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
-            OnAfterChooseMonth:  () =>{
+            OnAfterChooseMonth: () => {
                 var month = $(this).val().split('/')[0];
                 var year = $(this).val().split('/')[1];
                 document.getElementById('Year').value = year
@@ -1684,6 +1684,9 @@
                         })
                         .then(() => ButtonLoadingToggle("SaveWorkHours"));
                 },
+                onbeforeshow: calentim => {
+                    calentim.setDisplayDate(moment(new Date(setEndDate)));
+                },
                 onaftershow: () =>
                     //Fix Calentim width
                     [...document.getElementsByClassName('calentim-input')]
@@ -1705,6 +1708,7 @@
             responsive: true,
             colReorder: true,
             processing: true,
+            iDisplayLength: 150,
             dom: 'Bfrtlp',
             //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             buttons: [

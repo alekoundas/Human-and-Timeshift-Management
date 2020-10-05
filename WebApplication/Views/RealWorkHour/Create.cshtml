@@ -28,7 +28,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label asp-for="TimeShiftId" class="control-label"></label>
+                                <label class="control-label">Πόστο</label>
                                 <div class="input-group" style="width:100%">
                                     <select class="TimeShift_Select2" asp-for="TimeShiftId" style="width:70%"></select>
                                     <span asp-validation-for="TimeShiftId" class="text-danger"></span>
@@ -341,6 +341,7 @@
             ajax: {
                 url: '/api/timeshifts/select2',
                 data: (params) => ({
+                    predicate:"RealWorkHourCreate",
                     search: params.term,
                     page: params.page || 1
                 })

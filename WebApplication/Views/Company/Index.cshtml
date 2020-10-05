@@ -23,7 +23,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="CompaniesDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="CompaniesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Τίτλος</th>
@@ -56,8 +56,11 @@
             $('#CompaniesDatatable').DataTable({
                 serverSide: true,
                 responsive: true,
-                colReorder: true,
                 processing: true,
+                iDisplayLength: 150,
+                colReorder: {
+                    fixedColumnsLeft: 2
+                },
                 dom: 'Bfrtlp',
                 buttons: ['excel', 'pdf', 'print'],
                 language: {

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
 using LinqKit;
+using System.Linq.Expressions;
 
 namespace WebApplication.Controllers
 {
@@ -45,11 +46,8 @@ namespace WebApplication.Controllers
         public async Task<ActionResult<Company>> GetCompany(int id)
         {
             var company = await _context.Companies.FindAsync(id);
-
             if (company == null)
-            {
                 return NotFound();
-            }
 
             return company;
         }
@@ -59,9 +57,7 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> PutCompany(int id, Company company)
         {
             if (id != company.Id)
-            {
                 return BadRequest();
-            }
 
             _context.Entry(company).State = EntityState.Modified;
 
@@ -72,13 +68,9 @@ namespace WebApplication.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!CompanyExists(id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
 
             return NoContent();
@@ -101,9 +93,7 @@ namespace WebApplication.Controllers
         {
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
-            {
                 return NotFound();
-            }
 
             _context.Companies.Remove(company);
             await _context.SaveChangesAsync();
@@ -161,28 +151,32 @@ namespace WebApplication.Controllers
         [HttpPost("Datatable")]
         public async Task<ActionResult<Company>> Datatable([FromBody] Datatable datatable)
         {
-            var total = await _baseDataWork.Companies.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
-
+            var filter = PredicateBuilder.New<Company>();
+            filter = filter.And(GetSearchFilter(datatable));
             var includes = new List<Func<IQueryable<Company>, IIncludableQueryable<Company, object>>>();
+
 
             var companies = new List<Company>();
             if (datatable.Predicate == "CompanyIndex")
             {
-                companies = await _baseDataWork.Companies.GetWithPagging(SetOrderBy(columnName, orderDirection), pageSize, pageIndex);
+                companies = await _baseDataWork.Companies.GetPaggingWithFilter(
+                    SetOrderBy(columnName, orderDirection), filter, includes,
+                        pageSize, pageIndex);
 
             }
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = MapResults(companies, datatable);
+            var total = await _baseDataWork.Companies.CountAllAsyncFiltered(filter);
+            var mapedData = await MapResults(companies, datatable);
 
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+            return Ok(dataTableHelper.CreateResponse(datatable,  mapedData, total));
         }
 
-        private IEnumerable<ExpandoObject> MapResults(IEnumerable<Company> results, Datatable datatable)
+        protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Company> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Company>(_securityDatawork);
@@ -209,6 +203,40 @@ namespace WebApplication.Controllers
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             else
                 return null;
+        }
+
+        private Expression<Func<Company, bool>> GetSearchFilterOrTrue(string searchString)
+        {
+            var filter = PredicateBuilder.New<Company>();
+            if ( searchString != null)
+            {
+                filter = filter.Or(x => x.Title.Contains(searchString));
+                filter = filter.Or(x => x.Afm.Contains(searchString));
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
+        }
+
+        private Expression<Func<Company, bool>> GetSearchFilter(Datatable datatable)
+        {
+            var filter = PredicateBuilder.New<Company>();
+            if (datatable.Search.Value != null)
+            {
+                foreach (var column in datatable.Columns)
+                {
+                    if (column.Data == "Title")
+                        filter = filter.Or(x => x.Title.Contains(datatable.Search.Value));
+                    if (column.Data == "Afm")
+                        filter = filter.Or(x => x.Afm.Contains(datatable.Search.Value));
+                }
+
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
         }
 
         private bool CompanyExists(int id)

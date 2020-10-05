@@ -59,7 +59,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="rolesDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="rolesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -336,7 +336,13 @@
 
 
              $('#rolesDatatable').DataTable({
-                serverSide: true,
+                 serverSide: true,
+                 responsive: true,
+                 processing: true,
+             iDisplayLength: 150,
+                 colReorder: {
+                     fixedColumnsLeft: 1
+                 },
                 dom: 'frtlp',
                 ajax: {
                     url: '/api/role/datatable',

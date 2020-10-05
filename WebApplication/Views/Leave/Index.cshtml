@@ -20,7 +20,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="LeaveDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="LeaveDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Υπάλληλος</th>
@@ -54,8 +54,11 @@
         $('#LeaveDatatable').DataTable({
             serverSide: true,
             responsive: true,
-            colReorder: true,
             processing: true,
+            iDisplayLength: 150,
+            colReorder: {
+                fixedColumnsLeft: 1
+            },
             dom: 'Bfrtlp',
             buttons: ['excel', 'pdf', 'print'],
             language: {
@@ -79,7 +82,7 @@
                     className: "dt-nowrap",
                     render: (a, b, data, d) => {
                         //console.log(data);
-                        if (data.EmployeeFullName!= null)
+                        if (data.EmployeeFullName != null)
                             return data.EmployeeFullName;
                         else
                             return "";

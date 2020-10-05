@@ -293,9 +293,10 @@ namespace WebApplication.Api
 
             return Ok(dataToSaveRange);
         }
+
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOverlapRange")]
-        public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<HasOverlapRangeWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
         {
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
@@ -316,6 +317,38 @@ namespace WebApplication.Api
                             employeeId = id,
                             isSuccessful = 1,
                             value = ""
+
+                        });
+
+                });
+            }
+            return Ok(response);
+
+        }
+        
+        // POST: api/workhours/hasoverlap
+        [HttpPost("HasOvertime")]
+        public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<ApiRealWorkHoursHasOvertimeRange> workHours)
+        {
+            List<object> response = new List<object>();
+            foreach (var workHour in workHours)
+            {
+
+                workHour.EmployeeIds.ForEach(id =>
+                {
+                    if (_baseDataWork.RealWorkHours.IsDateOvertime(workHour, id))
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 0,
+                            value = "sdfsdfsdfsdsfsdsdfsdfsdfsdfς"
+                        });
+                    else
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 1,
+                            value = "zaaaaaaaaaaaaaaaaaaaa"
 
                         });
 

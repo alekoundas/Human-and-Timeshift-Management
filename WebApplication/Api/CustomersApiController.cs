@@ -15,6 +15,7 @@ using DataAccess.Models.Datatable;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
 using LinqKit;
+using System.Linq.Expressions;
 
 namespace WebApplication.Api
 {
@@ -131,35 +132,32 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<Customer>> Datatable([FromBody] Datatable datatable)
         {
-            var total = await _baseDataWork.Customers.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
+            var filter = PredicateBuilder.New<Customer>();
+            filter = filter.And(GetSearchFilter(datatable));
 
             var includes = new List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>();
             var customers = new List<Customer>();
 
-            if (string.IsNullOrWhiteSpace(datatable.Predicate))
-            {
-
-                customers = await _baseDataWork.Customers.GetPaggingWithFilter(null, null, null, pageSize, pageIndex);
-            }
-
             if (datatable.Predicate == "CustomerIndex")
             {
                 customers = await _baseDataWork.Customers
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+                        filter, includes, pageSize, pageIndex);
             }
 
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = MapResults(customers);
+            var mapedData = await MapResults(customers,datatable);
 
+            var total =await _baseDataWork.Customers.CountAllAsyncFiltered(filter);
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Customer> results)
+        protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Customer> results, Datatable datatable)
         {
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Customer>(_securityDatawork);
@@ -168,8 +166,12 @@ namespace WebApplication.Api
             {
                 var expandoObj = expandoObject.GetCopyFrom<Customer>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
-                dictionary.Add("Buttons", dataTableHelper.GetButtons("Customer", "Customers", result.Id.ToString()));
-                returnObjects.Add(expandoObj);
+
+                if (datatable.Predicate == "CustomerIndex")
+                {
+                    dictionary.Add("Buttons", dataTableHelper.GetButtons("Customer", "Customers", result.Id.ToString()));
+                    returnObjects.Add(expandoObj);
+                }
             }
 
             return returnObjects;
@@ -181,6 +183,34 @@ namespace WebApplication.Api
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             else
                 return null;
+        }
+
+        private Expression<Func<Customer, bool>> GetSearchFilter(Datatable datatable)
+        {
+            var filter = PredicateBuilder.New<Customer>();
+            if (datatable.Search.Value != null)
+            {
+                foreach (var column in datatable.Columns)
+                {
+                    if (column.Data == "ΙdentifyingΝame")
+                        filter = filter.Or(x => x.ΙdentifyingΝame.Contains(datatable.Search.Value));
+                    if (column.Data == "Profession")
+                        filter = filter.Or(x => x.Profession.Contains(datatable.Search.Value));
+                    if (column.Data == "Address")
+                        filter = filter.Or(x => x.Address.Contains(datatable.Search.Value));
+                    if (column.Data == "PostalCode")
+                        filter = filter.Or(x => x.PostalCode.Contains(datatable.Search.Value));
+                    if (column.Data == "DOY")
+                        filter = filter.Or(x => x.DOY.Contains(datatable.Search.Value));
+                    if (column.Data == "AFM")
+                        filter = filter.Or(x => x.AFM.Contains(datatable.Search.Value));
+                }
+
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
         }
 
         private bool CustomerExists(int id)

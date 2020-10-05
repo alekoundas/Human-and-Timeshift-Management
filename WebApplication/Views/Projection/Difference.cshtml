@@ -40,11 +40,11 @@
                         <div class="form-group">
                             <label class="control-label">Ανα χρονόγραμμα</label>&nbsp
                             <input type="checkbox" class="filterSlider" id="SliderWorkHour">
-                        </div>  
+                        </div>
                     </div>
                     <div style="width:100%; float:left;">
                         <label class="control-label">Ανα πραγματική</label>&nbsp
-                        <input type="checkbox"class="filterSlider" id="SliderRealWorkHour">
+                        <input type="checkbox" class="filterSlider" id="SliderRealWorkHour">
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
             </div>
             <hr />
             <div class="box-body table-responsive">
-                <table id="EmployeesWorkHourDifferenceDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="EmployeesWorkHourDifferenceDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th></th>
@@ -149,7 +149,7 @@
             off: ''
         });
 
-        
+
 
         $('.filterSlider').change(e => $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
         //$('#SliderRealWorkHour').change(() => $('#SliderWorkHour').bootstrapToggle('off'));
@@ -175,9 +175,12 @@
         var table = $('#EmployeesWorkHourDifferenceDatatable').DataTable({
             serverSide: true,
             responsive: true,
-            colReorder: true,
             processing: true,
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            iDisplayLength: 150,
+            colReorder: {
+                fixedColumnsLeft: 2
+            },
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             dom: 'Bfrtlp',
             ajax: {
                 url: '/api/employees/datatable',

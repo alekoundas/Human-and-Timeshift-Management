@@ -7,6 +7,7 @@ using Bussiness.Repository.Base.Interface;
 using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
+using DataAccess.ViewModels.RealWorkHours;
 using DataAccess.ViewModels.WorkHours;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +57,7 @@ namespace Bussiness.Repository.Base
                   (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn))
                     .Any(y => y.Employee.Id == employeeId);
         }
-        public bool IsDateOverlaping(HasOverlapRangeWorkHoursApiViewModel workHour, int employeeId)
+        public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId)
         {
             if (workHour.IsEdit)
                 return Context.WorkHours.Where(x =>
@@ -74,13 +75,33 @@ namespace Bussiness.Repository.Base
                   .Any(y => y.Employee.Id == employeeId);
         }
 
+        public bool IsDateOvertime(ApiWorkHoursHasOvertimeRange workHour, int employeeId)
+        {
+
+            var filter = PredicateBuilder.New<WorkHour>();
+            var filterOr = PredicateBuilder.New<WorkHour>();
+            workHour.StartOn = workHour.StartOn.AddHours(-8);
+            workHour.EndOn = workHour.StartOn.AddHours(8);
+
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn);
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
+            filterOr = filterOr.Or(x => workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn);
+
+            //if (!workHour.IsEdit)
+                return Context.WorkHours.Where(filterOr).Any();
+            //else
+            //    filter = filter.And(x => x.Employee.Id == employeeId);
+            //return Context.WorkHours
+            //        .Where(filterOr)
+            //        .Any(filter);
+        }
+
         public bool HasExactDate(WorkHoursApiViewModel workHour)
         {
             return Context.WorkHours.Any(x =>
                   x.TimeShiftId == workHour.TimeShiftId &&
                   x.StartOn == workHour.StartOn && workHour.EndOn == x.EndOn);
         }
-      
 
     }
 }

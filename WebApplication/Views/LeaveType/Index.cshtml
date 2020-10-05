@@ -21,7 +21,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="LeaveTypeDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="LeaveTypeDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Όνομα</th>
@@ -49,8 +49,9 @@
             $('#LeaveTypeDatatable').DataTable({
                 serverSide: true,
                 responsive: true,
-                colReorder: true,
                 processing: true,
+                colReorder: false,
+                iDisplayLength: 150,
                 dom: 'Bfrtlp',
                 buttons: ['excel', 'print'],
                 language: {

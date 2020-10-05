@@ -78,7 +78,7 @@ namespace WebApplication.Api
             var employees = (List<Employee>)await _baseDataWork.Employees
                      .GetPaggingWithFilter(null, filter, null, 1);
 
-            return Ok(select2Helper.CreateEmployeesResponse(employees,false));
+            return Ok(select2Helper.CreateEmployeesResponse(employees, false));
         }
 
 
@@ -187,13 +187,12 @@ namespace WebApplication.Api
         public async Task<ActionResult<Employee>> Datatable([FromBody] Datatable datatable)
         {
 
-            var total = await _baseDataWork.Employees.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
             var filter = PredicateBuilder.New<Employee>();
-            filter = filter.And(x => true);
+            filter = filter.And(GetSearchFilter(datatable));
 
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.Specialization));
@@ -202,13 +201,13 @@ namespace WebApplication.Api
 
             if (string.IsNullOrWhiteSpace(datatable.Predicate))
                 employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
 
             if (datatable.Predicate == "EmployeeIndex")
             {
                 includes.Add(x => x.Include(y => y.Company));
                 employees = await _baseDataWork.Employees
-                      .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+                      .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
             if (datatable.Predicate == "CompanyEdit")
             {
@@ -252,7 +251,7 @@ namespace WebApplication.Api
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
-          
+
             if (datatable.Predicate == "TimeShiftEdit")
             {
                 var timeShift = await _baseDataWork.TimeShifts
@@ -362,10 +361,13 @@ namespace WebApplication.Api
                      .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
                      filter, includes, pageSize, pageIndex);
             }
-            var mapedData = MapResults(employees, datatable);
+            var mapedData =await MapResults(employees, datatable);
+
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            return Ok(dataTableHelper.CreateResponse(datatable, await mapedData, total));
+            var total = await _baseDataWork.Employees.CountAllAsyncFiltered(filter);
+
+            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
         protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Employee> results, Datatable datatable)
@@ -378,7 +380,7 @@ namespace WebApplication.Api
                 var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                dictionary.Add("ScpecializationName", employee.Specialization?.Name);
+                dictionary.Add("SpecializationName", employee.Specialization?.Name);
 
                 if (datatable.Predicate == "EmployeeIndex")
                 {
@@ -462,7 +464,7 @@ namespace WebApplication.Api
 
                     returnObjects.Add(expandoObj);
                 }
-            
+
                 else if (datatable.Predicate == "TimeShiftEdit")
                 {
                     var timeshift = await _baseDataWork.TimeShifts
@@ -471,7 +473,7 @@ namespace WebApplication.Api
                     for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
                         dictionary.Add("Day" + i,
                             await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(
-                                _baseDataWork,i, datatable, employee.Id));
+                                _baseDataWork, i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper
                         .GetEmployeeCheckbox(datatable, employee.Id));
@@ -510,9 +512,9 @@ namespace WebApplication.Api
                         compareYear = (int)datatable.SelectedYear;
                     }
                     for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
-                            dictionary.Add("Day" + i,
-                                await dataTableHelper.GetTimeShiftEditCellBodyRealWorkHoursAsync(_baseDataWork,
-                                    i, datatable, employee.Id));
+                        dictionary.Add("Day" + i,
+                            await dataTableHelper.GetTimeShiftEditCellBodyRealWorkHoursAsync(_baseDataWork,
+                                i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper
                         .GetEmployeeCheckbox(datatable, employee.Id));
@@ -537,6 +539,8 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "ProjectionDifference")
                 {
+
+                    //Βy RealWorkHour
                     if (datatable.FilterByRealWorkHour == true ||
                         (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
                         if (employee.RealWorkHours.Count() > 0)
@@ -544,12 +548,12 @@ namespace WebApplication.Api
                             {
                                 expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
                                 dictionary = (IDictionary<string, object>)expandoObj;
-                                dictionary.Add("ScpecializationName", employee.Specialization?.Name);
                                 dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
                                 returnObjects.Add(expandoObj);
 
                             }
 
+                    //Βy WorkHour
                     if (datatable.FilterByWorkHour == true ||
                         (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
                         if (employee.WorkHours.Count() > 0)
@@ -557,7 +561,6 @@ namespace WebApplication.Api
                             {
                                 expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
                                 dictionary = (IDictionary<string, object>)expandoObj;
-                                dictionary.Add("ScpecializationName", employee.Specialization?.Name);
                                 dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
                                 returnObjects.Add(expandoObj);
                             }
@@ -587,44 +590,6 @@ namespace WebApplication.Api
                         dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
                     }
 
-                    //if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
-                    //{
-                    //    var daySeconds = await _baseDataWork.RealWorkHours
-                    //             .GetEmployeeTotalSecondsForDay(employee.Id, datatable.StartOn);
-
-                    //    var nightSeconds = await _baseDataWork.RealWorkHours
-                    //        .GetEmployeeTotalSecondsForNight(employee.Id, datatable.StartOn);
-                    //    if (datatable.ShowHoursInPercentage)
-                    //    {
-                    //        dictionary.Add("Day_0", daySeconds / 60 / 60);
-                    //        dictionary.Add("Night_0", nightSeconds / 60 / 60);
-                    //    }
-                    //    else
-                    //    {
-                    //        dictionary.Add("Day_0", ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
-                    //        dictionary.Add("Night_0", ((int)nightSeconds / 60 / 60).ToString() + ":" + ((int)nightSeconds / 60 % 60).ToString());
-                    //    }
-                    //}
-                    //else
-                    //    for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
-                    //    {
-                    //        var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
-                    //        var daySeconds = await _baseDataWork.RealWorkHours
-                    //               .GetEmployeeTotalSecondsForDay(employee.Id, compareDate);
-
-                    //        var nightSeconds = await _baseDataWork.RealWorkHours
-                    //            .GetEmployeeTotalSecondsForNight(employee.Id, compareDate);
-                    //        if (datatable.ShowHoursInPercentage)
-                    //        {
-                    //            dictionary.Add("Day_" + i, daySeconds / 60 / 60);
-                    //            dictionary.Add("Night_" + i, nightSeconds / 60 / 60);
-                    //        }
-                    //        else
-                    //        {
-                    //            dictionary.Add("Day_" + i, ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
-                    //            dictionary.Add("Night_" + i, ((int)nightSeconds / 60 / 60).ToString() + ":" + ((int)nightSeconds / 60 % 60).ToString());
-                    //        }
-                    //    }
                     returnObjects.Add(expandoObj);
 
                 }
@@ -733,6 +698,42 @@ namespace WebApplication.Api
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             else
                 return null;
+        }
+        private Expression<Func<Employee, bool>> GetSearchFilter(Datatable datatable)
+        {
+            var filter = PredicateBuilder.New<Employee>();
+
+            if (datatable.Search.Value != null)
+            {
+                foreach (var column in datatable.Columns)
+                {
+                    if (column.Data == "FirstName")
+                        filter = filter.Or(x => x.FirstName.Contains(datatable.Search.Value));
+                    if (column.Data == "LastName")
+                        filter = filter.Or(x => x.LastName.Contains(datatable.Search.Value));
+                    if (column.Data == "DateOfBirth")
+                        filter = filter.Or(x => x.DateOfBirth.ToString().Contains(datatable.Search.Value));
+                    if (column.Data == "Afm")
+                        filter = filter.Or(x => x.Afm.Contains(datatable.Search.Value));
+                    if (column.Data == "SocialSecurityNumber")
+                        filter = filter.Or(x => x.SocialSecurityNumber.Contains(datatable.Search.Value));
+                    if (column.Data == "ErpCode")
+                        filter = filter.Or(x => x.ErpCode.Contains(datatable.Search.Value));
+                    if (column.Data == "Address")
+                        filter = filter.Or(x => x.Address.Contains(datatable.Search.Value));
+                    if (column.Data == "Email")
+                        filter = filter.Or(x => x.Email.Contains(datatable.Search.Value));
+                    if (column.Data == "SpecializationName")
+                        filter = filter.Or(x => x.Specialization.Name.Contains(datatable.Search.Value));
+                    if (column.Data == "CompanyTitle")
+                        filter = filter.Or(x => x.Company.Title.Contains(datatable.Search.Value));
+                }
+
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
         }
 
     }

@@ -124,7 +124,7 @@
             on: 'HH:mm',
             off: '%',
             onstyle: 'primary',
-            offstyle:'primary'
+            offstyle: 'primary'
         });
 
         $('.filterSlider').change(e =>
@@ -134,15 +134,15 @@
         $('#Employee_Select2').select2({
             placeholder: "Επέλεξε υπάλληλο",
             allowClear: true,
-                ajax: {
-                    type: "POST",
-                    url: '/api/employees/select2',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: (params) => JSON.stringify(BuildSelect2Dto(params))
-                }
-            }).on('change',()=>
-                $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+            ajax: {
+                type: "POST",
+                url: '/api/employees/select2',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: (params) => JSON.stringify(BuildSelect2Dto(params))
+            }
+        }).on('change', () =>
+            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
 
 
 
@@ -151,8 +151,8 @@
             startOnMonday: true,
             showFooter: false,
             calendarCount: 1,
-            startDate:  Date.now(),
-            endDate:  Date.now(),
+            startDate: Date.now(),
+            endDate: Date.now(),
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
@@ -175,11 +175,14 @@
 
         var CreateDataTable = () =>
             $('#EmployeeRealHoursSumDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            colReorder: true,
-            processing: true,
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                serverSide: true,
+                responsive: true,
+                processing: true,
+                iDisplayLength: 150,
+                colReorder: {
+                    fixedColumnsLeft: 1
+                },
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 dom: 'Bfrtlp',
                 ajax: {
                     url: '/api/workplaces/datatable',
@@ -245,27 +248,27 @@
 
         const AppendNewDataTableHTML = () => {
 
-            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
-                '<div class="box-body table-responsive">'+
-                    '<table id="EmployeeRealHoursSumDatatable" class="table table-bordered table-hover table-responsive">'+
-                        '<thead>'+
-                            '<tr>'+
-                                '<th>Πόστο</th>'+
-                                '<th>Σύνολο ώρες</th>'+
-                                '<th>Σύνολο ώρες μέρα</th>'+
-                                '<th>Σύνολο ώρες νύχτα</th>'+
-                            '</tr>'+
-                        '</thead>'+
-                        '<tfoot>'+
-                            '<tr>'+
-                                '<th>Πόστο</th>'+
-                                '<th>Σύνολο ώρες</th>'+
-                                '<th>Σύνολο ώρες μέρα</th>' +
-                                '<th>Σύνολο ώρες νύχτα</th>' +
-                            '</tr>'+
-                        '</tfoot>'+
-                    '</table>'+
-                '</div>'+
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive">' +
+                '<table id="EmployeeRealHoursSumDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Πόστο</th>' +
+                '<th>Σύνολο ώρες</th>' +
+                '<th>Σύνολο ώρες μέρα</th>' +
+                '<th>Σύνολο ώρες νύχτα</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Πόστο</th>' +
+                '<th>Σύνολο ώρες</th>' +
+                '<th>Σύνολο ώρες μέρα</th>' +
+                '<th>Σύνολο ώρες νύχτα</th>' +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
                 '');
 
         }

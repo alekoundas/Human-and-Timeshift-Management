@@ -19,7 +19,7 @@ namespace Bussiness.Repository.Base
         public RealWorkHourRepository(BaseDbContext dbContext) : base(dbContext)
         {
         }
-        public async Task< List<RealWorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId)
+        public async Task<List<RealWorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
 
@@ -51,31 +51,65 @@ namespace Bussiness.Repository.Base
                    x.EndOn.Day == viewModel.CellDay))
                 .ToListAsync();
         }
-        public bool IsDateOverlaping(HasOverlapRangeWorkHoursApiViewModel workHour, int employeeId)
-        {
-            if (workHour.IsEdit)
-                return Context.RealWorkHours.Where(x =>
-                (x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn))
-                        .Where(x =>
-                      (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-                      (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-                      (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-                        .Any(y => y.Employee.Id == employeeId);
-            else
-                return Context.RealWorkHours.Where(x =>
-                (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-                (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-                (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-                  .Any(y => y.Employee.Id == employeeId);
-        }
-        //public bool IsDateOverlaping(WorkHoursApiViewModel workHour, int employeeId)
+        //public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId)
         //{
-        //    return Context.RealWorkHours.Where(x =>
-        //          (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-        //          (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn))
-        //            .Any(y => y.Employee.Id == employeeId);
+        //    if (workHour.IsEdit)
+        //        return Context.RealWorkHours.Where(x =>
+        //        (x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn))
+        //                .Where(x =>
+        //              (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
+        //              (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
+        //              (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
+        //                .Any(y => y.Employee.Id == employeeId);
+        //    else
+        //        return Context.RealWorkHours.Where(x =>
+        //        (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
+        //        (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
+        //        (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
+        //          .Any(y => y.Employee.Id == employeeId);
         //}
 
+        public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId)
+        {
+
+            var filter = PredicateBuilder.New<RealWorkHour>();
+            var filterOr = PredicateBuilder.New<RealWorkHour>();
+
+            filter = filter.And(x => x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn);
+
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn);
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
+            filterOr = filterOr.Or(x => workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn);
+
+            if (!workHour.IsEdit)
+                return Context.RealWorkHours.Where(filterOr).Any(filter);
+            else
+                filter = filter.And(x => x.Employee.Id == employeeId);
+            return Context.RealWorkHours.Where(filter)
+                    .Where(filterOr)
+                    .Any();
+        }
+        
+        public bool IsDateOvertime(ApiRealWorkHoursHasOvertimeRange workHour, int employeeId)
+        {
+
+            var filter = PredicateBuilder.New<RealWorkHour>();
+            var filterOr = PredicateBuilder.New<RealWorkHour>();
+
+            filter = filter.And(x => x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn);
+
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn);
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
+            filterOr = filterOr.Or(x => workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn);
+
+            if (!workHour.IsEdit)
+                return Context.RealWorkHours.Where(filterOr).Any(filter);
+            else
+                filter = filter.And(x => x.Employee.Id == employeeId);
+            return Context.RealWorkHours.Where(filter)
+                    .Where(filterOr)
+                    .Any();
+        }
 
         public bool AreDatesOverlaping(ApiRealWorkHourHasOverlap realWorkHour, int employeeId)
         {

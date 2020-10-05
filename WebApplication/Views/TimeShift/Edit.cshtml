@@ -82,7 +82,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Επιλογή</th>
@@ -359,7 +359,7 @@
                     ValidateAppendedWorkHoursTimeRange(workHourId));
         };
 
-        const ValidateEmployeesWithRangeToWorkhour = (workHourId) =>
+        const ValidateEmployeesWithRangeToWorkhour = (workHourId) => {
             AjaxPost('workhours/HasOverlapRange', GetSelect2HasOverlapData(workHourId))
                 .then((responses) => {
                     HandleEmployeeSelect2SpanPerWorkHour(undefined, undefined, workHourId)
@@ -372,6 +372,20 @@
                     });
                     HandleSubmitButton();
                 });
+
+            //AjaxPost('workhours/HasOvertime', GetSelect2HasOverlapData(workHourId))
+            //    .then((responses) => {
+            //        HandleEmployeeSelect2WarningSpanPerWorkHour(undefined, undefined, workHourId)
+            //        responses.forEach((response) => {
+            //            HandleEmployeeSelect2WarningSpanPerWorkHour(
+            //                'EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' +
+            //                GetSelect2NumBySelectedEmployeeIdAndWorkHourId(
+            //                    response.employeeId, workHourId),
+            //                response);
+            //        });
+            //        HandleSubmitButton();
+            //    });
+        }
 
         const ValidateAppendedWorkHoursTimeRange = (workHourId) => {
             if (IsEdit()) {
@@ -1070,6 +1084,25 @@
             }
         }
 
+        //Employee Warning Span handler
+        const HandleEmployeeSelect2WarningSpanPerWorkHour = (elementId, response, workHourId) => {
+            //Clear select2 errors
+            if (workHourId != undefined && elementId == undefined && response == undefined)
+                [...document.getElementsByClassName('EmployeeSelect2WarningSpanWorkHourNum_' + workHourId)]
+                    .forEach(span => {
+                        span.innerHTML = '';
+                        span.style = "display:none;"
+                    });
+            else if (elementId != undefined) {
+                var span = document.getElementById(elementId)
+                if (!response.isSuccessful) {
+                    span.style = "display:;";
+                    if (!span.innerHTML.includes(response.value))
+                        span.innerHTML = response.value + '</br>';
+                }
+            }
+        }
+
         const HandleConvertAndSetCalentimInputValue = workHourId => {
 
             var dateRange = GetCalentimInputValue(workHourId)
@@ -1681,8 +1714,8 @@
                         })
                         .then(() => ButtonLoadingToggle("SaveWorkHours"));
                 },
-                onafterselect: () => {
-
+                onbeforeshow: calentim => {
+                    calentim.setDisplayDate(moment(new Date(setEndDate)));
                 },
                 onaftershow: () =>
                     //Fix Calentim width
@@ -1763,6 +1796,9 @@
                         })
                         .then(() => ButtonLoadingToggle("SaveWorkHours"));
                 },
+                onbeforeshow: calentim => {
+                    calentim.setDisplayDate(moment(new Date(setEndDate)));
+                },
                 onaftershow: () =>
                     //Fix Calentim width
                     [...document.getElementsByClassName('calentim-input')]
@@ -1782,8 +1818,11 @@
         var Datatable = () => $('#EmployeesWorkhoursDatatable').DataTable({
             serverSide: true,
             responsive: true,
-            colReorder: true,
             processing: true,
+            iDisplayLength: 150,
+            colReorder: {
+                fixedColumnsLeft: 3
+            },
             dom: 'Bfrtlp',
             //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             buttons: [
@@ -2068,6 +2107,7 @@
                 '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
                 '</select >' +
                 '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '<span style="display:none;" id="EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-warning EmployeeSelect2WarningSpan EmployeeSelect2WarningSpanWorkHourNum_' + workHourId + '"></span>' +
                 '</div >' +
                 '<div style="width: 5%; float: left;">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;">' +
@@ -2087,6 +2127,7 @@
                 '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
                 '</select >' +
                 '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '<span style="display:none;" id="EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-warning EmployeeSelect2WarningSpan EmployeeSelect2WarningSpanWorkHourNum_' + workHourId + '"></span>' +
                 '</div >' +
                 '</div >' +
                 '</div >'
@@ -2102,6 +2143,7 @@
                 '<input style="display:none;" id="DatabaseEmployeesSelect2TextNum_' + workHourId + '_EmployeeNum_' + currNum + '" />' +
                 '<select class="EmployeeSelect2WorkHourNum_' + workHourId + ' NewSelect2Append" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
                 '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '<span style="display:none;" id="EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-warning EmployeeSelect2WarningSpan EmployeeSelect2WarningSpanWorkHourNum_' + workHourId + '"></span>' +
                 '</div >' +
                 '<div style="width: 5%; float: left;">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;">' +

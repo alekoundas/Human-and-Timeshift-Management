@@ -54,7 +54,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="WorkPlaceEmployeesDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="WorkPlaceEmployeesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Όνομα</th>
@@ -91,8 +91,11 @@
              $('#WorkPlaceEmployeesDatatable').DataTable({
                  serverSide: true,
                  responsive: true,
-                 colReorder: true,
                  processing: true,
+             iDisplayLength: 150,
+                 colReorder: {
+                     fixedColumnsLeft: 1
+                 },
                  dom: 'Bfrtlp',
                  buttons: ['excel', 'pdf', 'print'],
                  language: {

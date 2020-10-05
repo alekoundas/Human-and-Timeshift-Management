@@ -15,6 +15,8 @@ using System.Dynamic;
 using WebApplication.Utilities;
 using Bussiness.Service;
 using System.Linq.Dynamic.Core;
+using LinqKit;
+using System.Linq.Expressions;
 
 namespace WebApplication.Api
 {
@@ -133,11 +135,13 @@ namespace WebApplication.Api
         public async Task<ActionResult<Leave>> Datatable([FromBody] Datatable datatable)
         {
 
-            var total = await _baseDataWork.Specializations.CountAllAsync();
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
+
+            var filter = PredicateBuilder.New<Leave>();
+            filter = filter.And(GetSearchFilter(datatable));
 
             var includes = new List<Func<IQueryable<Leave>, IIncludableQueryable<Leave, object>>>();
             var leaves = new List<Leave>();
@@ -147,11 +151,12 @@ namespace WebApplication.Api
                 includes.Add(x => x.Include(y => y.LeaveType));
                 includes.Add(x => x.Include(y => y.Employee));
                 leaves = await _baseDataWork.Leaves
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), null, includes, pageSize, pageIndex);
+                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
 
             var mapedData = MapResults(leaves, datatable);
 
+            var total = await _baseDataWork.Leaves.CountAllAsyncFiltered(filter);
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
@@ -186,7 +191,31 @@ namespace WebApplication.Api
             else
                 return null;
         }
+        private Expression<Func<Leave, bool>> GetSearchFilter(Datatable datatable)
+        {
+            var filter = PredicateBuilder.New<Leave>();
+            if (datatable.Search.Value != null)
+            {
+                foreach (var column in datatable.Columns)
+                {
+                    if (column.Data == "StartOn")
+                        filter = filter.Or(x => x.StartOn.ToString().Contains(datatable.Search.Value));
+                    if (column.Data == "EndOn")
+                        filter = filter.Or(x => x.EndOn.ToString().Contains(datatable.Search.Value));
+                    if (column.Data == "EmployeeFullName")
+                        filter = filter.Or(x => x.Employee.FullName.Contains(datatable.Search.Value));
+                    if (column.Data == "LeaveTypeName")
+                        filter = filter.Or(x => x.LeaveType.Name.Contains(datatable.Search.Value));
+                    if (column.Data == "ApprovedBy")
+                        filter = filter.Or(x => x.ApprovedBy.Contains(datatable.Search.Value));
+                }
 
+            }
+            else
+                filter = filter.And(x => true);
+
+            return filter;
+        }
         private bool LeaveExists(int id)
         {
             return _context.Leaves.Any(e => e.Id == id);

@@ -86,17 +86,18 @@ namespace WebApplication.Controllers
                     realWorkHour.EmployeeId = id;
                     _baseDataWork.RealWorkHours.Add(realWorkHour);
                 });
-               var state =  await _baseDataWork.SaveChangesAsync();
-                if(state>0)
-                    TempData["StatusMessage"] = "Aποθηκεύτηκαν με επιτυχία "+ 
-                        changeCount + 
+                var state = await _baseDataWork.SaveChangesAsync();
+                if (state > 0)
+                    TempData["StatusMessage"] = "Aποθηκεύτηκαν με επιτυχία " +
+                        changeCount +
                         " νέες πραγματικές βάρδιες";
                 else
                     TempData["StatusMessage"] = "Ωχ! Οι αλλαγές ΔΕΝ αποθηκεύτηκαν.";
 
-                return RedirectToAction(nameof(Index));
             }
-            TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν συμπληρώθηκαν τα απαραίτητα παιδία.";
+            else
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν συμπληρώθηκαν τα απαραίτητα παιδία.";
+
             return View();
         }
 

@@ -126,8 +126,8 @@
             startOnMonday: true,
             showFooter: false,
             calendarCount: 1,
-            startDate:  Date.now(),
-            endDate:  Date.now(),
+            startDate: Date.now(),
+            endDate: Date.now(),
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
@@ -149,11 +149,14 @@
 
         var CreateDataTable = () =>
             $('#EmployeesRealWorkHoursAnalytically').DataTable({
-            serverSide: true,
-            responsive: true,
-            colReorder: true,
-            processing: true,
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                serverSide: true,
+                responsive: true,
+                processing: true,
+                iDisplayLength: 150,
+                colReorder: {
+                    fixedColumnsLeft: 2
+                },
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 dom: 'Bfrtlp',
                 ajax: {
                     url: '/api/employees/datatable',
@@ -214,9 +217,9 @@
         }
 
         const GetDaysColumns = () => {
-            var thElements='';
+            var thElements = '';
             for (var i = 0; i < GetDaysDifferenceFromRange(); i++) {
-                var colDate= GetStartOn();
+                var colDate = GetStartOn();
                 colDate.setDate(colDate.getDate() + i);
                 thElements = thElements + CreateThElement(colDate);
             }
@@ -237,27 +240,27 @@
 
         const AppendNewDataTableHTML = () => {
 
-            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend',''+
-                '<div class="box-body table-responsive">'+
-                    '<table id="EmployeesRealWorkHoursAnalytically" class="table table-bordered table-hover table-responsive">'+
-                        '<thead>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                GetDaysColumns()+
-                            '</tr>'+
-                        '</thead>'+
-                        '<tfoot>'+
-                            '<tr>'+
-                                '<th>Όνομα</th>'+
-                                '<th>Επίθετο</th>'+
-                                '<th>Erp Code</th>'+
-                                GetDaysColumns() +
-                            '</tr>'+
-                        '</tfoot>'+
-                    '</table>'+
-                '</div>'+
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive">' +
+                '<table id="EmployeesRealWorkHoursAnalytically" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Όνομα</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Erp Code</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
                 '');
 
         }

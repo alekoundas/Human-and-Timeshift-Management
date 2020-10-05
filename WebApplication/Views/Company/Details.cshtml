@@ -61,7 +61,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="CompanyEmployeesDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="CompanyEmployeesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Όνομα</th>
@@ -103,6 +103,7 @@
              responsive: true,
              colReorder: true,
              processing: true,
+             iDisplayLength: 150,
              dom: 'Bfrtlp',
              buttons: ['excel', 'pdf', 'print'],
              language: {

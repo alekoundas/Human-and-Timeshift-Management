@@ -22,7 +22,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Τίτλος</th>
@@ -50,6 +50,10 @@
 
             $('#WorkPlacesDatatable').DataTable({
                 serverSide: true,
+                responsive: true,
+                processing: true,
+                colReorder: false,
+                iDisplayLength: 150,
                 dom: 'frtlp',
                 ajax: {
                     url: '/api/workplaces/datatable',

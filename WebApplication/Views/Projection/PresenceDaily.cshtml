@@ -42,7 +42,7 @@
             </div>
             <hr />
             <div class="box-body table-responsive">
-                <table id="PresenceDailyDatatable" class="table table-bordered table-hover table-responsive">
+                <table id="PresenceDailyDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
                             <th>Όνομα</th>
@@ -124,10 +124,13 @@
         $('#PresenceDailyDatatable').DataTable({
             serverSide: true,
             responsive: true,
-            colReorder: true,
             processing: true,
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-           dom: 'Bfrtlp',
+            iDisplayLength: 150,
+            colReorder: {
+                fixedColumnsLeft: 2
+            },
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            dom: 'Bfrtlp',
             ajax: {
                 url: '/api/employees/datatable',
                 type: 'POST',

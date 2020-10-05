@@ -11,17 +11,18 @@ namespace Bussiness.Repository.Base.Interface
 {
     public interface IRealWorkHourRepository : IBaseRepository<RealWorkHour>
     {
-        public Task<List<RealWorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId);
-        public Task<List<RealWorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel);
-        public bool IsDateOverlaping(HasOverlapRangeWorkHoursApiViewModel workHour, int employeeId);
-        public bool AreDatesOverlaping(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
-        public bool AreDatesOverlapingLeaves(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
-        public bool AreDatesOverlapingDayOff(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
-        public Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
-        public Task<double> GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
-        public Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId);
-        public Task<double> GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        public Task<double> GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        public Task<double> GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        Task<List<RealWorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId);
+        Task<List<RealWorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel);
+        public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId);
+        bool IsDateOvertime(ApiRealWorkHoursHasOvertimeRange workHour, int employeeId);
+        bool AreDatesOverlaping(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
+        bool AreDatesOverlapingLeaves(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
+        bool AreDatesOverlapingDayOff(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
+        Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
+        Task<double> GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
+        Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId);
+        Task<double> GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        Task<double> GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        Task<double> GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
     }
 }
