@@ -1601,7 +1601,6 @@
     <!--///////////////////////////////////////-->
     <script>
         //Workplaces Select2
-
         $('.WorkPlace_Select2').select2({
             ajax: {
                 url: '/api/workplaces/select2',
@@ -1623,6 +1622,7 @@
             }).on('change', (e) => {
                 if (e.target.checked == true && !ValidateNullInputs(workHourId)) {
 
+                    //Add Ajax call to learn valid starton
                     var startTs = SetTimeStampTimeToMin(
                         GetCalentimInputValue(workHourId)[0]);
 
