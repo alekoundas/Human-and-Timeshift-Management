@@ -25,7 +25,7 @@ namespace Bussiness.Repository.Base
             get { return Context as BaseDbContext; }
         }
 
-        public async  Task<List<WorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId)
+        public async Task<List<WorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId)
         {
             return await Context.WorkHours.Where(x =>
                    x.TimeShiftId == timeShiftId &&
@@ -52,27 +52,58 @@ namespace Bussiness.Repository.Base
 
         public bool IsDateOverlaping(WorkHoursApiViewModel workHour, int employeeId)
         {
-            return Context.WorkHours.Where(x =>
-                  (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-                  (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn))
-                    .Any(y => y.Employee.Id == employeeId);
+            var filterOr = PredicateBuilder.New<WorkHour>();
+            var filter = PredicateBuilder.New<WorkHour>();
+
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn);
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
+            filterOr = filterOr.Or(x => workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn);//Not sure
+
+            filter = filter.And(x => x.Employee.Id == employeeId);
+            filter = filter.And(filterOr);
+
+            return Context.WorkHours.Any(filter);
         }
         public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId)
         {
+
+            var filterOr = PredicateBuilder.New<WorkHour>();
+            var filter = PredicateBuilder.New<WorkHour>();
+
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn);
+            filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
+            filterOr = filterOr.Or(x => workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn);
+
+            if (workHour.IsDayOff)
+                filter = filter
+                    .And(x => x.StartOn.Day==workHour.StartOn.Day);
+
             if (workHour.IsEdit)
-                return Context.WorkHours.Where(x =>
-                (x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn))
-                        .Where(x =>
-                      (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-                      (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-                      (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-                        .Any(y => y.Employee.Id == employeeId);
-            else
-                return Context.WorkHours.Where(x =>
-                (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-                (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-                (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-                  .Any(y => y.Employee.Id == employeeId);
+                filter = filter.And(x => x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn);
+
+            filter = filter.And(x => x.Employee.Id == employeeId);
+            filter = filter.And(x => !(workHour.StartOn.Day != x.StartOn.Day && x.IsDayOff == true));
+            filter = filter.And(filterOr);
+
+
+
+            return Context.WorkHours.Any(filter);
+
+
+            //if (workHour.IsEdit)
+            //    return Context.WorkHours.Where(x =>
+            //    (x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn))
+            //            .Where(x =>
+            //          (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
+            //          (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
+            //          (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
+            //            .Any(y => y.Employee.Id == employeeId);
+            //else
+            //    return Context.WorkHours.Where(x =>
+            //    (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
+            //    (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
+            //    (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
+            //      .Any(y => y.Employee.Id == employeeId);
         }
 
         public bool IsDateOvertime(ApiWorkHoursHasOvertimeRange workHour, int employeeId)
@@ -80,20 +111,22 @@ namespace Bussiness.Repository.Base
 
             var filter = PredicateBuilder.New<WorkHour>();
             var filterOr = PredicateBuilder.New<WorkHour>();
-            workHour.StartOn = workHour.StartOn.AddHours(-8);
-            workHour.EndOn = workHour.StartOn.AddHours(8);
+            workHour.StartOn = workHour.StartOn.AddHours(-11);
+            workHour.EndOn = workHour.StartOn.AddHours(11);
 
             filterOr = filterOr.Or(x => x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn);
             filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
             filterOr = filterOr.Or(x => workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn);
 
-            //if (!workHour.IsEdit)
-                return Context.WorkHours.Where(filterOr).Any();
-            //else
-            //    filter = filter.And(x => x.Employee.Id == employeeId);
-            //return Context.WorkHours
-            //        .Where(filterOr)
-            //        .Any(filter);
+            if (workHour.IsEdit)
+                filter = filter.And(x => x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn);
+
+
+            filter = filter.And(x => x.TimeShiftId == workHour.TimeShiftId);
+            filter = filter.And(x => x.EmployeeId == employeeId);
+            filter = filter.And(filterOr);
+
+            return Context.WorkHours.Any(filter);
         }
 
         public bool HasExactDate(WorkHoursApiViewModel workHour)

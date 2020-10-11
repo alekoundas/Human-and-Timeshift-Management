@@ -30,6 +30,14 @@ namespace Bussiness.Repository.Interface
             int pageSize = 10,
             int pageIndex = 1);
 
+        Task<List<TEntity>> GetPaggingWithFilter<TSource>(
+             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+             List<string> selectFields,
+             Expression<Func<TEntity, bool>> filter,
+             List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+             int pageSize = 10,
+             int pageIndex = 1);
+
 
         Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter);
         Task<List<TEntity>> GetAllAsync();

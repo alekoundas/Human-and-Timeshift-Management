@@ -164,6 +164,7 @@ namespace WebApplication.Api
             return Ok(new {value = "Δεν δόθηκαν υπάλληλοι" });
         }
 
+        //RealWorkHour-Create view
         // POST: api/workhours/hasoverlap
         [HttpPost("hasoverlap")]
         public async Task<ActionResult<WorkHour>> HasOverlap([FromBody] WorkHoursApiViewModel workHour)
@@ -239,7 +240,6 @@ namespace WebApplication.Api
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
             {
-
                 workHour.EmployeeIds.ForEach(id =>
                 {
                     if (_baseDataWork.WorkHours.IsDateOvertime(workHour, id))
@@ -247,7 +247,7 @@ namespace WebApplication.Api
                         {
                             employeeId = id,
                             isSuccessful = 0,
-                            value = "Ο υπάππηλος έχει ήδη μια βάρδια με λιγότερο απο 8 ώρες διαφορά"
+                            value = "Ο υπάλληλος έχει ήδη μια βάρδια με λιγότερο απο 11 ώρες διαφορά"
                         });
                     else
                         response.Add(new
@@ -257,11 +257,9 @@ namespace WebApplication.Api
                             value = ""
 
                         });
-
                 });
             }
             return Ok(response);
-
         }
 
 

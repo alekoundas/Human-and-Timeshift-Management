@@ -25,7 +25,6 @@ namespace DataAccess.ViewModels.WorkHours
         [JsonProperty(PropertyName = "comments")]
         public string Comments { get; set; }
 
-
         [JsonProperty(PropertyName = "timeShiftId", Required = Required.Default)]
         public int TimeShiftId { get; set; }
 

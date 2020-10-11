@@ -43,9 +43,7 @@ namespace WebApplication.Api
             var realWorkHour = await _context.RealWorkHours.FindAsync(id);
 
             if (realWorkHour == null)
-            {
                 return NotFound();
-            }
 
             return realWorkHour;
         }
@@ -55,9 +53,7 @@ namespace WebApplication.Api
         public async Task<IActionResult> PutRealWorkHour(int id, RealWorkHour realWorkHour)
         {
             if (id != realWorkHour.Id)
-            {
                 return BadRequest();
-            }
 
             _context.Entry(realWorkHour).State = EntityState.Modified;
 
@@ -68,13 +64,9 @@ namespace WebApplication.Api
             catch (DbUpdateConcurrencyException)
             {
                 if (!RealWorkHourExists(id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
 
             return NoContent();
@@ -96,9 +88,7 @@ namespace WebApplication.Api
         {
             var realWorkHour = await _context.RealWorkHours.FindAsync(id);
             if (realWorkHour == null)
-            {
                 return NotFound();
-            }
 
             _context.RealWorkHours.Remove(realWorkHour);
             await _context.SaveChangesAsync();
@@ -110,47 +100,7 @@ namespace WebApplication.Api
 
 
 
-        // POST: api/realworkhours/hasoverlap
-        [HttpPost("hasoverlap")]
-        public async Task<ActionResult<RealWorkHour>> HasOverlap([FromBody] ApiRealWorkHourHasOverlap apiOverlap)
-        {
-            var dataToReturn = new List<ApiRealWorkHourHasOverlapResponse>();
-            foreach (var id in apiOverlap.EmployeeIds)
-            {
-                if (_baseDataWork.RealWorkHours.AreDatesOverlaping(apiOverlap, id))
-                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
-                    {
-                        EmployeeId = id,
-                        ErrorType = "error",
-                        ErrorValue = "Ο χρήστης αυτός έχει ήδη δηλωθεί για αυτές τις ώρες",
-                    });
 
-                if (_baseDataWork.RealWorkHours.AreDatesOverlapingLeaves(
-                    apiOverlap, id))
-
-                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
-                    {
-                        EmployeeId = id,
-                        ErrorType = "warning",
-                        ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
-                                        "αυτές τις ώρες ως άδεια",
-                    });
-
-                if (_baseDataWork.RealWorkHours.AreDatesOverlapingDayOff(
-                   apiOverlap, id))
-
-                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
-                    {
-                        EmployeeId = id,
-                        ErrorType = "warning",
-                        ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
-                                        "αυτές τις ώρες ως ρεπό",
-                    });
-            };
-
-
-            return Ok(dataToReturn);
-        }
 
 
         // POST: api/workhours/getforcell
@@ -172,7 +122,7 @@ namespace WebApplication.Api
                     StartOn = group.Key.StartOn,
                     EndOn = group.Key.EndOn,
                     //IsDayOff = group.Select(x => x.IsDayOff).FirstOrDefault(),
-                    //Comments = group.Select(x => x.Comments).FirstOrDefault(),
+                    Comments = group.Select(x => x.Comments).FirstOrDefault(),
                     EmployeeIds = group.Select(x => x.EmployeeId).ToList()
                 });
 
@@ -225,7 +175,7 @@ namespace WebApplication.Api
         [HttpPost("editEmployeeWorkhours")]
         public async Task<ActionResult<WorkHour>> EditEmployeeWorkhours([FromBody] List<EditWorkHoursApiViewModel> workHours)
         {
-            var dataToSaveRange = new List<RealWorkHour>();
+            var realWorkHoursToSaveRange = new List<RealWorkHour>();
 
             foreach (var realWorkHour in workHours)
             {
@@ -235,65 +185,143 @@ namespace WebApplication.Api
                         x.EndOn == realWorkHour.EndOn &&
                         x.EmployeeId == realWorkHour.EmployeeId
                  );
-                //if workhour exists for employee, edit it
-                if (workHourToModify != null)
-                {
-                    workHourToModify.StartOn = realWorkHour.NewStartOn;
-                    workHourToModify.EndOn = realWorkHour.NewEndOn;
-                    //workHourToModify.IsDayOff = workHour.IsDayOff;
-                    //workHourToModify.Comments = workHour.Comments;
-                    _baseDataWork.Update(workHourToModify);
-                    await _baseDataWork.SaveChangesAsync();
 
-                }
-                //if workhour does NOT exists for employee, create it
-                else
+
+                if (realWorkHour.IsDayOff)
                 {
-                    dataToSaveRange.Add(new RealWorkHour()
+
+                    //if workhour exists for employee, delete it and create workHour
+                    if (workHourToModify != null)
                     {
-                        StartOn = realWorkHour.NewStartOn,
-                        EndOn = realWorkHour.NewEndOn,
+                        workHourToModify.Comments = realWorkHour.Comments;
+                        _baseDataWork.RealWorkHours.Remove(workHourToModify);
+
+                    }
+                    _baseDataWork.WorkHours.Add(new WorkHour
+                    {
+                        StartOn = realWorkHour.StartOn,
+                        EndOn = realWorkHour.EndOn,
+                        Comments = realWorkHour.Comments,
                         TimeShiftId = realWorkHour.TimeShiftId,
                         EmployeeId = realWorkHour.EmployeeId,
                         CreatedOn = DateTime.Now
                     });
-                }
 
+                }
+                else
+                {
+                    //if workhour exists for employee, edit it
+                    if (workHourToModify != null)
+                    {
+                        workHourToModify.StartOn = realWorkHour.NewStartOn;
+                        workHourToModify.EndOn = realWorkHour.NewEndOn;
+                        workHourToModify.Comments = realWorkHour.Comments;
+
+                        _baseDataWork.Update(workHourToModify);
+                    }
+                    //if workhour does NOT exists for employee, create it
+                    else
+                    {
+                        realWorkHoursToSaveRange.Add(new RealWorkHour()
+                        {
+                            StartOn = realWorkHour.NewStartOn,
+                            EndOn = realWorkHour.NewEndOn,
+                            TimeShiftId = realWorkHour.TimeShiftId,
+                            EmployeeId = realWorkHour.EmployeeId,
+                            Comments = realWorkHour.Comments,
+                            CreatedOn = DateTime.Now
+                        });
+                    }
+                }
             }
 
-            _baseDataWork.RealWorkHours.AddRange(dataToSaveRange);
+            _baseDataWork.RealWorkHours.AddRange(realWorkHoursToSaveRange);
             await _baseDataWork.SaveChangesAsync();
 
-            return Ok(dataToSaveRange);
+            return Ok(realWorkHoursToSaveRange);
         }
         // POST: api/workhours/addEmployeeWorkhours
         [HttpPost("addEmployeeWorkhours")]
         public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<CreateWorkHoursApiViewModel> workHours)
         {
-            var dataToSaveRange = new List<RealWorkHour>();
+            var realWorkHoursToSaveRange = new List<RealWorkHour>();
+            var workHoursToSaveRange = new List<WorkHour>();
 
             foreach (var realWorkHour in workHours)
             {
                 //if (_baseDataWork.WorkHours.IsDateOverlaping(workHour))
                 //    return NotFound();
-
-                dataToSaveRange.Add(new RealWorkHour()
-                {
-                    StartOn = realWorkHour.StartOn,
-                    EndOn = realWorkHour.EndOn,
-                    TimeShiftId = realWorkHour.TimeShiftId,
-                    EmployeeId = realWorkHour.EmployeeId,
-                    //IsDayOff = realWorkHour.IsDayOff,
-                    //Comments = realWorkHour.Comments,
-                    CreatedOn = DateTime.Now
-                });
+                if (realWorkHour.IsDayOff)
+                    workHoursToSaveRange.Add(new WorkHour()
+                    {
+                        StartOn = realWorkHour.StartOn,
+                        EndOn = realWorkHour.EndOn,
+                        TimeShiftId = realWorkHour.TimeShiftId,
+                        EmployeeId = realWorkHour.EmployeeId,
+                        IsDayOff = realWorkHour.IsDayOff,
+                        Comments = realWorkHour.Comments,
+                        CreatedOn = DateTime.Now
+                    });
+                else
+                    realWorkHoursToSaveRange.Add(new RealWorkHour()
+                    {
+                        StartOn = realWorkHour.StartOn,
+                        EndOn = realWorkHour.EndOn,
+                        TimeShiftId = realWorkHour.TimeShiftId,
+                        EmployeeId = realWorkHour.EmployeeId,
+                        Comments = realWorkHour.Comments,
+                        CreatedOn = DateTime.Now
+                    });
             }
-            _baseDataWork.RealWorkHours.AddRange(dataToSaveRange);
+            _baseDataWork.WorkHours.AddRange(workHoursToSaveRange);
+            _baseDataWork.RealWorkHours.AddRange(realWorkHoursToSaveRange);
             await _baseDataWork.SaveChangesAsync();
 
-            return Ok(dataToSaveRange);
+            return Ok(new { realWorkHoursToSaveRange, workHoursToSaveRange });
         }
+        // POST: api/realworkhours/hasoverlap
+        [HttpPost("hasoverlap")]
+        public async Task<ActionResult<RealWorkHour>> HasOverlap([FromBody] ApiRealWorkHourHasOverlap apiOverlap)
+        {
+            var dataToReturn = new List<ApiRealWorkHourHasOverlapResponse>();
+            foreach (var id in apiOverlap.EmployeeIds)
+            {
+                if (_baseDataWork.RealWorkHours.AreDatesOverlaping(
+                    apiOverlap.StartOn, apiOverlap.EndOn, id))
 
+                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
+                    {
+                        EmployeeId = id,
+                        ErrorType = "error",
+                        ErrorValue = "Ο χρήστης αυτός έχει ήδη δηλωθεί για αυτές τις ώρες",
+                    });
+
+                if (_baseDataWork.RealWorkHours.AreDatesOverlapingLeaves(
+                    apiOverlap.StartOn, apiOverlap.EndOn, id))
+
+                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
+                    {
+                        EmployeeId = id,
+                        ErrorType = "warning",
+                        ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
+                                        "αυτές τις ώρες ως άδεια",
+                    });
+
+                if (_baseDataWork.RealWorkHours.AreDatesOverlapingDayOff(
+                   apiOverlap.StartOn, apiOverlap.EndOn, false, id))
+
+                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
+                    {
+                        EmployeeId = id,
+                        ErrorType = "warning",
+                        ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
+                                        "αυτές τις ώρες ως ρεπό",
+                    });
+            };
+
+
+            return Ok(dataToReturn);
+        }
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOverlapRange")]
         public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
@@ -301,7 +329,6 @@ namespace WebApplication.Api
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
             {
-
                 workHour.EmployeeIds.ForEach(id =>
                 {
                     if (_baseDataWork.RealWorkHours.IsDateOverlaping(workHour, id))
@@ -311,6 +338,26 @@ namespace WebApplication.Api
                             isSuccessful = 0,
                             value = "Ο χρήστης αυτός έχει ήδη δηλωθεί για αυτές τις ώρες"
                         });
+                    else if (_baseDataWork.RealWorkHours.AreDatesOverlapingLeaves(
+                        workHour.StartOn, workHour.EndOn, id))
+
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 0,
+                            value = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
+                                            "αυτές τις ώρες ως άδεια",
+                        });
+                    else if (_baseDataWork.RealWorkHours.AreDatesOverlapingDayOff(
+                        workHour.StartOn, workHour.EndOn, workHour.IsDayOff, id))
+
+                        response.Add(new
+                        {
+                            employeeId = id,
+                            isSuccessful = 0,
+                            value = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
+                                            "αυτές τις ώρες ως ρεπό",
+                        });
                     else
                         response.Add(new
                         {
@@ -319,13 +366,11 @@ namespace WebApplication.Api
                             value = ""
 
                         });
-
                 });
             }
             return Ok(response);
-
         }
-        
+
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOvertime")]
         public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<ApiRealWorkHoursHasOvertimeRange> workHours)
@@ -333,7 +378,6 @@ namespace WebApplication.Api
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
             {
-
                 workHour.EmployeeIds.ForEach(id =>
                 {
                     if (_baseDataWork.RealWorkHours.IsDateOvertime(workHour, id))
@@ -341,22 +385,21 @@ namespace WebApplication.Api
                         {
                             employeeId = id,
                             isSuccessful = 0,
-                            value = "sdfsdfsdfsdsfsdsdfsdfsdfsdfς"
+                            value = "Ο υπάλληλος έχει ήδη μια βάρδια με λιγότερο απο 11 ώρες διαφορά"
                         });
                     else
                         response.Add(new
                         {
                             employeeId = id,
                             isSuccessful = 1,
-                            value = "zaaaaaaaaaaaaaaaaaaaa"
+                            value = ""
 
                         });
-
                 });
             }
             return Ok(response);
-
         }
+
 
         private bool RealWorkHourExists(int id)
         {

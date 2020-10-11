@@ -205,7 +205,6 @@ namespace WebApplication.Api
 
             if (datatable.Predicate == "EmployeeIndex")
             {
-                includes.Add(x => x.Include(y => y.Company));
                 employees = await _baseDataWork.Employees
                       .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
@@ -302,13 +301,21 @@ namespace WebApplication.Api
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
                     filter, includes, pageSize, pageIndex);
+
+                employees = employees
+                    .Select(x => new Employee {
+                        Id=x.Id,
+                        FirstName=x.FirstName,
+                        LastName=x.LastName,
+                        RealWorkHours=x.RealWorkHours.Where(y=>y.StartOn.Day==DateTime.Now.Day).ToList()
+                    })
+                    .ToList();
             }
             if (datatable.Predicate == "ProjectionDifference")
             {
                 employees = await _baseDataWork.Employees
                     .ProjectionDifference(SetOrderBy(columnName, orderDirection),
-                    datatable.StartOn, datatable.EndOn, filter,
-                    datatable.GenericId,pageSize, pageIndex);
+                    datatable, filter,pageSize, pageIndex);
             }
             if (datatable.Predicate == "ProjectionConcentric")
             {

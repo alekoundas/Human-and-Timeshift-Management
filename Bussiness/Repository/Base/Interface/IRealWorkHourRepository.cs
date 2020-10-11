@@ -15,9 +15,9 @@ namespace Bussiness.Repository.Base.Interface
         Task<List<RealWorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel);
         public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId);
         bool IsDateOvertime(ApiRealWorkHoursHasOvertimeRange workHour, int employeeId);
-        bool AreDatesOverlaping(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
-        bool AreDatesOverlapingLeaves(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
-        bool AreDatesOverlapingDayOff(ApiRealWorkHourHasOverlap realWorkHour, int employeeId);
+        bool AreDatesOverlaping(DateTime startOn, DateTime endOn, int employeeId);
+        bool AreDatesOverlapingLeaves(DateTime startOn, DateTime endOn, int employeeId);
+        bool AreDatesOverlapingDayOff(DateTime startOn, DateTime endOn,bool isDayOff, int employeeId);
         Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
         Task<double> GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
         Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId);

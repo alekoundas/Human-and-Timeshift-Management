@@ -203,7 +203,7 @@ namespace WebApplication.Api
                     if (column.Data == "EndOn")
                         filter = filter.Or(x => x.EndOn.ToString().Contains(datatable.Search.Value));
                     if (column.Data == "EmployeeFullName")
-                        filter = filter.Or(x => x.Employee.FullName.Contains(datatable.Search.Value));
+                        filter = filter.Or(x => x.Employee.FirstName.Contains(datatable.Search.Value) || x.Employee.LastName.Contains(datatable.Search.Value));
                     if (column.Data == "LeaveTypeName")
                         filter = filter.Or(x => x.LeaveType.Name.Contains(datatable.Search.Value));
                     if (column.Data == "ApprovedBy")

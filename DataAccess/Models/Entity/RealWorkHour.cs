@@ -16,6 +16,9 @@ namespace DataAccess.Models.Entity
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
 
+        public string Comments { get; set; }
+
+
         //public int SpecializationOverrideId { get; set; }
         //public SpecializationOverride SpecializationOverride{ get; set; }
     }

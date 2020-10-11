@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.RealWorkHours
+namespace DataAccess.ViewModels.WorkHours
 {
-    public class ApiRealWorkHoursHasOverlapRange
+    public class WorkHoursHasOverlapRange
     {
         [JsonProperty(PropertyName = "startOn")]
         public DateTime StartOn { get; set; }
@@ -20,7 +20,7 @@ namespace DataAccess.ViewModels.RealWorkHours
         public DateTime ExcludeEndOn { get; set; }
 
         [JsonProperty(PropertyName = "isEdit")]
-        public bool IsEdit{ get; set; }
+        public bool IsEdit { get; set; }
 
         [JsonProperty(PropertyName = "isDayOff")]
         public bool IsDayOff { get; set; }
@@ -30,6 +30,6 @@ namespace DataAccess.ViewModels.RealWorkHours
         public int TimeShiftId { get; set; }
 
         [JsonProperty(PropertyName = "employeeIds")]
-        public List<int>EmployeeIds { get; set; }
+        public List<int> EmployeeIds { get; set; }
     }
 }

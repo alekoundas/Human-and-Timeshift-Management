@@ -15,8 +15,10 @@ namespace DataAccess.ViewModels.RealWorkHours
 
         [Display(Name = "Λήξη")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό.")]
-        //[RegularExpression(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((20)\d\d))$", ErrorMessage = "Invalid date formatasdfadfadfadfasdfasdfasdfasdfasdfasdfasdfasfwdeassdfsadfsdaf.")]
         public DateTime EndOn { get; set; }
+
+        [Display(Name = "Σχόλια")]
+        public string Comments { get; set; }
 
         [Display(Name = "Υπάλληλοι")]
         public List<int> Employees { get; set; }
@@ -35,6 +37,7 @@ namespace DataAccess.ViewModels.RealWorkHours
                 StartOn = viewModel.StartOn,
                 EndOn = viewModel.EndOn,
                 TimeShiftId = viewModel.TimeShiftId,
+                Comments=viewModel.Comments,
                 CreatedOn = DateTime.Now
             };
         }

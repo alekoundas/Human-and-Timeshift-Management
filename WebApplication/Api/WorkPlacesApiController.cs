@@ -340,7 +340,7 @@ namespace WebApplication.Api
                     var apiUrl = UrlHelper.CustomerWorkPlace(datatable.GenericId,
                          workplace.Id);
 
-                    if (workplace.Customer != null)
+                    if (workplace.Customer?.Id == datatable.GenericId)
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                             "WorkPlace", apiUrl, "checked", true));
                     else
@@ -354,7 +354,7 @@ namespace WebApplication.Api
                     var apiUrl = UrlHelper.CustomerWorkPlace(datatable.GenericId,
                         workplace.Id);
 
-                    if (workplace.Customer != null)
+                    if (workplace.Customer?.Id== datatable.GenericId)
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                             "WorkPlace", apiUrl, "checked"));
                     else

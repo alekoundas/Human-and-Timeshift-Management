@@ -39,12 +39,20 @@
 
                     <div class="row">
                         <div class="col-md-12">
-
                             <div class="form-group" id="TimeRangeDiv" style="display:none;">
                                 <input id="TimeRange" />
                             </div>
                             </br>
                             <span id="TimeRangeSpan" style="display:none;" class="text-warning"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                                <label asp-for="Comments" class="control-label"></label>
+                            <div class="form-group" id="CommentsDiv" style="display:none;">
+                                <textarea asp-for="Comments" class="form-control" style="resize: vertical;max-width:50%"></textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -226,9 +234,10 @@
                 '0' + date.getHours() : date.getHours();
             var min = String(date.getMinutes()).length == 1 ?
                 '0' + date.getMinutes() : date.getMinutes();
-
             if (hasLaterDate)
-                day++;
+                var day = String(date.getDate()+1).length == 1 ?
+                    '0' + (date.getDate()+1) : date.getDate()+1;
+
             var time = year + '-' + month + '-' + day + 'T' + hour + ':' + min;
             return time;
         }
@@ -350,10 +359,12 @@
             if (e.target.value != "") {
                 document.getElementById('EmployeesDiv').style = 'display:;';
                 document.getElementById('TimeRangeDiv').style = 'display:;';
+                document.getElementById('CommentsDiv').style = 'display:;';
             }
             else {
                 document.getElementById('EmployeesDiv').style = 'display:none;';
                 document.getElementById('TimeRangeDiv').style = 'display:none;';
+                document.getElementById('CommentsDiv').style = 'display:none;';
             }
         });
     </script>

@@ -64,51 +64,6 @@
     </div>
 </div>
 
-
-@*<div class="row">
-        <div class="col-md-12">
-
-            <div class="box box-danger" style="margin-top:5%;">
-
-                <div class="box-header">
-                    <h3 class="box-title">@ViewData["Title"]</h3>
-                </div>
-                <hr />
-                <div class="box-body table-responsive">
-
-                    <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive">
-                        <thead>
-                            <tr>
-                                <th>Επιλογή</th>
-                                <th>Όνομα</th>
-                                <th>Επίθετο</th>
-                                <th>ErpCode</th>
-                                @for (int i = 1; i <= DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month); i++)
-                                {
-                                    <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
-                                }
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th data-searchable="false">Επιλογή</th>
-                                <th data-searchable="false">Όνομα</th>
-                                <th data-searchable="false">Επίθετο</th>
-                                <th data-searchable="false">ErpCode</th>
-                                @for (int i = 1; i <= Model.DaysInMonth; i++)
-                                {
-                                    <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
-                                }
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>*@
-
-
-
 <div class="modal fade in" data-backdrop="static" id="AddWorkHour_Modal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -284,7 +239,7 @@
                 0, 0, 0, 0).valueOf();                                 //time
 
             var maxTs = new Date(new Date(CelentimDate).getFullYear(),//year
-                new Date(CelentimDate).getMonth()+1,                    //month
+                new Date(CelentimDate).getMonth() + 1,                    //month
                 0,                                                    //day
                 23, 59, 59, 0).valueOf();                             //time
 
@@ -331,27 +286,50 @@
             return hasError;
         };
 
-        const AreDatesOverlaping = (baseDate, checkDate) => {
-            if (baseDate.length > 0 && toString.call(baseDate[0]) === "[object Array]") {
-                for (var i = 0; i < baseDate.length; i++)
-                    if ((baseDate[i][0] <= checkDate[0] && checkDate[0] <= baseDate[i][1]) ||
-                        (baseDate[i][0] <= checkDate[1] && checkDate[1] <= baseDate[i][1]) ||
-                        (checkDate[0] < baseDate[i][0] && baseDate[i][1] < checkDate[1]) == true)
+        const AreDatesOverlaping = (baseDate, isDayOf, workHourId) => {
+            var checkDate = GetWorkHoursDateInputValuesPerDay(workHourId);
+            if (isDayOf) {
+                if (baseDate.length > 0 && toString.call(baseDate[0]) === "[object Array]") {
+                    for (var i = 0; i < baseDate.length; i++)
+                        if (new Date(parseInt(baseDate[i][0])).getDate() == new Date(parseInt(checkDate.dateRange[0])).getDate())
+                            return true;
+                }
+                else if (checkDate.length > 0 && toString.call(checkDate[0].dateRange) === "[object Array]") {
+                    for (var i = 0; i < checkDate.length; i++)
+                        if (new Date(parseInt(baseDate[0])).getDate() == new Date(parseInt(checkDate[i].dateRange[0])).getDate())
+                            return true;
+                }
+                else
+                    if (new Date(parseInt(baseDate[0])).getDate() == new Date(parseInt(checkDate[0])).getDate())
                         return true;
             }
-            else if (checkDate.length > 0 && toString.call(checkDate[0]) === "[object Array]") {
-                for (var i = 0; i < checkDate.length; i++)
-                    if ((baseDate[0] <= checkDate[i][0] && checkDate[i][0] <= baseDate[1]) ||
-                        (baseDate[0] <= checkDate[i][1] && checkDate[i][1] <= baseDate[1]) ||
-                        (checkDate[i][0] < baseDate[0] && baseDate[1] < checkDate[i][1]) == true)
+            else {
+                if (baseDate.length > 0 && toString.call(baseDate[0]) === "[object Array]") {
+                    for (var i = 0; i < baseDate.length; i++)
+                        if ((baseDate[i][0] <= checkDate.dateRange[0] && checkDate.dateRange[0] <= baseDate[i][1]) ||
+                            (baseDate[i][0] <= checkDate.dateRange[1] && checkDate.dateRange[1] <= baseDate[i][1]) ||
+                            (checkDate.dateRange[0] < baseDate[i][0] && baseDate[i][1] < checkDate.dateRange[1]) == true)
+                            return true;
+                }
+                else if (checkDate.length > 0 && toString.call(checkDate[0].dateRange) === "[object Array]") {
+                    for (var i = 0; i < checkDate.length; i++)
+                        if (checkDate[i].isDayOff) {
+                            if (new Date(parseInt(baseDate[0])).getDate() == new Date(parseInt(checkDate[i].dateRange[0])).getDate())
+                                return true;
+                        }
+                        else {
+                            if ((baseDate[0] <= checkDate[i].dateRange[0] && checkDate[i].dateRange[0] <= baseDate[1]) ||
+                                (baseDate[0] <= checkDate[i].dateRange[1] && checkDate[i].dateRange[1] <= baseDate[1]) ||
+                                (checkDate[i].dateRange[0] < baseDate[0] && baseDate[1] < checkDate[i].dateRange[1]) == true)
+                                return true;
+                        }
+                }
+                else
+                    if ((baseDate[0] <= checkDate.dateRange[0] && checkDate[0] <= baseDate[1]) ||
+                        (baseDate[0] <= checkDate.dateRange[1] && checkDate[1] <= baseDate[1]) ||
+                        (checkDate.dateRange[0] < baseDate[0] && baseDate[1] < checkDate.dateRange[1]) == true)
                         return true;
             }
-            else
-                if ((baseDate[0] <= checkDate[0] && checkDate[0] <= baseDate[1]) ||
-                    (baseDate[0] <= checkDate[1] && checkDate[1] <= baseDate[1]) ||
-                    (checkDate[0] < baseDate[0] && baseDate[1] < checkDate[1]) == true)
-                    return true;
-
             return false
         }
 
@@ -365,7 +343,8 @@
                     ValidateAppendedWorkHoursTimeRange(workHourId));
         };
 
-        const ValidateEmployeesWithRangeToWorkhour = (workHourId) =>
+        const ValidateEmployeesWithRangeToWorkhour = (workHourId) => {
+
             AjaxPost('realworkhours/HasOverlapRange', GetSelect2HasOverlapData(workHourId))
                 .then((responses) => {
                     HandleEmployeeSelect2SpanPerWorkHour(undefined, undefined, workHourId)
@@ -378,8 +357,21 @@
                     });
                     HandleSubmitButton();
                 });
+            AjaxPost('realworkhours/HasOvertime', GetSelect2HasOverlapData())
+                .then((responses) => {
+                    HandleEmployeeSelect2WarningSpanPerWorkHour(undefined, undefined, workHourId)
+                    responses.forEach((response) => {
+                        HandleEmployeeSelect2WarningSpanPerWorkHour(
+                            'EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' +
+                            GetSelect2NumBySelectedEmployeeIdAndWorkHourId(
+                                response.employeeId, workHourId),
+                            response);
+                    });
+                    HandleSubmitButton();
+                });
+        }
 
-        const ValidateWarningEmployeesWithOvertime= (workHourId) =>
+        const ValidateWarningEmployeesWithOvertime = workHourId =>
             AjaxPost('realworkhours/HasOvertime', GetSelect2HasOverlapData(workHourId))
                 .then((responses) => {
                     HandleEmployeeSelect2SpanPerWorkHour(undefined, undefined, workHourId)
@@ -398,7 +390,7 @@
                 var inputsFiltered = GetAllDateInputValuesFiltered(workHourId)
                     .filter(response =>
                         AreDatesOverlaping(response.startEndDate,
-                            GetDateInputValuesPerDay(workHourId)))
+                            GetWorkHoursDateInputValuesPerDay(workHourId)))
 
                 if (inputsFiltered.length == 0)
                     HandleWorkHourSpan(workHourId);
@@ -420,7 +412,7 @@
                     var inputsFiltered = GetAllDateInputValuesFiltered(workHourId)
                         .filter(response =>
                             AreDatesOverlaping(response.startEndDate,
-                                GetDateInputValuesPerDay(workHourId)))
+                                GetWorkHoursDateInputValuesPerDay(workHourId)))
                     if (inputsFiltered.length <= 1)
                         HandleWorkHourSpan(workHourId);
 
@@ -457,9 +449,11 @@
             page: params.page || 1
         });
 
-        const BuildValidateAreDatesOverlapingDto = (startTs, endTs, workHourId) => ({
+        const BuildValidateAreDatesOverlapingDto = (startTs, endTs, workHourId, isDayOf) => ({
             startEndDate: [startTs, endTs],
-            workHourId: workHourId
+            workHourId: workHourId,
+            isDayOf: isDayOf
+
         });
 
         const BuildValidateEmployeesToAddWorkHourDto = (startTs, endTs,
@@ -468,6 +462,7 @@
                 startOn: ConvertDateForApi(startTs),
                 endOn: ConvertDateForApi(endTs),
                 isEdit: false,
+                isDayOff: IsDayOff(workHourId),
                 employeeIds: GetAlreadyAppendedEmployeeIdsPerWorkHour(workHourId)
             });
 
@@ -480,6 +475,7 @@
                 excludeStartOn: ConvertDateForApi(excludeStartTs),
                 excludeEndOn: ConvertDateForApi(excludeEndTsn),
                 isEdit: true,
+                isDayOff: IsDayOff(workHourId),
                 employeeIds: GetAlreadyAppendedEmployeeIdsPerWorkHour(workHourId)
             });
 
@@ -564,7 +560,7 @@
             return ajaxResponse;
         }
 
-        const GetDateInputValuesPerDay = workHourId => {
+        const GetWorkHoursDateInputValuesPerDay = workHourId => {
             var response = [];
             var startDate = new Date(parseInt(GetCalentimInputValue(workHourId)[0]));
             var endDate = new Date(parseInt(GetCalentimInputValue(workHourId)[1]));
@@ -582,7 +578,10 @@
                 if (startDate.valueOf() > endDate.valueOf())
                     endDate.setDate(startDate.getDate() + 1);
 
-                response.push([startDate.valueOf(), endDate.valueOf()]);
+                response.push({
+                    dateRange: [startDate.valueOf(), endDate.valueOf()],
+                    isDayOff: IsDayOff(workHourId)
+                });
                 //Add next Day
                 startDate.setDate(startDate.getDate() + 1);
             }
@@ -637,22 +636,22 @@
                 startDate.setDate(startDate.getDate() + 1);
             }
             else
-            for (var i = 0; i < CurrentDateDaysDiff; i++) {
+                for (var i = 0; i < CurrentDateDaysDiff; i++) {
 
-                endDate.setDate(startDate.getDate());
-                endDate.setMonth(startDate.getMonth());
-                endDate.setFullYear(startDate.getFullYear());
-                if (startDate.valueOf() > endDate.valueOf())
-                    endDate.setDate(startDate.getDate() + 1);
+                    endDate.setDate(startDate.getDate());
+                    endDate.setMonth(startDate.getMonth());
+                    endDate.setFullYear(startDate.getFullYear());
+                    if (startDate.valueOf() > endDate.valueOf())
+                        endDate.setDate(startDate.getDate() + 1);
 
-                response.push({
-                    startTimestamp: startDate.valueOf(),
-                    endTimestamp: endDate.valueOf(),
-                    workHourId: dateInput.id.split('_')[1]
-                });
+                    response.push({
+                        startTimestamp: startDate.valueOf(),
+                        endTimestamp: endDate.valueOf(),
+                        workHourId: dateInput.id.split('_')[1]
+                    });
 
-                startDate.setDate(startDate.getDate() + 1);
-            }
+                    startDate.setDate(startDate.getDate() + 1);
+                }
             return response;
         }
 
@@ -667,7 +666,8 @@
                                     BuildValidateAreDatesOverlapingDto(
                                         result.startTimestamp,
                                         result.endTimestamp,
-                                        result.workHourId)));
+                                        result.workHourId,
+                                        IsDayOff(result.workHourId))));
 
                     else
                         SplitDateRangeInDates(
@@ -677,7 +677,8 @@
                                     BuildValidateAreDatesOverlapingDto(
                                         result.startTimestamp,
                                         result.endTimestamp,
-                                        result.workHourId)));
+                                        result.workHourId,
+                                        IsDayOff(result.workHourId))));
                 })
             }
             else {
@@ -697,7 +698,8 @@
                             BuildValidateAreDatesOverlapingDto(
                                 result.startTimestamp,
                                 result.endTimestamp,
-                                result.workHourId))));
+                                result.workHourId,
+                                IsDayOff(result.workHourId)))));
             }
 
             return response;
@@ -1119,6 +1121,25 @@
             //Clear select2 errors
             if (workHourId != undefined && elementId == undefined && response == undefined)
                 [...document.getElementsByClassName('EmployeeSelect2SpanWorkHourNum_' + workHourId)]
+                    .forEach(span => {
+                        span.innerHTML = '';
+                        span.style = "display:none;"
+                    });
+            else if (elementId != undefined) {
+                var span = document.getElementById(elementId)
+                if (!response.isSuccessful) {
+                    span.style = "display:;";
+                    if (!span.innerHTML.includes(response.value))
+                        span.innerHTML = response.value + '</br>';
+                }
+            }
+        }
+
+        //Employee Warning Span handler
+        const HandleEmployeeSelect2WarningSpanPerWorkHour = (elementId, response, workHourId) => {
+            //Clear select2 errors
+            if (workHourId != undefined && elementId == undefined && response == undefined)
+                [...document.getElementsByClassName('EmployeeSelect2WarningSpanWorkHourNum_' + workHourId)]
                     .forEach(span => {
                         span.innerHTML = '';
                         span.style = "display:none;"
@@ -2088,11 +2109,14 @@
     <!--    Html Append -->
     <script>
 
-        var DestroyDataTable = () => $('#EmployeesWorkhoursDatatable')
-            .DataTable().destroy();
+        var DestroyDataTable = () => {
+            if (document.getElementById('EmployeesWorkhoursDatatable') != null)
+                $('#EmployeesWorkhoursDatatable')
+                    .DataTable().destroy();
+        }
 
         const DeleteDataTableHTML = () =>
-            document.getElementById('EmployeesWorkhoursDatatable').remove();
+            document.getElementById('EmployeesWorkhoursDatatable')?.remove();
 
         const GetDaysColumns = () => {
             var thElements = '';
@@ -2284,6 +2308,7 @@
                 '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
                 '</select >' +
                 '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '<span style="display:none;" id="EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-warning EmployeeSelect2WarningSpan EmployeeSelect2WarningSpanWorkHourNum_' + workHourId + '"></span>' +
                 '</div >' +
                 '<div style="width: 5%; float: left;">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;">' +
@@ -2303,6 +2328,7 @@
                 '<option value="' + employeeId + '" selected="selected">' + text + '</option>' +
                 '</select >' +
                 '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '<span style="display:none;" id="EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-warning EmployeeSelect2WarningSpan EmployeeSelect2WarningSpanWorkHourNum_' + workHourId + '"></span>' +
                 '</div >' +
                 '</div >' +
                 '</div >'
@@ -2318,6 +2344,7 @@
                 '<input style="display:none;" id="DatabaseEmployeesSelect2TextNum_' + workHourId + '_EmployeeNum_' + currNum + '" />' +
                 '<select class="EmployeeSelect2WorkHourNum_' + workHourId + ' NewSelect2Append" id="EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + currNum + '" style="width:100%"></select >' +
                 '<span style="display:none;" id="EmployeeSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-danger EmployeeSelect2Span EmployeeSelect2SpanWorkHourNum_' + workHourId + '"></span>' +
+                '<span style="display:none;" id="EmployeeWarningSpanWorkHourNum_' + workHourId + '_EmployeeNum_' + currNum + '" class="text-warning EmployeeSelect2WarningSpan EmployeeSelect2WarningSpanWorkHourNum_' + workHourId + '"></span>' +
                 '</div >' +
                 '<div style="width: 5%; float: left;">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;">' +
@@ -2328,8 +2355,8 @@
             );
 
 
-        $(document).ready(AppendNewDataTableHTML());
-        $(document).ready(InitDatatable());
+                //$(document).ready(AppendNewDataTableHTML());
+                //$(document).ready(InitDatatable());
 
     </script>
 }

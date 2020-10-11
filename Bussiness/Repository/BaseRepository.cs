@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Bussiness.Repository.Interface;
@@ -88,7 +89,47 @@ namespace Bussiness.Repository
 
             return await qry.ToListAsync();
         }
+        public async Task<List<TEntity>> GetPaggingWithFilter<TSource>(
+           Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+           List<string> selectFields,
+           Expression<Func<TEntity, bool>> filter,
+           List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+           int pageSize = 10,
+           int pageIndex = 1)
+        {
 
+            var qry = (IQueryable<TEntity>)_set;
+
+            if (includes != null)
+                foreach (var include in includes)
+                    qry = include(qry);
+
+            //if (selectFields != null)
+            //    qry = qry.Select(x=> SelectObject(selectFields,x));
+
+            if (filter != null)
+                qry = qry.Where(filter);
+
+            if (orderingInfo != null)
+                qry = orderingInfo(qry);
+
+            if (pageSize != -1)
+                qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return await qry.ToListAsync();
+        }
+    //    TEntity SelectObject(List<string> fields,TEntity value)
+    //    {
+    //        TEntity classTEntity = (TEntity)Activator.CreateInstance(typeof(TEntity));
+
+    //        foreach (var field in fields)
+    //        classTEntity.GetType().GetProperty(field).SetValue(classTEntity, value.GetType().get);
+
+
+    //        return classTEntity
+
+      
+    //}
 
 
 

@@ -286,6 +286,19 @@ namespace WebApplication.Utilities
               dayOfMonth,
               employeeId);
 
+            var cellWorkHours = await baseDatawork.WorkHours.GetCurrentAssignedOnCell(
+               datatable.GenericId,
+              compareYear,
+               compareMonth,
+               dayOfMonth,
+               employeeId);
+
+            if (cellWorkHours.Any(x => x.IsDayOff))
+                strToReturn +=
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                    "<center><p><b>Ρεπό</b></p></center>" +
+                     "</div>";
+
             var cellLeaves = await baseDatawork.Leaves.GetCurrentAssignedOnCell(
                compareYear,
                compareMonth,
@@ -338,14 +351,18 @@ namespace WebApplication.Utilities
 
                 if (datatable.GenericId != 0)
                 {
-                    if (currentUserRoles.Contains("RealWorkHour_Create"))
-                        strToReturn += FaIconAdd(dayOfMonth, "", employeeId,
-                            compareMonth, compareYear);
+                    if (!cellWorkHours.Any(x => x.IsDayOff))
+                    {
 
-                    if (currentUserRoles.Contains("RealWorkHour_Edit"))
-                        if (cellRealWorkHours.Count() > 0)
-                            strToReturn += FaIconEdit(dayOfMonth, "green", employeeId,
-                                   datatable.GenericId, compareMonth, compareYear);
+                        if (currentUserRoles.Contains("RealWorkHour_Create"))
+                            strToReturn += FaIconAdd(dayOfMonth, "", employeeId,
+                                compareMonth, compareYear);
+
+                        if (currentUserRoles.Contains("RealWorkHour_Edit"))
+                            if (cellRealWorkHours.Count() > 0)
+                                strToReturn += FaIconEdit(dayOfMonth, "green", employeeId,
+                                       datatable.GenericId, compareMonth, compareYear);
+                    }
                 }
                 return strToReturn;
 
