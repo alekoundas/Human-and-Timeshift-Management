@@ -30,6 +30,17 @@ namespace DataAccess
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfiguration(new LeaveConfiguration());
+            builder.ApplyConfiguration(new CompanyConfiguration());
+            builder.ApplyConfiguration(new ContactConfiguration());
+            builder.ApplyConfiguration(new CustomerConfiguration());
+            builder.ApplyConfiguration(new WorkHourConfiguration());
+            builder.ApplyConfiguration(new EmployeeConfiguration());
+            builder.ApplyConfiguration(new LeaveTypeConfiguration());
+            builder.ApplyConfiguration(new TimeShiftConfiguration());
+            builder.ApplyConfiguration(new WorkPlaceConfiguration());
+            builder.ApplyConfiguration(new RealWorkHourConfiguration());
+            builder.ApplyConfiguration(new SpecializationConfiguration());
             builder.ApplyConfiguration(new EmployeeWorkPlaceConfiguration());
         }
     }

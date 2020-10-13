@@ -45,26 +45,26 @@ namespace WebApplication.Utilities
             _httpContext = new HttpContextAccessor();
 
             var stringToReturn = "<div style='width:100%;'>";
-            stringToReturn += "<div style='width: 30%; float: left;'>&nbsp</div>";
+            //stringToReturn += "<div style='width: 30%; float: left;'>&nbsp</div>";
 
             var currentUserRoles = _httpContext.HttpContext.User.Claims
                 .Select(x => x.Value).ToList();
 
             if (currentUserRoles.Contains(baseRole + "_View"))
-                stringToReturn += "<div style='width: 13%; float: left;'>" +
+                stringToReturn += "<div style='width: 20%; float: left;'>" +
                     ViewButton(baseRole, id) +
                     "</div>";
 
             if (currentUserRoles.Contains(baseRole + "_Edit"))
-                stringToReturn += "<div style='width: 13%; float: left;'>" +
+                stringToReturn += "<div style='width: 20%; float: left;'>" +
                     EditButton(baseRole, id) +
                     "</div>";
 
             if (currentUserRoles.Contains(baseRole + "_Delete"))
-                stringToReturn += "<div style='width: 13%; float: left;'>" +
+                stringToReturn += "<div style='width: 20%; float: left;'>" +
                     DeleteButton(baseRole, id) +
                     "</div>";
-            stringToReturn += "<div style='width: 30%; float: left;'>&nbsp</div>";
+            //stringToReturn += "<div style='width: 30%; float: left;'>&nbsp</div>";
             stringToReturn += "</div>";
             return stringToReturn;
         }
@@ -180,6 +180,210 @@ namespace WebApplication.Utilities
         {
             return "";
         }
+
+
+
+
+
+
+
+
+
+        public string GetTimeShiftEditCellBodyWorkHours(List<WorkHour> workHours, List<Leave> leaves, int dayOfMonth, Datatable datatable, int employeeId)
+        {
+            var strToReturn = "";
+
+            var cellWorkHours = workHours.Where(x =>
+                   x.TimeShiftId == datatable.GenericId &&
+                   x.StartOn.Year == datatable.TimeShiftYear &&
+                   x.StartOn.Month == datatable.TimeShiftMonth &&
+                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                   x.EmployeeId == employeeId)
+                .ToList();
+
+
+
+            var cellLeaves = leaves.Where(x =>
+                   x.StartOn.Year == datatable.TimeShiftYear &&
+                   x.StartOn.Month == datatable.TimeShiftMonth &&
+                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                   x.EmployeeId == employeeId)
+                .ToList();
+
+            if (cellWorkHours.Any(x => x.IsDayOff))
+                strToReturn +=
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                    "<center><p><b>Ρεπό</b></p></center>" +
+                     "</div>";
+            else if (cellLeaves.Count() > 0)
+                return
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                    "<center><p><b>Άδεια</b></p></center>" +
+                     "</div>";
+            else
+                foreach (var cellWorkHour in cellWorkHours)
+                {
+                    var celStartOn = cellWorkHour.StartOn;
+                    if (celStartOn.Day != dayOfMonth)
+                        celStartOn = new DateTime(
+                            cellWorkHour.StartOn.Year,
+                            cellWorkHour.StartOn.Month,
+                            cellWorkHour.StartOn.Day,
+                            0,
+                            0,
+                            0,
+                            0);
+
+                    var celEndOn = cellWorkHour.EndOn;
+                    if (celEndOn.Day != dayOfMonth)
+                        celEndOn = new DateTime(
+                                cellWorkHour.EndOn.Year,
+                                cellWorkHour.EndOn.Month,
+                                cellWorkHour.EndOn.Day,
+                                23,
+                                59,
+                                0,
+                                0);
+                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
+                        celStartOn.ToShortTimeString() +
+                  "</div>";
+
+                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
+                        celEndOn.ToShortTimeString() +
+                     "</div></div>";
+
+                }
+
+
+            _httpContext = new HttpContextAccessor();
+            var currentUserRoles = _httpContext.HttpContext.User.Claims
+                .Select(x => x.Value).ToList();
+
+            strToReturn += "</div>";
+            if (datatable.Predicate != "TimeShiftDetail")
+            {
+
+                if (currentUserRoles.Contains("TimeShift_Create"))
+                    if (true)
+                        strToReturn += FaIconAdd(dayOfMonth, "", employeeId);
+
+                if (currentUserRoles.Contains("TimeShift_Edit"))
+                    if (true)
+                        if (cellWorkHours.Count() > 0)
+                            strToReturn += FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId);
+            }
+
+            return strToReturn;
+
+        }
+
+        public string GetTimeShiftEditCellBodyRealWorkHours(List<RealWorkHour> realWorkHours,
+            List<WorkHour> workHours, List<Leave> leaves, int compareMonth , int compareYear ,
+            int dayOfMonth, Datatable datatable, int employeeId)
+        {
+            var strToReturn = "";
+
+            var cellWorkHours = workHours.Where(x =>
+                  x.TimeShiftId == datatable.GenericId &&
+                  x.StartOn.Year == compareYear &&
+                  x.StartOn.Month == compareMonth &&
+                  (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                  x.EmployeeId == employeeId)
+               .ToList();
+
+            var cellRealWorkHours = realWorkHours.Where(x =>
+               x.TimeShiftId == datatable.GenericId &&
+               x.StartOn.Year == compareYear &&
+               x.StartOn.Month == compareMonth &&
+               (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+               x.EmployeeId == employeeId)
+            .ToList();
+
+
+            var cellLeaves = leaves.Where(x =>
+                   x.StartOn.Year == compareYear &&
+                   x.StartOn.Month == compareMonth &&
+                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                   x.EmployeeId == employeeId)
+                .ToList();
+
+            if (cellWorkHours.Any(x => x.IsDayOff))
+                strToReturn +=
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                    "<center><p><b>Ρεπό</b></p></center>" +
+                     "</div>";
+
+            if (cellLeaves.Count() > 0)
+                return
+                    "<div style='width:110px; white-space: nowrap;'>" +
+                        "<center><p><b>Άδεια</b></p></center>" +
+                     "</div>";
+            else
+            {
+                foreach (var cellWorkHour in cellRealWorkHours)
+                {
+                    var celStartOn = cellWorkHour.StartOn;
+                    if (celStartOn.Day != dayOfMonth)
+                        celStartOn = new DateTime(
+                            cellWorkHour.StartOn.Year,
+                            cellWorkHour.StartOn.Month,
+                            cellWorkHour.StartOn.Day,
+                            0,
+                            0,
+                            0,
+                            0);
+
+                    var celEndOn = cellWorkHour.EndOn;
+                    if (celEndOn.Day != dayOfMonth)
+                        celEndOn = new DateTime(
+                                cellWorkHour.EndOn.Year,
+                                cellWorkHour.EndOn.Month,
+                                cellWorkHour.EndOn.Day,
+                                23,
+                                59,
+                                0,
+                                0);
+                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
+                        celStartOn.ToShortTimeString() +
+                  "</div>";
+
+                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
+                        celEndOn.ToShortTimeString() +
+                     "</div></div>";
+                }
+
+                _httpContext = new HttpContextAccessor();
+                var currentUserRoles = _httpContext.HttpContext.User.Claims
+                    .Select(x => x.Value).ToList();
+
+                if (datatable.GenericId != 0)
+                {
+                    if (!cellWorkHours.Any(x => x.IsDayOff))
+                    {
+
+                        if (currentUserRoles.Contains("RealWorkHour_Create"))
+                            strToReturn += FaIconAdd(dayOfMonth, "", employeeId,
+                                compareMonth, compareYear);
+
+                        if (currentUserRoles.Contains("RealWorkHour_Edit"))
+                            if (cellRealWorkHours.Count() > 0)
+                                strToReturn += FaIconEdit(dayOfMonth, "green", employeeId,
+                                       datatable.GenericId, compareMonth, compareYear);
+                    }
+                }
+                return strToReturn;
+
+            }
+        }
+
+
+
+
+
+
+
+
+
         public async Task<string> GetTimeShiftEditCellBodyWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
             var strToReturn = "";

@@ -11,6 +11,9 @@ public class EmployeeWorkPlaceConfiguration : IEntityTypeConfiguration<EmployeeW
     {
         public void Configure(EntityTypeBuilder<EmployeeWorkPlace> builder)
         {
+            builder.HasIndex(x => x.Id).IsUnique();
+
+
             builder.HasOne(u => u.Employee).WithMany(u => u.EmployeeWorkPlaces).IsRequired().OnDelete(DeleteBehavior.Restrict);
             builder.HasKey(t => new { t.Id, t.EmployeeId });
             builder.HasOne(pt => pt.WorkPlace).WithMany(p => p.EmployeeWorkPlaces).HasForeignKey(pt => pt.WorkPlaceId);

@@ -95,7 +95,7 @@ namespace WebApplication.Api
 
             if (select2.TimeShiftId != null)
                 filter = filter.And(x => x.EmployeeWorkPlaces
-                .Any(y => y.WorkPlace.TimeShift
+                .Any(y => y.WorkPlace.TimeShifts
                     .Any(z => z.Id == select2.TimeShiftId)));
 
             if (select2.ExistingIds?.Count > 0)
@@ -182,6 +182,126 @@ namespace WebApplication.Api
             return Ok(select2Helper.CreateEmployeesResponse(employees, hasMore));
         }
 
+
+        // POST: api/employees/datatable2
+        [HttpPost("datatable2")]
+        public async Task<ActionResult<WorkHour>> datatable2([FromBody] Datatable datatable)
+        {
+            var pageSize = datatable.Length;
+            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            var orderDirection = datatable.Order[0].Dir;
+            var filter = PredicateBuilder.New<Employee>();
+            filter = filter.And(GetSearchFilter(datatable));
+
+            var employees = new List<Employee>();
+
+            if (datatable.Predicate == "TimeShiftEdit")
+                filter = filter.And(x => x.EmployeeWorkPlaces
+                .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
+
+            if (datatable.Predicate == "RealWorkHourIndex")
+                if (datatable.GenericId != 0)
+                    filter = filter.And(x => x.EmployeeWorkPlaces
+                        .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
+
+            employees = await _baseDataWork.Employees
+                .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+                        filter, null, pageSize, pageIndex);
+
+            employees = employees.Select(x => new Employee
+            {
+                Id=x.Id,
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                ErpCode = x.ErpCode
+            }).ToList();
+
+            var mapedData = await MapResults2(employees, datatable);
+            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
+            var total = await _baseDataWork.Employees.CountAllAsyncFiltered(filter);
+            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+        }
+        protected async Task<IEnumerable<ExpandoObject>> MapResults2(IEnumerable<Employee> results, Datatable datatable)
+        {
+
+
+            
+            var workHours = await _baseDataWork.WorkHours.Where(x =>
+                    x.StartOn.Year == datatable.TimeShiftYear &&
+                    x.TimeShiftId == datatable.GenericId &&
+                    x.StartOn.Month == datatable.TimeShiftMonth)
+                .ToDynamicListAsync<WorkHour>();
+
+            var leaves = await _baseDataWork.Leaves.Where(x =>
+                    x.StartOn.Year == datatable.TimeShiftYear &&
+                    x.StartOn.Month == datatable.TimeShiftMonth)
+                .ToDynamicListAsync<Leave>();
+
+
+
+            var compareMonth = 0;
+            var compareYear = 0;
+
+
+            var timeshifts = await _baseDataWork.TimeShifts
+                .Where(x => x.Id == datatable.GenericId)
+                .ToDynamicListAsync<TimeShift>();
+
+            if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
+            {
+                compareMonth = timeshifts[0].Month;
+                compareYear = timeshifts[0].Year;
+            }
+            else
+            {
+                compareMonth = (int)datatable.SelectedMonth;
+                compareYear = (int)datatable.SelectedYear;
+            }
+            var realWorkHours = await _baseDataWork.RealWorkHours.Where(x =>
+                   x.StartOn.Year == compareYear &&
+                   x.TimeShiftId == datatable.GenericId &&
+                   x.StartOn.Month == compareMonth)
+               .ToDynamicListAsync<RealWorkHour>();
+
+
+            var expandoObject = new ExpandoCopier();
+            var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
+            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+            foreach (var employee in results)
+            {
+                var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+                var dictionary = (IDictionary<string, object>)expandoObj;
+                if (datatable.Predicate == "TimeShiftEdit")
+                {
+                    for (int i = 1; i <= DateTime.DaysInMonth(datatable.TimeShiftYear, datatable.TimeShiftMonth); i++)
+                        dictionary.Add("Day" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
+                            (workHours, leaves, i, datatable, employee.Id));
+
+                    dictionary.Add("ToggleSlider", dataTableHelper
+                        .GetEmployeeCheckbox(datatable, employee.Id));
+
+                    returnObjects.Add(expandoObj);
+                }
+                else if (datatable.Predicate == "RealWorkHourIndex")
+                {
+                   
+
+                    for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
+                        dictionary.Add("Day" + i,
+                             dataTableHelper.GetTimeShiftEditCellBodyRealWorkHours(
+                                 realWorkHours, workHours, leaves, compareMonth, compareYear,i, datatable, employee.Id));
+
+                    dictionary.Add("ToggleSlider", dataTableHelper
+                        .GetEmployeeCheckbox(datatable, employee.Id));
+
+                    returnObjects.Add(expandoObj);
+                }
+            }
+            return returnObjects;
+
+        }
+
         // POST: api/employees/datatable
         [HttpPost("datatable")]
         public async Task<ActionResult<Employee>> Datatable([FromBody] Datatable datatable)
@@ -205,6 +325,8 @@ namespace WebApplication.Api
 
             if (datatable.Predicate == "EmployeeIndex")
             {
+                includes.Add(x => x.Include(y => y.Company));
+
                 employees = await _baseDataWork.Employees
                       .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
             }
@@ -253,8 +375,8 @@ namespace WebApplication.Api
 
             if (datatable.Predicate == "TimeShiftEdit")
             {
-                var timeShift = await _baseDataWork.TimeShifts
-                    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                var timeShift = _baseDataWork.TimeShifts
+                    .Where(x => x.Id == datatable.GenericId).ToList()[0];
 
                 filter = filter.And(x => x.EmployeeWorkPlaces
                     .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId));
@@ -265,8 +387,10 @@ namespace WebApplication.Api
             }
             if (datatable.Predicate == "TimeShiftDetail")
             {
-                var timeShift = await _baseDataWork.TimeShifts
-                    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                var timeShift = _baseDataWork.TimeShifts
+                    .Where(x => x.Id == datatable.GenericId).ToList()[0];
+                //var timeShift = await _baseDataWork.TimeShifts
+                //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
 
                 filter = filter.And(x => x.EmployeeWorkPlaces
                      .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId));
@@ -274,16 +398,23 @@ namespace WebApplication.Api
                 employees = await _baseDataWork.Employees
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
                     filter, includes, pageSize, pageIndex);
+
+                employees = employees.Select(x => new Employee
+                {
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    ErpCode = x.ErpCode
+                }).ToList();
             }
             if (datatable.Predicate == "RealWorkHourIndex")
             {
                 if (datatable.GenericId != 0)
                 {
-                    var timeShift = await _baseDataWork.TimeShifts
-                        .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                    var timeShift = _baseDataWork.TimeShifts
+                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
 
                     filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId));
+                        .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
                 }
 
                 employees = await _baseDataWork.Employees
@@ -303,11 +434,12 @@ namespace WebApplication.Api
                     filter, includes, pageSize, pageIndex);
 
                 employees = employees
-                    .Select(x => new Employee {
-                        Id=x.Id,
-                        FirstName=x.FirstName,
-                        LastName=x.LastName,
-                        RealWorkHours=x.RealWorkHours.Where(y=>y.StartOn.Day==DateTime.Now.Day).ToList()
+                    .Select(x => new Employee
+                    {
+                        Id = x.Id,
+                        FirstName = x.FirstName,
+                        LastName = x.LastName,
+                        RealWorkHours = x.RealWorkHours.Where(y => y.StartOn.Day == DateTime.Now.Day).ToList()
                     })
                     .ToList();
             }
@@ -315,7 +447,7 @@ namespace WebApplication.Api
             {
                 employees = await _baseDataWork.Employees
                     .ProjectionDifference(SetOrderBy(columnName, orderDirection),
-                    datatable, filter,pageSize, pageIndex);
+                    datatable, filter, pageSize, pageIndex);
             }
             if (datatable.Predicate == "ProjectionConcentric")
             {
@@ -368,9 +500,8 @@ namespace WebApplication.Api
                      .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
                      filter, includes, pageSize, pageIndex);
             }
-            var mapedData =await MapResults(employees, datatable);
 
-
+            var mapedData = await MapResults(employees, datatable);
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             var total = await _baseDataWork.Employees.CountAllAsyncFiltered(filter);
 
@@ -382,6 +513,10 @@ namespace WebApplication.Api
             var expandoObject = new ExpandoCopier();
             var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+
+            //var leaves = _baseDataWork.Leaves.Where(x =>
+            //x.StartOn.Year == timeshift.Year &&
+            //x.StartOn.Month == timeshift.Month).ToList<Leave>();
             foreach (var employee in results)
             {
                 var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
@@ -474,13 +609,24 @@ namespace WebApplication.Api
 
                 else if (datatable.Predicate == "TimeShiftEdit")
                 {
-                    var timeshift = await _baseDataWork.TimeShifts
-                        .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                    //var timeShift = await _baseDataWork.TimeShifts
+                    //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                    var timeShift = _baseDataWork.TimeShifts
+                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
 
-                    for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
-                        dictionary.Add("Day" + i,
-                            await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(
-                                _baseDataWork, i, datatable, employee.Id));
+                    var workHours = await _baseDataWork.WorkHours.Where(x =>
+                  x.StartOn.Year == timeShift.Year &&
+                  x.StartOn.Month == timeShift.Month).ToDynamicListAsync<WorkHour>();
+
+                    var leaves = await _baseDataWork.Leaves.Where(x =>
+                    x.StartOn.Year == timeShift.Year &&
+                    x.StartOn.Month == timeShift.Month).ToDynamicListAsync<Leave>();
+
+                    for (int i = 1; i <= DateTime.DaysInMonth(timeShift.Year, timeShift.Month); i++)
+                    {
+                        var asdfasd = await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork, i, datatable, employee.Id);
+                        dictionary.Add("Day" + i, asdfasd);
+                    }
 
                     dictionary.Add("ToggleSlider", dataTableHelper
                         .GetEmployeeCheckbox(datatable, employee.Id));
@@ -489,13 +635,21 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "TimeShiftDetail")
                 {
-                    var timeshift = await _baseDataWork.TimeShifts
-                        .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                    //var timeShift = await _baseDataWork.TimeShifts
+                    //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                    var timeShift = _baseDataWork.TimeShifts
+                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
+                    var workHours = await _baseDataWork.WorkHours.Where(x =>
+                  x.StartOn.Year == timeShift.Year &&
+                  x.StartOn.Month == timeShift.Month).ToDynamicListAsync<WorkHour>();
 
-                    for (int i = 1; i <= DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
+                    var leaves = await _baseDataWork.Leaves.Where(x =>
+                    x.StartOn.Year == timeShift.Year &&
+                    x.StartOn.Month == timeShift.Month).ToDynamicListAsync<Leave>();
+
+                    for (int i = 1; i <= DateTime.DaysInMonth(timeShift.Year, timeShift.Month); i++)
                         dictionary.Add("Day" + i,
-                           await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork,
-                                i, datatable, employee.Id));
+                           await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork, i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper
                         .GetEmployeeCheckbox(datatable, employee.Id));
@@ -509,7 +663,9 @@ namespace WebApplication.Api
 
                     if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
                     {
-                        var timeShift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                        //var timeShift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+                        var timeShift = _baseDataWork.TimeShifts
+                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
                         compareMonth = timeShift.Month;
                         compareYear = timeShift.Year;
                     }

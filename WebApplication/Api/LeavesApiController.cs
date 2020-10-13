@@ -36,9 +36,21 @@ namespace WebApplication.Api
 
         // GET: api/leaves
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Leave>>> GetLeaves()
+        public async Task<ActionResult<IEnumerable<WorkHour>>> GetLeaves()
         {
-            return await _context.Leaves.ToListAsync();
+            //return await _context.Leaves.ToListAsync();
+            return await _baseDataWork.WorkHours.Where(x =>
+        x.TimeShiftId == 13 &&
+        x.StartOn.Year == 2020 &&
+        x.StartOn.Month == 10).Select(x => new WorkHour
+        {
+            StartOn = x.StartOn,
+            EndOn = x.EndOn,
+            IsDayOff = x.IsDayOff,
+            EmployeeId = x.EmployeeId,
+            Comments = x.Comments,
+            TimeShiftId = x.TimeShiftId
+        }).ToDynamicListAsync<WorkHour>();
         }
 
         // GET: api/leaves/5
@@ -87,10 +99,10 @@ namespace WebApplication.Api
                     {
                         StartOn = apiLeave.StartOn,
                         EndOn = apiLeave.EndOn,
-                        ApprovedBy=apiLeave.ApprovedBy,
+                        ApprovedBy = apiLeave.ApprovedBy,
                         Description = apiLeave.Description,
                         EmployeeId = id,
-                        LeaveTypeId=apiLeave.LeaveTypeId,
+                        LeaveTypeId = apiLeave.LeaveTypeId,
                         CreatedOn = DateTime.Now
                     }));
             await _context.SaveChangesAsync();
@@ -124,7 +136,7 @@ namespace WebApplication.Api
                 foreach (var id in apiLeave.EmployeeIds)
                 {
                     dataToReturn.AddRange(await _baseDataWork.DateHasOverlap(
-                        apiLeave.StartOn, apiLeave.EndOn, id) ?? 
+                        apiLeave.StartOn, apiLeave.EndOn, id) ??
                         new List<ApiLeavesHasOverlapResponse>());
                 }
 

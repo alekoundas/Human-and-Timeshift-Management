@@ -18,7 +18,7 @@ namespace DataAccess.Models.Entity
         [Display(Name = "Πελάτης")]
         public int? CustomerId { get; set; }
         public Customer Customer { get; set; }
-        public ICollection<TimeShift>TimeShift { get; set; }
+        public ICollection<TimeShift>TimeShifts { get; set; }
         public ICollection<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
     }
 }
