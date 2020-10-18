@@ -1,0 +1,118 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonCreateNew("WorkPlaceHourRestriction")
+                    @Html.ButtonImport("WorkPlaceHourRestriction")
+                </div>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="WorkPlaceHourRestrictionDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Πόστο</th>
+                            <th>Μήνας</th>
+                            <th>Έτος</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Πόστο</th>
+                            <th>Μήνας</th>
+                            <th>Έτος</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+
+</div>
+<partial name="_ImportModal" model='new {Entity = "WorkPlaceHourRestriction" }'>
+    @section Scripts {
+        <script>
+            $('#WorkPlaceHourRestrictionDatatable').DataTable({
+                serverSide: true,
+                responsive: true,
+                processing: true,
+                colReorder: false,
+                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
+                iDisplayLength: 150,
+                dom: 'Bfrtlp',
+                buttons: ['excel', 'print'],
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+                },
+                ajax: {
+                    url: '/api/WorkPlaceHourRestrictions/datatable',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: (data, type, row, meta) => {
+                        data.Predicate = 'WorkPlaceHourRestrictionIndex';
+                        return JSON.stringify(data);
+                    }
+                },
+                order: [[1, 'desc']],
+                columns: [
+                    {
+                        data: "WorkPlaceName",
+                        searchable: true,
+                        orderable: true,
+                        render: (a, b, data, d) => {
+                            console.log(data);
+                            if (data.WorkPlaceName != null)
+                                return data.WorkPlaceName;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Month",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Month != null)
+                                return data.Month;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Year",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Year != null)
+                                return data.Year;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Button",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Buttons != null)
+                                return data.Buttons;
+                            else
+                                return "";
+                        }
+                    }
+                ]
+            });
+        </script>
+    }

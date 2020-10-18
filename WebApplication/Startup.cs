@@ -1,24 +1,20 @@
 using System;
+using System.Globalization;
+using System.Threading;
+using Business.Seed;
+using DataAccess;
+using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using DataAccess;
-using Business.Seed;
-using DataAccess.Models.Identity;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using System.Threading;
-using Microsoft.AspNetCore.HttpOverrides;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace WebApplication
 {
@@ -41,7 +37,8 @@ namespace WebApplication
             services.AddDbContext<SecurityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options => {
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+            {
                 options.ClaimsIdentity.UserIdClaimType = "UserID";
                 //options.ClaimsIdentity.RoleClaimType= "FirstName";
                 //options.ClaimsIdentity.RoleClaimType= "LastName";
@@ -51,7 +48,8 @@ namespace WebApplication
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<SecurityDbContext>();
 
-            services.Configure<IdentityOptions>(opts => {
+            services.Configure<IdentityOptions>(opts =>
+            {
                 opts.Password.RequiredLength = 8;
                 opts.Password.RequireNonAlphanumeric = true;
                 opts.Password.RequireLowercase = true;
@@ -70,7 +68,8 @@ namespace WebApplication
             });
 
             //Enable TempData[""] from API
-            services.Configure<CookieTempDataProviderOptions>(options => {
+            services.Configure<CookieTempDataProviderOptions>(options =>
+            {
                 options.Cookie.IsEssential = true;
             });
 

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DataAccess.Models.Entity;
+﻿using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccess.Configurations
 {
-   public class CompanyConfiguration : IEntityTypeConfiguration<Contact>
+    public class CompanyConfiguration : IEntityTypeConfiguration<Company>
     {
-        public void Configure(EntityTypeBuilder<Contact> builder)
+        public void Configure(EntityTypeBuilder<Company> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
         }

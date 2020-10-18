@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Bussiness.Repository.Interface;
 using DataAccess;
-using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -18,12 +15,6 @@ namespace Bussiness.Repository
         protected readonly BaseDbContext Context;
         protected readonly DbSet<TEntity> _set;
 
-        // Here we assign the set of entities in the _Set private field in order to avoid
-        // extra noise that would be created when in each method we would have to 
-        // call things like: 
-        // return Context.Set<TEntity>().ToList(); 
-        // or 
-        // return Context.Set<TEntity>().SingleOrDefault() etc;
         public BaseRepository(BaseDbContext context)
         {
             Context = context;
@@ -118,18 +109,18 @@ namespace Bussiness.Repository
 
             return await qry.ToListAsync();
         }
-    //    TEntity SelectObject(List<string> fields,TEntity value)
-    //    {
-    //        TEntity classTEntity = (TEntity)Activator.CreateInstance(typeof(TEntity));
+        //    TEntity SelectObject(List<string> fields,TEntity value)
+        //    {
+        //        TEntity classTEntity = (TEntity)Activator.CreateInstance(typeof(TEntity));
 
-    //        foreach (var field in fields)
-    //        classTEntity.GetType().GetProperty(field).SetValue(classTEntity, value.GetType().get);
+        //        foreach (var field in fields)
+        //        classTEntity.GetType().GetProperty(field).SetValue(classTEntity, value.GetType().get);
 
 
-    //        return classTEntity
+        //        return classTEntity
 
-      
-    //}
+
+        //}
 
 
 
@@ -158,7 +149,11 @@ namespace Bussiness.Repository
             _set.Add(entity);
         }
 
-        public void Select(Expression<Func<TEntity, bool>> predicate)
+        //public void Select(Expression<Func<TEntity, bool>> predicate)
+        //{
+        //    _set.Select(predicate);
+        //}
+        public void Select(Func<TEntity, TEntity> predicate)
         {
             _set.Select(predicate);
         }
@@ -182,6 +177,18 @@ namespace Bussiness.Repository
         {
             return await _set.FindAsync(id);
         }
+        public async Task<TEntity> FirstAsync(int id,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
+        {
+            var qry = (IQueryable<TEntity>)_set;
+
+            if (includes != null)
+                foreach (var include in includes)
+                    qry = include(qry);
+
+            return await qry.FirstOrDefaultAsync();
+
+        }
 
         public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter)
         {
@@ -196,4 +203,3 @@ namespace Bussiness.Repository
 
     }
 }
-

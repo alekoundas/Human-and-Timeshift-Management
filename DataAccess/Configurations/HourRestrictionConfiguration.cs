@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccess.Configurations
 {
-    public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
+    public class HourRestrictionConfiguration : IEntityTypeConfiguration<HourRestriction>
     {
-        public void Configure(EntityTypeBuilder<Customer> builder)
+        public void Configure(EntityTypeBuilder<HourRestriction> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
         }

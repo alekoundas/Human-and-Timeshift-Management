@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using DataAccess.Models.Identity;
+using DataAccess.Models.Select2;
+using LinqKit;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Bussiness;
-using WebApplication.Utilities;
-using DataAccess.Models.Datatable;
-using System.Dynamic;
-using Bussiness.Service;
-using LinqKit;
-using DataAccess.Models.Select2;
-using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
-using DataAccess.Models.Identity;
-using Microsoft.AspNetCore.Identity;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -287,6 +287,18 @@ namespace WebApplication.Api
 
                 workPlaces = await _baseDataWork.WorkPlaces
                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+
+                workPlaces = workPlaces.Select(X => new WorkPlace
+                {
+                    CustomerId = X.CustomerId,
+                    Title = X.Title,
+                    EmployeeWorkPlaces = X.EmployeeWorkPlaces.Select(y => new EmployeeWorkPlace
+                    {
+                        Id = y.Id,
+                        WorkPlaceId = y.WorkPlaceId,
+                        EmployeeId = y.EmployeeId
+                    }).ToList()
+                }).ToList();
             }
             if (datatable.Predicate == "EmployeeDetails")
             {
@@ -354,7 +366,7 @@ namespace WebApplication.Api
                     var apiUrl = UrlHelper.CustomerWorkPlace(datatable.GenericId,
                         workplace.Id);
 
-                    if (workplace.Customer?.Id== datatable.GenericId)
+                    if (workplace.Customer?.Id == datatable.GenericId)
                         dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                             "WorkPlace", apiUrl, "checked"));
                     else
@@ -441,7 +453,7 @@ namespace WebApplication.Api
             foreach (var workPlaceId in workPlaceIds)
                 filter = filter.Or(x => x.Id == workPlaceId);
 
-            if(workPlaceIds.Count()==0)
+            if (workPlaceIds.Count() == 0)
                 filter = filter.And(x => true);
 
             return filter;

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.Models.Entity
 {
@@ -18,7 +15,8 @@ namespace DataAccess.Models.Entity
         [Display(Name = "Πελάτης")]
         public int? CustomerId { get; set; }
         public Customer Customer { get; set; }
-        public ICollection<TimeShift>TimeShifts { get; set; }
+        public ICollection<TimeShift> TimeShifts { get; set; }
         public ICollection<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
+        public ICollection<WorkPlaceHourRestriction> WorkPlaceHourRestrictions { get; set; }
     }
 }

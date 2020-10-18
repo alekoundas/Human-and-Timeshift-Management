@@ -1,0 +1,125 @@
+﻿@model DataAccess.ViewModels.WorkPlaceHourRestrictions.WorkPlaceHourRestrictionCreate
+
+
+<div class="row">
+    <div class="col-md-2"> </div>
+    <div class="col-md-8">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonBackToList("RealWorkHour")
+                </div>
+            </div>
+
+            <hr />
+
+            <form asp-controller="WorkPlaceHourRestriction" asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="Month" id="Month" style="display:none;" />
+                <input asp-for="Year" id="Year" style="display:none;" />
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="WorkPlaceId" class="control-label"></label>
+                        <div class="input-group" style="width:30%">
+                            <select class="WorkPlace_Select2" asp-for="WorkPlaceId" style="width:70%"></select>
+                            <span asp-validation-for="WorkPlaceId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label"> Επιλογή μήνα και έτους</label>
+                        <div class="input-group" style="width:30%">
+                            <input type="text" id="MonthPicker" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div id="DaysDiv" style="display:none;">
+
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" id="SubmitButton" value="Υποβολή" class="btn btn-primary" disabled />
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="col-md-2"> </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/jQueryMonthPicker/MonthPicker.js"></script>
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        $('.WorkPlace_Select2').select2({
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: params => {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
+        $('#MonthPicker').MonthPicker({
+            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
+            OnAfterChooseMonth: function () {
+                var month = $(this).val().split('/')[0];
+                var year = $(this).val().split('/')[1];
+                document.getElementById('Year').value = year
+                document.getElementById('Month').value = month
+                document.getElementById('DaysDiv').style.display = '';
+
+                AppendMonthDaysHtml(year, month);
+            }
+        });
+    </script>
+
+    <!--///////////////////////////////////////-->
+    <!--///             Functions           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        var getDaysInMonth = (year, month) =>
+            new Date(year, month, 0).getDate();
+
+
+        const GetDaysHtml = (year, month) => {
+            var returnStr = '';
+            for (var i = 1; i <= getDaysInMonth(year, month); i++) {
+                var currentDate = new Date(year, month, i);
+                var options = { weekday: 'long', day: 'numeric' };
+
+                returnStr +=
+                    '<div class="form-group">' +
+                    '<div class="input-group" style="width:30%">' +
+                    '<label class="control-label">' + currentDate.toLocaleString('el-GR', options) + '</label>' +
+                    '<input type="text" name="HourRestrictions[' + i + '].Day" class="form-control" style="display:none;"value="' + i + '" readonly />' +
+                    '<input type="number" name="HourRestrictions[' + i + '].MaxHours" class="form-control"value="0" />' +
+                    '</div>' +
+                    '</div>';
+            }
+            return returnStr;
+        }
+
+        const AppendMonthDaysHtml = (year, month) =>
+            document.getElementById('DaysDiv')
+                .insertAdjacentHTML('beforeend', GetDaysHtml(year, month))
+
+
+    </script>
+
+}

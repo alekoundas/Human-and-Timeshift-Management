@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using DataAccess.Models.Datatable;
 using System.Dynamic;
-using Bussiness.Service;
-using WebApplication.Utilities;
-using Bussiness;
-using Bussiness.Repository.Security.Interface;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
 using DataAccess.Models.Select2;
 using LinqKit;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Dynamic.Core;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -46,6 +44,28 @@ namespace WebApplication.Api
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+        }
+        [HttpGet("testapi")]
+        public async Task<ActionResult<Employee>> testapi()
+        {
+            var select = new SelectLambdaBuilder<Employee>()
+                .CreateSelect()
+                .WithProperty("Id")
+                .WithProperty("FirstName")
+                .WithProperty("LastName")
+                .AddClass<WorkHour>("workhours")
+                //.AddClass<Specialization>("Id")
+                .CompleteSelect();
+
+
+            var aaa = _context.Employees
+                .Include(x => x.EmployeeWorkPlaces)
+                .Include(x => x.Specialization)
+                .Include(x => x.WorkHours)
+                .Select(select)
+                .ToList();
+
+            return Ok(aaa);
         }
 
         // DELETE: api/employees/5
@@ -211,7 +231,7 @@ namespace WebApplication.Api
 
             employees = employees.Select(x => new Employee
             {
-                Id=x.Id,
+                Id = x.Id,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 ErpCode = x.ErpCode
@@ -224,9 +244,6 @@ namespace WebApplication.Api
         }
         protected async Task<IEnumerable<ExpandoObject>> MapResults2(IEnumerable<Employee> results, Datatable datatable)
         {
-
-
-            
             var workHours = await _baseDataWork.WorkHours.Where(x =>
                     x.StartOn.Year == datatable.TimeShiftYear &&
                     x.TimeShiftId == datatable.GenericId &&
@@ -237,8 +254,6 @@ namespace WebApplication.Api
                     x.StartOn.Year == datatable.TimeShiftYear &&
                     x.StartOn.Month == datatable.TimeShiftMonth)
                 .ToDynamicListAsync<Leave>();
-
-
 
             var compareMonth = 0;
             var compareYear = 0;
@@ -285,12 +300,12 @@ namespace WebApplication.Api
                 }
                 else if (datatable.Predicate == "RealWorkHourIndex")
                 {
-                   
+
 
                     for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
                         dictionary.Add("Day" + i,
                              dataTableHelper.GetTimeShiftEditCellBodyRealWorkHours(
-                                 realWorkHours, workHours, leaves, compareMonth, compareYear,i, datatable, employee.Id));
+                                 realWorkHours, workHours, leaves, compareMonth, compareYear, i, datatable, employee.Id));
 
                     dictionary.Add("ToggleSlider", dataTableHelper
                         .GetEmployeeCheckbox(datatable, employee.Id));

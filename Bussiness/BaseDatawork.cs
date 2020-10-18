@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using Business.Repository;
 using Business.Repository.Interface;
-using Bussiness.Repository;
 using Bussiness.Repository.Base;
 using Bussiness.Repository.Base.Interface;
 using DataAccess;
@@ -23,32 +19,36 @@ namespace Bussiness
         private readonly BaseDbContext _dbcontext;
 
 
-        public IEmployeeRepository Employees { get; private set; }
-        public ISpecializationRepository Specializations { get; private set; }
-        public ICompanyRepository Companies { get; private set; }
-        public ICustomerRepository Customers { get; private set; }
-        public IWorkplaceRepository WorkPlaces { get; private set; }
-        public IWorkHourRepository WorkHours { get; private set; }
-        public IRealWorkHourRepository RealWorkHours { get; private set; }
-        public ITimeShiftRepository TimeShifts { get; private set; }
-        public IEmployeeWorkPlaceRepository EmployeeWorkPlaces { get; private set; }
         public ILeaveRepository Leaves { get; private set; }
+        public ICompanyRepository Companies { get; private set; }
+        public IWorkHourRepository WorkHours { get; private set; }
+        public ICustomerRepository Customers { get; private set; }
+        public IEmployeeRepository Employees { get; private set; }
+        public IWorkplaceRepository WorkPlaces { get; private set; }
+        public ITimeShiftRepository TimeShifts { get; private set; }
         public ILeaveTypeRepository LeaveTypes { get; private set; }
+        public IRealWorkHourRepository RealWorkHours { get; private set; }
+        public ISpecializationRepository Specializations { get; private set; }
+        public IHourRestrictionRepository HourRestrictions { get; private set; }
+        public IEmployeeWorkPlaceRepository EmployeeWorkPlaces { get; private set; }
+        public IWorkPlaceHourRestrictionRepository WorkPlaceHourRestrictions { get; private set; }
 
         public BaseDatawork(BaseDbContext baseDbContext)
         {
             _dbcontext = baseDbContext;
-            Employees = new EmployeeRepository(_dbcontext);
-            Specializations = new SpecializationRepository(_dbcontext);
+            Leaves = new LeaveRepository(_dbcontext);
             Companies = new CompanyRepository(_dbcontext);
             Customers = new CustomerRepository(_dbcontext);
-            WorkPlaces = new WorkPlaceRepository(_dbcontext);
+            Employees = new EmployeeRepository(_dbcontext);
             WorkHours = new WorkHourRepository(_dbcontext);
-            RealWorkHours = new RealWorkHourRepository(_dbcontext);
-            TimeShifts = new TimeShiftRepository(_dbcontext);
-            EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
-            Leaves = new LeaveRepository(_dbcontext);
+            WorkPlaces = new WorkPlaceRepository(_dbcontext);
             LeaveTypes = new LeaveTypeRepository(_dbcontext);
+            TimeShifts = new TimeShiftRepository(_dbcontext);
+            RealWorkHours = new RealWorkHourRepository(_dbcontext);
+            Specializations = new SpecializationRepository(_dbcontext);
+            HourRestrictions = new HourRestrictionRepository(_dbcontext);
+            EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
+            WorkPlaceHourRestrictions = new WorkPlaceHourRestrictionRepository(_dbcontext);
         }
 
         public async Task<int> SaveChangesAsync()
@@ -105,7 +105,7 @@ namespace Bussiness
             return response;
         }
 
-  
+
         private Func<T, bool> GetDateOverlapFilter<T>(DateTime startOn, DateTime endOn) =>
              x =>
                  ((DateTime)x.GetType().GetProperty("StartOn").GetValue(x) <= startOn && startOn <= (DateTime)x.GetType().GetProperty("EndOn").GetValue(x)) ||

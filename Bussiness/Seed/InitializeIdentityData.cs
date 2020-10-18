@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DataAccess.Models.Identity;
-using Microsoft.AspNetCore.Authorization;
+﻿using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace Business.Seed
@@ -25,9 +20,9 @@ namespace Business.Seed
                 {
                     UserName = "Admin",
                     Email = "Admin@Admin.gr",
-                    FirstName= "Admin",
+                    FirstName = "Admin",
                     LastName = "User",
-                    HasToChangePassword=false
+                    HasToChangePassword = false
                 };
 
                 IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd").Result;
@@ -39,7 +34,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_Create").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
-                    
+
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
@@ -202,7 +197,7 @@ namespace Business.Seed
                 ApplicationRole role = new ApplicationRole();
                 role.Name = "Employee_View";
                 role.Controller = role.Name.Split('_')[0];
-                role.Permition= role.Name.Split('_')[1];
+                role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
             if (!roleManager.RoleExistsAsync("Employee_Create").Result)
@@ -537,6 +532,40 @@ namespace Business.Seed
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
             }
 
+            //RealWorkhour
+            if (!roleManager.RoleExistsAsync("WorkPlaceHourRestriction_View").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlaceHourRestriction_View";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("WorkPlaceHourRestriction_Create").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlaceHourRestriction_Create";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("WorkPlaceHourRestriction_Edit").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlaceHourRestriction_Edit";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+            if (!roleManager.RoleExistsAsync("WorkPlaceHourRestriction_Delete").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "WorkPlaceHourRestriction_Delete";
+                role.Controller = role.Name.Split('_')[0];
+                role.Permition = role.Name.Split('_')[1];
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
             //Projection
             if (!roleManager.RoleExistsAsync("ProjectionDifference_View").Result)
             {
@@ -545,7 +574,7 @@ namespace Business.Seed
                 role.Controller = role.Name.Split('_')[0];
                 role.Permition = role.Name.Split('_')[1];
                 IdentityResult roleResult = roleManager.CreateAsync(role).Result;
-            
+
             }
             if (!roleManager.RoleExistsAsync("ProjectionConcentric_View").Result)
             {

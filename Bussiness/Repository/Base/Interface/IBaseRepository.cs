@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -59,8 +58,9 @@ namespace Bussiness.Repository.Interface
         IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> expression);
 
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
-
-        void Select(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> FirstAsync(int id, List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
+        void Select(Func<TEntity, TEntity> predicate);
+        //void Select(Expression<Func<TEntity, bool>> predicate);
 
 
     }

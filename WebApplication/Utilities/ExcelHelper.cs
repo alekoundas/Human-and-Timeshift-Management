@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Business.Repository.Interface;
 using Bussiness;
 using DataAccess;
-using DataAccess.Models.Entity;
-using Microsoft.AspNetCore.Http;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
 using OfficeOpenXml;
 using OfficeOpenXml.DataValidation;
 
@@ -75,7 +67,7 @@ namespace WebApplication.Utilities
             return this;
         }
 
-        public ExcelPackage CompleteExcel(out List<string>  Errors)
+        public ExcelPackage CompleteExcel(out List<string> Errors)
         {
             Errors = this.Errors;
             return this.ExcelPackage;
