@@ -16,47 +16,35 @@
 
             <hr />
 
-            <form asp-controller="WorkPlaceHourRestriction" asp-action="Edit" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="Id" id="Month" style="display:none;" />
-                <input asp-for="DaysInMonth" id="DaysInMonth" style="display:none;" />
-                <div class="box-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Id" id="Month" style="display:none;" />
+            <input asp-for="DaysInMonth" id="DaysInMonth" style="display:none;" />
+            <div class="box-body">
+                @if (Model.WorkPlace != null)
+                {
+    <div class="form-group">
+        <label asp-for="WorkPlaceId" class="control-label"></label>
+        <div class="input-group">
+            <input asp-for="WorkPlace.Title" class="form-control" readonly="readonly" disabled />
+        </div>
+    </div>}
 
-                    <div class="form-group">
-                        <label asp-for="WorkPlaceId" class="control-label"></label>
-                        <div class="input-group" style="width:100%">
-                            <select class="WorkPlace_Select2" asp-for="WorkPlaceId" style="width:30%">
-                                <option value="@Model.WorkPlaceId" selected="selected">@Model.WorkPlace.Title</option>
-                            </select>
-                            <span asp-validation-for="WorkPlaceId" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="Month" class="control-label"></label>
-                        <div class="input-group" style="width:30%">
-                            <input asp-for="Month" id="Month" class="form-control" readonly />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="Year" class="control-label"></label>
-                        <div class="input-group" style="width:30%">
-                            <input asp-for="Year" id="Year" class="form-control" readonly />
-                        </div>
-                    </div>
-
-                    <div id="DaysDiv">
-
-
-                    </div>
-
-                    <div class="form-group">
-                        <input type="submit" id="SubmitButton" value="Υποβολή" class="btn btn-primary" disabled />
+                <div class="form-group">
+                    <label asp-for="Month" class="control-label"></label>
+                    <div class="input-group" style="width:30%">
+                        <input asp-for="Month" id="Month" class="form-control" readonly />
                     </div>
                 </div>
-            </form>
 
+                <div class="form-group">
+                    <label asp-for="Year" class="control-label"></label>
+                    <div class="input-group" style="width:30%">
+                        <input asp-for="Year" id="Year" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <div id="DaysDiv"></div>
+            </div>
         </div>
     </div>
     <div class="col-md-2"> </div>
@@ -181,33 +169,21 @@
                 var options = { weekday: 'long', day: 'numeric' };
 
                 returnStr +=
-                    '<div class="form-group row" style="width:100% top:10px;">' +
-                    '<div class="input-group" style="width:25%; float: left;">' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Minutes_30" >-30λ.</button>' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Hours_4"   >-4ω.</button>' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Hours_8"   >-8ωλ.</button>' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Hours_16"   >-16ωλ.</button>' +
-                    '</div>' +
-                    '<div class="input-group" style="margin-right:15px; width:30%; float: left;">' +
+                    '<div class="form-group " style="width:100% top:10px;">' +
+                    '<div class="input-group" style="width:30%;">' +
                     '<label class="control-label">' + currentDate.toLocaleString('el-GR', options) + '</label>' +
                     '<input type="number" name="HourRestrictions[' + i + '].Id"  class="form-control" style="display:none;" value="' + GetIdValueFromMVC(day, hourRestrictions) + '" readonly />' +
                     '<input type="number" name="HourRestrictions[' + i + '].Day"  class="form-control" style="display:none;" value="' + day + '" readonly />' +
                     '<input type="text" ' +
                     'data-val="true" ' +
-                    'data-val-regex="Ο τύπος ώρας πρέπει να ειναι της μορφής ΗΗ:ΜΜ ή ΗΗΗ:ΜΜ" ' +
-                    'data-val-regex-pattern="^([0-9]{1}[0-9]{1}[0-9]{1}|[0-9]{1}[0-9]{1}):[0-5]{1}[0-9]{1}$" ' +
+                    'data-val-regex="Ο τύπος ώρας πρέπει να ειναι της μορφής ΗΗ:ΜΜ" ' +
+                    'data-val-regex-pattern="^([0-9]{1}[0-9]{1}):[0-5]{1}[0-9]{1}$" ' +
                     'data-val-required="Η ώρα απαιτείται" ' +
                     'aria-invalid="true" ' +
-                    'id="HourRestrictions[' + i + '].MaxTime" name="HourRestrictions[' + i + '].MaxTime"  class="form-control" value="' + GetDateValueFromMVC(day, hourRestrictions) + '" />' +
+                    'id="HourRestrictions[' + i + '].MaxTime" name="HourRestrictions[' + i + '].MaxTime"  class="form-control" value="' + GetDateValueFromMVC(day, hourRestrictions) + '" readonly />' +
 
                     '</br>' +
                     '<span class="text-danger field-validation-error" data-valmsg-for="HourRestrictions[' + i + '].MaxTime" data-valmsg-replace="true"></span>' +
-                    '</div>' +
-                    '<div class="input-group" style="width:25%; float: left;">' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Minutes_30" >+30λ.</button>' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Hours_4"   >+4ω.</button>' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Hours_8"   >+8ωλ.</button>' +
-                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Hours_16"   >+16ωλ.</button>' +
                     '</div>' +
                     '</div>';
 

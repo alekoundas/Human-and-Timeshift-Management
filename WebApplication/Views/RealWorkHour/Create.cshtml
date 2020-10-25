@@ -1,8 +1,6 @@
 ﻿@model DataAccess.ViewModels.RealWorkHours.RealWorkHourCreateViewModel
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-2"> </div>
@@ -32,6 +30,8 @@
                                 <div class="input-group" style="width:100%">
                                     <select class="TimeShift_Select2" asp-for="TimeShiftId" style="width:70%"></select>
                                     <span asp-validation-for="TimeShiftId" class="text-danger"></span>
+                                    <span style="display:none;" id="TimeShiftWarningSpan" class="text-warning">   </span>
+
                                 </div>
                             </div>
                         </div>
@@ -174,6 +174,19 @@
             }
         };
 
+        const HandleTimeShiftSpan = response => {
+            var warningSpan = document.getElementById('TimeShiftWarningSpan');
+
+            if (response != undefined)
+                if (response.errorType == 'warning')
+                    if (!warningSpan.innerHTML.includes(response.errorValue)) {
+                        warningSpan.innerHTML = response.errorValue;
+                        warningSpan.style.display = '';
+                    }
+
+
+        };
+
 
     </script>
 
@@ -213,6 +226,24 @@
                     BuildValidateWorkHourDto(startOn, endOn, employeeIds))
             }).done((data) => {
                 ShowResultPerEmployeeDropdown(data);
+                HandleSubmitButton();
+            });
+        };
+
+        const ValidateEmployeesWithRestrictionMaxHours = () => {
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+            var employeeIds = GetAlreadyAppendedEmployeeIds();
+
+            $.ajax({
+                type: "POST",
+                url: '/api/WorkPlaceHourRestrictions/ValidateHoursToWorkPlaceHourRestriction',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildValidateWorkHourDto(startOn, endOn, employeeIds))
+            }).done((data) => {
+                HandleTimeShiftSpan(data);
                 HandleSubmitButton();
             });
         };
@@ -313,12 +344,13 @@
                             data: JSON.stringify(
                                 BuildHasOverlapWorkHourDto(startDate, endDate))
                         }).done((data) => {
-
+                            HandleTimeShiftSpan();
                             HandleEmployeeSelect2Span();
                             AppendDateRangeToDateInputs(startDate, endDate, hasLaterDate);
                             HandleTimeRangeSpan(data);
                             ValidateEmployeesWithRangeToRealWorkhour();
                             ValidateEmployeesWithRangeToWorkHour();
+                            ValidateEmployeesWithRestrictionMaxHours();
                         });
 
                 }, 800);
@@ -339,7 +371,9 @@
                 }
             }).on('change', (e) => {
                 HandleEmployeeSelect2Span();
+                HandleTimeShiftSpan();
                 ValidateEmployeesWithRangeToRealWorkhour();
+                ValidateEmployeesWithRestrictionMaxHours();
                 ValidateEmployeesWithRangeToWorkHour();
                 HandleSubmitButton();
             });

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20201017122806_Add_HourRestriction_And_WorkPlaceHourRestriction_Tables")]
+    [Migration("20201022162924_Add_HourRestriction_And_WorkPlaceHourRestriction_Tables")]
     partial class Add_HourRestriction_And_WorkPlaceHourRestriction_Tables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -230,8 +230,8 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<int>("Day")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaxHours")
-                        .HasColumnType("int");
+                    b.Property<TimeSpan>("MaxTime")
+                        .HasColumnType("time");
 
                     b.Property<int>("WorkPlaceHourRestrictionId")
                         .HasColumnType("int");

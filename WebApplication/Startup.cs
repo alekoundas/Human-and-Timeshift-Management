@@ -61,9 +61,10 @@ namespace WebApplication
             //Redirect for account
             services.ConfigureApplicationCookie(options =>
             {
+                options.Cookie.HttpOnly = true;
                 options.LoginPath = "/Account/LogIn";
                 options.AccessDeniedPath = "/Account/LogIn";
-                options.ExpireTimeSpan = TimeSpan.FromHours(9);
+                options.ExpireTimeSpan = TimeSpan.FromDays(1);
                 options.SlidingExpiration = true;
             });
 

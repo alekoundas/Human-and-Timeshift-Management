@@ -41,13 +41,23 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "WorkPlaceHourRestriction_View")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            var includes = new List<Func<IQueryable<WorkPlaceHourRestriction>, IIncludableQueryable<WorkPlaceHourRestriction, object>>>();
+
+            includes.Add(x => x.Include(y => y.HourRestrictions));
+            includes.Add(x => x.Include(y => y.WorkPlace));
+
+            var workPlaceHourRestriction = await _baseDataWork
+                .WorkPlaceHourRestrictions
+                .FirstAsync(x => x.Id == id, includes);
+
+            if (workPlaceHourRestriction == null)
                 return NotFound();
 
             ViewData["Title"] = "Προβολη περιορσμών μήνα ";
             ViewData["HourRestrictionDataTable"] = "Σύνολο περιορσμών μέγιστης εισαγωγής π.βαρδιών ανα μέρα";
 
-            return View();
+            return View(WorkPlaceHourRestrictionEdit
+                .CreateFrom(workPlaceHourRestriction));
         }
 
         // GET: WorkPlaceHourRestriction/Create
@@ -66,11 +76,15 @@ namespace WebApplication.Controllers
 
             if (ModelState.IsValid)
             {
-                _baseDataWork.WorkPlaceHourRestrictions.Add(
-                    WorkPlaceHourRestrictionCreate.CreateFrom(workPlaceHourRestriction));
+                var workPlaceRestriction = WorkPlaceHourRestrictionCreate
+                    .CreateFrom(workPlaceHourRestriction);
+
+                _baseDataWork.WorkPlaceHourRestrictions.Add(workPlaceRestriction);
                 await _baseDataWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Title"] = "Προσθήκη νέου περιορισμού ";
+
             return View();
         }
 
@@ -87,7 +101,7 @@ namespace WebApplication.Controllers
 
             var workPlaceHourRestriction = await _baseDataWork
                 .WorkPlaceHourRestrictions
-                .FirstAsync((int)id, includes);
+                .FirstAsync(x => x.Id == id, includes);
 
             if (workPlaceHourRestriction == null)
                 return NotFound();
@@ -111,7 +125,9 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(workPlaceHourRestriction);
+                    _context.Update(WorkPlaceHourRestrictionEdit
+                        .CreateFrom(workPlaceHourRestriction));
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

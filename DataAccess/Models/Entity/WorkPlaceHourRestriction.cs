@@ -18,6 +18,6 @@ namespace DataAccess.Models.Entity
         public WorkPlace WorkPlace { get; set; }
 
         [Display(Name = "Περιορσμός μέγιστης εισαγωγής π.βαρδιών")]
-        public ICollection<HourRestriction> HourRestrictions { get; set; }
+        public IList<HourRestriction> HourRestrictions { get; set; }
     }
 }

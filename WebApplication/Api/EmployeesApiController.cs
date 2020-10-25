@@ -244,25 +244,14 @@ namespace WebApplication.Api
         }
         protected async Task<IEnumerable<ExpandoObject>> MapResults2(IEnumerable<Employee> results, Datatable datatable)
         {
-            var workHours = await _baseDataWork.WorkHours.Where(x =>
-                    x.StartOn.Year == datatable.TimeShiftYear &&
-                    x.TimeShiftId == datatable.GenericId &&
-                    x.StartOn.Month == datatable.TimeShiftMonth)
-                .ToDynamicListAsync<WorkHour>();
-
-            var leaves = await _baseDataWork.Leaves.Where(x =>
-                    x.StartOn.Year == datatable.TimeShiftYear &&
-                    x.StartOn.Month == datatable.TimeShiftMonth)
-                .ToDynamicListAsync<Leave>();
+            var workHours = new List<WorkHour>();
+            var leaves = new List<Leave>();
+            var timeshifts = await _baseDataWork.TimeShifts
+               .Where(x => x.Id == datatable.GenericId)
+               .ToDynamicListAsync<TimeShift>();
 
             var compareMonth = 0;
             var compareYear = 0;
-
-
-            var timeshifts = await _baseDataWork.TimeShifts
-                .Where(x => x.Id == datatable.GenericId)
-                .ToDynamicListAsync<TimeShift>();
-
             if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
             {
                 compareMonth = timeshifts[0].Month;
@@ -273,6 +262,39 @@ namespace WebApplication.Api
                 compareMonth = (int)datatable.SelectedMonth;
                 compareYear = (int)datatable.SelectedYear;
             }
+
+
+            if (datatable.TimeShiftYear != 0)
+            {
+                workHours = await _baseDataWork.WorkHours.Where(x =>
+                    x.TimeShiftId == datatable.GenericId &&
+                    x.StartOn.Year == datatable.TimeShiftYear &&
+                    x.StartOn.Month == datatable.TimeShiftMonth)
+                .ToDynamicListAsync<WorkHour>();
+
+                leaves = await _baseDataWork.Leaves.Where(x =>
+                       x.StartOn.Year == datatable.TimeShiftYear &&
+                       x.StartOn.Month == datatable.TimeShiftMonth)
+                   .ToDynamicListAsync<Leave>();
+
+            }
+            else
+            {
+                workHours = await _baseDataWork.WorkHours.Where(x =>
+                  x.TimeShiftId == datatable.GenericId &&
+                  x.StartOn.Year == compareYear &&
+                  x.StartOn.Month == compareMonth)
+              .ToDynamicListAsync<WorkHour>();
+
+                leaves = await _baseDataWork.Leaves.Where(x =>
+                       x.StartOn.Year == compareYear &&
+                       x.StartOn.Month == compareMonth)
+                   .ToDynamicListAsync<Leave>();
+            }
+
+
+
+
             var realWorkHours = await _baseDataWork.RealWorkHours.Where(x =>
                    x.StartOn.Year == compareYear &&
                    x.TimeShiftId == datatable.GenericId &&

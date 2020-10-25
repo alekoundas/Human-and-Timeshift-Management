@@ -23,7 +23,7 @@ namespace DataAccess.ViewModels.WorkPlaceHourRestrictions
         public WorkPlace WorkPlace { get; set; }
 
         [Display(Name = "Περιορσμός μέγιστης εισαγωγής π.βαρδιών")]
-        public ICollection<HourRestrictionEdit> HourRestrictions { get; set; }
+        public IList<HourRestrictionEdit> HourRestrictions { get; set; }
 
         public int DaysInMonth
         {
@@ -51,15 +51,16 @@ namespace DataAccess.ViewModels.WorkPlaceHourRestrictions
             };
         }
 
-        public static WorkPlaceHourRestrictionEdit CreateFrom(WorkPlaceHourRestriction viewModel)
+        public static WorkPlaceHourRestrictionEdit CreateFrom(WorkPlaceHourRestriction model)
         {
             return new WorkPlaceHourRestrictionEdit
             {
-                Id = viewModel.Id,
-                Month = viewModel.Month,
-                Year = viewModel.Year,
-                WorkPlaceId = viewModel.WorkPlaceId,
-                HourRestrictions = HourRestrictionEdit.CreateFrom(viewModel.HourRestrictions)
+                Id = model.Id,
+                Month = model.Month,
+                Year = model.Year,
+                WorkPlaceId = model.WorkPlaceId,
+                WorkPlace = model.WorkPlace,
+                HourRestrictions = HourRestrictionEdit.CreateFrom(model.HourRestrictions)
             };
         }
     }

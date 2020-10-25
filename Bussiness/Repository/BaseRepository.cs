@@ -177,7 +177,7 @@ namespace Bussiness.Repository
         {
             return await _set.FindAsync(id);
         }
-        public async Task<TEntity> FirstAsync(int id,
+        public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter,
             List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
         {
             var qry = (IQueryable<TEntity>)_set;
@@ -186,7 +186,7 @@ namespace Bussiness.Repository
                 foreach (var include in includes)
                     qry = include(qry);
 
-            return await qry.FirstOrDefaultAsync();
+            return await qry.FirstOrDefaultAsync(filter);
 
         }
 

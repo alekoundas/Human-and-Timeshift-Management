@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Bussiness;
+using DataAccess;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Microsoft.AspNetCore.Authorization;
-using Bussiness;
-using DataAccess.ViewModels;
-using WebApplication.Utilities;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 using OfficeOpenXml;
+using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -120,7 +120,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(employee);
-                 var zzz =    await _context.SaveChangesAsync();
+                    var zzz = await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -130,7 +130,6 @@ namespace WebApplication.Controllers
                         throw;
                 }
             return RedirectToAction(nameof(Index));
-            return View(employee);
         }
 
         [HttpGet]

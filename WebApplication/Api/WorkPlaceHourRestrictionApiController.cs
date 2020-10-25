@@ -10,6 +10,7 @@ using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
+using DataAccess.ViewModels.HourRestrictions;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -95,6 +96,37 @@ namespace WebApplication.Api
             return returnObjects;
         }
 
+
+
+        // POST: api/datatable
+        [HttpPost("ValidateHoursToWorkPlaceHourRestriction")]
+        public async Task<ActionResult<RealWorkHour>> ValidateHoursToWorkPlaceHourRestriction([FromBody] ApiHourRestrictionValidate validateVM)
+        {
+            var dataToReturn = new ApiHourRestrictionValidateResponse();
+            var day = validateVM.StartOn.Day;
+            var month = validateVM.StartOn.Month;
+            var year = validateVM.StartOn.Year;
+            var secondsToSubmit = validateVM.EmployeeIds.Count() *
+                Math.Abs(validateVM.StartOn.Subtract(validateVM.EndOn).TotalSeconds);
+
+            if (!_baseDataWork.WorkPlaceHourRestrictions.ValidateMaxHours(
+                validateVM.TimeShiftId, year, month, day, secondsToSubmit))
+                dataToReturn = new ApiHourRestrictionValidateResponse
+                {
+                    ErrorType = "warning",
+                    ErrorValue = "<br>Μέγιστο επιτρεπτό όριο εισαγωγής:" +
+                        _baseDataWork.WorkPlaceHourRestrictions.GetDayMaxTime(
+                            validateVM.TimeShiftId, year, month, day) +
+                        "<br>Υπάρχων ώρες μέρας:" +
+                        _baseDataWork.WorkPlaceHourRestrictions.GetDayRealWorkHoursTime(
+                            validateVM.TimeShiftId, year, month, day) +
+                        "<br>Πρόκειται να εισαχθούν:" +
+                        GetTime(secondsToSubmit)
+                };
+
+            return Ok(dataToReturn);
+        }
+
         private Func<IQueryable<WorkPlaceHourRestriction>, IOrderedQueryable<WorkPlaceHourRestriction>> SetOrderBy(string columnName, string orderDirection)
         {
             if (columnName == "WorkPlaceName")
@@ -126,7 +158,19 @@ namespace WebApplication.Api
 
             return filter;
         }
+        private static string GetTime(double seconds)
+        {
+            var hours = (seconds / 3600).ToString();
+            var minutes = (seconds % 3600).ToString();
 
+            if (hours.Length == 1)
+                hours = "0" + hours;
+            if (minutes.Length == 1)
+                minutes = "0" + minutes;
+
+            return hours + ":" + minutes;
+
+        }
         private bool LeaveTypeExists(int id)
         {
             return _context.LeaveTypes.Any(e => e.Id == id);

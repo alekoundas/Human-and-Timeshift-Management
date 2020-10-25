@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels.RealWorkHours;
-using Bussiness;
 using DataAccess.ViewModels.WorkHours;
 using LinqKit;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication.Api
 {
@@ -279,6 +278,7 @@ namespace WebApplication.Api
 
             return Ok(new { realWorkHoursToSaveRange, workHoursToSaveRange });
         }
+
         // POST: api/realworkhours/hasoverlap
         [HttpPost("hasoverlap")]
         public async Task<ActionResult<RealWorkHour>> HasOverlap([FromBody] ApiRealWorkHourHasOverlap apiOverlap)
@@ -322,6 +322,7 @@ namespace WebApplication.Api
 
             return Ok(dataToReturn);
         }
+
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOverlapRange")]
         public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)

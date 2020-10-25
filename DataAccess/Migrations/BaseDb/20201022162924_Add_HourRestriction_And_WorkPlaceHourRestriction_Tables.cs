@@ -37,7 +37,7 @@ namespace DataAccess.Migrations.BaseDb
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Day = table.Column<int>(nullable: false),
-                    MaxHours = table.Column<int>(nullable: false),
+                    MaxTime = table.Column<TimeSpan>(nullable: false),
                     WorkPlaceHourRestrictionId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

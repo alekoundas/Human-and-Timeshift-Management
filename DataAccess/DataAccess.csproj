@@ -7,6 +7,16 @@
   <ItemGroup>
     <Compile Remove="Migrations\BaseDb\20201017110714_Add_HourRestriction_Tables.cs" />
     <Compile Remove="Migrations\BaseDb\20201017110714_Add_HourRestriction_Tables.Designer.cs" />
+    <Compile Remove="Migrations\BaseDb\20201017122806_Add_HourRestriction_And_WorkPlaceHourRestriction_Tables.cs" />
+    <Compile Remove="Migrations\BaseDb\20201017122806_Add_HourRestriction_And_WorkPlaceHourRestriction_Tables.Designer.cs" />
+    <Compile Remove="Migrations\BaseDb\20201020163810_Alter_Table_HourRestriction.cs" />
+    <Compile Remove="Migrations\BaseDb\20201020163810_Alter_Table_HourRestriction.Designer.cs" />
+    <Compile Remove="Migrations\BaseDb\20201020171810_Alter_Table_HourRestriction.cs" />
+    <Compile Remove="Migrations\BaseDb\20201020171810_Alter_Table_HourRestriction.Designer.cs" />
+    <Compile Remove="Migrations\BaseDb\20201020213405_Alter_Table_HourRestriction.cs" />
+    <Compile Remove="Migrations\BaseDb\20201020213405_Alter_Table_HourRestriction.Designer.cs" />
+    <Compile Remove="Migrations\BaseDb\20201022162550_Add_HourRestriction_And_WorkPlaceHourRestriction_Table.cs" />
+    <Compile Remove="Migrations\BaseDb\20201022162550_Add_HourRestriction_And_WorkPlaceHourRestriction_Table.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,9 +11,10 @@ namespace DataAccess.ViewModels.HourRestrictions
         public int Day { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
-        public int MaxHours { get; set; }
+        [RegularExpression("^([0-9]{1}[0-9]{1}[0-9]{1}|[0-9]{1}[0-9]{1}):[0-5]{1}[0-9]{1}$", ErrorMessage = "Ο τύπος ώρας πρέπει να ειναι της μορφής ΗΗ:ΜΜ")]
+        public string MaxTime { get; set; }
 
-        public static ICollection<HourRestriction> CreateFrom(ICollection<HourRestrictionCreate> viewModels)
+        public static IList<HourRestriction> CreateFrom(IList<HourRestrictionCreate> viewModels)
         {
             var returnList = new List<HourRestriction>();
 
@@ -21,7 +22,9 @@ namespace DataAccess.ViewModels.HourRestrictions
                 returnList.Add(new HourRestriction
                 {
                     Day = viewModel.Day,
-                    MaxHours = viewModel.MaxHours,
+                    MaxTicks = new TimeSpan(int.Parse(viewModel.MaxTime.Split(':')[0]),
+                                           int.Parse(viewModel.MaxTime.Split(':')[1]),
+                                           0).TotalSeconds,
                     CreatedOn = DateTime.Now
                 });
             return returnList;

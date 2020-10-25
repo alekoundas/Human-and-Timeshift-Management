@@ -1,8 +1,6 @@
 ﻿@model DataAccess.ViewModels.EmployeeCreateViewModel
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -128,11 +126,6 @@
 
 
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
@@ -152,8 +145,7 @@
                 }
             }
         });
-    </script>
-    <script>
+
         $('.Company_Select2').select2({
             allowClear: true,
             ajax: {
@@ -167,8 +159,7 @@
                 }
             }
         });
-    </script>
-    <script>
+
         $('#DateOfBirth').calentim({
             showTimePickers: false,
             startOnMonday: true,
@@ -181,7 +172,7 @@
             calendarCount: 1,
             locale: "el",
             showOn: "right",
-                 onaftershow: () =>
+            onaftershow: () =>
                 //Fix Calentim width
                 [...document.getElementsByClassName('calentim-input')]
                     .forEach((calentim) =>

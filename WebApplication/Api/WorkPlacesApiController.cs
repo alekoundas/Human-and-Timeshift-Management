@@ -116,7 +116,7 @@ namespace WebApplication.Api
             var total = await _baseDataWork.WorkPlaces.CountAllAsync();
             var hasMore = (select2.Page * 10) < total;
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(await GetUserRoleFiltersAsync());
+            filter = filter.And(GetUserRoleFiltersAsync());
 
 
             if (string.IsNullOrWhiteSpace(select2.Search))
@@ -139,7 +139,7 @@ namespace WebApplication.Api
             var workPlaces = new List<WorkPlace>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(await GetUserRoleFiltersAsync());
+            filter = filter.And(GetUserRoleFiltersAsync());
 
 
             if (string.IsNullOrWhiteSpace(search))
@@ -167,7 +167,7 @@ namespace WebApplication.Api
             var workPlaces = new List<WorkPlace>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(await GetUserRoleFiltersAsync());
+            filter = filter.And(GetUserRoleFiltersAsync());
 
             if (select2.ExistingIds?.Count > 0)
                 foreach (var workPlaceId in select2.ExistingIds)
@@ -251,7 +251,7 @@ namespace WebApplication.Api
             var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(await GetUserRoleFiltersAsync());
+            filter = filter.And(GetUserRoleFiltersAsync());
             filter = filter.And(GetSearchFilter(datatable));
 
             var workPlaces = new List<WorkPlace>();
@@ -442,7 +442,7 @@ namespace WebApplication.Api
             return returnObjects;
         }
 
-        private async Task<Expression<Func<WorkPlace, bool>>> GetUserRoleFiltersAsync()
+        private Expression<Func<WorkPlace, bool>> GetUserRoleFiltersAsync()
         {
             //Get WorkPlaceId from user roles
             var workPlaceIds = HttpContext.User.Claims

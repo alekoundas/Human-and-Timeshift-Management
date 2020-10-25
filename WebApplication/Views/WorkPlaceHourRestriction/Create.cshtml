@@ -25,7 +25,7 @@
                     <div class="form-group">
                         <label asp-for="WorkPlaceId" class="control-label"></label>
                         <div class="input-group" style="width:30%">
-                            <select class="WorkPlace_Select2" asp-for="WorkPlaceId" style="width:70%"></select>
+                            <select class="WorkPlace_Select2" asp-for="WorkPlaceId" id="WorkPlaceId" style="width:30%"></select>
                             <span asp-validation-for="WorkPlaceId" class="text-danger"></span>
                         </div>
                     </div>
@@ -37,9 +37,8 @@
                         </div>
                     </div>
 
-                    <div id="DaysDiv" style="display:none;">
 
-                    </div>
+                    <div class="form-group" id="DaysDiv" style="display:none; width:100%"></div>
 
                     <div class="form-group">
                         <input type="submit" id="SubmitButton" value="Υποβολή" class="btn btn-primary" disabled />
@@ -59,6 +58,21 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <!--///////////////////////////////////////-->
+    <!--///             Events              ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        //Add or Substruct button
+        $('body').on('click', '.TimeButton', (e) => {
+            console.log(e.target.id);
+            var num = e.target.id.split('_')[1];   //i
+            var action = e.target.id.split('_')[2];//Add - Substruct
+            var type = e.target.id.split('_')[3];  //Minutes - Hours
+            var value = e.target.id.split('_')[4]; // 5 - 10 - 1 - 2
+
+            window[action + type](num, value);
+        })
+    </script>
+    <!--///////////////////////////////////////-->
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
@@ -73,7 +87,7 @@
                     return query;
                 }
             }
-        });
+        }).change(() => HandleSubmitButton());
 
         $('#MonthPicker').MonthPicker({
             Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
@@ -84,11 +98,32 @@
                 document.getElementById('Month').value = month
                 document.getElementById('DaysDiv').style.display = '';
 
+                document.getElementById('DaysDiv').innerHTML = '';
                 AppendMonthDaysHtml(year, month);
+                HandleSubmitButton();
             }
         });
     </script>
 
+    <!--///////////////////////////////////////-->
+    <!--///             Handlers            ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        const HandleSubmitButton = () => {
+            var isOkToShow = true;
+
+            if (document.getElementById('MonthPicker').value == '')
+                isOkToShow = false;
+
+            if (document.getElementById('WorkPlaceId').value == '')
+                isOkToShow = false;
+
+            if (isOkToShow)
+                document.getElementById('SubmitButton').disabled = false;
+            else
+                document.getElementById('SubmitButton').disabled = true;
+        }
+    </script>
     <!--///////////////////////////////////////-->
     <!--///             Functions           ///-->
     <!--///////////////////////////////////////-->
@@ -99,27 +134,152 @@
 
         const GetDaysHtml = (year, month) => {
             var returnStr = '';
-            for (var i = 1; i <= getDaysInMonth(year, month); i++) {
-                var currentDate = new Date(year, month, i);
+            for (var i = 0; i < getDaysInMonth(year, month); i++) {
+                var day = i;
+                var currentDate = new Date(year, month, ++day);
                 var options = { weekday: 'long', day: 'numeric' };
 
                 returnStr +=
-                    '<div class="form-group">' +
-                    '<div class="input-group" style="width:30%">' +
+                    '<div class="form-group row" style="width:100% top:10px;">' +
+                    '<div class="input-group" style="width:25%; float: left;">' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Minutes_30" >-30λ.</button>' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Hours_4"   >-4ω.</button>' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Hours_8"   >-8ωλ.</button>' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Substruct_Hours_16"   >-16ωλ.</button>' +
+                    '</div>' +
+                    '<div class="input-group" style="margin-right:15px; width:30%; float: left;">' +
                     '<label class="control-label">' + currentDate.toLocaleString('el-GR', options) + '</label>' +
-                    '<input type="text" name="HourRestrictions[' + i + '].Day" class="form-control" style="display:none;"value="' + i + '" readonly />' +
-                    '<input type="number" name="HourRestrictions[' + i + '].MaxHours" class="form-control"value="0" />' +
+                    '<input type="number" name="HourRestrictions[' + i + '].Day"  class="form-control" style="display:none;"value="' + day + '" readonly />' +
+                    '<input type="text" ' +
+                    'data-val="true" ' +
+                    'data-val-regex="Ο τύπος ώρας πρέπει να ειναι της μορφής ΗΗ:ΜΜ ή ΗΗΗ:ΜΜ" ' +
+                    'data-val-regex-pattern="^([0-9]{1}[0-9]{1}[0-9]{1}|[0-9]{1}[0-9]{1}):[0-5]{1}[0-9]{1}$" ' +
+                    'data-val-required="Η ώρα απαιτείται" ' +
+                    'aria-invalid="true" ' +
+                    'id="HourRestrictions[' + i + '].MaxTime" name="HourRestrictions[' + i + '].MaxTime"  class="form-control"value="00:00" />' +
+
+                    '</br>' +
+                    '<span class="text-danger field-validation-error" data-valmsg-for="HourRestrictions[' + i + '].MaxTime" data-valmsg-replace="true"></span>' +
+                    '</div>' +
+                    '<div class="input-group" style="width:25%; float: left;">' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Minutes_30" >+30λ.</button>' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Hours_4"   >+4ω.</button>' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Hours_8"   >+8ωλ.</button>' +
+                    '<button type="button" class="TimeButton btn btn-primary" id="Num_' + i + '_Add_Hours_16"   >+16ωλ.</button>' +
                     '</div>' +
                     '</div>';
+
             }
             return returnStr;
         }
 
-        const AppendMonthDaysHtml = (year, month) =>
-            document.getElementById('DaysDiv')
-                .insertAdjacentHTML('beforeend', GetDaysHtml(year, month))
+        const NumberOfDigits = x =>
+            (Math.log10((x ^ (x >> 31)) - (x >> 31)) | 0) + 1;
 
+
+        const SetInputMaxHourValue = (num, value) =>
+            document.getElementById('HourRestrictions[' + num + '].MaxTime')
+                .value = value;
+
+        const GetInputMaxHourValue = (num) =>
+            document.getElementById('HourRestrictions[' + num + '].MaxTime')
+                .value;
+
+
+
+        const AppendMonthDaysHtml = (year, month) => {
+
+            document.getElementById('DaysDiv')
+                .insertAdjacentHTML('beforeend', GetDaysHtml(year, month));
+
+            //Clear cuurrent validations
+            $("form").removeData("validator").removeData("unobtrusiveValidation");
+            //Parse the form again
+            $.validator.unobtrusive.parse($("form"));
+        }
+
+
+        //Functions bellow will be called from window via string function name
+
+        function AddMinutes(num, value) {
+            value = parseInt(value);
+            var currTime;
+            var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
+            var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+            if (minute + value < 60)
+                minute = minute + value;
+            else {
+                minute = (minute - 60) + value;
+                hour++;
+            }
+
+            if (NumberOfDigits(minute) == 1)
+                minute = '0' + minute;
+            if (NumberOfDigits(hour) == 1)
+                hour = '0' + hour;
+
+            currTime = hour + ':' + minute;
+            SetInputMaxHourValue(num, currTime);
+        }
+
+        function SubstructMinutes(num, value) {
+            value = parseInt(value);
+            var currTime;
+            var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
+            var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+            if (Math.sign(minute - value) >= 0)//1 = Positive, -1 = Negative
+                minute = minute - value;
+            else if (hour != 0) {
+                minute = (minute + 60) - value;
+                hour--;
+            }
+
+            if (NumberOfDigits(minute) == 1)
+                minute = '0' + minute;
+            if (NumberOfDigits(hour) == 1)
+                hour = '0' + hour;
+
+            currTime = hour + ':' + minute;
+            SetInputMaxHourValue(num, currTime);
+        }
+
+        function AddHours(num, value) {
+            value = parseInt(value);
+            var currTime;
+            var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
+            var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+
+            hour = hour + value;
+
+            if (NumberOfDigits(minute) == 1)
+                minute = '0' + minute;
+            if (NumberOfDigits(hour) == 1)
+                hour = '0' + hour;
+
+            currTime = hour + ':' + minute;
+            SetInputMaxHourValue(num, currTime);
+        }
+
+        function SubstructHours(num, value) {
+            value = parseInt(value);
+            var currTime;
+            var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
+            var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+            if (Math.sign(hour - value) >= 0)//1 = Positive, -1 = Negative
+                hour = hour - value;
+
+            if (NumberOfDigits(minute) == 1)
+                minute = '0' + minute;
+            if (NumberOfDigits(hour) == 1)
+                hour = '0' + hour;
+
+            currTime = hour + ':' + minute;
+            SetInputMaxHourValue(num, currTime);
+        }
 
     </script>
-
 }

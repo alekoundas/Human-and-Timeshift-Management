@@ -5,6 +5,7 @@ EntityFrameworkCore\add-migration InitializeDb -Context BaseDbContext -Project D
 
 EntityFrameworkCore\remove-migration -Context BaseDbContext -Project DataAccess
 
+EntityFrameworkCore\update-database -Context BaseDbContext -Project DataAccess -Migration 
 EntityFrameworkCore\update-database -Context BaseDbContext -Project DataAccess
 
 

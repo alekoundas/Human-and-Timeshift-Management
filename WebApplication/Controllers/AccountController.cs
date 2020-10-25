@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Bussiness;
@@ -12,7 +11,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace WebApplication.Controllers
@@ -51,7 +49,7 @@ namespace WebApplication.Controllers
             return View(viewModel);
         }
 
-     
+
 
         // POST: Account/Login
         [HttpPost]
@@ -69,7 +67,7 @@ namespace WebApplication.Controllers
                     //Check if user needs to change password
                     if (user.HasToChangePassword)
                     {
-                      return  RedirectToAction("ChangePassword", "User", new { userId = user.Id, returnUrl = viewModel.ReturnUrl });
+                        return RedirectToAction("ChangePassword", "User", new { userId = user.Id, returnUrl = viewModel.ReturnUrl });
                     }
                     var result = await _signInManager.CheckPasswordSignInAsync(user, viewModel.Password, lockoutOnFailure: true);
                     if (result.Succeeded)
@@ -95,6 +93,7 @@ namespace WebApplication.Controllers
                         customClaims.Add(new Claim("UserID", user.Id));
                         customClaims.Add(new Claim("FirstName", user.FirstName));
                         customClaims.Add(new Claim("LastName", user.LastName));
+                        customClaims.Add(new Claim("Email", user.Email));
 
                         var claimsIdentity = new ClaimsIdentity(customClaims,
                             CookieAuthenticationDefaults.AuthenticationScheme);
@@ -108,6 +107,7 @@ namespace WebApplication.Controllers
                             return RedirectToAction("Index", "Home");
                         else
                             return Redirect(viewModel.ReturnUrl);
+
                     }
                 }
             }

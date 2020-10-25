@@ -91,7 +91,7 @@
                             <th>ErpCode</th>
                             @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
+                            <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
                             }
                         </tr>
                     </thead>
@@ -103,7 +103,7 @@
                             <th data-searchable="false">ErpCode</th>
                             @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
+                            <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
                             }
                         </tr>
                     </tfoot>
@@ -1249,8 +1249,9 @@
         };
 
     </script>
-
-
+    <!--///////////////////////////////////////-->
+    <!--///             Events              ///-->
+    <!--///////////////////////////////////////-->
     <!--    Modal 'Edit'  Functionality   -->
     <script>
         $('#EmployeesWorkhoursDatatable').on('click', '.faIconEdit', (element) => {
