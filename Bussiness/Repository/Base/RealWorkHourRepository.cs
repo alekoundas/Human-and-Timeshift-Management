@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.SqlServer;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Bussiness.Repository.Base.Interface;
+using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels.RealWorkHours;
@@ -162,8 +161,10 @@ namespace Bussiness.Repository.Base
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
+
             if (workplaceId != 0)
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
+
             filter = filter.And(x =>
                     (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
 
@@ -171,6 +172,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                 .Where(filter)
                 .Select(x => (x.EndOn - x.StartOn).TotalSeconds)
+                .Select(x => Math.Abs(x))
                 .ToList()
                 .Sum();
         }
@@ -182,18 +184,20 @@ namespace Bussiness.Repository.Base
 
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
+
             if (workplaceId != 0)
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
+
             filter = filter.And(x =>
                 startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date);
 
             return Context.RealWorkHours
-                .Where(filter)
-               .Select(x =>
-                   (((x.EndOn <= x.EndOn.Date.Add(startOnNightTimeSpan) ? x.EndOn : x.EndOn.Date.Add(startOnNightTimeSpan)) -
-                     (x.StartOn >= x.StartOn.Date.Add(endOnNightTimeSpan) ? x.StartOn : x.StartOn.Date.Add(endOnNightTimeSpan))).TotalSeconds))
-                .ToList()
-                .Sum();
+              .Where(filter)
+              .ToList()
+              .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
+              .Sum();
+
+
         }
 
         public async Task<double> GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
@@ -203,20 +207,28 @@ namespace Bussiness.Repository.Base
 
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
+
             if (workplaceId != 0)
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
+
             filter = filter.And(x =>
                startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date);
 
-
             return Context.RealWorkHours
-                .Where(filter)
-               .Select(x =>
-                   ((x.EndOn >= x.EndOn.Date.Add(startOnNightTimeSpan) ? x.EndOn : x.EndOn.Date.Add(startOnNightTimeSpan)) - x.EndOn.Date.Add(startOnNightTimeSpan)).TotalSeconds +
-                   (x.StartOn.Date.Add(endOnNightTimeSpan) - (x.StartOn <= x.StartOn.Date.Add(endOnNightTimeSpan) ? x.StartOn : x.StartOn.Date.Add(endOnNightTimeSpan))).TotalSeconds
-                   )
-                .ToList()
-                .Sum();
+               .Where(filter)
+               .ToList()
+               .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
+               .Sum();
+
+            //return Context.RealWorkHours
+            //    .Where(filter)
+            //   .Select(x =>
+            //       ((x.EndOn >= x.EndOn.Date.Add(startOnNightTimeSpan) ? x.EndOn : x.EndOn.Date.Add(startOnNightTimeSpan)) - x.EndOn.Date.Add(startOnNightTimeSpan)).TotalSeconds +
+            //       (x.StartOn.Date.Add(endOnNightTimeSpan) - (x.StartOn <= x.StartOn.Date.Add(endOnNightTimeSpan) ? x.StartOn : x.StartOn.Date.Add(endOnNightTimeSpan))).TotalSeconds
+            //       )
+            //    .ToList()
+            //    .Select(x => Math.Abs(x))
+            //    .Sum();
         }
 
         public async Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate)
@@ -231,10 +243,8 @@ namespace Bussiness.Repository.Base
 
             return Context.RealWorkHours
                 .Where(filter)
-               .Select(x =>
-                   (((x.EndOn <= startOnNight ? x.EndOn : startOnNight) -
-                     (x.StartOn >= endOnNight ? x.StartOn : endOnNight)).TotalSeconds))
                 .ToList()
+                .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
                 .Sum();
         }
 
@@ -247,22 +257,10 @@ namespace Bussiness.Repository.Base
             filter = filter.And(x => x.EmployeeId == employeeId);
             filter = filter.And(x => compareDate.Date == x.StartOn.Date);
 
-            var ddd = Context.RealWorkHours.First().StartOn.Date;
-            var sdafsdf = Context.RealWorkHours
-               .Where(filter)
-               .Select(x =>
-                    ((x.EndOn >= startOnNight ? x.EndOn : startOnNight) - startOnNight).TotalSeconds +
-                    (endOnNight - (x.StartOn <= endOnNight ? x.StartOn : endOnNight)).TotalSeconds
-                   )
-               .ToList();
-
             return Context.RealWorkHours
                 .Where(filter)
-               .Select(x =>
-                   ((x.EndOn >= startOnNight ? x.EndOn : startOnNight) - startOnNight).TotalSeconds +
-                   (endOnNight - (x.StartOn <= endOnNight ? x.StartOn : endOnNight)).TotalSeconds
-                   )
                 .ToList()
+                .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
                 .Sum();
         }
 

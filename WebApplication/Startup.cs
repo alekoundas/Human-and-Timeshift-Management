@@ -57,14 +57,16 @@ namespace WebApplication
                 opts.Password.RequireDigit = true;
             });
 
-
+            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(1));
             //Redirect for account
             services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.HttpOnly = true;
+                options.Cookie.MaxAge = TimeSpan.FromDays(1);
                 options.LoginPath = "/Account/LogIn";
                 options.AccessDeniedPath = "/Account/LogIn";
                 options.ExpireTimeSpan = TimeSpan.FromDays(1);
+                //options.Cookie.MaxAge
                 options.SlidingExpiration = true;
             });
 

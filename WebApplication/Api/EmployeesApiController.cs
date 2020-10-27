@@ -825,10 +825,12 @@ namespace WebApplication.Api
                         var nightSeconds = await _baseDataWork.RealWorkHours
                             .GetEmployeeTotalSecondsForNight(employee.Id, datatable.StartOn);
 
+                        var dayTotalSeconds = daySeconds + nightSeconds;
+
                         if (datatable.ShowHoursInPercentage)
-                            dictionary.Add("Day_0", daySeconds / 60 / 60);
+                            dictionary.Add("Day_0", dayTotalSeconds / 60 / 60);
                         else
-                            dictionary.Add("Day_0", ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
+                            dictionary.Add("Day_0", ((int)dayTotalSeconds / 60 / 60).ToString() + ":" + ((int)dayTotalSeconds / 60 % 60).ToString());
                     }
                     else
                         for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
@@ -839,10 +841,13 @@ namespace WebApplication.Api
 
                             var nightSeconds = await _baseDataWork.RealWorkHours
                                 .GetEmployeeTotalSecondsForNight(employee.Id, compareDate);
+                            var dayTotalSeconds = daySeconds + nightSeconds;
+
+
                             if (datatable.ShowHoursInPercentage)
-                                dictionary.Add("Day_" + i, daySeconds / 60 / 60);
+                                dictionary.Add("Day_" + i, dayTotalSeconds / 60 / 60);
                             else
-                                dictionary.Add("Day_" + i, ((int)daySeconds / 60 / 60).ToString() + ":" + ((int)daySeconds / 60 % 60).ToString());
+                                dictionary.Add("Day_" + i, ((int)dayTotalSeconds / 60 / 60).ToString() + ":" + ((int)dayTotalSeconds / 60 % 60).ToString());
                         }
                     returnObjects.Add(expandoObj);
                 }
@@ -869,6 +874,15 @@ namespace WebApplication.Api
                     {
                         var realWorkHours = await _baseDataWork.RealWorkHours
                           .GetCurrentAssignedOnCell(datatable.SpecificDates[i], employee.Id);
+
+                        var hasLeave = _baseDataWork.Leaves
+                            .Where(x => x.EmployeeId == employee.Id)
+                            .Any(x => datatable.SpecificDates[i].Date >= x.StartOn.Date && datatable.SpecificDates[i].Date <= x.EndOn.Date);
+
+
+                        var dayOffs = await _baseDataWork.WorkHours
+                          .GetCurrentDayOffAssignedOnCell(datatable.SpecificDates[i], employee.Id);
+
                         var dayCell = "";
                         foreach (var realWorkHour in realWorkHours)
                             dayCell += "<p style='white-space:nowrap;'>" +
@@ -876,7 +890,18 @@ namespace WebApplication.Api
                                 " - " +
                                 realWorkHour.EndOn.ToShortTimeString() +
                                 "</p></br>";
-
+                        if (dayOffs.Count > 0)
+                        {
+                            dayCell += "<p style='white-space:nowrap;'>" +
+                                "Ρεπό" +
+                                "</p></br>";
+                        }
+                        if (hasLeave)
+                        {
+                            dayCell += "<p style='white-space:nowrap;'>" +
+                                "Άδεια" +
+                                "</p></br>";
+                        }
                         dictionary.Add("Day_" + i, dayCell);
 
                     }

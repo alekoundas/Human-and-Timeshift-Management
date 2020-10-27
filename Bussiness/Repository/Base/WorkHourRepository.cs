@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Bussiness.Repository.Base.Interface;
 using DataAccess;
-using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels.RealWorkHours;
 using DataAccess.ViewModels.WorkHours;
@@ -24,7 +22,15 @@ namespace Bussiness.Repository.Base
         {
             get { return Context as BaseDbContext; }
         }
+        public async Task<List<WorkHour>> GetCurrentDayOffAssignedOnCell(DateTime compareDate, int employeeId)
+        {
+            var filter = PredicateBuilder.New<WorkHour>();
+            filter = filter.And(x => x.IsDayOff == true);
+            filter = filter.And(x => x.EmployeeId == employeeId);
+            filter = filter.And(x => x.StartOn.Date == compareDate.Date);
 
+            return await Context.WorkHours.Where(filter).ToListAsync();
+        }
         public async Task<List<WorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int? year, int? month, int day, int employeeId)
         {
             return await Context.WorkHours.Where(x =>
@@ -76,7 +82,7 @@ namespace Bussiness.Repository.Base
 
             if (workHour.IsDayOff)
                 filter = filter
-                    .And(x => x.StartOn.Day==workHour.StartOn.Day);
+                    .And(x => x.StartOn.Day == workHour.StartOn.Day);
 
             if (workHour.IsEdit)
                 filter = filter.And(x => x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn);

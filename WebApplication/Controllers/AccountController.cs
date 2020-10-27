@@ -78,9 +78,8 @@ namespace WebApplication.Controllers
                         {
                             roles = await _datawork.ApplicationUserRoles.GetRolesFormLoggedInUserEmail(_userManager, viewModel.LoginUserNameOrEmail);
                         }
-                        catch (Exception /*ex*/)
+                        catch (Exception e)
                         {
-
                             throw;
                         }
 

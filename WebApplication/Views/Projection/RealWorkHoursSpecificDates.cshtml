@@ -87,11 +87,11 @@
             document.getElementById('WorkPlace_Select2').value;
 
         const GetSelectedDate = (num) =>
-            new Date(moment(document.getElementById('CalnentimNum_'+num).value
+            new Date(moment(document.getElementById('CalnentimNum_' + num).value
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
 
 
-        const GetDaysToAppentNums=() =>
+        const GetDaysToAppentNums = () =>
             [...document.getElementsByClassName('CalentimInputs')]
                 .filter(input => input.value != '')
                 .map(input => input.id.split('_')[1]);
@@ -129,11 +129,11 @@
                     'ErpCode')
             });
             columns.push({
-                data: "ΑΦΜ",
+                data: "Afm",
                 searchable: false,
                 orderable: true,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ΑΦΜ')
+                    'Afm')
             });
 
             [...document.getElementsByClassName('CalentimInputs')]
@@ -180,7 +180,7 @@
             InitiateCalentim(Count);
         });
 
-        $(document).on('click', '.DeleteCalentimButton',(e) =>
+        $(document).on('click', '.DeleteCalentimButton', (e) =>
             document.getElementById('CalnentimDivNum_' + e.target.id.split('_')[1])
                 .remove())
     </script>
