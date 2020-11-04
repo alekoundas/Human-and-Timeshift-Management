@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Bussiness;
-using DataAccess.Models.Datatable;
-using WebApplication.Utilities;
-using System.Dynamic;
-using Bussiness.Service;
-using DataAccess.Models.Select2;
 using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 using System.Linq.Dynamic.Core;
-using LinqKit;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -89,16 +88,29 @@ namespace WebApplication.Api
 
         // DELETE: api/specializations/id
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Specialization>> DeleteSpecialization(int id)
+        public async Task<ActionResult<DeleteViewModel>> DeleteSpecialization(int id)
         {
+            var response = new DeleteViewModel();
             var specialization = await _context.Specializations.FindAsync(id);
             if (specialization == null)
                 return NotFound();
 
             _context.Specializations.Remove(specialization);
-            await _context.SaveChangesAsync();
+            var status = await _context.SaveChangesAsync();
 
-            return specialization;
+            if (status >= 1)
+                response.ResponseBody = "Η ειδικότητα" +
+                    specialization.Name +
+                    " διαγράφηκε με επιτυχία";
+            else
+                response.ResponseBody = "Ωχ! Η ειδικότητα" +
+                    specialization.Name +
+                    " ΔΕΝ διαγράφηκε!";
+
+
+            response.ResponseTitle = "Διαγραφή ειδικότητας";
+            response.Entity = specialization;
+            return response;
         }
 
         // GET: api/select2

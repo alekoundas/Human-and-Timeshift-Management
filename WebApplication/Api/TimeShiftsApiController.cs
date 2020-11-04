@@ -1,21 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using LinqKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using DataAccess.Models.Datatable;
-using Bussiness;
-using System.Dynamic;
-using Bussiness.Service;
-using WebApplication.Utilities;
 using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 using System.Linq.Dynamic.Core;
-using LinqKit;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -58,9 +59,7 @@ namespace WebApplication.Api
         public async Task<IActionResult> PutTimeShift(int id, TimeShift timeShift)
         {
             if (id != timeShift.Id)
-            {
                 return BadRequest();
-            }
 
             _context.Entry(timeShift).State = EntityState.Modified;
 
@@ -71,13 +70,9 @@ namespace WebApplication.Api
             catch (DbUpdateConcurrencyException)
             {
                 if (!TimeShiftExists(id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
 
             return NoContent();
@@ -95,18 +90,38 @@ namespace WebApplication.Api
 
         // DELETE: api/timeshifts/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<TimeShift>> DeleteTimeShift(int id)
+        public async Task<ActionResult<DeleteViewModel>> DeleteTimeShift(int id)
         {
-            var timeShift = await _context.TimeShifts.FindAsync(id);
+            var response = new DeleteViewModel();
+            var timeShift = await _context.TimeShifts.Include(x => x.WorkHours).FirstOrDefaultAsync(x => x.Id == id);
             if (timeShift == null)
-            {
                 return NotFound();
+
+            _context.WorkHours.RemoveRange(timeShift.WorkHours);
+            _context.TimeShifts.Remove(timeShift);
+            var status = await _context.SaveChangesAsync();
+
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Το χρονοδιάγραμμα " +
+                    timeShift.Title +
+                    " διαγράφηκε με επιτυχία." +
+                    " Επίσης διαγράφηκαν για αυτο το χρονοδιάγραμμα:" +
+                    "Βάρδιες:" + timeShift.WorkHours.Count;
+
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Το χρονοδιάγραμμα" +
+                     timeShift.Title +
+                    " ΔΕΝ διαγράφηκε!";
             }
 
-            _context.TimeShifts.Remove(timeShift);
-            await _context.SaveChangesAsync();
-
-            return timeShift;
+            response.ResponseTitle = "Διαγραφή χρονοδιάγραμματος";
+            response.Entity = timeShift;
+            return response;
         }
 
 

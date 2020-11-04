@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Bussiness.Repository.Interface;
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Bussiness.Repository.Interface;
-using DataAccess;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bussiness.Repository
 {
@@ -200,6 +200,18 @@ namespace Bussiness.Repository
             return _set.Where(expression);
         }
 
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter = null,
+        List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
+        {
+            var qry = (IQueryable<TEntity>)_set;
+            if (includes != null)
+                foreach (var include in includes)
+                    qry = include(qry);
+
+            if (filter != null)
+                qry = qry.Where(filter);
+            return await qry.ToListAsync();
+        }
 
     }
 }

@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Bussiness;
-using WebApplication.Utilities;
-using DataAccess.Models.Datatable;
-using System.Dynamic;
-using Bussiness.Service;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 using System.Linq.Dynamic.Core;
-using LinqKit;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -88,17 +87,47 @@ namespace WebApplication.Controllers
 
         // DELETE: api/companies/id
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Company_Delete")]
-        public async Task<ActionResult<Company>> DeleteCompany(int id)
+        public async Task<ActionResult<DeleteViewModel>> DeleteCompany(int id)
         {
+            var response = new DeleteViewModel();
             var company = await _context.Companies.FindAsync(id);
+
             if (company == null)
                 return NotFound();
 
-            _context.Companies.Remove(company);
-            await _context.SaveChangesAsync();
+            var companyEmployees = _baseDataWork.Employees
+                .Where(x => x.CompanyId == id).ToList();
 
-            return company;
+            var companyCustomers = _baseDataWork.Customers
+               .Where(x => x.CompanyId == id).ToList();
+
+            companyEmployees.ForEach(x => x.CompanyId = null);
+            companyCustomers.ForEach(x => x.CompanyId = null);
+
+            _baseDataWork.UpdateRange(companyEmployees);
+            _baseDataWork.UpdateRange(companyCustomers);
+            _baseDataWork.Companies.Remove(company);
+
+            var status = await _context.SaveChangesAsync();
+
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Η εταιρία " +
+                    company.Title +
+                    " διαγράφηκε με επιτυχία.";
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Η εταιρία " +
+                    company.Title +
+                    " ΔΕΝ διαγράφηκε!";
+            }
+
+            response.ResponseTitle = "Διαγραφή εταιρίας";
+            response.Entity = company;
+            return response;
         }
 
         // GET: api/companies/select2
@@ -173,7 +202,7 @@ namespace WebApplication.Controllers
             var total = await _baseDataWork.Companies.CountAllAsyncFiltered(filter);
             var mapedData = await MapResults(companies, datatable);
 
-            return Ok(dataTableHelper.CreateResponse(datatable,  mapedData, total));
+            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
         protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Company> results, Datatable datatable)
@@ -208,7 +237,7 @@ namespace WebApplication.Controllers
         private Expression<Func<Company, bool>> GetSearchFilterOrTrue(string searchString)
         {
             var filter = PredicateBuilder.New<Company>();
-            if ( searchString != null)
+            if (searchString != null)
             {
                 filter = filter.Or(x => x.Title.Contains(searchString));
                 filter = filter.Or(x => x.Afm.Contains(searchString));

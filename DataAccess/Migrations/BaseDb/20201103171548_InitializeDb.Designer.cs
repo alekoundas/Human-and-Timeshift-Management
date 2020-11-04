@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20200929171319_InitializeDb")]
+    [Migration("20201103171548_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,9 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.ToTable("Companies");
                 });
@@ -80,6 +83,9 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("EmployeeId");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("Contacts");
                 });
 
@@ -97,7 +103,7 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CompanyId")
+                    b.Property<int?>("CompanyId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOn")
@@ -122,6 +128,9 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.ToTable("Customers");
                 });
@@ -172,6 +181,9 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("CompanyId");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.HasIndex("SpecializationId");
 
                     b.ToTable("Employees");
@@ -197,9 +209,41 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("EmployeeId");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.HasIndex("WorkPlaceId");
 
                     b.ToTable("EmployeeWorkPlaces");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.HourRestriction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<double>("MaxTicks")
+                        .HasColumnType("float");
+
+                    b.Property<int>("WorkPlaceHourRestrictionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("WorkPlaceHourRestrictionId");
+
+                    b.ToTable("HourRestrictions");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Leave", b =>
@@ -234,7 +278,11 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("EmployeeId");
 
+                    b.HasIndex("EndOn");
+
                     b.HasIndex("LeaveTypeId");
+
+                    b.HasIndex("StartOn");
 
                     b.ToTable("Leaves");
                 });
@@ -258,6 +306,9 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("LeaveTypes");
                 });
 
@@ -267,6 +318,9 @@ namespace DataAccess.Migrations.BaseDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -286,6 +340,10 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
+
+                    b.HasIndex("EndOn");
+
+                    b.HasIndex("StartOn");
 
                     b.HasIndex("TimeShiftId");
 
@@ -314,6 +372,9 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("Specializations");
                 });
 
@@ -341,6 +402,9 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("WorkPlaceId");
 
@@ -379,6 +443,10 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("EmployeeId");
 
+                    b.HasIndex("EndOn");
+
+                    b.HasIndex("StartOn");
+
                     b.HasIndex("TimeShiftId");
 
                     b.ToTable("WorkHours");
@@ -408,7 +476,39 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("WorkPlaces");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.WorkPlaceHourRestriction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkPlaceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("WorkPlaceId");
+
+                    b.ToTable("WorkPlaceHourRestrictions");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Contact", b =>
@@ -427,15 +527,15 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasOne("DataAccess.Models.Entity.Company", "Company")
                         .WithMany("Customers")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Employee", b =>
                 {
                     b.HasOne("DataAccess.Models.Entity.Company", "Company")
                         .WithMany("Employees")
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("DataAccess.Models.Entity.Specialization", "Specialization")
                         .WithMany()
@@ -453,6 +553,15 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasOne("DataAccess.Models.Entity.WorkPlace", "WorkPlace")
                         .WithMany("EmployeeWorkPlaces")
                         .HasForeignKey("WorkPlaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.HourRestriction", b =>
+                {
+                    b.HasOne("DataAccess.Models.Entity.WorkPlaceHourRestriction", "WorkPlaceHourRestriction")
+                        .WithMany("HourRestrictions")
+                        .HasForeignKey("WorkPlaceHourRestrictionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -490,7 +599,7 @@ namespace DataAccess.Migrations.BaseDb
             modelBuilder.Entity("DataAccess.Models.Entity.TimeShift", b =>
                 {
                     b.HasOne("DataAccess.Models.Entity.WorkPlace", "WorkPlace")
-                        .WithMany("TimeShift")
+                        .WithMany("TimeShifts")
                         .HasForeignKey("WorkPlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -516,6 +625,15 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasOne("DataAccess.Models.Entity.Customer", "Customer")
                         .WithMany("WorkPlaces")
                         .HasForeignKey("CustomerId");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.WorkPlaceHourRestriction", b =>
+                {
+                    b.HasOne("DataAccess.Models.Entity.WorkPlace", "WorkPlace")
+                        .WithMany("WorkPlaceHourRestrictions")
+                        .HasForeignKey("WorkPlaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

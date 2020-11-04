@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Business.Repository.Interface;
 using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
-using LinqKit;
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 
 namespace WebApplication.Utilities
@@ -62,7 +57,7 @@ namespace WebApplication.Utilities
 
             if (currentUserRoles.Contains(baseRole + "_Delete"))
                 stringToReturn += "<div style='width: 20%; float: left;'>" +
-                    DeleteButton(baseRole, id) +
+                    DeleteButton(apiController, id) +
                     "</div>";
             //stringToReturn += "<div style='width: 30%; float: left;'>&nbsp</div>";
             stringToReturn += "</div>";
@@ -278,7 +273,7 @@ namespace WebApplication.Utilities
         }
 
         public string GetTimeShiftEditCellBodyRealWorkHours(List<RealWorkHour> realWorkHours,
-            List<WorkHour> workHours, List<Leave> leaves, int compareMonth , int compareYear ,
+            List<WorkHour> workHours, List<Leave> leaves, int compareMonth, int compareYear,
             int dayOfMonth, Datatable datatable, int employeeId)
         {
             var strToReturn = "";

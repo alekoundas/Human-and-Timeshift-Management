@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using DataAccess.ViewModels.Leaves;
+using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Bussiness;
-using DataAccess.ViewModels.Leaves;
-using DataAccess.Models.Datatable;
 using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
 using System.Dynamic;
-using WebApplication.Utilities;
-using Bussiness.Service;
+using System.Linq;
 using System.Linq.Dynamic.Core;
-using LinqKit;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -112,16 +112,37 @@ namespace WebApplication.Api
 
         // DELETE: api/leaves/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Leave>> DeleteLeave(int id)
+        public async Task<ActionResult<DeleteViewModel>> DeleteLeave(int id)
         {
-            var leave = await _context.Leaves.FindAsync(id);
+            var response = new DeleteViewModel();
+            var leave = await _context.Leaves
+                .Include(x => x.Employee)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (leave == null)
                 return NotFound();
 
             _context.Leaves.Remove(leave);
-            await _context.SaveChangesAsync();
+            var status = await _context.SaveChangesAsync();
 
-            return leave;
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Η άδεια του" +
+                    leave.Employee.FullName +
+                    " διαγράφηκε με επιτυχία.";
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Η άδεια του" +
+                     leave.Employee.FullName +
+                    " ΔΕΝ διαγράφηκε!";
+            }
+
+            response.ResponseTitle = "Διαγραφή άδειας";
+            response.Entity = leave;
+            return response;
         }
 
 

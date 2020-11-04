@@ -32,7 +32,7 @@
     }
 
     table.dataTable thead .sorting {
-         background-image: url('../../img/sort_both.png');
+        background-image: url('../../img/sort_both.png');
     }
 
     table.dataTable thead .sorting_asc {

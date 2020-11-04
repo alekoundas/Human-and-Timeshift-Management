@@ -1,23 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Identity;
 using DataAccess.Models.Select2;
+using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using WebApplication.Utilities;
 
 namespace WebApplication.Api
@@ -92,18 +93,57 @@ namespace WebApplication.Api
 
         // DELETE: api/workplaces/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<WorkPlace>> DeleteWorkPlace(int id)
+        public async Task<ActionResult<DeleteViewModel>> DeleteWorkPlace(int id)
         {
-            var workPlace = await _context.WorkPlaces.FindAsync(id);
+            var response = new DeleteViewModel();
+            var workPlace = await _context.WorkPlaces
+                .Include(x => x.WorkPlaceHourRestrictions).ThenInclude(x => x.HourRestrictions)
+                .Include(x => x.TimeShifts).ThenInclude(x => x.RealWorkHours)
+                .Include(x => x.TimeShifts).ThenInclude(x => x.WorkHours)
+                .Include(x => x.WorkPlaceHourRestrictions)
+
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (workPlace == null)
-            {
                 return NotFound();
+
+            var workPlaceHourRestrictions = workPlace.WorkPlaceHourRestrictions;
+            var workPlaceHourRestrictionsHourrestrictions = workPlace.WorkPlaceHourRestrictions.SelectMany(x => x.HourRestrictions);
+            var workPlaceTimeShifts = workPlace.TimeShifts;
+            var workPlaceTimeShiftsRealWorkHours = workPlace.TimeShifts.SelectMany(x => x.RealWorkHours);
+            var workPlaceTimeShiftsWorkHours = workPlace.TimeShifts.SelectMany(x => x.WorkHours);
+
+            _context.WorkHours.RemoveRange(workPlaceTimeShiftsWorkHours);
+            _context.RealWorkHours.RemoveRange(workPlaceTimeShiftsRealWorkHours);
+            _context.TimeShifts.RemoveRange(workPlaceTimeShifts);
+            _context.HourRestrictions.RemoveRange(workPlaceHourRestrictionsHourrestrictions);
+            _context.WorkPlaceHourRestrictions.RemoveRange(workPlaceHourRestrictions);
+            _context.WorkPlaces.Remove(workPlace);
+            var status = await _context.SaveChangesAsync();
+
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Το πόστο " +
+                    workPlace.Title +
+                    " διαγράφηκε με επιτυχία." +
+                    "Επίσης διαγράφηκαν για αυτο το πόστο: " +
+                    " Περιορισμοί πόστων:" + workPlaceHourRestrictions.Count().ToString() +
+                    " Χρονοδιαγράμματα:" + workPlaceTimeShifts.Count().ToString() +
+                    " Βάρδιες:" + workPlaceTimeShiftsWorkHours.Count().ToString() +
+                    " Πραγματικές Βάρδιες:" + workPlaceTimeShiftsRealWorkHours.Count().ToString();
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Το πόστο " +
+                     workPlace.Title +
+                    " ΔΕΝ διαγράφηκε!";
             }
 
-            _context.WorkPlaces.Remove(workPlace);
-            await _context.SaveChangesAsync();
-
-            return workPlace;
+            response.ResponseTitle = "Διαγραφή πόστου";
+            response.Entity = workPlace;
+            return response;
         }
 
 

@@ -9,6 +9,10 @@ namespace DataAccess.Configurations
         public void Configure(EntityTypeBuilder<Customer> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
+
+            builder.HasOne(x => x.Company)
+               .WithMany(x => x.Customers)
+               .HasForeignKey(x => x.CompanyId);
         }
     }
 }

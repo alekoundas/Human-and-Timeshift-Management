@@ -18,6 +18,7 @@ namespace Bussiness.Repository.Base
         public RealWorkHourRepository(BaseDbContext dbContext) : base(dbContext)
         {
         }
+
         public async Task<List<RealWorkHour>> GetCurrentAssignedOnCell(int timeShiftId, int year, int month, int day, int employeeId)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
@@ -32,10 +33,9 @@ namespace Bussiness.Repository.Base
             filter = filter.And(x => x.StartOn.Month == month);
             filter = filter.And(x => x.StartOn.Day <= day && day <= x.EndOn.Day);
 
-
             return await Context.RealWorkHours.Where(filter).ToListAsync();
-
         }
+
         public async Task<List<RealWorkHour>> GetCurrentAssignedOnCellFilterByEmployeeIds(GetForEditCellWorkHoursApiViewModel viewModel)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
@@ -50,23 +50,6 @@ namespace Bussiness.Repository.Base
                    x.EndOn.Day == viewModel.CellDay))
                 .ToListAsync();
         }
-        //public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId)
-        //{
-        //    if (workHour.IsEdit)
-        //        return Context.RealWorkHours.Where(x =>
-        //        (x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn))
-        //                .Where(x =>
-        //              (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-        //              (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-        //              (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-        //                .Any(y => y.Employee.Id == employeeId);
-        //    else
-        //        return Context.RealWorkHours.Where(x =>
-        //        (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-        //        (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-        //        (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-        //          .Any(y => y.Employee.Id == employeeId);
-        //}
 
         public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId)
         {
@@ -129,6 +112,7 @@ namespace Bussiness.Repository.Base
                        (startOn < x.StartOn && x.EndOn < endOn)))
                     .Any(y => y.Employee.Id == employeeId);
         }
+
         public bool AreDatesOverlapingDayOff(DateTime startOn, DateTime endOn, bool isDayOff, int employeeId)
         {
             var filter = PredicateBuilder.New<WorkHour>();
@@ -142,12 +126,8 @@ namespace Bussiness.Repository.Base
 
             return Context.WorkHours
                     .Any(filter);
-
-            //return Context.WorkHours
-            //        .Where(x => startOn.Day == x.StartOn.Day)
-            //        .Where(y => y.IsDayOff)
-            //        .Any(y => y.Employee.Id == employeeId);
         }
+
         public async Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
@@ -168,13 +148,84 @@ namespace Bussiness.Repository.Base
             filter = filter.And(x =>
                     (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
 
-
             return Context.RealWorkHours
                 .Where(filter)
                 .Select(x => (x.EndOn - x.StartOn).TotalSeconds)
                 .Select(x => Math.Abs(x))
                 .ToList()
                 .Sum();
+        }
+
+        public async Task<double> GetEmployeeTotalSecondsSaturdayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        {
+            var filter = PredicateBuilder.New<RealWorkHour>();
+            filter = filter.And(x => x.EmployeeId == employeeId);
+
+            if (workplaceId != 0)
+                filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
+
+            filter = filter.And(x =>
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+
+            return Context.RealWorkHours
+                   .Where(filter)
+                   .ToList()
+                   .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSaturdayDayWork().TotalSeconds)
+                   .Sum();
+        }
+
+        public async Task<double> GetEmployeeTotalSecondsSaturdayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        {
+            var filter = PredicateBuilder.New<RealWorkHour>();
+            filter = filter.And(x => x.EmployeeId == employeeId);
+
+            if (workplaceId != 0)
+                filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
+
+            filter = filter.And(x =>
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+
+            return Context.RealWorkHours
+                .Where(filter)
+                .ToList()
+                .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSaturdayNightWork().TotalSeconds)
+                .Sum();
+        }
+
+        public async Task<double> GetEmployeeTotalSecondsSundayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        {
+            var filter = PredicateBuilder.New<RealWorkHour>();
+            filter = filter.And(x => x.EmployeeId == employeeId);
+
+            if (workplaceId != 0)
+                filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
+
+            filter = filter.And(x =>
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+
+            return Context.RealWorkHours
+                 .Where(filter)
+                 .ToList()
+                 .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSundayDayWork().TotalSeconds)
+                 .Sum();
+        }
+
+        public async Task<double> GetEmployeeTotalSecondsSundayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        {
+            var filter = PredicateBuilder.New<RealWorkHour>();
+            filter = filter.And(x => x.EmployeeId == employeeId);
+
+            if (workplaceId != 0)
+                filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
+
+            filter = filter.And(x =>
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+
+            return Context.RealWorkHours
+                 .Where(filter)
+                 .ToList()
+                 .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSundayNightWork().TotalSeconds)
+                 .Sum();
         }
 
         public async Task<double> GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
@@ -196,8 +247,6 @@ namespace Bussiness.Repository.Base
               .ToList()
               .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
               .Sum();
-
-
         }
 
         public async Task<double> GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
@@ -219,16 +268,6 @@ namespace Bussiness.Repository.Base
                .ToList()
                .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
                .Sum();
-
-            //return Context.RealWorkHours
-            //    .Where(filter)
-            //   .Select(x =>
-            //       ((x.EndOn >= x.EndOn.Date.Add(startOnNightTimeSpan) ? x.EndOn : x.EndOn.Date.Add(startOnNightTimeSpan)) - x.EndOn.Date.Add(startOnNightTimeSpan)).TotalSeconds +
-            //       (x.StartOn.Date.Add(endOnNightTimeSpan) - (x.StartOn <= x.StartOn.Date.Add(endOnNightTimeSpan) ? x.StartOn : x.StartOn.Date.Add(endOnNightTimeSpan))).TotalSeconds
-            //       )
-            //    .ToList()
-            //    .Select(x => Math.Abs(x))
-            //    .Sum();
         }
 
         public async Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate)

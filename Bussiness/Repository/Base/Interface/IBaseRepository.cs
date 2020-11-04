@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bussiness.Repository.Interface
 {
@@ -15,7 +15,8 @@ namespace Bussiness.Repository.Interface
              Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
              int pageSize = 10,
              int pageIndex = 1);
-
+        Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter = null,
+       List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
 
 
         Task<int> CountAllAsync();

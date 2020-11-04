@@ -11,6 +11,7 @@ using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Select2;
+using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -70,20 +71,60 @@ namespace WebApplication.Api
 
         // DELETE: api/employees/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Employee>> DeleteEmployee(int id)
+        public async Task<ActionResult<DeleteViewModel>> DeleteEmployee(int id)
         {
+            var response = new DeleteViewModel();
             var employee = await _context.Employees.FindAsync(id);
+
             if (employee == null)
                 return NotFound();
 
             var employeeWorkplaces = _baseDataWork.EmployeeWorkPlaces
                 .Where(x => x.EmployeeId == id).ToList();
 
-            _baseDataWork.EmployeeWorkPlaces.RemoveRange(employeeWorkplaces);
-            _baseDataWork.Employees.Remove(employee);
-            var sdfsdf = await _context.SaveChangesAsync();
+            var employeeLeaves = _baseDataWork.Leaves
+                .Where(x => x.EmployeeId == id).ToList();
 
-            return employee;
+            var employeeWorkHours = _baseDataWork.WorkHours
+                .Where(x => x.EmployeeId == id).ToList();
+
+            var employeeRealWorkHours = _baseDataWork.RealWorkHours
+                .Where(x => x.EmployeeId == id).ToList();
+
+
+            _baseDataWork.EmployeeWorkPlaces.RemoveRange(employeeWorkplaces);
+            _baseDataWork.Leaves.RemoveRange(employeeLeaves);
+            _baseDataWork.WorkHours.RemoveRange(employeeWorkHours);
+            _baseDataWork.RealWorkHours.RemoveRange(employeeRealWorkHours);
+
+            _baseDataWork.Employees.Remove(employee);
+            var status = await _context.SaveChangesAsync();
+
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Ο υπάλληλος " +
+                    employee.FullName +
+                    " διαγράφηκε με επιτυχία." +
+                    "Επίσης διαγράφηκαν για αυτον τον υπάλληλο: " +
+                    " Άδειες:" + employeeLeaves.Count +
+                    " Βάρδιες:" + employeeWorkHours.Count +
+                    " Πραγματικές Βάρδιες:" + employeeRealWorkHours.Count +
+                    "";
+            }
+
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Ο υπάλληλος " +
+                    employee.FullName +
+                    " ΔΕΝ διαγράφηκε!";
+            }
+
+
+            response.ResponseTitle = "Διαγραφή υπαλλήλου";
+            response.Entity = employee;
+            return response;
         }
 
 
@@ -700,7 +741,6 @@ namespace WebApplication.Api
 
                     if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
                     {
-                        //var timeShift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
                         var timeShift = _baseDataWork.TimeShifts
                    .Where(x => x.Id == datatable.GenericId).ToList()[0];
                         compareMonth = timeShift.Month;
@@ -777,17 +817,38 @@ namespace WebApplication.Api
                     var totalSecondsNight = await _baseDataWork.RealWorkHours
                             .GetEmployeeTotalSecondsNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
 
+
+                    var totalSecondsSaturdayDay = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsSaturdayDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+                    var totalSecondsSaturdayNight = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsSaturdayNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+                    var totalSecondsSundayDay = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsSundayDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+                    var totalSecondsSundayNight = await _baseDataWork.RealWorkHours
+                            .GetEmployeeTotalSecondsSundayNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
                     if (datatable.ShowHoursInPercentage)
                     {
                         dictionary.Add("TotalHours", totalSeconds / 60 / 60);
                         dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 60);
                         dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 60);
+                        dictionary.Add("TotalHoursSaturdayDay", totalSecondsSaturdayDay / 60 / 60);
+                        dictionary.Add("TotalHoursSaturdayNight", totalSecondsSaturdayNight / 60 / 60);
+                        dictionary.Add("TotalHoursSundayDay", totalSecondsSundayDay / 60 / 60);
+                        dictionary.Add("TotalHoursSundayNight", totalSecondsSundayNight / 60 / 60);
                     }
                     else
                     {
                         dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
                         dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
                         dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursSaturdayDay", ((int)totalSecondsSaturdayDay / 60 / 60).ToString() + ":" + ((int)totalSecondsSaturdayDay / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursSaturdayNight", ((int)totalSecondsSaturdayNight / 60 / 60).ToString() + ":" + ((int)totalSecondsSaturdayNight / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursSundayDay", ((int)totalSecondsSundayDay / 60 / 60).ToString() + ":" + ((int)totalSecondsSundayDay / 60 % 60).ToString());
+                        dictionary.Add("TotalHoursSundayNight", ((int)totalSecondsSundayNight / 60 / 60).ToString() + ":" + ((int)totalSecondsSundayNight / 60 % 60).ToString());
                     }
 
                     returnObjects.Add(expandoObj);

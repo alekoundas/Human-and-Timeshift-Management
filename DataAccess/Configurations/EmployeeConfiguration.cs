@@ -9,6 +9,13 @@ namespace DataAccess.Configurations
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
+
+            builder.HasOne(x => x.Company)
+                .WithMany(x => x.Employees)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
         }
     }
 }

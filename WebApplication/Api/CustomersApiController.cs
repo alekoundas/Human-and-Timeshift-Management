@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using WebApplication.Utilities;
-using Bussiness;
-using System.Dynamic;
-using Bussiness.Service;
-using DataAccess.Models.Datatable;
 using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 using System.Linq.Dynamic.Core;
-using LinqKit;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -88,18 +88,67 @@ namespace WebApplication.Api
 
         // DELETE: api/customers/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Customer>> DeleteCustomer(int id)
+        public async Task<ActionResult<DeleteViewModel>> DeleteCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var response = new DeleteViewModel();
+            var customer = await _context.Customers
+                .Include(x => x.Contacts)
+                .Include(x => x.WorkPlaces).ThenInclude(x => x.WorkPlaceHourRestrictions).ThenInclude(x => x.HourRestrictions)
+                .Include(x => x.WorkPlaces).ThenInclude(x => x.EmployeeWorkPlaces)
+                .Include(x => x.WorkPlaces).ThenInclude(x => x.TimeShifts).ThenInclude(x => x.RealWorkHours)
+                .Include(x => x.WorkPlaces).ThenInclude(x => x.TimeShifts).ThenInclude(x => x.WorkHours)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            var customerWorkPlaces = customer.WorkPlaces;
+            var customerWorkPlacesEmployeeWorkPlaces = customer.WorkPlaces.SelectMany(x => x.EmployeeWorkPlaces);
+            var customerContacts = customer.Contacts;
+            var customerWorkPlacesWorkHourRestrictions = customer.WorkPlaces.SelectMany(x => x.WorkPlaceHourRestrictions);
+            var customerWorkPlacesWorkHourRestrictionsHourRestictions = customer.WorkPlaces.SelectMany(x => x.WorkPlaceHourRestrictions.SelectMany(y => y.HourRestrictions));
+            var customerTimeShifts = customer.WorkPlaces.SelectMany(x => x.TimeShifts);
+            var customerTimeShiftsRealWorHours = customer.WorkPlaces.SelectMany(x => x.TimeShifts.SelectMany(y => y.RealWorkHours));
+            var customerTimeShiftsWorHours = customer.WorkPlaces.SelectMany(x => x.TimeShifts.SelectMany(y => y.WorkHours));
+
             if (customer == null)
-            {
                 return NotFound();
+
+            _context.WorkHours.RemoveRange(customerTimeShiftsWorHours);
+            _context.RealWorkHours.RemoveRange(customerTimeShiftsRealWorHours);
+            _context.TimeShifts.RemoveRange(customerTimeShifts);
+            _context.HourRestrictions.RemoveRange(customerWorkPlacesWorkHourRestrictionsHourRestictions);
+            _context.WorkPlaceHourRestrictions.RemoveRange(customerWorkPlacesWorkHourRestrictions);
+            _context.Contacts.RemoveRange(customerContacts);
+            _context.WorkPlaces.RemoveRange(customerWorkPlaces);
+            _context.EmployeeWorkPlaces.RemoveRange(customerWorkPlacesEmployeeWorkPlaces);
+            _context.Customers.Remove(customer);
+
+            var status = await _context.SaveChangesAsync();
+
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Ο πελάτης " +
+                    customer.ΙdentifyingΝame +
+                    " διαγράφηκε με επιτυχία" +
+                    "Επίσης διαγράφηκαν για αυτον τον πελάτη: " +
+                    " Πόστα:" + customerWorkPlaces.Count().ToString() +
+                    " Επαφές:" + customerContacts.Count().ToString() +
+                    " Περιορισμοί πόστων:" + customerWorkPlacesWorkHourRestrictions.Count().ToString() +
+                    " Χρονοδιαγράμματα:" + customerTimeShifts.Count().ToString() +
+                    " Βάρδιες:" + customerTimeShiftsWorHours.Count().ToString() +
+                    " Πραγματικές Βάρδιες:" + customerTimeShiftsRealWorHours.Count().ToString();
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Ο πελάτης " +
+                    customer.ΙdentifyingΝame +
+                    " ΔΕΝ διαγράφηκε!";
             }
 
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
 
-            return customer;
+            response.ResponseTitle = "Διαγραφή πελάτη";
+            response.Entity = customer;
+            return response;
         }
 
         // GET: api/customers/select2
@@ -151,9 +200,9 @@ namespace WebApplication.Api
 
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = await MapResults(customers,datatable);
+            var mapedData = await MapResults(customers, datatable);
 
-            var total =await _baseDataWork.Customers.CountAllAsyncFiltered(filter);
+            var total = await _baseDataWork.Customers.CountAllAsyncFiltered(filter);
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
@@ -179,7 +228,7 @@ namespace WebApplication.Api
 
         private Func<IQueryable<Customer>, IOrderedQueryable<Customer>> SetOrderBy(string columnName, string orderDirection)
         {
-             if (columnName != "")
+            if (columnName != "")
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             else
                 return null;

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.Models.Entity
 {
@@ -34,7 +30,7 @@ namespace DataAccess.Models.Entity
         public string Description { get; set; }
 
         [Display(Name = "Εταιρία")]
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
         public Company Company { get; set; }
 
 

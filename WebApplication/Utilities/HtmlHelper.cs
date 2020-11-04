@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace WebApplication.Utilities
 {
@@ -65,17 +62,6 @@ namespace WebApplication.Utilities
 
             return false;
         }
-
-
-
-
-
-
-
-
-
-
-
 
         private static bool IsOkToShow(string permition)
         {

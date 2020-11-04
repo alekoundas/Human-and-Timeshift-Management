@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Business.Repository;
+﻿using Business.Repository;
 using Business.Repository.Interface;
 using Bussiness.Repository.Base;
 using Bussiness.Repository.Base.Interface;
@@ -11,6 +6,11 @@ using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels.Leaves;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Bussiness
 {
@@ -59,6 +59,12 @@ namespace Bussiness
         public void Update<TEntity>(TEntity model)
         {
             _dbcontext.Entry(model).State = EntityState.Modified;
+        }
+
+        public void UpdateRange<TEntity>(List<TEntity> models)
+        {
+            foreach (var model in models)
+                _dbcontext.Entry(model).State = EntityState.Modified;
         }
 
         public async Task<List<ApiLeavesHasOverlapResponse>> DateHasOverlap(

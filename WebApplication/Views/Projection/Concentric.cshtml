@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -235,20 +233,49 @@
             columns.push({
                 data: "TotalHoursDay",
                 searchable: false,
-                orderable: true,
+                orderable: false,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
                     'TotalHoursDay')
             });
             columns.push({
                 data: "TotalHoursNight",
                 searchable: false,
-                orderable: true,
+                orderable: false,
                 render: (a, b, data, d) => RenderDataFromDatatable(data,
                     'TotalHoursNight')
+            });
+            columns.push({
+                data: "TotalHoursSaturdayDay",
+                searchable: false,
+                orderable: false,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'TotalHoursSaturdayDay')
+            });
+            columns.push({
+                data: "TotalHoursSaturdayNight",
+                searchable: false,
+                orderable: false,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'TotalHoursSaturdayNight')
+            });
+            columns.push({
+                data: "TotalHoursSundayDay",
+                searchable: false,
+                orderable: false,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'TotalHoursSundayDay')
+            });
+            columns.push({
+                data: "TotalHoursSundayNight",
+                searchable: false,
+                orderable: false,
+                render: (a, b, data, d) => RenderDataFromDatatable(data,
+                    'TotalHoursSundayNight')
             });
 
             return columns;
         }
+
         const RenderDataFromDatatable = (data, property) => {
             if (data[property] != null)
                 return data[property];
@@ -270,6 +297,10 @@
                 '<th>Σύνολο ώρες</th>' +
                 '<th>Σύνολο ώρες Μέρα</th>' +
                 '<th>Σύνολο ώρες Νύχτα</th>' +
+                '<th>Σύνολο ώρες Σάββατο Μέρα</th>' +
+                '<th>Σύνολο ώρες Σάββατο Νύχτα</th>' +
+                '<th>Σύνολο ώρες Κυριακή Μέρα</th>' +
+                '<th>Σύνολο ώρες Κυριακή Νύχτα</th>' +
                 '</tr>' +
                 '</thead>' +
                 '<tfoot>' +
@@ -280,6 +311,10 @@
                 '<th>Σύνολο ώρες</th>' +
                 '<th>Σύνολο ώρες Μέρα</th>' +
                 '<th>Σύνολο ώρες Νύχτα</th>' +
+                '<th>Σύνολο ώρες Σάββατο Μέρα</th>' +
+                '<th>Σύνολο ώρες Σάββατο Νύχτα</th>' +
+                '<th>Σύνολο ώρες Κυριακή Μέρα</th>' +
+                '<th>Σύνολο ώρες Κυριακή Νύχτα</th>' +
                 '</tr>' +
                 '</tfoot>' +
                 '</table>' +

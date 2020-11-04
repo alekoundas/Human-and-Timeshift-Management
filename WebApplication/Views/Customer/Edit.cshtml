@@ -1,8 +1,6 @@
 ﻿@model DataAccess.Models.Entity.Customer
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -83,7 +81,9 @@
                         <label asp-for="CompanyId" class="control-label"></label>
                         <div class="input-group" style="width:100%">
                             <select class="Company_Select2" asp-for="CompanyId" style="width:70%">
-                                <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>
+                                @if (Model.Company != null)
+                                {
+                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>}
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>
