@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using WebApplication.Utilities;
-using System.Dynamic;
-using DataAccess.Models.Datatable;
+﻿using Bussiness;
 using Bussiness.Service;
-using System.Linq.Dynamic.Core;
-using Bussiness;
-using Microsoft.EntityFrameworkCore.Query;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
 using LinqKit;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -32,61 +31,43 @@ namespace WebApplication.Api
             _baseDataWork = new BaseDatawork(BaseDbContext);
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
-
-        // GET: api/LeaveTypeApi
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeaveType>>> GetLeaveTypes()
+        // GET: api/leavetypes/deactivate/5
+        [HttpGet("deactivate/{id}")]
+        public async Task<ActionResult<DeactivateViewModel>> Deactivate(int id)
         {
-            return await _context.LeaveTypes.ToListAsync();
-        }
+            var response = new DeactivateViewModel();
+            var leavetype = await _baseDataWork.LeaveTypes
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        // GET: api/LeaveTypeApi/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<LeaveType>> GetLeaveType(int id)
-        {
-            var leaveType = await _context.LeaveTypes.FindAsync(id);
+            leavetype.IsActive = !leavetype.IsActive;
+            _baseDataWork.Update(leavetype);
 
-            if (leaveType == null)
-                return NotFound();
-
-            return leaveType;
-        }
-
-        // PUT: api/LeaveTypeApi/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutLeaveType(int id, LeaveType leaveType)
-        {
-            if (id != leaveType.Id)
-                return BadRequest();
-
-            _context.Entry(leaveType).State = EntityState.Modified;
-
-            try
+            var status = await _baseDataWork.SaveChangesAsync();
+            if (status >= 1)
             {
-                await _context.SaveChangesAsync();
+                response.IsSuccessful = true;
+                response.ResponseBody = "Ο τύπος άδειας " +
+                    leavetype.Name +
+                    (leavetype.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία.";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!LeaveTypeExists(id))
-                    return NotFound();
-                else
-                    throw;
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Ο τύπος άδειας " +
+                     leavetype.Name +
+                    " ΔΕΝ " +
+                    (leavetype.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία";
             }
 
-            return NoContent();
+            response.ResponseTitle = "Αλλαγή κατάστασης τύπου άδειας";
+            response.Entity = leavetype;
+
+            return Ok(response);
         }
 
-        // POST: api/LeaveTypeApi
-        [HttpPost]
-        public async Task<ActionResult<LeaveType>> PostLeaveType(LeaveType leaveType)
-        {
-            _context.LeaveTypes.Add(leaveType);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetLeaveType", new { id = leaveType.Id }, leaveType);
-        }
-
-        // DELETE: api/LeaveTypeApi/5
+        // DELETE: api/leavetypes/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<LeaveType>> DeleteLeaveType(int id)
         {
@@ -109,6 +90,11 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<LeaveType>();
             filter = filter.And(x => true);
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<LeaveType>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (string.IsNullOrWhiteSpace(search))
                 specializations = await _baseDataWork.LeaveTypes
@@ -137,6 +123,11 @@ namespace WebApplication.Api
             var orderDirection = datatable.Order[0].Dir;
             var filter = PredicateBuilder.New<LeaveType>();
             filter = filter.And(GetSearchFilter(datatable));
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<LeaveType>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             var includes = new List<Func<IQueryable<LeaveType>, IIncludableQueryable<LeaveType, object>>>();
             var leaveTypes = new List<LeaveType>();

@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -1953,10 +1951,14 @@
             serverSide: true,
             responsive: true,
             processing: true,
+            colReorder: false,
+            scrollX: true,
+            scrollCollapse: true,
             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
             iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 3
+            fixedColumns: {
+                leftColumns: 2,
+                rightColumns: 0
             },
             dom: 'Bfrtlp',
             //buttons: ['excel', 'pdf', 'print'],
@@ -2355,8 +2357,8 @@
             );
 
 
-                //$(document).ready(AppendNewDataTableHTML());
-                //$(document).ready(InitDatatable());
+                                                            //$(document).ready(AppendNewDataTableHTML());
+                                                            //$(document).ready(InitDatatable());
 
     </script>
 }

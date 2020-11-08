@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.WorkHours
+namespace DataAccess.ViewModels
 {
     public class GetForEditCellWorkHoursApiViewModel
     {
@@ -30,7 +29,7 @@ namespace DataAccess.ViewModels.WorkHours
 
         [JsonProperty(PropertyName = "employeeIds")]
         public List<int> EmployeeIds { get; set; }
-    
+
 
 
         [JsonProperty(PropertyName = "employeeId", Required = Required.Default)]

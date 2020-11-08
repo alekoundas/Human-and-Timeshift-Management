@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Bussiness;
+using DataAccess;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Microsoft.AspNetCore.Authorization;
-using Bussiness;
-using DataAccess.ViewModels;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
@@ -64,7 +62,7 @@ namespace WebApplication.Controllers
         // POST: TimeShifts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TimeShiftCreateViewModel timeShift)
+        public async Task<IActionResult> Create(TimeShiftCreate timeShift)
         {
             if (ModelState.IsValid)
             {
@@ -72,10 +70,11 @@ namespace WebApplication.Controllers
                     .Where(x => x.WorkPlaceId == timeShift.WorkPlaceId)
                     .Where(y => y.Year == timeShift.Year)
                     .Where(y => y.Month == timeShift.Month).Any();
+
                 if (!timeShiftExists)
                 {
 
-                    var newTimeShift = TimeShiftCreateViewModel.CreateFrom(timeShift);
+                    var newTimeShift = TimeShiftCreate.CreateFrom(timeShift);
                     newTimeShift.Title = timeShift.Year + " " +
                         CultureInfo.CreateSpecificCulture("el-GR").DateTimeFormat.GetMonthName(timeShift.Month);
 

@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Bussiness.Repository.Base.Interface;
+using DataAccess;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using LinqKit;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Bussiness.Repository.Base.Interface;
-using DataAccess;
-using DataAccess.Models.Entity;
-using DataAccess.ViewModels.RealWorkHours;
-using DataAccess.ViewModels.WorkHours;
-using LinqKit;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bussiness.Repository.Base
 {
@@ -56,7 +55,7 @@ namespace Bussiness.Repository.Base
                 .ToListAsync();
         }
 
-        public bool IsDateOverlaping(WorkHoursApiViewModel workHour, int employeeId)
+        public bool IsDateOverlaping(WorkHourApiViewModel workHour, int employeeId)
         {
             var filterOr = PredicateBuilder.New<WorkHour>();
             var filter = PredicateBuilder.New<WorkHour>();
@@ -112,7 +111,7 @@ namespace Bussiness.Repository.Base
             //      .Any(y => y.Employee.Id == employeeId);
         }
 
-        public bool IsDateOvertime(ApiWorkHoursHasOvertimeRange workHour, int employeeId)
+        public bool IsDateOvertime(WorkHourHasOvertimeRange workHour, int employeeId)
         {
 
             var filter = PredicateBuilder.New<WorkHour>();
@@ -135,7 +134,7 @@ namespace Bussiness.Repository.Base
             return Context.WorkHours.Any(filter);
         }
 
-        public bool HasExactDate(WorkHoursApiViewModel workHour)
+        public bool HasExactDate(WorkHourApiViewModel workHour)
         {
             return Context.WorkHours.Any(x =>
                   x.TimeShiftId == workHour.TimeShiftId &&

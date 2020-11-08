@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace DataAccess.Models.Entity
 {
-    public class TimeShift : BaseEntity
+    public class TimeShift : BaseEntityIsActive
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Τίτλος")]

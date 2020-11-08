@@ -4,7 +4,6 @@ using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
-using DataAccess.ViewModels.Leaves;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -91,7 +90,7 @@ namespace WebApplication.Api
 
         // POST: api/leaves/postleave
         [HttpPost("postleave")]
-        public async Task<ActionResult<Leave>> PostLeave(ApiLeavesAdd apiLeave)
+        public async Task<ActionResult<Leave>> PostLeave(LeaveCreate apiLeave)
         {
             if (apiLeave.EmployeeIds.Count() > 0)
                 apiLeave.EmployeeIds.ForEach(id => _baseDataWork.Leaves.Add(

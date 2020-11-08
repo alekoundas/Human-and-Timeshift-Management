@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Bussiness;
+using DataAccess;
+using DataAccess.Models.Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Bussiness;
-using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
@@ -65,12 +63,19 @@ namespace WebApplication.Controllers
         // POST: Leave/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Leave leave)
+        public async Task<IActionResult> Create(Leave leave)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(leave);
-                await _context.SaveChangesAsync();
+
+                var status = await _baseDataWork.SaveChangesAsync();
+                if (status > 0)
+                    TempData["StatusMessage"] = "Η άδεια " +
+                    " δημιουργήθηκε με επιτυχία";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", leave.EmployeeId);
@@ -85,15 +90,15 @@ namespace WebApplication.Controllers
                 return NotFound();
 
             var leave = await _context.Leaves
-                .Include(x=>x.Employee)
-                .Include(x=>x.LeaveType)
-                .FirstOrDefaultAsync(x=>x.Id==id);
-            
+                .Include(x => x.Employee)
+                .Include(x => x.LeaveType)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (leave == null)
                 return NotFound();
 
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", leave.EmployeeId);
-            ViewData["Title"] ="Επεξεργασία άδειας";
+            ViewData["Title"] = "Επεξεργασία άδειας";
 
             return View(leave);
         }
@@ -133,7 +138,7 @@ namespace WebApplication.Controllers
         }
 
 
-       
+
 
         private bool LeaveExists(int id)
         {

@@ -1,8 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -47,7 +43,7 @@
                         <div style="width:100%; float:left;">
                             <label class="control-label">Αντιστάθμιση ωρας(λεπτά)</label>&nbsp
                             <div class="input-group">
-                                <input type="number" class="filterOffsetMinutes" id="OffsetMinutes">
+                                <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
                             </div>
                         </div>
 
@@ -157,15 +153,11 @@
             off: ''
         });
 
-
-
         $('.filterSlider').change(e =>
             $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
 
         $('.filterOffsetMinutes').change(e =>
             $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
-        //$('#SliderRealWorkHour').change(() => $('#SliderWorkHour').bootstrapToggle('off'));
-        //$('#SliderRealWorkHour').change(() => $('#SliderWorkHour').bootstrapToggle('off'));
 
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
@@ -188,11 +180,9 @@
             serverSide: true,
             responsive: true,
             processing: true,
+            colReorder: true,
             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
             iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 2
-            },
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             dom: 'Bfrtlp',
             ajax: {

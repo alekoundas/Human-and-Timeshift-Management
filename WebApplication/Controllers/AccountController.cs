@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models.Identity;
-using DataAccess.ViewModels.View.Account;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {

@@ -38,58 +38,43 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
-        // GET: api/workplaces
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<WorkPlace>>> GetWorkPlaces()
+
+        // GET: api/workplaces/deactivate/5
+        [HttpGet("deactivate/{id}")]
+        public async Task<ActionResult<DeactivateViewModel>> Deactivate(int id)
         {
-            return await _context.WorkPlaces.ToListAsync();
-        }
+            var response = new DeactivateViewModel();
+            var workPlace = await _baseDataWork.WorkPlaces
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        // GET: api/workplaces/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<WorkPlace>> GetWorkPlace(int id)
-        {
-            var workPlace = await _context.WorkPlaces.FindAsync(id);
+            workPlace.IsActive = !workPlace.IsActive;
+            _baseDataWork.Update(workPlace);
 
-            if (workPlace == null)
-                return NotFound();
-
-            return workPlace;
-        }
-
-        // PUT: api/workplaces/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorkPlace(int id, WorkPlace workPlace)
-        {
-            if (id != workPlace.Id)
-                return BadRequest();
-
-            _context.Entry(workPlace).State = EntityState.Modified;
-
-            try
+            var status = await _context.SaveChangesAsync();
+            if (status >= 1)
             {
-                await _context.SaveChangesAsync();
+                response.IsSuccessful = true;
+                response.ResponseBody = "Το πόστο " +
+                    workPlace.Title +
+                    (workPlace.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία.";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!WorkPlaceExists(id))
-                    return NotFound();
-                else
-                    throw;
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Το πόστο " +
+                     workPlace.Title +
+                    " ΔΕΝ " +
+                    (workPlace.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία";
             }
 
-            return NoContent();
+            response.ResponseTitle = "Αλλαγή κατάστασης πόστου";
+            response.Entity = workPlace;
+
+            return Ok(response);
         }
 
-        // POST: api/workplaces
-        [HttpPost]
-        public async Task<ActionResult<WorkPlace>> PostWorkPlace(WorkPlace workPlace)
-        {
-            _context.WorkPlaces.Add(workPlace);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetWorkPlace", new { id = workPlace.Id }, workPlace);
-        }
 
         // DELETE: api/workplaces/5
         [HttpDelete("{id}")]
@@ -158,6 +143,10 @@ namespace WebApplication.Api
             var filter = PredicateBuilder.New<WorkPlace>();
             filter = filter.And(GetUserRoleFiltersAsync());
 
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (string.IsNullOrWhiteSpace(select2.Search))
                 workPlaces = (List<WorkPlace>)await _baseDataWork
@@ -172,6 +161,7 @@ namespace WebApplication.Api
 
             return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
         }
+
         // GET: api/workplaces/select2
         [HttpGet("select2")]
         public async Task<ActionResult<WorkPlace>> Select2(string search, int page)
@@ -180,7 +170,10 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<WorkPlace>();
             filter = filter.And(GetUserRoleFiltersAsync());
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
 
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (string.IsNullOrWhiteSpace(search))
                 workPlaces = (List<WorkPlace>)await _baseDataWork
@@ -200,6 +193,7 @@ namespace WebApplication.Api
 
             return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
         }
+
         // POST: api/workplaces/select2filtered
         [HttpPost("select2filtered")]
         public async Task<ActionResult<WorkPlace>> Select2Filtered([FromBody] Select2FilteredGet select2)
@@ -208,7 +202,10 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<WorkPlace>();
             filter = filter.And(GetUserRoleFiltersAsync());
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
 
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
             if (select2.ExistingIds?.Count > 0)
                 foreach (var workPlaceId in select2.ExistingIds)
                     filter = filter.And(x => x.Id != workPlaceId);
@@ -293,6 +290,11 @@ namespace WebApplication.Api
             var filter = PredicateBuilder.New<WorkPlace>();
             filter = filter.And(GetUserRoleFiltersAsync());
             filter = filter.And(GetSearchFilter(datatable));
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             var workPlaces = new List<WorkPlace>();
 
@@ -498,6 +500,7 @@ namespace WebApplication.Api
 
             return filter;
         }
+
         private Func<IQueryable<WorkPlace>, IOrderedQueryable<WorkPlace>> SetOrderBy(string columnName, string orderDirection)
         {
             if (columnName != "")
@@ -524,7 +527,6 @@ namespace WebApplication.Api
                     if (column.Data == "Customer.company.title")
                         filter = filter.Or(x => x.Customer.Company.Title.Contains(datatable.Search.Value));
                 }
-
             }
             else
                 filter = filter.And(x => true);
@@ -532,10 +534,5 @@ namespace WebApplication.Api
             return filter;
         }
 
-
-        private bool WorkPlaceExists(int id)
-        {
-            return _context.WorkPlaces.Any(e => e.Id == id);
-        }
     }
 }

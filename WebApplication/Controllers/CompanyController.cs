@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
-using Bussiness;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using WebApplication.Utilities;
 using Microsoft.AspNetCore.Http;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -67,14 +66,22 @@ namespace WebApplication.Controllers
         // POST: Companies/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CompanyCreateViewModel company)
+        public async Task<IActionResult> Create(CompanyCreate company)
         {
 
             if (ModelState.IsValid)
             {
                 _baseDataWork.Companies.Add(
-                    CompanyCreateViewModel.CreateFrom(company));
-                await _baseDataWork.SaveChangesAsync();
+                    CompanyCreate.CreateFrom(company));
+
+                var status = await _baseDataWork.SaveChangesAsync();
+                if (status > 0)
+                    TempData["StatusMessage"] = "H εταιρία " +
+                        company.Title +
+                    " δημιουργήθηκε με επιτυχία";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+
                 return RedirectToAction(nameof(Index));
             }
             return View(company);

@@ -89,18 +89,20 @@
                             <th>ErpCode</th>
                             @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>}
+                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
+}
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="false">Επιλογή</th>
-                            <th data-searchable="false">Όνομα</th>
-                            <th data-searchable="false">Επίθετο</th>
-                            <th data-searchable="false">ErpCode</th>
+                            <th>Επιλογή</th>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>ErpCode</th>
                             @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>}
+                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
+}
                         </tr>
                     </tfoot>
                 </table>
@@ -1894,11 +1896,9 @@
             serverSide: true,
             responsive: true,
             processing: true,
+            colReorder: true,
             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
             iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 3
-            },
             dom: 'Bfrtlp',
             //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             buttons: [
@@ -1972,6 +1972,11 @@
                         document.getElementById('tbDayNum_' + day)
                             .innerHTML = dayToShow;
                     });
+            },
+            createdRow: (row, data, dataIndex) => {
+                if (!data.IsActive) {
+                    $(row).css('background-color', '#AAAFB4');
+                }
             }
         });
 

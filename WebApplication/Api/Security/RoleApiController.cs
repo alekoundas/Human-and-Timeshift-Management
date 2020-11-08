@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Identity;
 using LinqKit;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Threading.Tasks;
 using WebApplication.Utilities;
 
 namespace WebApplication.Api.Security
@@ -82,6 +80,7 @@ namespace WebApplication.Api.Security
                     dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId));
                     dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId));
                     dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId));
+                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId));
                     dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId));
                     returnObjects.Add(expandoObj);
 
@@ -92,6 +91,7 @@ namespace WebApplication.Api.Security
                     dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId));
                     dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId));
                     dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId));
+                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId));
                     dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId));
                     returnObjects.Add(expandoObj);
                 }

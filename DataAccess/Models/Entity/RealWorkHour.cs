@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.Models.Entity
 {
-    public class RealWorkHour:  BaseEntity
+    public class RealWorkHour : BaseEntity
     {
         public DateTime StartOn { get; set; }
         public DateTime EndOn { get; set; }

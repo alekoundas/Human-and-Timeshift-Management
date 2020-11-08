@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
-using Bussiness;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using DataAccess.ViewModels.LeaveTypes;
-using WebApplication.Utilities;
 using Microsoft.AspNetCore.Http;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -64,14 +63,21 @@ namespace WebApplication.Controllers
         // POST: LeaveType/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateLeaveType leaveType)
+        public async Task<IActionResult> Create(LeaveTypeCreate leaveType)
         {
             if (ModelState.IsValid)
             {
                 _baseDataWork.LeaveTypes.Add(
-                    CreateLeaveType.CreateFrom(leaveType));
+                    LeaveTypeCreate.CreateFrom(leaveType));
 
-                await _baseDataWork.SaveChangesAsync();
+                var status = await _baseDataWork.SaveChangesAsync();
+                if (status > 0)
+                    TempData["StatusMessage"] = "Το είδος άδειας " +
+                        leaveType.Name +
+                    " δημιουργήθηκε με επιτυχία";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+
                 return RedirectToAction(nameof(Index));
             }
             return View(leaveType);

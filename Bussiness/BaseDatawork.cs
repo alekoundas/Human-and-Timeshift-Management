@@ -4,7 +4,7 @@ using Bussiness.Repository.Base;
 using Bussiness.Repository.Base.Interface;
 using DataAccess;
 using DataAccess.Models.Entity;
-using DataAccess.ViewModels.Leaves;
+using DataAccess.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

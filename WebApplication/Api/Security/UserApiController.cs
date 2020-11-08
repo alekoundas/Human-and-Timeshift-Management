@@ -1,24 +1,17 @@
-﻿using System;
+﻿using Bussiness;
+using Bussiness.Service;
+using DataAccess;
+using DataAccess.Models.Datatable;
+using DataAccess.Models.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Threading.Tasks;
-using Business.Repository;
-using Bussiness;
-using Bussiness.Service;
-using DataAccess;
-using DataAccess.Models;
-using DataAccess.Models.Datatable;
-using DataAccess.Models.Entity;
-using DataAccess.Models.Identity;
-using DataAccess.ViewModels.User;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using WebApplication.Utilities;
 using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Api.Security
 {
@@ -52,7 +45,7 @@ namespace WebApplication.Api.Security
             return Ok(new { });
         }
 
-         [HttpPost("datatable")]
+        [HttpPost("datatable")]
         public async Task<ActionResult<ApplicationUser>> DataTable([FromBody] Datatable datatable)
         {
             var total = _securityDatawork.ApplicationUsers.CountAll();

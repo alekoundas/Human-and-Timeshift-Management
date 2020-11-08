@@ -1,8 +1,6 @@
 ﻿@model IEnumerable<DataAccess.Models.Entity.Customer>
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 <div class="row">
@@ -48,7 +46,6 @@
 <partial name="_ImportModal" model='new {Entity = "Customer" }'>
 
     @section Scripts {
-        <script src="~/js/Custom/DatatableDeleteButton.js"></script>
         <script>
 
             $('#CustomersDatatable').DataTable({
@@ -57,9 +54,7 @@
                 processing: true,
                 lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
                 iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 1
-                },
+                colReorder: true,
                 dom: 'Bfrtlp',
                 buttons: ['excel', 'print'],
                 language: {
@@ -109,7 +104,12 @@
                                 return "";
                         }
                     }
-                ]
+                ],
+                createdRow: (row, data, dataIndex) => {
+                    if (!data.IsActive) {
+                        $(row).css('background-color', '#AAAFB4');
+                    }
+                }
             });
         </script>
     }

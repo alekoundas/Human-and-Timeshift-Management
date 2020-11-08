@@ -108,7 +108,12 @@
                                 return "";
                         }
                     }
-                ]
+                ],
+                createdRow: (row, data, dataIndex) => {
+                    if (!data.IsActive) {
+                        $(row).css('background-color', '#AAAFB4');
+                    }
+                }
             });
         </script>
     }

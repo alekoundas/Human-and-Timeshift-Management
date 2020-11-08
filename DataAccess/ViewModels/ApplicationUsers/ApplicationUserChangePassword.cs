@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.ViewModels.ApplicationUsers
+namespace DataAccess.ViewModels
 {
     public class ApplicationUserChangePassword
     {
-        public string UserId{ get; set; }
+        public string UserId { get; set; }
 
         [Display(Name = "Κωδικός")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]

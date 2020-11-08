@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.ViewModels
 {
-    public class SpecializationCreateViewModel
-    { 
+    public class SpecializationCreate
+    {
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
@@ -16,13 +14,14 @@ namespace DataAccess.ViewModels
         [Column(TypeName = "decimal(18,2)")]
         public decimal PayPerHour { get; set; }
 
-        public static Specialization CreateFrom(SpecializationCreateViewModel viewModel)
+        public static Specialization CreateFrom(SpecializationCreate viewModel)
         {
             return new Specialization()
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 PayPerHour = viewModel.PayPerHour,
+                IsActive = true,
                 CreatedOn = DateTime.Now
 
             };

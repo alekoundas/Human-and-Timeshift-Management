@@ -1,13 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
 
 namespace DataAccess.Models.Select2
 {
     public class Select2Get
     {
-        [JsonProperty(PropertyName = "search", Required = Required.Default)]
+        [JsonProperty(PropertyName = "search")]
         public string Search { get; set; }
 
         [JsonProperty(PropertyName = "page", Required = Required.Default)]
@@ -16,7 +14,7 @@ namespace DataAccess.Models.Select2
         [JsonProperty(PropertyName = "timeShiftId")]
         public int? TimeShiftId { get; set; }
 
-        [JsonProperty(PropertyName = "existingIds", Required = Required.Default)]
+        [JsonProperty(PropertyName = "existingIds")]
         public List<int> ExistingIds { get; set; }
 
     }

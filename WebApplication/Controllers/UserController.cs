@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess;
-using DataAccess.Models;
 using DataAccess.Models.Identity;
-using DataAccess.ViewModels.ApplicationUserRoles;
-using DataAccess.ViewModels.ApplicationUsers;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 
 
@@ -25,11 +21,15 @@ namespace WebApplication.Controllers
         private readonly ISecurityDatawork _datawork;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly BaseDatawork _baseDataWork;
+
         public UserController(SecurityDbContext dbContext,
+            BaseDbContext BaseDbContext,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
         {
             _datawork = new SecurityDataWork(dbContext);
+            _baseDataWork = new BaseDatawork(BaseDbContext);
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -106,14 +106,50 @@ namespace WebApplication.Controllers
             if (ModelState.IsValid)
             {
                 var user = ApplicationUserCreate.CreateFrom(viewModel);
-                var result = await _userManager.CreateAsync(user, "@TempPass1");
+                var result = await _userManager.CreateAsync(user, "TempPass_1");
                 if (result.Succeeded)
-                    TempData["StatusMessage"] = "Ο χρήστης δημιουργήθηκε με επιτυχία. Κωδικός: @TempPass1 .";
+                    TempData["StatusMessage"] = "Ο χρήστης δημιουργήθηκε με επιτυχία. Κωδικός: TempPass_1 ";
                 else
                     TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν δημιουργήθηκε.";
                 return RedirectToAction(nameof(Index));
             }
             return View(viewModel);
+        }
+
+
+        // GET:  User/Profile/Id
+        //[Authorize(Roles = "User_Edit")]
+        public async Task<IActionResult> Profile(string id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var user = _datawork.ApplicationUsers.Get(id.ToString());
+            if (user == null)
+                return NotFound();
+
+            var returnViewModel = ApplicationUserEdit.CreateFrom(user);
+            returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
+            if (returnViewModel.IsEmployee)
+                returnViewModel.EmployeeOption = _baseDataWork.Employees
+                    .Where(x => x.Id == returnViewModel.EmployeeId)
+                    .Select(x => new StringBuilder(x.FullName + " - " + x.ErpCode).ToString())
+                    .FirstOrDefault();
+
+            var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
+                .GetWorkPlaceRolesByUserId(user.Id);
+
+            returnViewModel.WorkPlaceRoles = applicationWorkPlaceRoles
+                .Select(x => new WorkPlaceRoleValues
+                {
+                    WorkPlaceId = x.WorkPlaceId,
+                    Name = x.WorkPlaceName
+                }).ToList();
+
+            ViewData["Title"] = "Προφίλ χρήστη";
+            ViewData["UserRolesTable"] = "Οι ρόλοι μου";
+
+            return View(returnViewModel);
         }
 
         // GET:  User/Edit/Id
@@ -127,8 +163,15 @@ namespace WebApplication.Controllers
             if (user == null)
                 return NotFound();
 
-            var returnViewModel = ApplicationUsersEdit.CreateFrom(user);
+            var returnViewModel = ApplicationUserEdit.CreateFrom(user);
             returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
+            if (returnViewModel.IsEmployee)
+                returnViewModel.EmployeeOption = _baseDataWork.Employees
+                    .Where(x => x.Id == returnViewModel.EmployeeId)
+                    .Select(x => new StringBuilder(x.FullName + " - " + x.ErpCode).ToString())
+                    .FirstOrDefault();
+
+
 
             var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
                 .GetWorkPlaceRolesByUserId(user.Id);
@@ -141,34 +184,8 @@ namespace WebApplication.Controllers
                 }).ToList();
 
             ViewData["Title"] = "Επεξεργασία χρήστη";
+            ViewData["UserRolesTable"] = "Διαθέσιμοι ρόλοι συστήματος";
 
-            return View(returnViewModel);
-        }
-        // GET:  User/Profile/Id
-        //[Authorize(Roles = "User_Edit")]
-        public async Task<IActionResult> Profile(string id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var user = _datawork.ApplicationUsers.Get(id.ToString());
-            if (user == null)
-                return NotFound();
-
-            var returnViewModel = ApplicationUsersEdit.CreateFrom(user);
-            returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
-
-            var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
-                .GetWorkPlaceRolesByUserId(user.Id);
-
-            returnViewModel.WorkPlaceRoles = applicationWorkPlaceRoles
-                .Select(x => new WorkPlaceRoleValues
-                {
-                    WorkPlaceId = x.WorkPlaceId,
-                    Name = x.WorkPlaceName
-                }).ToList();
-
-            ViewData["Title"] = "Προφίλ χρήστη";
 
             return View(returnViewModel);
         }
@@ -177,8 +194,12 @@ namespace WebApplication.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "User_Edit")]
-        public async Task<IActionResult> Edit(string id, ApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(string id, ApplicationUserEdit applicationUser)
         {
+            var user = _datawork.ApplicationUsers.Get(id.ToString());
+            if (user == null)
+                return NotFound();
+
             if (id != applicationUser.Id)
                 return NotFound();
 
@@ -186,15 +207,19 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    applicationUser.UserName = applicationUser.Email;
-                     await _userManager.UpdateAsync(applicationUser);
-                    TempData["StatusMessage"] = "Ο χρήστης ενημερώθηκε με επιτυχία.";
+                    user.UserName = applicationUser.UserName;
+                    user.Email = applicationUser.Email;
+                    user.FirstName = applicationUser.FirstName;
+                    user.LastName = applicationUser.LastName;
+                    user.IsEmployee = applicationUser.IsEmployee;
+                    user.EmployeeId = applicationUser.EmployeeId;
 
+                    await _userManager.UpdateAsync(user);
+                    TempData["StatusMessage"] = "Ο χρήστης ενημερώθηκε με επιτυχία.";
                 }
                 catch (Exception /*e*/)
                 {
                     TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν ενημερώθηκε.";
-
                 }
                 return RedirectToAction(nameof(Index));
             }

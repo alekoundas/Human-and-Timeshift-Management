@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
-using Bussiness;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using WebApplication.Utilities;
 using Microsoft.AspNetCore.Http;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -66,13 +65,21 @@ namespace WebApplication.Controllers
         // POST: WorkPlace/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WorkPlaceCreateViewModel workPlace)
+        public async Task<IActionResult> Create(WorkPlaceCreate workPlace)
         {
             if (ModelState.IsValid)
             {
                 _baseDataWork.WorkPlaces.Add(
-                    WorkPlaceCreateViewModel.CreateFrom(workPlace));
-                await _baseDataWork.SaveChangesAsync();
+                    WorkPlaceCreate.CreateFrom(workPlace));
+
+                var status = await _baseDataWork.SaveChangesAsync();
+                if (status > 0)
+                    TempData["StatusMessage"] = "Το πόστο " +
+                        workPlace.Title +
+                    " δημιουργήθηκε με επιτυχία";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+
                 return RedirectToAction(nameof(Index));
             }
             return View(workPlace);
@@ -86,8 +93,8 @@ namespace WebApplication.Controllers
                 return NotFound();
 
             var workPlace = await _context.WorkPlaces
-                .Include(x=>x.Customer)
-                .FirstOrDefaultAsync(z=>z.Id==id);
+                .Include(x => x.Customer)
+                .FirstOrDefaultAsync(z => z.Id == id);
 
             if (workPlace == null)
                 return NotFound();
@@ -134,12 +141,12 @@ namespace WebApplication.Controllers
                 "Description",
                 "CustomerId" });
 
-            var excelPackage = (await(new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelHelper(_context)
                 .CreateNewExcel("WorkPlaces"))
                 .AddSheetAsync<WorkPlace>(excelColumns))
                 .CompleteExcel(out errors);
 
-            
+
             if (errors.Count == 0)
             {
                 byte[] reportBytes;

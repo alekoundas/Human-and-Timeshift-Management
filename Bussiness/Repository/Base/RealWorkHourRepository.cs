@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Bussiness.Repository.Base.Interface;
+﻿using Bussiness.Repository.Base.Interface;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
-using DataAccess.ViewModels.RealWorkHours;
-using DataAccess.ViewModels.WorkHours;
+using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bussiness.Repository.Base
 {

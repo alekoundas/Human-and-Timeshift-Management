@@ -1,8 +1,6 @@
-﻿@model DataAccess.ViewModels.ApplicationUsers.ApplicationUsersEdit;
+﻿@model DataAccess.ViewModels.ApplicationUserEdit;
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 <div class="row">
@@ -20,34 +18,49 @@
 
             <hr />
 
-            <form asp-controller="User" asp-action="Edit" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <div class="box-body">
+            <div class="box-body">
 
-                    <div class="form-group">
-                        <label asp-for="Email" class="control-label"></label>
-                        <div class="input-group">
-                            <input type="text" asp-for="Email" class="form-control" readonly />
-                            <span asp-validation-for="Email" aria-label="Email" placeholder="Email" class="text-danger"></span>
-                        </div>
+                <div class="form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <div class="input-group">
+                        <input type="text" asp-for="FirstName" class="form-control" readonly />
                     </div>
-
-                    <div class="form-group">
-                        <label asp-for="UserName" class="control-label"></label>
-                        <div class="input-group">
-                            <input type="text" asp-for="UserName" class="form-control" readonly />
-                            <span asp-validation-for="UserName" aria-label="Email" placeholder="Email" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    @*<div class="form-group pull-right">
-                            <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
-                        </div>*@
-
                 </div>
-            </form>
 
+                <div class="form-group">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <div class="input-group">
+                        <input type="text" asp-for="LastName" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <div class="input-group">
+                        <input type="text" asp-for="UserName" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <div class="input-group">
+                        <input type="text" asp-for="Email" class="form-control" readonly />
+                    </div>
+                </div>
+
+                @if (Model.IsEmployee)
+                {
+    <div class="form-group">
+        <label asp-for="EmployeeOption" class="control-label"></label>
+        <div class="input-group">
+            <input type="text" asp-for="EmployeeOption" class="form-control" readonly />
+        </div>
+    </div>}
+
+
+            </div>
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -61,7 +74,7 @@
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title">Διαθέσιμοι ρόλοι συστήματος</h3>
+                <h3 class="box-title">@ViewData["UserRolesTable"]</h3>
             </div>
             <hr />
             <div class="box-body table-responsive">
@@ -103,19 +116,17 @@
                 <div style="width:100%;" id="BoxWorkPlace">
                     @if (User.IsInRole("User_Edit"))
                     {
-                        <div style="width:100%; float:left;">
-                            Προσθήκη πόστου
-                            <button id="ButtonAddWorkPlace" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                        </div>
-                    }
+        <div style="width:100%; float:left;">
+            Προσθήκη πόστου
+            <button id="ButtonAddWorkPlace" class="btn btn-success"><i class="fa fa-plus"></i></button>
+        </div>}
 
                     <div style="width:100%; float:left;" id="DivToAppendSelect2"></div>
                     @if (User.IsInRole("User_Edit"))
                     {
-                        <div class="form-group pull-right">
-                            <button @*style="display:none;"*@ value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveWorkPlaces">Αποθήκευση</button>
-                        </div>
-                    }
+        <div class="form-group pull-right">
+            <button @*style="display:none;"*@ value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveWorkPlaces">Αποθήκευση</button>
+        </div>}
                 </div>
             </div>
         </div>
@@ -449,7 +460,7 @@
             '</div >' +
             '<div style="width: 5%; float: left;">&nbsp;</div >' +
             '<div style="width: 20%; float: left;">' +
-                GetHtmlButtons()+
+            GetHtmlButtons() +
             '</div >' +
             '</div >';
 

@@ -1,4 +1,4 @@
-﻿@model DataAccess.ViewModels.RealWorkHours.RealWorkHourCreateViewModel
+﻿@model DataAccess.ViewModels.RealWorkHourCreate
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
@@ -105,6 +105,12 @@
             endOn: TimeConverter(endDate),
             timeShiftId: document.getElementById('TimeShiftId').value //for "belongs" only
         });
+        const BuildValidateHasOvertimeDto = (startDate, endDate, employeeIds) => ([{
+            startOn: TimeConverter(startDate),
+            endOn: TimeConverter(endDate),
+            employeeIds: employeeIds,
+            timeShiftId: document.getElementById('TimeShiftId').value //for "belongs" only
+        }]);
         const BuildSelect2Dto = (params) => ({
             timeShiftId: document.getElementById('TimeShiftId').value,
             search: params.term,
@@ -183,10 +189,7 @@
                         warningSpan.innerHTML = response.errorValue;
                         warningSpan.style.display = '';
                     }
-
-
         };
-
 
     </script>
 
@@ -244,6 +247,31 @@
                     BuildValidateWorkHourDto(startOn, endOn, employeeIds))
             }).done((data) => {
                 HandleTimeShiftSpan(data);
+                HandleSubmitButton();
+            });
+        };
+
+        const ValidateEmployeesWithRestrictionHasOvertime = () => {
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+            var employeeIds = GetAlreadyAppendedEmployeeIds();
+
+            $.ajax({
+                type: "POST",
+                url: '/api/realworkhours/HasOvertime',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildValidateHasOvertimeDto(startOn, endOn, employeeIds))
+            }).done((data) => {
+
+                data.filter(response => !response.isSuccessful)
+                    .forEach(response => HandleEmployeeSelect2Span(({
+                        errorType: 'warning',
+                        errorValue: response.value,
+                        employeeId: response.employeeId
+                    })));
+
                 HandleSubmitButton();
             });
         };
@@ -351,6 +379,7 @@
                             ValidateEmployeesWithRangeToRealWorkhour();
                             ValidateEmployeesWithRangeToWorkHour();
                             ValidateEmployeesWithRestrictionMaxHours();
+                            ValidateEmployeesWithRestrictionHasOvertime();
                         });
 
                 }, 800);
@@ -374,6 +403,7 @@
                 HandleTimeShiftSpan();
                 ValidateEmployeesWithRangeToRealWorkhour();
                 ValidateEmployeesWithRestrictionMaxHours();
+                ValidateEmployeesWithRestrictionHasOvertime();
                 ValidateEmployeesWithRangeToWorkHour();
                 HandleSubmitButton();
             });

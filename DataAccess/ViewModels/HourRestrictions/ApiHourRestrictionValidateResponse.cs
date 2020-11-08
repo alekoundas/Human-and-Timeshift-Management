@@ -1,7 +1,7 @@
 ﻿using DataAccess.Models;
 using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.HourRestrictions
+namespace DataAccess.ViewModels
 {
     public class ApiHourRestrictionValidateResponse : BaseEntity
     {

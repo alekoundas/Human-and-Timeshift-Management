@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.Models.Entity
 {
-    public class Employee : BaseEntity
+    public class Employee : BaseEntityIsActive
     {
         [Display(Name = "Όνομα")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
@@ -23,7 +22,7 @@ namespace DataAccess.Models.Entity
         public string Afm { get; set; }
 
         [Display(Name = "Αριθμός Ταυτότητας")]
-        public string  SocialSecurityNumber { get; set; }
+        public string SocialSecurityNumber { get; set; }
 
         [Display(Name = "Κωδικός Erp")]
         public string ErpCode { get; set; }
@@ -44,7 +43,7 @@ namespace DataAccess.Models.Entity
 
 
         [Display(Name = "Επαφές")]
-        public ICollection<Contact> Contacts{ get; set; }
+        public ICollection<Contact> Contacts { get; set; }
 
         [Display(Name = "Πόστα")]
         public ICollection<WorkHour> WorkHours { get; set; }

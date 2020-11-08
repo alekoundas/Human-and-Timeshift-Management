@@ -1,6 +1,5 @@
-﻿@model DataAccess.ViewModels.ApplicationUsers.ApplicationUserCreate
-@{ Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@model DataAccess.ViewModels.ApplicationUserCreate
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -22,25 +21,6 @@
                 <div class="box-body">
 
                     <div class="form-group">
-
-                        <label asp-for="UserName" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="UserName" class="form-control" />
-                            <span asp-validation-for="UserName" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-
-                        <label asp-for="Email" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-
                         <label asp-for="FirstName" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="FirstName" class="form-control" />
@@ -49,21 +29,44 @@
                     </div>
 
                     <div class="form-group">
-
                         <label asp-for="LastName" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="LastName" class="form-control" />
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="form-group">
 
-                        <label asp-for="Gender" class="control-label"></label>
+                    <div class="form-group">
+                        <label asp-for="UserName" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Gender" id="Gender" type="checkbox" class="form-control" />
-                            <span asp-validation-for="Gender" class="text-danger"></span>
+                            <input asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="IsEmployee" class="control-label"></label>
+                        <div class="input-group">
+                            <input type="checkbox" asp-for="IsEmployee" class="form-control IsEmployeeSlider" />
+                            <span asp-validation-for="IsEmployee" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="EmployeeIdDiv" style="display:none;">
+                        <label asp-for="EmployeeId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%"></select>
+                            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                        </div>
+                    </div>
+
 
                     <div class="form-group pull-right">
                         <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
@@ -81,6 +84,41 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <!--///////////////////////////////////////-->
+    <!--///              Events             ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        //Handle show/hide Employee fields
+        $('.IsEmployeeSlider').change(e => {
+            if (e.target.checked) {
+                document.getElementById('EmployeeIdDiv').style.display = '';
+                document.getElementById('FirstName').readOnly = true;
+                document.getElementById('LastName').readOnly = true;
+            }
+            else {
+                document.getElementById('EmployeeIdDiv').style.display = 'none';
+                document.getElementById('FirstName').readOnly = false;
+                document.getElementById('LastName').readOnly = false;
+            }
+        });
+
+        $('.Employee_Select2').change(e => {
+            if (e.target.value != '') {
+                var names = e.target.options[e.target.selectedIndex].innerText
+                    .split(' ')
+                    .filter(str => str.length >= 1);
+
+                document.getElementById('FirstName').value = names[0];
+                document.getElementById('LastName').value = names[1];
+            }
+        });
+
+    </script>
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
     <script>
 
         $('#Gender').bootstrapToggle({
@@ -90,6 +128,25 @@
             offstyle: 'primary'
         });
 
+        $('.Employee_Select2').select2({
+            language: "el",
+            allowClear: true,
+            ajax: {
+                type: "POST",
+                url: '/api/employees/select2',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: params => JSON.stringify({
+                    search: params.term,
+                    page: params.page || 1
+                })
+            }
+        });
+
+        $('.IsEmployeeSlider').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι'
+        })
 
     </script>
 }

@@ -36,13 +36,6 @@ namespace WebApplication.Api
         }
 
         // GET: api/TimeShiftsApi
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TimeShift>>> GetTimeShifts()
-        {
-            return await _context.TimeShifts.ToListAsync();
-        }
-
-        // GET: api/timeshifts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TimeShift>> GetTimeShift(int id)
         {
@@ -54,38 +47,40 @@ namespace WebApplication.Api
             return timeShift;
         }
 
-        // PUT: api/timeshifts/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTimeShift(int id, TimeShift timeShift)
+        // GET: api/timeshifts/deactivate/5
+        [HttpGet("deactivate/{id}")]
+        public async Task<ActionResult<DeactivateViewModel>> Deactivate(int id)
         {
-            if (id != timeShift.Id)
-                return BadRequest();
+            var response = new DeactivateViewModel();
+            var timeshift = await _baseDataWork.TimeShifts
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            _context.Entry(timeShift).State = EntityState.Modified;
+            timeshift.IsActive = !timeshift.IsActive;
+            _baseDataWork.Update(timeshift);
 
-            try
+            var status = await _context.SaveChangesAsync();
+            if (status >= 1)
             {
-                await _context.SaveChangesAsync();
+                response.IsSuccessful = true;
+                response.ResponseBody = "Το χρονοδιάγραμμα " +
+                    timeshift.Title +
+                    (timeshift.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία.";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!TimeShiftExists(id))
-                    return NotFound();
-                else
-                    throw;
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Το χρονοδιάγραμμα " +
+                     timeshift.Title +
+                    " ΔΕΝ " +
+                    (timeshift.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία";
             }
 
-            return NoContent();
-        }
+            response.ResponseTitle = "Αλλαγή κατάστασης χρονοδιαγράμματος";
+            response.Entity = timeshift;
 
-        // POST: api/timeshifts
-        [HttpPost]
-        public async Task<ActionResult<TimeShift>> PostTimeShift(TimeShift timeShift)
-        {
-            _context.TimeShifts.Add(timeShift);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetTimeShift", new { id = timeShift.Id }, timeShift);
+            return Ok(response);
         }
 
         // DELETE: api/timeshifts/5
@@ -139,7 +134,10 @@ namespace WebApplication.Api
 
             includes.Add(x => x.Include(y => y.WorkPlace));
             filter = filter.And(x => true);
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<TimeShift>(HttpContext);
 
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
 
             if (predicate == "RealWorkHourCreate")
@@ -176,9 +174,14 @@ namespace WebApplication.Api
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
-
             var filter = PredicateBuilder.New<TimeShift>();
             filter = filter.And(GetSearchFilter(datatable));
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<TimeShift>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
+
 
             var includes = new List<Func<IQueryable<TimeShift>, IIncludableQueryable<TimeShift, object>>>();
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);

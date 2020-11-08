@@ -64,6 +64,7 @@ namespace Bussiness.Repository
             int pageIndex = 1)
         {
             var qry = (IQueryable<TEntity>)_set;
+            //qry = qry.AsExpandable();
 
             if (includes != null)
                 foreach (var include in includes)

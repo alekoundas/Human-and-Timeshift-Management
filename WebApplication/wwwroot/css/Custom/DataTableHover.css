@@ -1,0 +1,7 @@
+﻿.table tbody tr:nth-child(even):hover td {
+    background-color: #e6eeff !important;
+}
+
+table tbody tr:nth-child(odd):hover td {
+    background-color: #e6eeff !important;
+}

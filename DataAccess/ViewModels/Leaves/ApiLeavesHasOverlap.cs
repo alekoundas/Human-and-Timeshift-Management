@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.Leaves
+namespace DataAccess.ViewModels
 {
     public class ApiLeavesHasOverlap
     {

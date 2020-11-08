@@ -34,56 +34,40 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
-        // GET: api/Customers
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        // GET: api/customers/deactivate/5
+        [HttpGet("deactivate/{id}")]
+        public async Task<ActionResult<DeactivateViewModel>> Deactivate(int id)
         {
-            return await _context.Customers.ToListAsync();
-        }
+            var response = new DeactivateViewModel();
+            var customer = await _baseDataWork.Customers
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        // GET: api/Customers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
-        {
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
-                return NotFound();
+            customer.IsActive = !customer.IsActive;
+            _baseDataWork.Update(customer);
 
-            return customer;
-        }
-
-        // PUT: api/Customers/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, Customer customer)
-        {
-            if (id != customer.Id)
-                return BadRequest();
-
-            _context.Entry(customer).State = EntityState.Modified;
-
-            try
+            var status = await _context.SaveChangesAsync();
+            if (status >= 1)
             {
-                await _context.SaveChangesAsync();
+                response.IsSuccessful = true;
+                response.ResponseBody = "Ο πελάτης " +
+                    customer.ΙdentifyingΝame +
+                    (customer.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία.";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!CustomerExists(id))
-                    return NotFound();
-                else
-                    throw;
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Ο πελάτης " +
+                     customer.ΙdentifyingΝame +
+                    " ΔΕΝ " +
+                    (customer.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία";
             }
 
-            return NoContent();
-        }
+            response.ResponseTitle = "Αλλαγή κατάστασης πελάτη";
+            response.Entity = customer;
 
-        // POST: api/Customers
-        [HttpPost]
-        public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
-        {
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCustomer", new { id = customer.Id }, customer);
+            return Ok(response);
         }
 
         // DELETE: api/customers/5
@@ -160,6 +144,10 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<Customer>();
             filter = filter.And(x => true);
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Customer>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (string.IsNullOrWhiteSpace(search))
                 customers = await _baseDataWork.Customers
@@ -187,6 +175,11 @@ namespace WebApplication.Api
             var orderDirection = datatable.Order[0].Dir;
             var filter = PredicateBuilder.New<Customer>();
             filter = filter.And(GetSearchFilter(datatable));
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Customer>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             var includes = new List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>();
             var customers = new List<Customer>();
@@ -262,9 +255,5 @@ namespace WebApplication.Api
             return filter;
         }
 
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.Id == id);
-        }
     }
 }

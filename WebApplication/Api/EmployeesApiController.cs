@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
@@ -16,6 +9,13 @@ using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using WebApplication.Utilities;
 
 namespace WebApplication.Api
@@ -25,7 +25,7 @@ namespace WebApplication.Api
     public class EmployeesApiController : ControllerBase
     {
         private BaseDbContext _context;
-        private BaseDatawork _baseDataWork;
+        private readonly BaseDatawork _baseDataWork;
         private readonly SecurityDataWork _securityDatawork;
 
         public EmployeesApiController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
@@ -35,17 +35,6 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
-
-
-        // POST: api/employees
-        [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
-        {
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
-        }
         [HttpGet("testapi")]
         public async Task<ActionResult<Employee>> testapi()
         {
@@ -68,6 +57,43 @@ namespace WebApplication.Api
 
             return Ok(aaa);
         }
+
+        // GET: api/employees/deactivate/5
+        [HttpGet("deactivate/{id}")]
+        public async Task<ActionResult<DeactivateViewModel>> Deactivate(int id)
+        {
+            var response = new DeactivateViewModel();
+            var employee = await _baseDataWork.Employees
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            employee.IsActive = !employee.IsActive;
+            _baseDataWork.Update(employee);
+
+            var status = await _context.SaveChangesAsync();
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Ο υπάλληλος " +
+                    employee.FullName +
+                    (employee.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία.";
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Ο υπάλληλος " +
+                     employee.FullName +
+                    " ΔΕΝ " +
+                    (employee.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία";
+            }
+
+            response.ResponseTitle = "Αλλαγή κατάστασης υπαλλήλου ";
+            response.Entity = employee;
+
+            return Ok(response);
+        }
+
 
         // DELETE: api/employees/5
         [HttpDelete("{id}")]
@@ -143,7 +169,7 @@ namespace WebApplication.Api
         }
 
 
-        // GET: api/employees/select2
+        // POST: api/employees/select2
         [HttpPost("select2")]
         public async Task<ActionResult<Employee>> Select2([FromBody] Select2Get select2)
         {
@@ -153,6 +179,11 @@ namespace WebApplication.Api
             var hasMore = (select2.Page * 10) < total;
             var filter = PredicateBuilder.New<Employee>();
             var parentFilter = filter;
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (select2.TimeShiftId != null)
                 filter = filter.And(x => x.EmployeeWorkPlaces
@@ -181,13 +212,18 @@ namespace WebApplication.Api
             return Ok(select2Helper.CreateEmployeesResponse(employees, hasMore));
         }
 
-        // GET: api/employees/select2
+        // POST: api/employees/select2
         [HttpPost("select2filtered")]
         public async Task<ActionResult<Employee>> Select2Filtered([FromBody] Select2FilteredGet select2)
         {
             var employees = new List<Employee>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<Employee>();
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (select2.ExistingIds?.Count > 0)
                 foreach (var employeeId in select2.ExistingIds)
@@ -254,6 +290,11 @@ namespace WebApplication.Api
             var orderDirection = datatable.Order[0].Dir;
             var filter = PredicateBuilder.New<Employee>();
             filter = filter.And(GetSearchFilter(datatable));
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             var employees = new List<Employee>();
 
@@ -333,9 +374,6 @@ namespace WebApplication.Api
                    .ToDynamicListAsync<Leave>();
             }
 
-
-
-
             var realWorkHours = await _baseDataWork.RealWorkHours.Where(x =>
                    x.StartOn.Year == compareYear &&
                    x.TimeShiftId == datatable.GenericId &&
@@ -391,6 +429,11 @@ namespace WebApplication.Api
             var orderDirection = datatable.Order[0].Dir;
             var filter = PredicateBuilder.New<Employee>();
             filter = filter.And(GetSearchFilter(datatable));
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.Specialization));
@@ -1021,6 +1064,7 @@ namespace WebApplication.Api
 
             return filter;
         }
+
 
     }
 }

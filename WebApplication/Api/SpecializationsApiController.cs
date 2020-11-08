@@ -6,7 +6,6 @@ using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -33,57 +32,40 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
-        // GET: api/specializations
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Specialization>>> GetSpecializations()
+        // GET: api/specializations/deactivate/5
+        [HttpGet("deactivate/{id}")]
+        public async Task<ActionResult<DeactivateViewModel>> Deactivate(int id)
         {
-            return await _context.Specializations.ToListAsync();
-        }
+            var response = new DeactivateViewModel();
+            var specialization = await _baseDataWork.Specializations
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        // GET: api/specializations/id
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Specialization>> GetSpecialization(int id)
-        {
-            var specialization = await _context.Specializations.FindAsync(id);
+            specialization.IsActive = !specialization.IsActive;
+            _baseDataWork.Update(specialization);
 
-            if (specialization == null)
-                return NotFound();
-
-            return specialization;
-        }
-
-        // PUT: api/specializations/id
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSpecialization(int id, Specialization specialization)
-        {
-            if (id != specialization.Id)
-                return BadRequest();
-
-            _context.Entry(specialization).State = EntityState.Modified;
-
-            try
+            var status = await _context.SaveChangesAsync();
+            if (status >= 1)
             {
-                await _context.SaveChangesAsync();
+                response.IsSuccessful = true;
+                response.ResponseBody = "Η ειδικότητα " +
+                    specialization.Name +
+                    (specialization.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία.";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!SpecializationExists(id))
-                    return NotFound();
-                else
-                    throw;
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Η ειδικότητα " +
+                     specialization.Name +
+                    " ΔΕΝ " +
+                    (specialization.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία";
             }
 
-            return NoContent();
-        }
+            response.ResponseTitle = "Αλλαγή κατάστασης ειδικότητας";
+            response.Entity = specialization;
 
-        // POST: api/specializations
-        [HttpPost]
-        public async Task<ActionResult<Specialization>> PostSpecialization(Specialization specialization)
-        {
-            _context.Specializations.Add(specialization);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetSpecialization", new { id = specialization.Id }, specialization);
+            return Ok(response);
         }
 
         // DELETE: api/specializations/id
@@ -121,6 +103,10 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<Specialization>();
             filter = filter.And(x => true);
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Specialization>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (string.IsNullOrWhiteSpace(search))
                 specializations = await _baseDataWork.Specializations
@@ -147,9 +133,13 @@ namespace WebApplication.Api
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
             var orderDirection = datatable.Order[0].Dir;
-
             var filter = PredicateBuilder.New<Specialization>();
             filter = filter.And(GetSearchFilter(datatable));
+
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Specialization>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             var includes = new List<Func<IQueryable<Specialization>, IIncludableQueryable<Specialization, object>>>();
             var specializations = new List<Specialization>();

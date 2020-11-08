@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Business.ViewModels;
+﻿using Business.ViewModels;
 using DataAccess.Models.Identity;
-using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.ViewModels.User
+namespace DataAccess.ViewModels
 {
     public class ApplicationUserViewModel : ViewModel
     {
@@ -26,8 +25,8 @@ namespace DataAccess.ViewModels.User
             return new ApplicationUserViewModel
             {
                 Email = model.Email,
-                UserName =  model.UserName
-                
+                UserName = model.UserName
+
             };
         }
     }

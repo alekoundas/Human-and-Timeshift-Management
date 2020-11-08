@@ -33,60 +33,70 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_View").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Create").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Employee_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
 
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "User_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
 
                     //Specialization
                     userManager.AddToRoleAsync(user, "Specialization_View").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Create").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Delete").Wait();
 
                     //Company
                     userManager.AddToRoleAsync(user, "Company_View").Wait();
                     userManager.AddToRoleAsync(user, "Company_Create").Wait();
                     userManager.AddToRoleAsync(user, "Company_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Company_Delete").Wait();
 
                     //Customer
                     userManager.AddToRoleAsync(user, "Customer_View").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Create").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Delete").Wait();
 
                     //WorkPlace
                     userManager.AddToRoleAsync(user, "WorkPlace_View").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Create").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
 
                     //TimeShift
                     userManager.AddToRoleAsync(user, "TimeShift_View").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Create").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
 
                     //Leave
                     userManager.AddToRoleAsync(user, "Leave_View").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Create").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "Leave_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
 
                     //LeaveType
                     userManager.AddToRoleAsync(user, "LeaveType_View").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Create").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Delete").Wait();
 
                     //RealWorkhour
                     userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Create").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "RealWorkHour_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Delete").Wait();
 
                     //Projection
@@ -121,60 +131,70 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_View").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Create").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Employee_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
 
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "User_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
 
                     //Specialization
                     userManager.AddToRoleAsync(user, "Specialization_View").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Create").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Delete").Wait();
 
                     //Company
                     userManager.AddToRoleAsync(user, "Company_View").Wait();
                     userManager.AddToRoleAsync(user, "Company_Create").Wait();
                     userManager.AddToRoleAsync(user, "Company_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Company_Delete").Wait();
 
                     //Customer
                     userManager.AddToRoleAsync(user, "Customer_View").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Create").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Delete").Wait();
 
                     //WorkPlace
                     userManager.AddToRoleAsync(user, "WorkPlace_View").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Create").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
 
                     //TimeShift
                     userManager.AddToRoleAsync(user, "TimeShift_View").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Create").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
 
                     //Leave
                     userManager.AddToRoleAsync(user, "Leave_View").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Create").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "Leave_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
 
                     //LeaveType
                     userManager.AddToRoleAsync(user, "LeaveType_View").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Create").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Delete").Wait();
 
                     //RealWorkhour
                     userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Create").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "RealWorkHour_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Delete").Wait();
 
                     //Projection
@@ -244,7 +264,7 @@ namespace Business.Seed
             CreateRole(roleManager, "Leave", "View");
             CreateRole(roleManager, "Leave", "Create");
             CreateRole(roleManager, "Leave", "Edit");
-            CreateRole(roleManager, "Leave", "Deactivate");
+            //CreateRole(roleManager, "Leave", "Deactivate");
             CreateRole(roleManager, "Leave", "Delete");
 
             //LeaveType
@@ -255,17 +275,17 @@ namespace Business.Seed
             CreateRole(roleManager, "LeaveType", "Delete");
 
             //RealWorkhour
-            CreateRole(roleManager, "RealWorkΗour", "View");
-            CreateRole(roleManager, "RealWorkΗour", "Create");
-            CreateRole(roleManager, "RealWorkΗour", "Edit");
-            CreateRole(roleManager, "RealWorkΗour", "Deactivate");
-            CreateRole(roleManager, "RealWorkΗour", "Delete");
+            CreateRole(roleManager, "RealWorkHour", "View");
+            CreateRole(roleManager, "RealWorkHour", "Create");
+            CreateRole(roleManager, "RealWorkHour", "Edit");
+            //CreateRole(roleManager, "RealWorkHour", "Deactivate");
+            CreateRole(roleManager, "RealWorkHour", "Delete");
 
             //WorkPlaceHourRestriction
             CreateRole(roleManager, "WorkPlaceHourRestriction", "View");
             CreateRole(roleManager, "WorkPlaceHourRestriction", "Create");
             CreateRole(roleManager, "WorkPlaceHourRestriction", "Edit");
-            CreateRole(roleManager, "WorkPlaceHourRestriction", "Deactivate");
+            //CreateRole(roleManager, "WorkPlaceHourRestriction", "Deactivate");
             CreateRole(roleManager, "WorkPlaceHourRestriction", "Delete");
 
             //Projection

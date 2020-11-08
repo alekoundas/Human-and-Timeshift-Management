@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
-using Bussiness;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using DataAccess.ViewModels.Customers;
-using WebApplication.Utilities;
 using Microsoft.AspNetCore.Http;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -67,13 +65,20 @@ namespace WebApplication.Controllers
         // POST: Customers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Customer customer)
+        public async Task<IActionResult> Create(CustomerCreate customer)
         {
             if (ModelState.IsValid)
             {
-                _baseDataWork.Customers.Add(customer);
+                _baseDataWork.Customers.Add(CustomerCreate.CreateFrom(customer));
 
-                await _baseDataWork.SaveChangesAsync();
+                var status = await _baseDataWork.SaveChangesAsync();
+                if (status > 0)
+                    TempData["StatusMessage"] = "Ο πελάτης " +
+                        customer.ΙdentifyingΝame +
+                    " δημιουργήθηκε με επιτυχία";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+
                 return RedirectToAction(nameof(Index));
             }
             return View(customer);
@@ -139,7 +144,7 @@ namespace WebApplication.Controllers
                 "Description",
                 "CompanyId" });
 
-            var excelPackage = (await(new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelHelper(_context)
                .CreateNewExcel("Customers"))
                .AddSheetAsync<Customer>(excelColumns))
                .CompleteExcel(out errors);

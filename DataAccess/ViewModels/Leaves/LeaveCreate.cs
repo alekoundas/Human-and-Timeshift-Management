@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.Leaves
+namespace DataAccess.ViewModels
 {
-    public class ApiLeavesAdd
+    public class LeaveCreate
     {
         [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
         public DateTime StartOn { get; set; }
@@ -24,5 +23,7 @@ namespace DataAccess.ViewModels.Leaves
 
         [JsonProperty(PropertyName = "employeeIds", Required = Required.Default)]
         public List<int> EmployeeIds { get; set; }
+
+
     }
 }

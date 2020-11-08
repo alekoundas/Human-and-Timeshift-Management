@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Bussiness;
+using DataAccess;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using Bussiness;
-using DataAccess.ViewModels.RealWorkHours;
-using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
@@ -72,7 +70,7 @@ namespace WebApplication.Controllers
         // POST: RealWorkHours/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RealWorkHourCreateViewModel viewModel)
+        public async Task<IActionResult> Create(RealWorkHourCreate viewModel)
         {
             var changeCount = 0;
             if (ModelState.IsValid)
@@ -80,7 +78,7 @@ namespace WebApplication.Controllers
                 viewModel.Employees.ForEach(id =>
                 {
                     changeCount++;
-                    var realWorkHour = RealWorkHourCreateViewModel
+                    var realWorkHour = RealWorkHourCreate
                         .CreateFrom(viewModel);
 
                     realWorkHour.EmployeeId = id;
@@ -163,16 +161,7 @@ namespace WebApplication.Controllers
             return View(realWorkHour);
         }
 
-        // POST: RealWorkHours/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var realWorkHour = await _context.RealWorkHours.FindAsync(id);
-            _context.RealWorkHours.Remove(realWorkHour);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+
         // POST: RealWorkHours/CurrentDay
         [HttpGet, ActionName("CurrentDay")]
         public IActionResult CurrentDay()

@@ -1,4 +1,4 @@
-﻿@model DataAccess.ViewModels.TimeShiftCreateViewModel
+﻿@model DataAccess.ViewModels.TimeShiftCreate
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -48,7 +48,7 @@
                     <div class="form-group">
                         <label class="control-label"> Επιλογή μήνα και έτους</label>
                         <div class="input-group" style="width:30%">
-                            <input type="text" id="MonthPicker" class="form-control" readonly/>
+                            <input type="text" id="MonthPicker" class="form-control" readonly />
                             <span class="text-danger"></span>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
         $('.WorkPlace_Select2').select2({
             ajax: {
                 url: '/api/workplaces/select2',
-                data:  params =>{
+                data: params => {
                     var query = {
                         search: params.term,
                         page: params.page || 1

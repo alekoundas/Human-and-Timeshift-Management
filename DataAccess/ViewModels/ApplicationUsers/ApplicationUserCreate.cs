@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccess.Models.Entity;
-using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Identity;
-using DataAccess.Models.Identity;
+using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.ViewModels.ApplicationUsers
+namespace DataAccess.ViewModels
 {
-    public class ApplicationUserCreate: IdentityUser
+    public class ApplicationUserCreate : IdentityUser
     {
         [Display(Name = "Όνομα")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
@@ -22,13 +15,19 @@ namespace DataAccess.ViewModels.ApplicationUsers
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string LastName { get; set; }
 
-        [Display(Name = "Ημερομηνία Γέννησης")]
-        public DateTime? DateOfBirth { get; set; }
+        [Display(Name = "Όνομα χρήστη")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        public string UserName { get; set; }
 
-        [Display(Name = "Φύλο")]
-        public bool Gender { get; set; }
+        [Display(Name = "Μέλος από")]
+        public DateTime? MemberSince { get; set; }
+
+        public bool HasToChangePassword { get; set; }
+
+        [Display(Name = "Είναι υπάλληλος;")]
         public bool IsEmployee { get; set; }
 
+        [Display(Name = "Yπάλληλος")]
         public int? EmployeeId { get; set; }
 
 
@@ -36,14 +35,13 @@ namespace DataAccess.ViewModels.ApplicationUsers
         {
             return new ApplicationUser()
             {
-                UserName=viewModel.UserName,
+                UserName = viewModel.UserName,
                 Email = viewModel.Email,
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
                 IsEmployee = viewModel.IsEmployee,
-                Gender = viewModel.Gender,
-                DateOfBirth = viewModel.DateOfBirth,
-                HasToChangePassword=true
+                EmployeeId = viewModel.EmployeeId,
+                HasToChangePassword = true
             };
         }
     }

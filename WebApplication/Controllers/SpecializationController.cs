@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
-using Microsoft.AspNetCore.Authorization;
 using DataAccess.ViewModels;
-using Bussiness;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using System.Text;
-using System.IO;
-using NPOI.SS.UserModel;
-using NPOI.HSSF.UserModel;
-using NPOI.XSSF.UserModel;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting.Internal;
-using WebApplication.Utilities;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -71,16 +65,24 @@ namespace WebApplication.Controllers
         // POST: Specializations/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SpecializationCreateViewModel viewModel)
+        public async Task<IActionResult> Create(SpecializationCreate specialization)
         {
             if (ModelState.IsValid)
             {
                 _baseDataWork.Specializations.Add(
-                    SpecializationCreateViewModel.CreateFrom(viewModel));
-                await _baseDataWork.SaveChangesAsync();
+                    SpecializationCreate.CreateFrom(specialization));
+
+                var status = await _baseDataWork.SaveChangesAsync();
+                if (status > 0)
+                    TempData["StatusMessage"] = "Η ειδικότητα " +
+                        specialization.Name +
+                    " δημιουργήθηκε με επιτυχία";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(viewModel);
+            return View(specialization);
         }
 
         // GET: Specializations/Edit/5
@@ -160,7 +162,7 @@ namespace WebApplication.Controllers
         {
             var errors = new List<string>();
             var specialization = await _baseDataWork.Specializations.GetAllAsync();
-            var excelColumns = new List<string>(new string[] { 
+            var excelColumns = new List<string>(new string[] {
                 "Name",
                 "Description" });
 
@@ -231,4 +233,3 @@ namespace WebApplication.Controllers
         }
     }
 }
-

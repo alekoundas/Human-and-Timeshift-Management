@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.ViewModels
 {
-    public class WorkPlaceCreateViewModel
+    public class WorkPlaceCreate
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Τίτλος")]
@@ -18,13 +16,14 @@ namespace DataAccess.ViewModels
 
 
 
-        public static WorkPlace CreateFrom(WorkPlaceCreateViewModel viewModel)
+        public static WorkPlace CreateFrom(WorkPlaceCreate viewModel)
         {
             return new WorkPlace()
             {
                 Title = viewModel.Title,
                 Description = viewModel.Description,
                 CustomerId = viewModel.CustomerId,
+                IsActive = true,
                 CreatedOn = DateTime.Now
             };
         }

@@ -1,14 +1,11 @@
-﻿@model DataAccess.ViewModels.ApplicationUsers.ApplicationUsersEdit;
+﻿@model DataAccess.ViewModels.ApplicationUserEdit;
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 <div class="row">
     <div class="col-md-3"> </div>
     <div class="col-md-6">
-
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
@@ -22,25 +19,91 @@
 
             <form asp-controller="User" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="text" asp-for="Id" class="hidden" disabled />
+                <input type="text" asp-for="Id" class="hidden" disabled />
 
                 <div class="box-body">
 
                     <div class="form-group">
-                        <label asp-for="Email" class="control-label"></label>
+                        <label asp-for="FirstName" class="control-label"></label>
                         <div class="input-group">
-                            <input type="text" asp-for="Email" class="form-control" disabled />
-                            <span asp-validation-for="Email" aria-label="Email" placeholder="Email" class="text-danger"></span>
+                            @if (Model.IsEmployee)
+                            {
+                <input asp-for="FirstName" class="form-control" readonly />}
+            else
+            { <input asp-for="FirstName" class="form-control" />}
+                        </div>
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LastName" class="control-label"></label>
+                        <div class="input-group">
+                            @if (Model.IsEmployee)
+                            {
+                <input asp-for="LastName" class="form-control" readonly />}
+            else
+            { <input asp-for="LastName" class="form-control" />}
+                            @*<input asp-for="LastName" class="form-control" />*@
+                            <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
                     </div>
 
-                    @*<div class="form-group pull-right">
-                            <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
-                        </div>*@
+                    <div class="form-group">
+                        <label asp-for="UserName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="IsEmployee" class="control-label"></label>
+                        <div class="input-group">
+                            <input type="checkbox" asp-for="IsEmployee" class="form-control IsEmployeeSlider" />
+                            <span asp-validation-for="IsEmployee" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    @if (Model.IsEmployee)
+                    {
+
+        <div class="form-group" id="EmployeeIdDiv">
+            <label asp-for="EmployeeId" class="control-label"></label>
+            <div class="input-group" style="width:100%">
+                <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
+                    @if (Model.EmployeeId != null)
+                    {
+    <option value="@Model.EmployeeId" selected="selected">@Model.EmployeeOption</option>
+}
+                </select>
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+        </div>}
+    else
+    {
+<div class="form-group" id="EmployeeIdDiv" style="display:none;">
+    <label asp-for="EmployeeId" class="control-label"></label>
+    <div class="input-group" style="width:100%">
+        <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
+            }
+        </select>
+        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+    </div>
+</div>}
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
                 </div>
             </form>
-
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -50,32 +113,31 @@
 <div class="row">
     <div class="col-md-1"> </div>
     <div class="col-md-5">
-
         <div class="box box-danger" style="margin-top:5%;">
-
             <div class="box-header">
-                <h3 class="box-title">Διαθέσιμοι ρόλοι συστήματος</h3>
+                <h3 class="box-title">@ViewData["UserRolesTable"]</h3>
             </div>
             <hr />
             <div class="box-body table-responsive">
-
                 <table id="rolesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>View</th>
-                            <th>Edit</th>
-                            <th>Create</th>
-                            <th>Delete</th>
+                            <th>Όνομα</th>
+                            <th>Προβολή</th>
+                            <th>Επεξεργασία</th>
+                            <th>Δημιουργία</th>
+                            <th>Απενεργοποίηση</th>
+                            <th>Διαγραφή</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="true">Name</th>
-                            <th data-searchable="false">View</th>
-                            <th data-searchable="false">Edit</th>
-                            <th data-searchable="false">Create</th>
-                            <th data-searchable="false">Delete</th>
+                            <th>Όνομα</th>
+                            <th>Προβολή</th>
+                            <th>Επεξεργασία</th>
+                            <th>Δημιουργία</th>
+                            <th>Απενεργοποίηση</th>
+                            <th>Διαγραφή</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -124,8 +186,6 @@
 
             </div>
         </div>
-
-
     </div>
     <div class="col-md-1"> </div>
 
@@ -217,6 +277,64 @@
         const HasChangedValueToSelect2 = num =>
             document.getElementById('WorkPlaceSelect2Num_' + num).value != document.getElementById('DatabaseValueIdNum_' + num).value;
 
+        const HandleSelect2State = workPlaceId => {
+            var editButton = document
+                .getElementById('Select2EditButtonNum_' + workPlaceId);
+
+            var undoButton = document
+                .getElementById('Select2UndoButtonNum_' + workPlaceId);
+
+            var deleteButton = document
+                .getElementById('Select2DeleteButtonNum_' + workPlaceId);
+
+            var select2 = document
+                .getElementById('WorkPlaceSelect2Num_' + workPlaceId);
+
+            if (editButton.style.display == '') {
+                editButton.style.display = 'none';
+                undoButton.style.display = '';
+                deleteButton.style.display = '';
+                select2.disabled = false;
+            } else {
+                editButton.style.display = '';
+                undoButton.style.display = 'none';
+                deleteButton.style.display = 'none';
+                select2.disabled = true;
+            }
+        }
+    </script>
+
+    <!--///////////////////////////////////////-->
+    <!--///               Events            ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        //Handle show/hide Employee fields
+        $('.IsEmployeeSlider').change(e => {
+            if (e.target.checked) {
+                document.getElementById('EmployeeIdDiv').style.display = '';
+                document.getElementById('FirstName').readOnly = true;
+                document.getElementById('LastName').readOnly = true;
+            }
+            else {
+                document.getElementById('EmployeeIdDiv').style.display = 'none';
+                document.getElementById('FirstName').readOnly = false;
+                document.getElementById('LastName').readOnly = false;
+            }
+        });
+
+        //Fill Employee fiels on Employee selection
+        $('.Employee_Select2').change(e => {
+            if (e.target.value != '') {
+                var names = e.target.options[e.target.selectedIndex].innerText
+                    .split(' ')
+                    .filter(str => str.length >= 1);
+                console.log(names);
+
+                document.getElementById('FirstName').value = names[0];
+                document.getElementById('LastName').value = names[1];
+            }
+        });
+
         //Add WorkPlace Select2
         $('#ButtonAddWorkPlace').on('click', () => {
             document.getElementById('DivToAppendSelect2')
@@ -281,37 +399,32 @@
                 }
             });
         });
-        const HandleSelect2State = workPlaceId => {
-            var editButton = document
-                .getElementById('Select2EditButtonNum_' + workPlaceId);
-
-            var undoButton = document
-                .getElementById('Select2UndoButtonNum_' + workPlaceId);
-
-            var deleteButton = document
-                .getElementById('Select2DeleteButtonNum_' + workPlaceId);
-
-            var select2 = document
-                .getElementById('WorkPlaceSelect2Num_' + workPlaceId);
-
-            if (editButton.style.display == '') {
-                editButton.style.display = 'none';
-                undoButton.style.display = '';
-                deleteButton.style.display = '';
-                select2.disabled = false;
-            } else {
-                editButton.style.display = '';
-                undoButton.style.display = 'none';
-                deleteButton.style.display = 'none';
-                select2.disabled = true;
-            }
-        }
     </script>
 
     <!--///////////////////////////////////////-->
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
+        //IsEmploye slider
+        $('.IsEmployeeSlider').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι'
+        })
+
+        //Employees Select2
+        $('.Employee_Select2').select2({
+            allowClear: true,
+            ajax: {
+                type: "POST",
+                url: '/api/employees/select2',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: params => JSON.stringify({
+                    search: params.term,
+                    page: params.page || 1
+                })
+            }
+        });
 
         //WorkPlaces Select2
         const WorkPlaceSelect2 = Select2Count =>
@@ -327,7 +440,7 @@
 
 
         jQuery(function () {
-            console.log(WorkPlaceRoleIds);
+            //console.log(WorkPlaceRoleIds);
             //Append existing workplaces
             [...WorkPlaceRoleIds].forEach(role => {
                 AppendExistingWorkPlaceRole(role);
@@ -340,7 +453,7 @@
                  responsive: true,
                  processing: true,
                  lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150,"Όλα"]],
-             iDisplayLength: 150,
+                 iDisplayLength: 150,
                  colReorder: {
                      fixedColumnsLeft: 1
                  },
@@ -382,7 +495,7 @@
                     },
                     {
                         data: "Edit",
-                       searchable: false,
+                        searchable: false,
                         orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Edit != null)
@@ -398,6 +511,17 @@
                         render: (a, b, data, d) => {
                             if (data.Create != null)
                                 return data.Create.result;
+                            else
+                                return "";
+                        }
+                    },
+                    {
+                        data: "Deactivate",
+                        searchable: false,
+                        orderable: false,
+                        render: (a, b, data, d) => {
+                            if (data.Deactivate!= null)
+                                return data.Deactivate.result;
                             else
                                 return "";
                         }
@@ -420,7 +544,7 @@
 
 
     <script>
-       
+
 
         $('#rolesDatatable').on("change", ".PermitionCheckbox", (data) => {
             var userId = data.target.attributes['userid'].nodeValue;

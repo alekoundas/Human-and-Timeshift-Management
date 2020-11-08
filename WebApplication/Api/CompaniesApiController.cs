@@ -6,7 +6,6 @@ using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -33,56 +32,40 @@ namespace WebApplication.Controllers
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
-        // GET: api/companies
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
+        // GET: api/customers/deactivate/5
+        [HttpGet("deactivate/{id}")]
+        public async Task<ActionResult<DeactivateViewModel>> Deactivate(int id)
         {
-            return await _context.Companies.ToListAsync();
-        }
+            var response = new DeactivateViewModel();
+            var company = await _baseDataWork.Companies
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        // GET: api/companies/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Company>> GetCompany(int id)
-        {
-            var company = await _context.Companies.FindAsync(id);
-            if (company == null)
-                return NotFound();
+            company.IsActive = !company.IsActive;
+            _baseDataWork.Update(company);
 
-            return company;
-        }
-
-        // PUT: api/companies/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCompany(int id, Company company)
-        {
-            if (id != company.Id)
-                return BadRequest();
-
-            _context.Entry(company).State = EntityState.Modified;
-
-            try
+            var status = await _context.SaveChangesAsync();
+            if (status >= 1)
             {
-                await _context.SaveChangesAsync();
+                response.IsSuccessful = true;
+                response.ResponseBody = "Η εταιρία " +
+                    company.Title +
+                    (company.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία.";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!CompanyExists(id))
-                    return NotFound();
-                else
-                    throw;
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Η εταιρία " +
+                     company.Title +
+                    " ΔΕΝ " +
+                    (company.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
+                    "με επιτυχία";
             }
 
-            return NoContent();
-        }
+            response.ResponseTitle = "Αλλαγή κατάστασης εταιρίας";
+            response.Entity = company;
 
-        // POST: api/companies
-        [HttpPost]
-        public async Task<ActionResult<Company>> PostCompany(Company company)
-        {
-            _context.Companies.Add(company);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCompany", new { id = company.Id }, company);
+            return Ok(response);
         }
 
         // DELETE: api/companies/id
@@ -138,6 +121,10 @@ namespace WebApplication.Controllers
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<Company>();
             filter = filter.And(x => true);
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Company>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             if (string.IsNullOrWhiteSpace(search))
                 companies = await _baseDataWork.Companies
@@ -188,6 +175,10 @@ namespace WebApplication.Controllers
             filter = filter.And(GetSearchFilter(datatable));
             var includes = new List<Func<IQueryable<Company>, IIncludableQueryable<Company, object>>>();
 
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Company>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
 
             var companies = new List<Company>();
             if (datatable.Predicate == "CompanyIndex")
@@ -195,7 +186,6 @@ namespace WebApplication.Controllers
                 companies = await _baseDataWork.Companies.GetPaggingWithFilter(
                     SetOrderBy(columnName, orderDirection), filter, includes,
                         pageSize, pageIndex);
-
             }
 
             var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);

@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.ApplicationUserRoles
+namespace DataAccess.ViewModels
 {
     public class ApiUpdateWorkPlaceRoles
     {

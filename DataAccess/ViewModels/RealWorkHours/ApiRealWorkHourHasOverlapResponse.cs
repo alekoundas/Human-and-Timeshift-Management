@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.RealWorkHours
+namespace DataAccess.ViewModels
 {
     public class ApiRealWorkHourHasOverlapResponse
     {

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.ComponentModel.DataAnnotations;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.ViewModels
 {
-    public class TimeShiftCreateViewModel
+    public class TimeShiftCreate
     {
         [Display(Name = "Τίτλος")]
         public string Title { get; set; }
@@ -20,7 +19,7 @@ namespace DataAccess.ViewModels
         [Display(Name = "Πόστο")]
         public int WorkPlaceId { get; set; }
 
-        public static TimeShift CreateFrom(TimeShiftCreateViewModel viewModel)
+        public static TimeShift CreateFrom(TimeShiftCreate viewModel)
         {
             return new TimeShift
             {
@@ -28,6 +27,7 @@ namespace DataAccess.ViewModels
                 Month = viewModel.Month,
                 Year = viewModel.Year,
                 WorkPlaceId = viewModel.WorkPlaceId,
+                IsActive = true,
                 CreatedOn = DateTime.Now
             };
         }

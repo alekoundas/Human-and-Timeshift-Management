@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using DataAccess.Models.Entity;
 
-namespace DataAccess.ViewModels.Customers
+namespace DataAccess.ViewModels
 {
-    public class CreateCustomer
+    public class CustomerCreate
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Επωνυμία")]
@@ -41,18 +39,19 @@ namespace DataAccess.ViewModels.Customers
         public ICollection<Contact> Contacts { get; set; }
 
 
-        public static Customer CreateFrom(CreateCustomer viewModel)
+        public static Customer CreateFrom(CustomerCreate viewModel)
         {
             return new Customer()
             {
                 ΙdentifyingΝame = viewModel.ΙdentifyingΝame,
                 AFM = viewModel.AFM,
-                Address=viewModel.Address,
-                PostalCode=viewModel.PostalCode,
-                DOY=viewModel.DOY,
+                Address = viewModel.Address,
+                PostalCode = viewModel.PostalCode,
+                DOY = viewModel.DOY,
                 Description = viewModel.Description,
-                CompanyId = (int)viewModel.CompanyId,
-                Profession=viewModel.Profession,
+                CompanyId = viewModel.CompanyId,
+                Profession = viewModel.Profession,
+                IsActive = true,
                 CreatedOn = DateTime.Now
             };
         }

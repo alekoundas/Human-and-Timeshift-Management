@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -13,6 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
@@ -70,17 +70,30 @@ namespace WebApplication.Controllers
         // POST: Employee/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(EmployeeCreateViewModel employee)
+        public async Task<IActionResult> Create(EmployeeCreate employee)
         {
             var contacts = new List<Contact>();
             if (ModelState.IsValid)
             {
                 _baseDataWork.Employees.Add(
-                    EmployeeCreateViewModel.CreateFrom(employee));
-                await _baseDataWork.SaveChangesAsync();
+                    EmployeeCreate.CreateFrom(employee));
+
+                var status = await _baseDataWork.SaveChangesAsync();
+                if (status > 0)
+                    TempData["StatusMessage"] = "Ο Υπάλληλος " +
+                        employee.FirstName +
+                        " - " +
+                        employee.LastName +
+                    " δημιουργήθηκε με επιτυχία";
+                else
+                    TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", employee.CompanyId);
+
+
+
             return View(employee);
         }
 

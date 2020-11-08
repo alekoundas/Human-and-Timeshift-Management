@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using Bussiness.Repository.Security.Interface;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
 using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApplication.Utilities
 {
@@ -55,10 +55,16 @@ namespace WebApplication.Utilities
                     EditButton(baseRole, id) +
                     "</div>";
 
+            if (currentUserRoles.Contains(baseRole + "_Deactivate"))
+                stringToReturn += "<div style='width: 20%; float: left;'>" +
+                    DeactivateButton(apiController, id) +
+                    "</div>";
+
             if (currentUserRoles.Contains(baseRole + "_Delete"))
                 stringToReturn += "<div style='width: 20%; float: left;'>" +
                     DeleteButton(apiController, id) +
                     "</div>";
+
             //stringToReturn += "<div style='width: 30%; float: left;'>&nbsp</div>";
             stringToReturn += "</div>";
             return stringToReturn;
@@ -105,6 +111,15 @@ namespace WebApplication.Utilities
                             : RoleCheckbox(false, userId, roleId, isDisabled);
                 }
 
+                if (permition == "Deactivate")
+                {
+                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    if (roleId != null)
+                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+                        ? RoleCheckbox(true, userId, roleId, isDisabled)
+                            : RoleCheckbox(false, userId, roleId, isDisabled);
+                }
+
                 if (permition == "Delete")
                 {
                     var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
@@ -126,8 +141,12 @@ namespace WebApplication.Utilities
         private static string EditButton(string controller, string id)
             => @"<div style='width:20px; height:20px;'><a href='/" + controller + "/Edit/" + id + "'><i class='fa fa-pencil-square-o'></i></a></div>";
 
+        private static string DeactivateButton(string controller, string id)
+            => @"<div style='width:20px; height:20px;'><a ><i urlAttr='/api/" + controller + "/" + "deactivate" + "/" + id + "' class='fa fa-ban DatatableDeactivateButton' ></i></a></div>";
+
         private static string DeleteButton(string controller, string id)
             => @"<div style='width:20px; height:20px;'><a ><i urlAttr='/api/" + controller + "/" + id + "' class='fa fa-trash-o DatatableDeleteButton' ></i></a></div>";
+
 
 
 
@@ -169,19 +188,6 @@ namespace WebApplication.Utilities
 
         private static string EditToggle(string toggleState, string link)
             => @"<input urlAttr='" + link + "' class='ToggleSliders' type='checkbox' data-onstyle='success' " + toggleState + ">";
-
-
-        public string GetTableCellBody(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
-        {
-            return "";
-        }
-
-
-
-
-
-
-
 
 
         public string GetTimeShiftEditCellBodyWorkHours(List<WorkHour> workHours, List<Leave> leaves, int dayOfMonth, Datatable datatable, int employeeId)
@@ -274,7 +280,7 @@ namespace WebApplication.Utilities
 
         public string GetTimeShiftEditCellBodyRealWorkHours(List<RealWorkHour> realWorkHours,
             List<WorkHour> workHours, List<Leave> leaves, int compareMonth, int compareYear,
-            int dayOfMonth, Datatable datatable, int employeeId)
+            int compareDay, Datatable datatable, int employeeId)
         {
             var strToReturn = "";
 
@@ -282,7 +288,7 @@ namespace WebApplication.Utilities
                   x.TimeShiftId == datatable.GenericId &&
                   x.StartOn.Year == compareYear &&
                   x.StartOn.Month == compareMonth &&
-                  (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                  (x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
                   x.EmployeeId == employeeId)
                .ToList();
 
@@ -290,7 +296,7 @@ namespace WebApplication.Utilities
                x.TimeShiftId == datatable.GenericId &&
                x.StartOn.Year == compareYear &&
                x.StartOn.Month == compareMonth &&
-               (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+               (x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
                x.EmployeeId == employeeId)
             .ToList();
 
@@ -298,7 +304,7 @@ namespace WebApplication.Utilities
             var cellLeaves = leaves.Where(x =>
                    x.StartOn.Year == compareYear &&
                    x.StartOn.Month == compareMonth &&
-                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                   (x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
                    x.EmployeeId == employeeId)
                 .ToList();
 
@@ -318,7 +324,7 @@ namespace WebApplication.Utilities
                 foreach (var cellWorkHour in cellRealWorkHours)
                 {
                     var celStartOn = cellWorkHour.StartOn;
-                    if (celStartOn.Day != dayOfMonth)
+                    if (celStartOn.Day != compareDay)
                         celStartOn = new DateTime(
                             cellWorkHour.StartOn.Year,
                             cellWorkHour.StartOn.Month,
@@ -329,7 +335,7 @@ namespace WebApplication.Utilities
                             0);
 
                     var celEndOn = cellWorkHour.EndOn;
-                    if (celEndOn.Day != dayOfMonth)
+                    if (celEndOn.Day != compareDay)
                         celEndOn = new DateTime(
                                 cellWorkHour.EndOn.Year,
                                 cellWorkHour.EndOn.Month,
@@ -338,14 +344,26 @@ namespace WebApplication.Utilities
                                 59,
                                 0,
                                 0);
+
+
+
                     strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
                         celStartOn.ToShortTimeString() +
-                  "</div>";
+                        "</div>";
 
                     strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
                         celEndOn.ToShortTimeString() +
-                     "</div></div>";
+                        "</div></div>";
                 }
+
+
+                //var currentDate = new DateTime(compareYear, 1, 1);
+                //var currentDate2 = new DateTime(compareYear, 12, 12);
+                //var currentDate = new DateTime(compareYear, compareMonth, compareDay);
+                //var publicHolidays = DateSystem.GetPublicHoliday(currentDate, currentDate2, CountryCode.GR);
+                //if (publicHolidays.Count() > 0)
+                //    strToReturn += publicHolidays.FirstOrDefault();
+
 
                 _httpContext = new HttpContextAccessor();
                 var currentUserRoles = _httpContext.HttpContext.User.Claims
@@ -357,12 +375,12 @@ namespace WebApplication.Utilities
                     {
 
                         if (currentUserRoles.Contains("RealWorkHour_Create"))
-                            strToReturn += FaIconAdd(dayOfMonth, "", employeeId,
+                            strToReturn += FaIconAdd(compareDay, "", employeeId,
                                 compareMonth, compareYear);
 
                         if (currentUserRoles.Contains("RealWorkHour_Edit"))
                             if (cellRealWorkHours.Count() > 0)
-                                strToReturn += FaIconEdit(dayOfMonth, "green", employeeId,
+                                strToReturn += FaIconEdit(compareDay, "green", employeeId,
                                        datatable.GenericId, compareMonth, compareYear);
                     }
                 }
@@ -370,13 +388,6 @@ namespace WebApplication.Utilities
 
             }
         }
-
-
-
-
-
-
-
 
 
         public async Task<string> GetTimeShiftEditCellBodyWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
@@ -458,8 +469,8 @@ namespace WebApplication.Utilities
             }
 
             return strToReturn;
-
         }
+
         public async Task<string> GetTimeShiftEditCellBodyRealWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
         {
             var compareMonth = 0;
@@ -587,8 +598,6 @@ namespace WebApplication.Utilities
             return cellBody;
         }
 
-        private static string SpanTimeValue(string time)
-            => @"<span>" + time + "</span></br>";
         private static string FaIconEdit(int dayOfMonth, string color, int employeeid, int timeshiftid, int month = 0, int year = 0)
           => @"<i class='fa fa-pencil hidden faIconEdit'   timeshiftid='" + timeshiftid + "' employeeid='" + employeeid + "' cellColor='" + color + "'  dayOfMonth = '" + dayOfMonth + "' Month = '" + month + "' Year = '" + year + "'></i>";
 
@@ -602,8 +611,6 @@ namespace WebApplication.Utilities
                 "data-onstyle='success'" +
                 "employeeId=" + employeeId +
               ">";
-
-
 
         public string GetCurrentDayButtons(Employee employee)
            => CurrentDayFaIconEdit(employee.Id);

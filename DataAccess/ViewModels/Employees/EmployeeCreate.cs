@@ -1,12 +1,11 @@
-﻿using System;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.ViewModels
 {
-    public class EmployeeCreateViewModel
+    public class EmployeeCreate
     {
         [Display(Name = "Όνομα")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
@@ -47,7 +46,7 @@ namespace DataAccess.ViewModels
         public ICollection<Contact> Contacts { get; set; }
 
 
-        public static Employee CreateFrom(EmployeeCreateViewModel viewModel)
+        public static Employee CreateFrom(EmployeeCreate viewModel)
         {
             return new Employee()
             {
@@ -61,8 +60,9 @@ namespace DataAccess.ViewModels
                 SpecializationId = viewModel.SpecializationId,
                 CompanyId = viewModel.CompanyId,
                 Contacts = viewModel.Contacts,
-                Address=viewModel.Address,
-                CreatedOn= DateTime.Now
+                Address = viewModel.Address,
+                IsActive = true,
+                CreatedOn = DateTime.Now
             };
         }
     }

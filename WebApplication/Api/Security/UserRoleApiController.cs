@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Identity;
-using DataAccess.ViewModels.ApplicationUserRoles;
-using DataAccess.ViewModels.ApplicationUsers;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApplication.Api.Security
 {
@@ -54,9 +49,9 @@ namespace WebApplication.Api.Security
 
             _securityDbContext.UserRoles.Add(new ApplicationUserRole()
             {
-                UserId= userId,
+                UserId = userId,
                 RoleId = roleId,
-                
+
             });
             await _securityDbContext.SaveChangesAsync();
 
@@ -83,7 +78,7 @@ namespace WebApplication.Api.Security
                         .FirstOrDefaultAsync(x => x.WorkPlaceId == workPlaceValue.NewWorkPlaceId.ToString());
 
                     //If user has edited an WorkPlace Role
-                    if (workPlaceValue.ExistingWorkPlaceId != workPlaceValue.NewWorkPlaceId.ToString() && workPlaceValue.ExistingWorkPlaceId!="")
+                    if (workPlaceValue.ExistingWorkPlaceId != workPlaceValue.NewWorkPlaceId.ToString() && workPlaceValue.ExistingWorkPlaceId != "")
                     {
                         var existingRole = await _securityDatawork.ApplicationUsers
                             .GetRoleByWorkPlaceAndUser(workPlaceValue.ExistingWorkPlaceId, viewModel.UserId);
@@ -95,7 +90,7 @@ namespace WebApplication.Api.Security
                         await _securityDatawork.SaveChangesAsync();
 
                         newUserRole.RoleId = newRole.Id;
-                        newUserRole.UserId= viewModel.UserId;
+                        newUserRole.UserId = viewModel.UserId;
                         _securityDatawork.ApplicationUserRoles.Add(newUserRole);
 
                         await _securityDatawork.SaveChangesAsync();
@@ -123,7 +118,7 @@ namespace WebApplication.Api.Security
 
                     var role = new ApplicationRole()
                     {
-                        Name = "Specific_WorkPlace_"+ workPlaceValue.NewWorkPlaceId.ToString(),
+                        Name = "Specific_WorkPlace_" + workPlaceValue.NewWorkPlaceId.ToString(),
                         WorkPlaceId = workPlaceValue.NewWorkPlaceId.ToString(),
                         WorkPlaceName = workPlace.Title
                     };

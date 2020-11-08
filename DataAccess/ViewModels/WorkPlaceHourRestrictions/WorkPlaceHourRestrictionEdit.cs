@@ -1,10 +1,9 @@
-﻿using System;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DataAccess.Models.Entity;
-using DataAccess.ViewModels.HourRestrictions;
 
-namespace DataAccess.ViewModels.WorkPlaceHourRestrictions
+namespace DataAccess.ViewModels
 {
     public class WorkPlaceHourRestrictionEdit
     {

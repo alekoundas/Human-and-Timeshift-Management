@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
-namespace DataAccess.ViewModels.WorkHours
+namespace DataAccess.ViewModels
 {
-    public class DeleteWorkHoursApiViewModel
+    public class WorkHourDelete
     {
         [JsonProperty(PropertyName = "startOn")]
         public DateTime StartOn { get; set; }

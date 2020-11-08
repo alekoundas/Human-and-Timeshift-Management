@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models.Entity
 {
-    public class WorkPlace : BaseEntity
+    public class WorkPlace : BaseEntityIsActive
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Τίτλος")]

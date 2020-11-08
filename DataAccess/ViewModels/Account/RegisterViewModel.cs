@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
 
-namespace DataAccess.ViewModels.View.Account
+namespace DataAccess.ViewModels
 {
     public class RegisterViewModel
     {

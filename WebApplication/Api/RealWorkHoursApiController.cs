@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Bussiness;
+﻿using Bussiness;
 using DataAccess;
 using DataAccess.Models.Entity;
-using DataAccess.ViewModels.RealWorkHours;
-using DataAccess.ViewModels.WorkHours;
+using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApplication.Api
 {
@@ -130,7 +129,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/deletebatch
         [HttpPost("deletebatch")]
-        public async Task<ActionResult<RealWorkHour>> DeleteBatch([FromBody] WorkHoursApiViewModel workHourViewModel)
+        public async Task<ActionResult<RealWorkHour>> DeleteBatch([FromBody] WorkHourApiViewModel workHourViewModel)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
 
@@ -152,7 +151,7 @@ namespace WebApplication.Api
         }
         // POST: api/workhours/deleteEmployeeWorkhours
         [HttpPost("deleteEmployeeWorkhours")]
-        public async Task<ActionResult<RealWorkHour>> DeleteEmployeeWorkhours([FromBody] List<DeleteWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<RealWorkHour>> DeleteEmployeeWorkhours([FromBody] List<WorkHourDelete> workHours)
         {
             foreach (var workHour in workHours)
             {
@@ -172,7 +171,7 @@ namespace WebApplication.Api
         }
         // POST: api/workhours/editEmployeeWorkhours
         [HttpPost("editEmployeeWorkhours")]
-        public async Task<ActionResult<WorkHour>> EditEmployeeWorkhours([FromBody] List<EditWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> EditEmployeeWorkhours([FromBody] List<WorkHourEdit> workHours)
         {
             var realWorkHoursToSaveRange = new List<RealWorkHour>();
 
@@ -241,7 +240,7 @@ namespace WebApplication.Api
         }
         // POST: api/workhours/addEmployeeWorkhours
         [HttpPost("addEmployeeWorkhours")]
-        public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<CreateWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<WorkHourApiCreate> workHours)
         {
             var realWorkHoursToSaveRange = new List<RealWorkHour>();
             var workHoursToSaveRange = new List<WorkHour>();
@@ -372,7 +371,7 @@ namespace WebApplication.Api
             return Ok(response);
         }
 
-        // POST: api/workhours/hasoverlap
+        // POST: api/workhours/hasovertime
         [HttpPost("HasOvertime")]
         public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<ApiRealWorkHoursHasOvertimeRange> workHours)
         {

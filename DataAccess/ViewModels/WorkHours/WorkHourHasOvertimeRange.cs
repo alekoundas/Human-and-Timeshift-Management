@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
 
-namespace DataAccess.ViewModels.WorkHours
+namespace DataAccess.ViewModels
 {
-    public class ApiWorkHoursHasOvertimeRange
+    public class WorkHourHasOvertimeRange
     {
         [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
         public DateTime StartOn { get; set; }

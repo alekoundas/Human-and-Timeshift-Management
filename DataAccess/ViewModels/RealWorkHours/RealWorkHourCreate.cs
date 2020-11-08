@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using DataAccess.Models.Entity;
-using Microsoft.AspNetCore.Mvc;
 
-namespace DataAccess.ViewModels.RealWorkHours
+namespace DataAccess.ViewModels
 {
-    public class RealWorkHourCreateViewModel
+    public class RealWorkHourCreate
     {
         [Display(Name = "Έναρξη")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό.")]
@@ -30,14 +28,14 @@ namespace DataAccess.ViewModels.RealWorkHours
 
 
 
-        public static RealWorkHour CreateFrom(RealWorkHourCreateViewModel viewModel)
+        public static RealWorkHour CreateFrom(RealWorkHourCreate viewModel)
         {
             return new RealWorkHour
             {
                 StartOn = viewModel.StartOn,
                 EndOn = viewModel.EndOn,
                 TimeShiftId = viewModel.TimeShiftId,
-                Comments=viewModel.Comments,
+                Comments = viewModel.Comments,
                 CreatedOn = DateTime.Now
             };
         }

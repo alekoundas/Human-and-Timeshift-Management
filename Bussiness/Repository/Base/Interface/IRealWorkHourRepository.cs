@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Bussiness.Repository.Interface;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Bussiness.Repository.Interface;
-using DataAccess.Models.Entity;
-using DataAccess.ViewModels.RealWorkHours;
-using DataAccess.ViewModels.WorkHours;
 
 namespace Bussiness.Repository.Base.Interface
 {

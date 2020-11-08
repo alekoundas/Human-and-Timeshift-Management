@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
-namespace DataAccess.ViewModels.RealWorkHours
+namespace DataAccess.ViewModels
 {
     public class ApiRealWorkHourHasOverlap : BaseEntity
     {

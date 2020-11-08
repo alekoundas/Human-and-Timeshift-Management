@@ -1,17 +1,13 @@
-﻿using System;
+﻿using Bussiness;
+using DataAccess;
+using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
+using LinqKit;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DataAccess;
-using DataAccess.Models.Entity;
-using DataAccess.ViewModels.View;
-using Bussiness;
-using DataAccess.ViewModels.WorkHours;
-using LinqKit;
-using DataAccess.ViewModels.RealWorkHours;
 
 namespace WebApplication.Api
 {
@@ -30,61 +26,6 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
-        // GET: api/workhours
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<WorkHour>>> GetWorkHours()
-        {
-            return await _context.WorkHours.ToListAsync();
-        }
-
-        // GET: api/workhours/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<WorkHour>> GetWorkHour(int id)
-        {
-            var workHour = await _context.WorkHours.FindAsync(id);
-
-            if (workHour == null)
-            {
-                return NotFound();
-            }
-
-            return workHour;
-        }
-
-        // PUT: api/workhours/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWorkHour(int id, WorkHour workHour)
-        {
-            if (id != workHour.Id)
-                return BadRequest();
-
-            _context.Entry(workHour).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WorkHourExists(id))
-                    return NotFound();
-                else
-                    throw;
-            }
-
-            return Ok();
-        }
-
-        // POST: api/workhours
-        [HttpPost]
-        public async Task<ActionResult<WorkHour>> PostWorkHour(WorkHour workHour)
-        {
-            _context.WorkHours.Add(workHour);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetWorkHour", new { id = workHour.Id }, workHour);
-        }
-
         // DELETE: api/workhours/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<WorkHour>> DeleteWorkHour(int id)
@@ -101,7 +42,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/deletebatch
         [HttpPost("deletebatch")]
-        public async Task<ActionResult<WorkHour>> DeleteBatch([FromBody] WorkHoursApiViewModel workHourViewModel)
+        public async Task<ActionResult<WorkHour>> DeleteBatch([FromBody] WorkHourApiViewModel workHourViewModel)
         {
             var filter = PredicateBuilder.New<WorkHour>();
 
@@ -125,7 +66,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/employeebelongstoworkhour
         [HttpPost("employeebelongstoworkhour")]
-        public async Task<ActionResult<WorkHour>> EmployeeBelongsToWorkHour([FromBody] WorkHoursApiViewModel workHour)
+        public async Task<ActionResult<WorkHour>> EmployeeBelongsToWorkHour([FromBody] WorkHourApiViewModel workHour)
         {
             var filter = PredicateBuilder.New<WorkHour>();
             filter = filter.And(x => x.StartOn == workHour.StartOn);
@@ -137,13 +78,13 @@ namespace WebApplication.Api
                 List<object> response = new List<object>();
                 workHour.EmployeeIds.ForEach(id =>
                 {
-                    
-                    if (_baseDataWork.WorkHours.Where(filter).Any(x=>x.EmployeeId== id))
+
+                    if (_baseDataWork.WorkHours.Where(filter).Any(x => x.EmployeeId == id))
                         response.Add(new
                         {
                             employeeId = id,
                             isSuccessful = 1,
-                            errorType= "warning",
+                            errorType = "warning",
                             errorValue = "Η ώρα δήλωσης αντιστοιχεί στις βάρδιες του υπαλλήλου"
                         });
                     else
@@ -151,7 +92,7 @@ namespace WebApplication.Api
                         {
                             employeeId = id,
                             isSuccessful = 0,
-                            errorType= "warning",
+                            errorType = "warning",
                             errorValue = "Δεν βρέθηκε η ώρα δήλωσης στις βάρδιες του υπαλλήλου"
 
                         });
@@ -161,13 +102,13 @@ namespace WebApplication.Api
             }
 
 
-            return Ok(new {value = "Δεν δόθηκαν υπάλληλοι" });
+            return Ok(new { value = "Δεν δόθηκαν υπάλληλοι" });
         }
 
         //RealWorkHour-Create view
         // POST: api/workhours/hasoverlap
         [HttpPost("hasoverlap")]
-        public async Task<ActionResult<WorkHour>> HasOverlap([FromBody] WorkHoursApiViewModel workHour)
+        public async Task<ActionResult<WorkHour>> HasOverlap([FromBody] WorkHourApiViewModel workHour)
         {
             if (workHour.EmployeeIds != null)
             {
@@ -235,7 +176,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOvertime")]
-        public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<ApiWorkHoursHasOvertimeRange> workHours)
+        public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<WorkHourHasOvertimeRange> workHours)
         {
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
@@ -265,7 +206,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/addEmployeeWorkhours
         [HttpPost("addEmployeeWorkhours")]
-        public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<CreateWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<WorkHourApiCreate> workHours)
         {
             var dataToSaveRange = new List<WorkHour>();
 
@@ -292,7 +233,7 @@ namespace WebApplication.Api
         }
         // POST: api/workhours/editEmployeeWorkhours
         [HttpPost("editEmployeeWorkhours")]
-        public async Task<ActionResult<WorkHour>> EditEmployeeWorkhours([FromBody] List<EditWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> EditEmployeeWorkhours([FromBody] List<WorkHourEdit> workHours)
         {
             var dataToSaveRange = new List<WorkHour>();
 
@@ -337,7 +278,7 @@ namespace WebApplication.Api
         }
         // POST: api/workhours/deleteEmployeeWorkhours
         [HttpPost("deleteEmployeeWorkhours")]
-        public async Task<ActionResult<WorkHour>> DeleteEmployeeWorkhours([FromBody] List<DeleteWorkHoursApiViewModel> workHours)
+        public async Task<ActionResult<WorkHour>> DeleteEmployeeWorkhours([FromBody] List<WorkHourDelete> workHours)
         {
             foreach (var workHour in workHours)
             {
