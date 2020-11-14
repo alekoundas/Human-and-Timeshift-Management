@@ -201,7 +201,7 @@ namespace WebApplication.Api
 
         protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Customer> results, Datatable datatable)
         {
-            var expandoObject = new ExpandoCopier();
+            var expandoObject = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Customer>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var result in results)

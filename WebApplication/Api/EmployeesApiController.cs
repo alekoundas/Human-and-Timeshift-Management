@@ -381,7 +381,7 @@ namespace WebApplication.Api
                .ToDynamicListAsync<RealWorkHour>();
 
 
-            var expandoObject = new ExpandoCopier();
+            var expandoObject = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var employee in results)
@@ -422,7 +422,6 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<Employee>> Datatable([FromBody] Datatable datatable)
         {
-
             var pageSize = datatable.Length;
             var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
             var columnName = datatable.Columns[datatable.Order[0].Column].Data;
@@ -631,7 +630,7 @@ namespace WebApplication.Api
 
         protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Employee> results, Datatable datatable)
         {
-            var expandoObject = new ExpandoCopier();
+            var expandoObject = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
 

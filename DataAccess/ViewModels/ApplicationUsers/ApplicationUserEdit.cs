@@ -8,6 +8,9 @@ namespace DataAccess.ViewModels
 {
     public class ApplicationUserEdit : IdentityUser
     {
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        public string Id { get; set; }
+
         [Display(Name = "Όνομα")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string FirstName { get; set; }
@@ -37,6 +40,7 @@ namespace DataAccess.ViewModels
         public static ApplicationUserEdit CreateFrom(ApplicationUser user) =>
             new ApplicationUserEdit()
             {
+                Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
                 FirstName = user.FirstName,

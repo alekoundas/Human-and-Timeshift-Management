@@ -159,7 +159,7 @@ namespace WebApplication.Api
 
         protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Specialization> results, Datatable datatable)
         {
-            var expandoObject = new ExpandoCopier();
+            var expandoObject = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Specialization>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var specialization in results)

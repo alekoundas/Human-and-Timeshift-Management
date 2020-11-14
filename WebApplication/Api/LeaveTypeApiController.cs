@@ -147,7 +147,7 @@ namespace WebApplication.Api
 
         protected IEnumerable<ExpandoObject> MapResults(IEnumerable<LeaveType> results, Datatable datatable)
         {
-            var expandoObject = new ExpandoCopier();
+            var expandoObject = new ExpandoService();
             var dataTableHelper = new DataTableHelper<LeaveType>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var leaveTypes in results)

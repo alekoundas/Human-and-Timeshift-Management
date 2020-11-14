@@ -2,13 +2,13 @@
 
 namespace Bussiness.Service
 {
-    public sealed class DateRange
+    public sealed class DateRangeService
     {
 
         public DateTime StartTime { get; private set; }
         public DateTime EndTime { get; private set; }
 
-        public DateRange(DateTime startOn, DateTime endOn)
+        public DateRangeService(DateTime startOn, DateTime endOn)
         {
             this.StartTime = startOn;
             this.EndTime = endOn;
@@ -32,7 +32,7 @@ namespace Bussiness.Service
         private bool IsSunday(DateTime date) => date.DayOfWeek == DayOfWeek.Sunday;
 
 
-        public DateRange ConvertToDayWork()
+        public DateRangeService ConvertToDayWork()
         {
             this._Seconds = 0;
             var currentStartDate = this.StartTime;
@@ -76,7 +76,7 @@ namespace Bussiness.Service
             return this;
         }
 
-        public DateRange ConvertToNightWork()
+        public DateRangeService ConvertToNightWork()
         {
 
             this._Seconds = 0;
@@ -127,7 +127,7 @@ namespace Bussiness.Service
         }
 
 
-        public DateRange ConvertToSaturdayDayWork()
+        public DateRangeService ConvertToSaturdayDayWork()
         {
             this._Seconds = 0;
             var currentStartDate = this.StartTime;
@@ -174,7 +174,7 @@ namespace Bussiness.Service
             return this;
         }
 
-        public DateRange ConvertToSaturdayNightWork()
+        public DateRangeService ConvertToSaturdayNightWork()
         {
             if (IsSaturday(this.StartTime))
             {
@@ -226,7 +226,7 @@ namespace Bussiness.Service
             return this;
         }
 
-        public DateRange ConvertToSundayDayWork()
+        public DateRangeService ConvertToSundayDayWork()
         {
             if (IsSunday(this.StartTime))
             {
@@ -275,7 +275,7 @@ namespace Bussiness.Service
             return this;
         }
 
-        public DateRange ConvertToSundayNightWork()
+        public DateRangeService ConvertToSundayNightWork()
         {
             if (IsSunday(this.StartTime))
             {

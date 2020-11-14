@@ -79,7 +79,7 @@ namespace WebApplication.Utilities
                 var currentUserRoles = _httpContext.HttpContext.User.Claims
                     .Select(x => x.Value).ToList();
                 var isDisabled = true;
-                var roles = await _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
+                var roles = _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
 
                 if (currentUserRoles.Contains("User_Edit"))
                     isDisabled = false;

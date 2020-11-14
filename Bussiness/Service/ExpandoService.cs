@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Bussiness.Service
 {
-    public class ExpandoCopier
+    public class ExpandoService
     {
         public ExpandoObject GetCopyFrom<TEntity>(TEntity model)
         {

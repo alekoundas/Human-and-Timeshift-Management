@@ -1,6 +1,3 @@
-using System;
-using System.Globalization;
-using System.Threading;
 using Business.Seed;
 using DataAccess;
 using DataAccess.Models.Identity;
@@ -9,39 +6,38 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Globalization;
+using System.Threading;
 
 namespace WebApplication
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment HostingEnviroment { get; }
+        public Startup(IConfiguration configuration, IWebHostEnvironment envirement)
         {
             Configuration = configuration;
+            HostingEnviroment = envirement;
         }
 
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Data
-            services.AddDbContext<BaseDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+            //Seed Data
             services.AddDbContext<SecurityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.ClaimsIdentity.UserIdClaimType = "UserID";
-                //options.ClaimsIdentity.RoleClaimType= "FirstName";
-                //options.ClaimsIdentity.RoleClaimType= "LastName";
             })
                 .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddDefaultUI()
@@ -66,15 +62,14 @@ namespace WebApplication
                 options.LoginPath = "/Account/LogIn";
                 options.AccessDeniedPath = "/Account/LogIn";
                 options.ExpireTimeSpan = TimeSpan.FromDays(1);
-                //options.Cookie.MaxAge
                 options.SlidingExpiration = true;
             });
 
             //Enable TempData[""] from API
-            services.Configure<CookieTempDataProviderOptions>(options =>
-            {
-                options.Cookie.IsEssential = true;
-            });
+            //services.Configure<CookieTempDataProviderOptions>(options =>
+            //{
+            //    options.Cookie.IsEssential = true;
+            //});
 
 
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("el-GR");

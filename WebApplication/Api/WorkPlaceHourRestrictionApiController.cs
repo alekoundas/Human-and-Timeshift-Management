@@ -78,7 +78,7 @@ namespace WebApplication.Api
 
         protected IEnumerable<ExpandoObject> MapResults(IEnumerable<WorkPlaceHourRestriction> results, Datatable datatable)
         {
-            var expandoObject = new ExpandoCopier();
+            var expandoObject = new ExpandoService();
             var dataTableHelper = new DataTableHelper<WorkPlaceHourRestriction>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var workPlaceHourRestriction in results)

@@ -65,7 +65,7 @@ namespace WebApplication.Api.Security
         }
         protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<string> results, Datatable datatable)
         {
-            var expandoObject = new ExpandoCopier();
+            var expandoObject = new ExpandoService();
             var dataTableHelper = new DataTableHelper<string>(_securityDatawork);
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var result in results)

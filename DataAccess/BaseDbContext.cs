@@ -29,6 +29,8 @@ namespace DataAccess
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+
             builder.ApplyConfiguration(new LeaveConfiguration());
             builder.ApplyConfiguration(new CompanyConfiguration());
             builder.ApplyConfiguration(new ContactConfiguration());

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Business.ViewModels;
-using Bussiness.Repository.Security.Interface;
+﻿using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models.Identity;
 using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bussiness.Repository.Security
 {
@@ -28,7 +25,7 @@ namespace Bussiness.Repository.Security
         {
             var loggedInUserId = userManager.FindByEmailAsync(userNameOrEmail)
                 .Result?.Id.ToString();
-            if (loggedInUserId ==null)
+            if (loggedInUserId == null)
                 loggedInUserId = userManager.FindByNameAsync(userNameOrEmail)
                .Result?.Id.ToString();
 
@@ -59,7 +56,7 @@ namespace Bussiness.Repository.Security
                 foreach (var idToDelete in idsToDelete)
                     filterRole = filterRole.Or(x => x.WorkPlaceId == idToDelete &&
                     x.Id == userRole.RoleId &&
-                    x.Name.Contains( "Specific_WorkPlace")
+                    x.Name.Contains("Specific_WorkPlace")
                     );
 
             var roles = await SecurityDbContext.Roles
@@ -71,14 +68,8 @@ namespace Bussiness.Repository.Security
 
             return userRoles.Where(filterUserRole).ToList();
         }
-        public async Task<List<ApplicationRole>> GetRolesFormUserId(string userId)
+        public List<ApplicationRole> GetRolesFormUserId(string userId)
         {
-
-            //var userRoles = await SecurityDbContext.UserRoles
-            //.Where(x => x.UserId == userId).ToListAsync();
-
-            //var roles = await SecurityDbContext.Roles.ToListAsync();
-
             var userRoles = SecurityDbContext.UserRoles
                 .Where(x => x.UserId == userId).ToList();
 

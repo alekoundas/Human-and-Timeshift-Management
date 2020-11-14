@@ -169,7 +169,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                    .Where(filter)
                    .ToList()
-                   .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSaturdayDayWork().TotalSeconds)
+                   .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSaturdayDayWork().TotalSeconds)
                    .Sum();
         }
 
@@ -187,7 +187,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                 .Where(filter)
                 .ToList()
-                .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSaturdayNightWork().TotalSeconds)
+                .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSaturdayNightWork().TotalSeconds)
                 .Sum();
         }
 
@@ -205,7 +205,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                  .Where(filter)
                  .ToList()
-                 .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSundayDayWork().TotalSeconds)
+                 .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSundayDayWork().TotalSeconds)
                  .Sum();
         }
 
@@ -223,7 +223,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                  .Where(filter)
                  .ToList()
-                 .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToSundayNightWork().TotalSeconds)
+                 .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSundayNightWork().TotalSeconds)
                  .Sum();
         }
 
@@ -244,7 +244,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
               .Where(filter)
               .ToList()
-              .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
+              .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
               .Sum();
         }
 
@@ -265,7 +265,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                .Where(filter)
                .ToList()
-               .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
+               .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
                .Sum();
         }
 
@@ -282,7 +282,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                 .Where(filter)
                 .ToList()
-                .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
+                .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
                 .Sum();
         }
 
@@ -298,7 +298,7 @@ namespace Bussiness.Repository.Base
             return Context.RealWorkHours
                 .Where(filter)
                 .ToList()
-                .Select(x => new DateRange(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
+                .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
                 .Sum();
         }
 
