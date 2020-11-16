@@ -69,7 +69,8 @@ namespace WebApplication.Controllers
                 var timeShiftExists = _baseDataWork.TimeShifts
                     .Where(x => x.WorkPlaceId == timeShift.WorkPlaceId)
                     .Where(y => y.Year == timeShift.Year)
-                    .Where(y => y.Month == timeShift.Month).Any();
+                    .Where(y => y.Month == timeShift.Month)
+                    .Any();
 
                 if (!timeShiftExists)
                 {

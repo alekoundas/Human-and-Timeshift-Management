@@ -2,7 +2,7 @@
 
 namespace DataAccess.Models.Identity
 {
-    public class ApplicationUserRole : IdentityUserRole<string>
+    public class ApplicationUserLogin : IdentityUserLogin<string>
     {
     }
 }

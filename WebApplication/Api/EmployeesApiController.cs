@@ -8,10 +8,8 @@ using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -281,788 +279,794 @@ namespace WebApplication.Api
 
 
         // POST: api/employees/datatable2
-        [HttpPost("datatable2")]
-        public async Task<ActionResult<WorkHour>> datatable2([FromBody] Datatable datatable)
-        {
-            var pageSize = datatable.Length;
-            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var orderDirection = datatable.Order[0].Dir;
-            var filter = PredicateBuilder.New<Employee>();
-            filter = filter.And(GetSearchFilter(datatable));
+        //[HttpPost("datatable2")]
+        //public async Task<ActionResult<WorkHour>> datatable2([FromBody] Datatable datatable)
+        //{
+        //    var pageSize = datatable.Length;
+        //    var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+        //    var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+        //    var orderDirection = datatable.Order[0].Dir;
+        //    var filter = PredicateBuilder.New<Employee>();
+        //    filter = filter.And(GetSearchFilter(datatable));
 
-            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
+        //    var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
 
-            if (!canShowDeactivated)
-                filter = filter.And(x => x.IsActive == true);
+        //    if (!canShowDeactivated)
+        //        filter = filter.And(x => x.IsActive == true);
 
-            var employees = new List<Employee>();
+        //    var employees = new List<Employee>();
 
-            if (datatable.Predicate == "TimeShiftEdit")
-                filter = filter.And(x => x.EmployeeWorkPlaces
-                .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
+        //    if (datatable.Predicate == "TimeShiftEdit")
+        //        filter = filter.And(x => x.EmployeeWorkPlaces
+        //        .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
 
-            if (datatable.Predicate == "RealWorkHourIndex")
-                if (datatable.GenericId != 0)
-                    filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
+        //    if (datatable.Predicate == "RealWorkHourIndex")
+        //        if (datatable.GenericId != 0)
+        //            filter = filter.And(x => x.EmployeeWorkPlaces
+        //                .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
 
-            employees = await _baseDataWork.Employees
-                .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                        filter, null, pageSize, pageIndex);
+        //    employees = await _baseDataWork.Employees
+        //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+        //                filter, null, pageSize, pageIndex);
 
-            employees = employees.Select(x => new Employee
-            {
-                Id = x.Id,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                ErpCode = x.ErpCode
-            }).ToList();
+        //    employees = employees.Select(x => new Employee
+        //    {
+        //        Id = x.Id,
+        //        FirstName = x.FirstName,
+        //        LastName = x.LastName,
+        //        ErpCode = x.ErpCode
+        //    }).ToList();
 
-            var mapedData = await MapResults2(employees, datatable);
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var total = await _baseDataWork.Employees.CountAllAsyncFiltered(filter);
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
-        }
-        protected async Task<IEnumerable<ExpandoObject>> MapResults2(IEnumerable<Employee> results, Datatable datatable)
-        {
-            var workHours = new List<WorkHour>();
-            var leaves = new List<Leave>();
-            var timeshifts = await _baseDataWork.TimeShifts
-               .Where(x => x.Id == datatable.GenericId)
-               .ToDynamicListAsync<TimeShift>();
+        //    var mapedData = await MapResults2(employees, datatable);
+        //    var dataTableHelper = new DataTableHelper<ExpandoObject>();
+        //    var total = await _baseDataWork.Employees.CountAllAsyncFiltered(filter);
+        //    return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+        //}
+        //protected async Task<IEnumerable<ExpandoObject>> MapResults2(IEnumerable<Employee> results, Datatable datatable)
+        //{
+        //    var workHours = new List<WorkHour>();
+        //    var leaves = new List<Leave>();
+        //    var timeshifts = await _baseDataWork.TimeShifts
+        //       .Where(x => x.Id == datatable.GenericId)
+        //       .ToDynamicListAsync<TimeShift>();
 
-            var compareMonth = 0;
-            var compareYear = 0;
-            if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
-            {
-                compareMonth = timeshifts[0].Month;
-                compareYear = timeshifts[0].Year;
-            }
-            else
-            {
-                compareMonth = (int)datatable.SelectedMonth;
-                compareYear = (int)datatable.SelectedYear;
-            }
-
-
-            if (datatable.TimeShiftYear != 0)
-            {
-                workHours = await _baseDataWork.WorkHours.Where(x =>
-                    x.TimeShiftId == datatable.GenericId &&
-                    x.StartOn.Year == datatable.TimeShiftYear &&
-                    x.StartOn.Month == datatable.TimeShiftMonth)
-                .ToDynamicListAsync<WorkHour>();
-
-                leaves = await _baseDataWork.Leaves.Where(x =>
-                       x.StartOn.Year == datatable.TimeShiftYear &&
-                       x.StartOn.Month == datatable.TimeShiftMonth)
-                   .ToDynamicListAsync<Leave>();
-
-            }
-            else
-            {
-                workHours = await _baseDataWork.WorkHours.Where(x =>
-                  x.TimeShiftId == datatable.GenericId &&
-                  x.StartOn.Year == compareYear &&
-                  x.StartOn.Month == compareMonth)
-              .ToDynamicListAsync<WorkHour>();
-
-                leaves = await _baseDataWork.Leaves.Where(x =>
-                       x.StartOn.Year == compareYear &&
-                       x.StartOn.Month == compareMonth)
-                   .ToDynamicListAsync<Leave>();
-            }
-
-            var realWorkHours = await _baseDataWork.RealWorkHours.Where(x =>
-                   x.StartOn.Year == compareYear &&
-                   x.TimeShiftId == datatable.GenericId &&
-                   x.StartOn.Month == compareMonth)
-               .ToDynamicListAsync<RealWorkHour>();
+        //    var compareMonth = 0;
+        //    var compareYear = 0;
+        //    if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
+        //    {
+        //        compareMonth = timeshifts[0].Month;
+        //        compareYear = timeshifts[0].Year;
+        //    }
+        //    else
+        //    {
+        //        compareMonth = (int)datatable.SelectedMonth;
+        //        compareYear = (int)datatable.SelectedYear;
+        //    }
 
 
-            var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
-            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var employee in results)
-            {
-                var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
-                var dictionary = (IDictionary<string, object>)expandoObj;
-                if (datatable.Predicate == "TimeShiftEdit")
-                {
-                    for (int i = 1; i <= DateTime.DaysInMonth(datatable.TimeShiftYear, datatable.TimeShiftMonth); i++)
-                        dictionary.Add("Day" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
-                            (workHours, leaves, i, datatable, employee.Id));
+        //    if (datatable.TimeShiftYear != 0)
+        //    {
+        //        workHours = await _baseDataWork.WorkHours.Where(x =>
+        //            x.TimeShiftId == datatable.GenericId &&
+        //            x.StartOn.Year == datatable.TimeShiftYear &&
+        //            x.StartOn.Month == datatable.TimeShiftMonth)
+        //        .ToDynamicListAsync<WorkHour>();
 
-                    dictionary.Add("ToggleSlider", dataTableHelper
-                        .GetEmployeeCheckbox(datatable, employee.Id));
+        //        leaves = await _baseDataWork.Leaves.Where(x =>
+        //               x.StartOn.Year == datatable.TimeShiftYear &&
+        //               x.StartOn.Month == datatable.TimeShiftMonth)
+        //           .ToDynamicListAsync<Leave>();
 
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "RealWorkHourIndex")
-                {
+        //    }
+        //    else//real
+        //    {
+        //        workHours = await _baseDataWork.WorkHours.Where(x =>
+        //          x.TimeShiftId == datatable.GenericId &&
+        //          x.StartOn.Year == compareYear &&
+        //          x.StartOn.Month == compareMonth)
+        //      .ToDynamicListAsync<WorkHour>();
+
+        //        leaves = await _baseDataWork.Leaves.Where(x =>
+        //               x.StartOn.Year == compareYear &&
+        //               x.StartOn.Month == compareMonth)
+        //           .ToDynamicListAsync<Leave>();
+        //    }
+
+        //    var realWorkHours = await _baseDataWork.RealWorkHours.Where(x =>
+        //           x.StartOn.Year == compareYear &&
+        //           x.TimeShiftId == datatable.GenericId &&
+        //           x.StartOn.Month == compareMonth)
+        //       .ToDynamicListAsync<RealWorkHour>();
 
 
-                    for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
-                        dictionary.Add("Day" + i,
-                             dataTableHelper.GetTimeShiftEditCellBodyRealWorkHours(
-                                 realWorkHours, workHours, leaves, compareMonth, compareYear, i, datatable, employee.Id));
+        //    var expandoObject = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<Employee>();
+        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+        //    foreach (var employee in results)
+        //    {
+        //        var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
+        //        if (datatable.Predicate == "TimeShiftEdit")
+        //        {
+        //            for (int i = 1; i <= DateTime.DaysInMonth(datatable.TimeShiftYear, datatable.TimeShiftMonth); i++)
+        //                dictionary.Add("Day" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
+        //                    (workHours, leaves, i, datatable, employee.Id));
 
-                    dictionary.Add("ToggleSlider", dataTableHelper
-                        .GetEmployeeCheckbox(datatable, employee.Id));
+        //            dictionary.Add("ToggleSlider", dataTableHelper
+        //                .GetEmployeeCheckbox(datatable, employee.Id));
 
-                    returnObjects.Add(expandoObj);
-                }
-            }
-            return returnObjects;
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "RealWorkHourIndex")
+        //        {
 
-        }
+
+        //            for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
+        //                dictionary.Add("Day" + i,
+        //                     dataTableHelper.GetTimeShiftEditCellBodyRealWorkHours(
+        //                         realWorkHours, workHours, leaves, compareMonth, compareYear, i, datatable, employee.Id));
+
+        //            dictionary.Add("ToggleSlider", dataTableHelper
+        //                .GetEmployeeCheckbox(datatable, employee.Id));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //    }
+        //    return returnObjects;
+
+        //}
 
         // POST: api/employees/datatable
         [HttpPost("datatable")]
         public async Task<ActionResult<Employee>> Datatable([FromBody] Datatable datatable)
         {
-            var pageSize = datatable.Length;
-            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var orderDirection = datatable.Order[0].Dir;
-            var filter = PredicateBuilder.New<Employee>();
-            filter = filter.And(GetSearchFilter(datatable));
+            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext)
+                .ConvertData<Employee>())
+                .CompleteResponse<Employee>();
 
-            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
+            return Ok(results);
 
-            if (!canShowDeactivated)
-                filter = filter.And(x => x.IsActive == true);
+            //var pageSize = datatable.Length;
+            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            //var orderDirection = datatable.Order[0].Dir;
+            //var filter = PredicateBuilder.New<Employee>();
+            //filter = filter.And(GetSearchFilter(datatable));
 
-            var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
-            includes.Add(x => x.Include(y => y.Specialization));
+            //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(HttpContext);
 
-            var employees = new List<Employee>();
+            //if (!canShowDeactivated)
+            //    filter = filter.And(x => x.IsActive == true);
 
-            if (string.IsNullOrWhiteSpace(datatable.Predicate))
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
+            //includes.Add(x => x.Include(y => y.Specialization));
 
-            if (datatable.Predicate == "EmployeeIndex")
-            {
-                includes.Add(x => x.Include(y => y.Company));
+            //var employees = new List<Employee>();
 
-                employees = await _baseDataWork.Employees
-                      .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "CompanyEdit")
-            {
-                includes.Add(x => x.Include(y => y.Company));
+            //if (string.IsNullOrWhiteSpace(datatable.Predicate))
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
 
-                filter = filter.And(x =>
-                     x.CompanyId == datatable.GenericId || x.CompanyId == null);
+            //if (datatable.Predicate == "EmployeeIndex")
+            //{
+            //    includes.Add(x => x.Include(y => y.Company));
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "CompanyDetail")
-            {
-                includes.Add(x => x.Include(y => y.Company));
+            //    employees = await _baseDataWork.Employees
+            //          .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "CompanyEdit")
+            //{
+            //    includes.Add(x => x.Include(y => y.Company));
 
-                filter = filter.And(x =>
-                     x.CompanyId == datatable.GenericId || x.CompanyId == null);
+            //    filter = filter.And(x =>
+            //         x.CompanyId == datatable.GenericId || x.CompanyId == null);
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "WorkPlaceEdit")
-            {
-                includes.Add(x => x.Include(y => y.Company));
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "CompanyDetail")
+            //{
+            //    includes.Add(x => x.Include(y => y.Company));
 
-                filter = filter.And(x => x.Company.Customers
-                .Any(y => y.WorkPlaces
-                .Any(z => z.Id == datatable.GenericId)));
+            //    filter = filter.And(x =>
+            //         x.CompanyId == datatable.GenericId || x.CompanyId == null);
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "WorkPlaceDetail")
-            {
-                includes.Add(x => x.Include(y => y.Company));
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "WorkPlaceEdit")
+            //{
+            //    includes.Add(x => x.Include(y => y.Company));
 
-                filter = filter.And(x => x.Company.Customers
-                .Any(y => y.WorkPlaces
-                .Any(z => z.Id == datatable.GenericId)));
+            //    filter = filter.And(x => x.Company.Customers
+            //    .Any(y => y.WorkPlaces
+            //    .Any(z => z.Id == datatable.GenericId)));
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "WorkPlaceDetail")
+            //{
+            //    includes.Add(x => x.Include(y => y.Company));
 
-            if (datatable.Predicate == "TimeShiftEdit")
-            {
-                var timeShift = _baseDataWork.TimeShifts
-                    .Where(x => x.Id == datatable.GenericId).ToList()[0];
+            //    filter = filter.And(x => x.Company.Customers
+            //    .Any(y => y.WorkPlaces
+            //    .Any(z => z.Id == datatable.GenericId)));
 
-                filter = filter.And(x => x.EmployeeWorkPlaces
-                    .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId));
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                    filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "TimeShiftDetail")
-            {
-                var timeShift = _baseDataWork.TimeShifts
-                    .Where(x => x.Id == datatable.GenericId).ToList()[0];
-                //var timeShift = await _baseDataWork.TimeShifts
-                //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+            //if (datatable.Predicate == "TimeShiftEdit")
+            //{
+            //    var timeShift = _baseDataWork.TimeShifts
+            //        .Where(x => x.Id == datatable.GenericId).ToList()[0];
 
-                filter = filter.And(x => x.EmployeeWorkPlaces
-                     .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId));
+            //    filter = filter.And(x => x.EmployeeWorkPlaces
+            //        .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId));
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                    filter, includes, pageSize, pageIndex);
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //        filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "TimeShiftDetail")
+            //{
+            //    var timeShift = _baseDataWork.TimeShifts
+            //        .Where(x => x.Id == datatable.GenericId).ToList()[0];
+            //    //var timeShift = await _baseDataWork.TimeShifts
+            //    //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
 
-                employees = employees.Select(x => new Employee
-                {
-                    FirstName = x.FirstName,
-                    LastName = x.LastName,
-                    ErpCode = x.ErpCode
-                }).ToList();
-            }
-            if (datatable.Predicate == "RealWorkHourIndex")
-            {
-                if (datatable.GenericId != 0)
-                {
-                    var timeShift = _baseDataWork.TimeShifts
-                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
+            //    filter = filter.And(x => x.EmployeeWorkPlaces
+            //         .Any(y => y.WorkPlaceId == timeShift.WorkPlaceId));
 
-                    filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
-                }
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //        filter, includes, pageSize, pageIndex);
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                            filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "RealWorkHourCurrentDay")
-            {
-                includes.Add(x => x.Include(y => y.RealWorkHours));
+            //    employees = employees.Select(x => new Employee
+            //    {
+            //        FirstName = x.FirstName,
+            //        LastName = x.LastName,
+            //        ErpCode = x.ErpCode
+            //    }).ToList();
+            //}
+            //if (datatable.Predicate == "RealWorkHourIndex")
+            //{
+            //    if (datatable.GenericId != 0)
+            //    {
+            //        var timeShift = _baseDataWork.TimeShifts
+            //       .Where(x => x.Id == datatable.GenericId).ToList()[0];
 
-                var today = DateTime.Now;
-                filter = filter.And(x => x.RealWorkHours
-                    .Any(y => y.StartOn.Date == today.Date));
+            //        filter = filter.And(x => x.EmployeeWorkPlaces
+            //            .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == datatable.GenericId)));
+            //    }
 
-                employees = await _baseDataWork.Employees
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                    filter, includes, pageSize, pageIndex);
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //                filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "RealWorkHourCurrentDay")
+            //{
+            //    includes.Add(x => x.Include(y => y.RealWorkHours));
 
-                employees = employees
-                    .Select(x => new Employee
-                    {
-                        Id = x.Id,
-                        FirstName = x.FirstName,
-                        LastName = x.LastName,
-                        RealWorkHours = x.RealWorkHours.Where(y => y.StartOn.Day == DateTime.Now.Day).ToList()
-                    })
-                    .ToList();
-            }
-            if (datatable.Predicate == "ProjectionDifference")
-            {
-                employees = await _baseDataWork.Employees
-                    .ProjectionDifference(SetOrderBy(columnName, orderDirection),
-                    datatable, filter, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "ProjectionConcentric")
-            {
+            //    var today = DateTime.Now;
+            //    filter = filter.And(x => x.RealWorkHours
+            //        .Any(y => y.StartOn.Date == today.Date));
 
-                if (datatable.GenericId != 0)
-                    filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlaceId == datatable.GenericId));
+            //    employees = await _baseDataWork.Employees
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //        filter, includes, pageSize, pageIndex);
 
-                employees = await _baseDataWork.Employees
-                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                     filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "ProjectionRealWorkHoursAnalytically")
-            {
-                if (datatable.GenericId != 0)
-                    filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlaceId == datatable.GenericId));
+            //    employees = employees
+            //        .Select(x => new Employee
+            //        {
+            //            Id = x.Id,
+            //            FirstName = x.FirstName,
+            //            LastName = x.LastName,
+            //            RealWorkHours = x.RealWorkHours.Where(y => y.StartOn.Day == DateTime.Now.Day).ToList()
+            //        })
+            //        .ToList();
+            //}
+            //if (datatable.Predicate == "ProjectionDifference")
+            //{
+            //    employees = await _baseDataWork.Employees
+            //        .ProjectionDifference(SetOrderBy(columnName, orderDirection),
+            //        datatable, filter, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "ProjectionConcentric")
+            //{
 
-                employees = await _baseDataWork.Employees
-                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                     filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "ProjectionRealWorkHoursAnalyticallySum")
-            {
-                if (datatable.GenericId != 0)
-                    filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlaceId == datatable.GenericId));
+            //    if (datatable.GenericId != 0)
+            //        filter = filter.And(x => x.EmployeeWorkPlaces
+            //            .Any(y => y.WorkPlaceId == datatable.GenericId));
 
-                employees = await _baseDataWork.Employees
-                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                     filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "ProjectionPresenceDaily")
-            {
-                if (datatable.GenericId != 0)
-                    filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlaceId == datatable.GenericId));
+            //    employees = await _baseDataWork.Employees
+            //         .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //         filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "ProjectionRealWorkHoursAnalytically")
+            //{
+            //    if (datatable.GenericId != 0)
+            //        filter = filter.And(x => x.EmployeeWorkPlaces
+            //            .Any(y => y.WorkPlaceId == datatable.GenericId));
 
-                employees = await _baseDataWork.Employees
-                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                     filter, includes, pageSize, pageIndex);
-            }
-            if (datatable.Predicate == "ProjectionRealWorkHoursSpecific")
-            {
-                if (datatable.GenericId != 0)
-                    filter = filter.And(x => x.EmployeeWorkPlaces
-                        .Any(y => y.WorkPlaceId == datatable.GenericId));
+            //    employees = await _baseDataWork.Employees
+            //         .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //         filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "ProjectionRealWorkHoursAnalyticallySum")
+            //{
+            //    if (datatable.GenericId != 0)
+            //        filter = filter.And(x => x.EmployeeWorkPlaces
+            //            .Any(y => y.WorkPlaceId == datatable.GenericId));
 
-                employees = await _baseDataWork.Employees
-                     .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                     filter, includes, pageSize, pageIndex);
-            }
+            //    employees = await _baseDataWork.Employees
+            //         .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //         filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "ProjectionPresenceDaily")
+            //{
+            //    if (datatable.GenericId != 0)
+            //        filter = filter.And(x => x.EmployeeWorkPlaces
+            //            .Any(y => y.WorkPlaceId == datatable.GenericId));
 
-            var mapedData = await MapResults(employees, datatable);
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var total = await _baseDataWork.Employees.CountAllAsyncFiltered(filter);
+            //    employees = await _baseDataWork.Employees
+            //         .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //         filter, includes, pageSize, pageIndex);
+            //}
+            //if (datatable.Predicate == "ProjectionRealWorkHoursSpecific")
+            //{
+            //    if (datatable.GenericId != 0)
+            //        filter = filter.And(x => x.EmployeeWorkPlaces
+            //            .Any(y => y.WorkPlaceId == datatable.GenericId));
 
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+            //    employees = await _baseDataWork.Employees
+            //         .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //         filter, includes, pageSize, pageIndex);
+            //}
+
+            //var mapedData = await MapResults(employees, datatable);
+            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
+            //var total = await _baseDataWork.Employees.CountAllAsyncFiltered(filter);
+
+            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Employee> results, Datatable datatable)
-        {
-            var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<Employee>(_securityDatawork);
-            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-
-            //var leaves = _baseDataWork.Leaves.Where(x =>
-            //x.StartOn.Year == timeshift.Year &&
-            //x.StartOn.Month == timeshift.Month).ToList<Leave>();
-            foreach (var employee in results)
-            {
-                var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
-                var dictionary = (IDictionary<string, object>)expandoObj;
-
-                dictionary.Add("SpecializationName", employee.Specialization?.Name);
-
-                if (datatable.Predicate == "EmployeeIndex")
-                {
-                    if (employee.Company != null)
-                        dictionary.Add("CompanyTitle", employee.Company.Title);
-
-                    dictionary.Add("Buttons", dataTableHelper.GetButtons(
-                        "Employee", "Employees", employee.Id.ToString()));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "CompanyEdit")
-                {
-                    var apiUrl = UrlHelper.EmployeeCompany(employee.Id, datatable.GenericId);
-
-                    if (employee.Company != null)
-                    {
-                        dictionary.Add("CompanyTitle", employee.Company.Title);
-                        dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, "checked"));
-                    }
-                    else
-                        dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, ""));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "CompanyDetail")
-                {
-                    var apiUrl = UrlHelper.EmployeeCompany(employee.Id, datatable.GenericId);
-
-                    if (employee.Company != null)
-                    {
-                        dictionary.Add("CompanyTitle", employee.Company.Title);
-                        dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, "checked", true));
-                    }
-                    else
-                        dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, "", true));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "WorkPlaceEdit")
-                {
-                    var apiUrl = UrlHelper.EmployeeWorkPlace(employee.Id, datatable.GenericId);
-
-                    if (employee.Company != null)
-                        dictionary.Add("CompanyTitle", employee.Company.Title);
-
-                    if (_baseDataWork.EmployeeWorkPlaces
-                        .Any(x => x.EmployeeId == employee.Id &&
-                        x.WorkPlaceId == datatable.GenericId))
-                    {
-                        dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, "checked"));
-                    }
-                    else
-                        dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, ""));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "WorkPlaceDetail")
-                {
-                    var apiUrl = UrlHelper.EmployeeWorkPlace(employee.Id, datatable.GenericId);
-
-                    if (employee.Company != null)
-                        dictionary.Add("CompanyTitle", employee.Company.Title);
-
-                    if (_baseDataWork.EmployeeWorkPlaces
-                        .Any(x => x.EmployeeId == employee.Id &&
-                        x.WorkPlaceId == datatable.GenericId))
-                    {
-                        dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, "checked", true));
-                    }
-                    else
-                        dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-                            "Employee", apiUrl, "", true));
-
-                    returnObjects.Add(expandoObj);
-                }
-
-                else if (datatable.Predicate == "TimeShiftEdit")
-                {
-                    //var timeShift = await _baseDataWork.TimeShifts
-                    //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
-                    var timeShift = _baseDataWork.TimeShifts
-                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
-
-                    var workHours = await _baseDataWork.WorkHours.Where(x =>
-                  x.StartOn.Year == timeShift.Year &&
-                  x.StartOn.Month == timeShift.Month).ToDynamicListAsync<WorkHour>();
-
-                    var leaves = await _baseDataWork.Leaves.Where(x =>
-                    x.StartOn.Year == timeShift.Year &&
-                    x.StartOn.Month == timeShift.Month).ToDynamicListAsync<Leave>();
-
-                    for (int i = 1; i <= DateTime.DaysInMonth(timeShift.Year, timeShift.Month); i++)
-                    {
-                        var asdfasd = await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork, i, datatable, employee.Id);
-                        dictionary.Add("Day" + i, asdfasd);
-                    }
-
-                    dictionary.Add("ToggleSlider", dataTableHelper
-                        .GetEmployeeCheckbox(datatable, employee.Id));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "TimeShiftDetail")
-                {
-                    //var timeShift = await _baseDataWork.TimeShifts
-                    //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
-                    var timeShift = _baseDataWork.TimeShifts
-                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
-                    var workHours = await _baseDataWork.WorkHours.Where(x =>
-                  x.StartOn.Year == timeShift.Year &&
-                  x.StartOn.Month == timeShift.Month).ToDynamicListAsync<WorkHour>();
-
-                    var leaves = await _baseDataWork.Leaves.Where(x =>
-                    x.StartOn.Year == timeShift.Year &&
-                    x.StartOn.Month == timeShift.Month).ToDynamicListAsync<Leave>();
-
-                    for (int i = 1; i <= DateTime.DaysInMonth(timeShift.Year, timeShift.Month); i++)
-                        dictionary.Add("Day" + i,
-                           await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork, i, datatable, employee.Id));
-
-                    dictionary.Add("ToggleSlider", dataTableHelper
-                        .GetEmployeeCheckbox(datatable, employee.Id));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "RealWorkHourIndex")
-                {
-                    var compareMonth = 0;
-                    var compareYear = 0;
-
-                    if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
-                    {
-                        var timeShift = _baseDataWork.TimeShifts
-                   .Where(x => x.Id == datatable.GenericId).ToList()[0];
-                        compareMonth = timeShift.Month;
-                        compareYear = timeShift.Year;
-                    }
-                    else
-                    {
-                        compareMonth = (int)datatable.SelectedMonth;
-                        compareYear = (int)datatable.SelectedYear;
-                    }
-                    for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
-                        dictionary.Add("Day" + i,
-                            await dataTableHelper.GetTimeShiftEditCellBodyRealWorkHoursAsync(_baseDataWork,
-                                i, datatable, employee.Id));
-
-                    dictionary.Add("ToggleSlider", dataTableHelper
-                        .GetEmployeeCheckbox(datatable, employee.Id));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "RealWorkHourCurrentDay")
-                {
-                    dictionary.Add("StartOn", String.Join<string>("</br>",
-                        employee.RealWorkHours.Select(x => x.StartOn.ToString())));
-
-                    dictionary.Add("EndOn", String.Join<string>("</br>",
-                        employee.RealWorkHours.Select(x => x.EndOn.ToString())));
-
-                    dictionary.Add("ToggleSlider", dataTableHelper
-                        .GetEmployeeCheckbox(datatable, employee.Id));
-
-                    dictionary.Add("Buttons", dataTableHelper
-                        .GetCurrentDayButtons(employee));
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "ProjectionDifference")
-                {
-
-                    //Βy RealWorkHour
-                    if (datatable.FilterByRealWorkHour == true ||
-                        (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
-                        if (employee.RealWorkHours.Count() > 0)
-                            foreach (var realWorkHour in employee.RealWorkHours)
-                            {
-                                expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
-                                dictionary = (IDictionary<string, object>)expandoObj;
-                                dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
-                                returnObjects.Add(expandoObj);
-
-                            }
-
-                    //Βy WorkHour
-                    if (datatable.FilterByWorkHour == true ||
-                        (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
-                        if (employee.WorkHours.Count() > 0)
-                            foreach (var workHour in employee.WorkHours)
-                            {
-                                expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
-                                dictionary = (IDictionary<string, object>)expandoObj;
-                                dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
-                                returnObjects.Add(expandoObj);
-                            }
-
-                }
-                else if (datatable.Predicate == "ProjectionConcentric")
-                {
-                    var totalSeconds = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-                    var totalSecondsDay = await _baseDataWork.RealWorkHours
-                           .GetEmployeeTotalSecondsDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-                    var totalSecondsNight = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-
-                    var totalSecondsSaturdayDay = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsSaturdayDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-                    var totalSecondsSaturdayNight = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsSaturdayNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-                    var totalSecondsSundayDay = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsSundayDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-                    var totalSecondsSundayNight = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsSundayNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-                    if (datatable.ShowHoursInPercentage)
-                    {
-                        dictionary.Add("TotalHours", totalSeconds / 60 / 60);
-                        dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 60);
-                        dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 60);
-                        dictionary.Add("TotalHoursSaturdayDay", totalSecondsSaturdayDay / 60 / 60);
-                        dictionary.Add("TotalHoursSaturdayNight", totalSecondsSaturdayNight / 60 / 60);
-                        dictionary.Add("TotalHoursSundayDay", totalSecondsSundayDay / 60 / 60);
-                        dictionary.Add("TotalHoursSundayNight", totalSecondsSundayNight / 60 / 60);
-                    }
-                    else
-                    {
-                        dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
-                        dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
-                        dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
-                        dictionary.Add("TotalHoursSaturdayDay", ((int)totalSecondsSaturdayDay / 60 / 60).ToString() + ":" + ((int)totalSecondsSaturdayDay / 60 % 60).ToString());
-                        dictionary.Add("TotalHoursSaturdayNight", ((int)totalSecondsSaturdayNight / 60 / 60).ToString() + ":" + ((int)totalSecondsSaturdayNight / 60 % 60).ToString());
-                        dictionary.Add("TotalHoursSundayDay", ((int)totalSecondsSundayDay / 60 / 60).ToString() + ":" + ((int)totalSecondsSundayDay / 60 % 60).ToString());
-                        dictionary.Add("TotalHoursSundayNight", ((int)totalSecondsSundayNight / 60 / 60).ToString() + ":" + ((int)totalSecondsSundayNight / 60 % 60).ToString());
-                    }
-
-                    returnObjects.Add(expandoObj);
-
-                }
-                else if (datatable.Predicate == "ProjectionRealWorkHoursAnalytically")
-                {
-                    if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
-                    {
-                        dictionary.Add("Day_0", await dataTableHelper
-                               .GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(
-                               _baseDataWork, datatable.StartOn, datatable, employee.Id));
-                    }
-                    else
-                        for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
-                        {
-                            var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
-                            dictionary.Add("Day_" + i, await dataTableHelper
-                                .GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(
-                                _baseDataWork, compareDate, datatable, employee.Id));
-                        }
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "ProjectionRealWorkHoursAnalyticallySum")
-                {
-                    var totalSeconds = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
-
-
-                    if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
-                    {
-                        var daySeconds = await _baseDataWork.RealWorkHours
-                                 .GetEmployeeTotalSecondsForDay(employee.Id, datatable.StartOn);
-
-                        var nightSeconds = await _baseDataWork.RealWorkHours
-                            .GetEmployeeTotalSecondsForNight(employee.Id, datatable.StartOn);
-
-                        var dayTotalSeconds = daySeconds + nightSeconds;
-
-                        if (datatable.ShowHoursInPercentage)
-                            dictionary.Add("Day_0", dayTotalSeconds / 60 / 60);
-                        else
-                            dictionary.Add("Day_0", ((int)dayTotalSeconds / 60 / 60).ToString() + ":" + ((int)dayTotalSeconds / 60 % 60).ToString());
-                    }
-                    else
-                        for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
-                        {
-                            var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
-                            var daySeconds = await _baseDataWork.RealWorkHours
-                                   .GetEmployeeTotalSecondsForDay(employee.Id, compareDate);
-
-                            var nightSeconds = await _baseDataWork.RealWorkHours
-                                .GetEmployeeTotalSecondsForNight(employee.Id, compareDate);
-                            var dayTotalSeconds = daySeconds + nightSeconds;
-
-
-                            if (datatable.ShowHoursInPercentage)
-                                dictionary.Add("Day_" + i, dayTotalSeconds / 60 / 60);
-                            else
-                                dictionary.Add("Day_" + i, ((int)dayTotalSeconds / 60 / 60).ToString() + ":" + ((int)dayTotalSeconds / 60 % 60).ToString());
-                        }
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "ProjectionPresenceDaily")
-                {
-                    var realWorkHours = await _baseDataWork.RealWorkHours
-                            .GetCurrentAssignedOnCell(DateTime.Now, employee.Id);
-
-                    var todayCell = "";
-                    foreach (var realWorkHour in realWorkHours)
-                        todayCell += "<p style='white-space:nowrap;'>" +
-                            realWorkHour.StartOn.ToShortTimeString() +
-                            " - " +
-                            realWorkHour.EndOn.ToShortTimeString() +
-                            "</p></br>";
-                    dictionary.Add("Today", todayCell);
-
-                    returnObjects.Add(expandoObj);
-                }
-                else if (datatable.Predicate == "ProjectionRealWorkHoursSpecific")
-                {
-
-                    for (int i = 0; i < datatable.SpecificDates?.Count(); i++)
-                    {
-                        var realWorkHours = await _baseDataWork.RealWorkHours
-                          .GetCurrentAssignedOnCell(datatable.SpecificDates[i], employee.Id);
-
-                        var hasLeave = _baseDataWork.Leaves
-                            .Where(x => x.EmployeeId == employee.Id)
-                            .Any(x => datatable.SpecificDates[i].Date >= x.StartOn.Date && datatable.SpecificDates[i].Date <= x.EndOn.Date);
-
-
-                        var dayOffs = await _baseDataWork.WorkHours
-                          .GetCurrentDayOffAssignedOnCell(datatable.SpecificDates[i], employee.Id);
-
-                        var dayCell = "";
-                        foreach (var realWorkHour in realWorkHours)
-                            dayCell += "<p style='white-space:nowrap;'>" +
-                                realWorkHour.StartOn.ToShortTimeString() +
-                                " - " +
-                                realWorkHour.EndOn.ToShortTimeString() +
-                                "</p></br>";
-                        if (dayOffs.Count > 0)
-                        {
-                            dayCell += "<p style='white-space:nowrap;'>" +
-                                "Ρεπό" +
-                                "</p></br>";
-                        }
-                        if (hasLeave)
-                        {
-                            dayCell += "<p style='white-space:nowrap;'>" +
-                                "Άδεια" +
-                                "</p></br>";
-                        }
-                        dictionary.Add("Day_" + i, dayCell);
-
-                    }
-
-                    returnObjects.Add(expandoObj);
-                }
-
-            }
-            return returnObjects;
-        }
-
-        private Func<IQueryable<Employee>, IOrderedQueryable<Employee>> SetOrderBy(string columnName, string orderDirection)
-        {
-            if (columnName == "WorkHourDate")
-                return x => x.OrderBy(y => y.WorkHours.OrderBy(z => z.StartOn));
-            else if (columnName == "RealWorkHourDate")
-                return x => x.OrderBy(y => y.RealWorkHours.OrderBy(z => z.StartOn));
-            else if (columnName != "")
-                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
-            else
-                return null;
-        }
-        private Expression<Func<Employee, bool>> GetSearchFilter(Datatable datatable)
-        {
-            var filter = PredicateBuilder.New<Employee>();
-
-            if (datatable.Search.Value != null)
-            {
-                foreach (var column in datatable.Columns)
-                {
-                    if (column.Data == "FirstName")
-                        filter = filter.Or(x => x.FirstName.Contains(datatable.Search.Value));
-                    if (column.Data == "LastName")
-                        filter = filter.Or(x => x.LastName.Contains(datatable.Search.Value));
-                    if (column.Data == "DateOfBirth")
-                        filter = filter.Or(x => x.DateOfBirth.ToString().Contains(datatable.Search.Value));
-                    if (column.Data == "Afm")
-                        filter = filter.Or(x => x.Afm.Contains(datatable.Search.Value));
-                    if (column.Data == "SocialSecurityNumber")
-                        filter = filter.Or(x => x.SocialSecurityNumber.Contains(datatable.Search.Value));
-                    if (column.Data == "ErpCode")
-                        filter = filter.Or(x => x.ErpCode.Contains(datatable.Search.Value));
-                    if (column.Data == "Address")
-                        filter = filter.Or(x => x.Address.Contains(datatable.Search.Value));
-                    if (column.Data == "Email")
-                        filter = filter.Or(x => x.Email.Contains(datatable.Search.Value));
-                    if (column.Data == "SpecializationName")
-                        filter = filter.Or(x => x.Specialization.Name.Contains(datatable.Search.Value));
-                    if (column.Data == "CompanyTitle")
-                        filter = filter.Or(x => x.Company.Title.Contains(datatable.Search.Value));
-                }
-
-            }
-            else
-                filter = filter.And(x => true);
-
-            return filter;
-        }
+        //protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Employee> results, Datatable datatable)
+        //{
+        //    var expandoObject = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<Employee>();
+        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+
+        //    //var leaves = _baseDataWork.Leaves.Where(x =>
+        //    //x.StartOn.Year == timeshift.Year &&
+        //    //x.StartOn.Month == timeshift.Month).ToList<Leave>();
+        //    foreach (var employee in results)
+        //    {
+        //        var expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //        dictionary.Add("SpecializationName", employee.Specialization?.Name);
+
+        //        if (datatable.Predicate == "EmployeeIndex")
+        //        {
+        //            if (employee.Company != null)
+        //                dictionary.Add("CompanyTitle", employee.Company.Title);
+
+        //            dictionary.Add("Buttons", dataTableHelper.GetButtons(
+        //                "Employee", "Employees", employee.Id.ToString()));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "CompanyEdit")
+        //        {
+        //            var apiUrl = UrlHelper.EmployeeCompany(employee.Id, datatable.GenericId);
+
+        //            if (employee.Company != null)
+        //            {
+        //                dictionary.Add("CompanyTitle", employee.Company.Title);
+        //                dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, "checked"));
+        //            }
+        //            else
+        //                dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, ""));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "CompanyDetail")
+        //        {
+        //            var apiUrl = UrlHelper.EmployeeCompany(employee.Id, datatable.GenericId);
+
+        //            if (employee.Company != null)
+        //            {
+        //                dictionary.Add("CompanyTitle", employee.Company.Title);
+        //                dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, "checked", true));
+        //            }
+        //            else
+        //                dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, "", true));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "WorkPlaceEdit")
+        //        {
+        //            var apiUrl = UrlHelper.EmployeeWorkPlace(employee.Id, datatable.GenericId);
+
+        //            if (employee.Company != null)
+        //                dictionary.Add("CompanyTitle", employee.Company.Title);
+
+        //            if (_baseDataWork.EmployeeWorkPlaces
+        //                .Any(x => x.EmployeeId == employee.Id &&
+        //                x.WorkPlaceId == datatable.GenericId))
+        //            {
+        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, "checked"));
+        //            }
+        //            else
+        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, ""));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "WorkPlaceDetail")
+        //        {
+        //            var apiUrl = UrlHelper.EmployeeWorkPlace(employee.Id, datatable.GenericId);
+
+        //            if (employee.Company != null)
+        //                dictionary.Add("CompanyTitle", employee.Company.Title);
+
+        //            if (_baseDataWork.EmployeeWorkPlaces
+        //                .Any(x => x.EmployeeId == employee.Id &&
+        //                x.WorkPlaceId == datatable.GenericId))
+        //            {
+        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, "checked", true));
+        //            }
+        //            else
+        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
+        //                    "Employee", apiUrl, "", true));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+
+        //        else if (datatable.Predicate == "TimeShiftEdit")
+        //        {
+        //            //var timeShift = await _baseDataWork.TimeShifts
+        //            //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+        //            var timeShift = _baseDataWork.TimeShifts
+        //           .Where(x => x.Id == datatable.GenericId).ToList()[0];
+
+        //            var workHours = await _baseDataWork.WorkHours.Where(x =>
+        //          x.StartOn.Year == timeShift.Year &&
+        //          x.StartOn.Month == timeShift.Month).ToDynamicListAsync<WorkHour>();
+
+        //            var leaves = await _baseDataWork.Leaves.Where(x =>
+        //            x.StartOn.Year == timeShift.Year &&
+        //            x.StartOn.Month == timeShift.Month).ToDynamicListAsync<Leave>();
+
+        //            for (int i = 1; i <= DateTime.DaysInMonth(timeShift.Year, timeShift.Month); i++)
+        //            {
+        //                var asdfasd = await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork, i, datatable, employee.Id);
+        //                dictionary.Add("Day" + i, asdfasd);
+        //            }
+
+        //            dictionary.Add("ToggleSlider", dataTableHelper
+        //                .GetEmployeeCheckbox(datatable, employee.Id));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "TimeShiftDetail")
+        //        {
+        //            //var timeShift = await _baseDataWork.TimeShifts
+        //            //    .FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
+        //            var timeShift = _baseDataWork.TimeShifts
+        //           .Where(x => x.Id == datatable.GenericId).ToList()[0];
+        //            var workHours = await _baseDataWork.WorkHours.Where(x =>
+        //          x.StartOn.Year == timeShift.Year &&
+        //          x.StartOn.Month == timeShift.Month).ToDynamicListAsync<WorkHour>();
+
+        //            var leaves = await _baseDataWork.Leaves.Where(x =>
+        //            x.StartOn.Year == timeShift.Year &&
+        //            x.StartOn.Month == timeShift.Month).ToDynamicListAsync<Leave>();
+
+        //            for (int i = 1; i <= DateTime.DaysInMonth(timeShift.Year, timeShift.Month); i++)
+        //                dictionary.Add("Day" + i,
+        //                   await dataTableHelper.GetTimeShiftEditCellBodyWorkHoursAsync(_baseDataWork, i, datatable, employee.Id));
+
+        //            dictionary.Add("ToggleSlider", dataTableHelper
+        //                .GetEmployeeCheckbox(datatable, employee.Id));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "RealWorkHourIndex")
+        //        {
+        //            var compareMonth = 0;
+        //            var compareYear = 0;
+
+        //            if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
+        //            {
+        //                var timeShift = _baseDataWork.TimeShifts
+        //           .Where(x => x.Id == datatable.GenericId).ToList()[0];
+        //                compareMonth = timeShift.Month;
+        //                compareYear = timeShift.Year;
+        //            }
+        //            else
+        //            {
+        //                compareMonth = (int)datatable.SelectedMonth;
+        //                compareYear = (int)datatable.SelectedYear;
+        //            }
+        //            for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
+        //                dictionary.Add("Day" + i,
+        //                    await dataTableHelper.GetTimeShiftEditCellBodyRealWorkHoursAsync(_baseDataWork,
+        //                        i, datatable, employee.Id));
+
+        //            dictionary.Add("ToggleSlider", dataTableHelper
+        //                .GetEmployeeCheckbox(datatable, employee.Id));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "RealWorkHourCurrentDay")
+        //        {
+        //            dictionary.Add("StartOn", String.Join<string>("</br>",
+        //                employee.RealWorkHours.Select(x => x.StartOn.ToString())));
+
+        //            dictionary.Add("EndOn", String.Join<string>("</br>",
+        //                employee.RealWorkHours.Select(x => x.EndOn.ToString())));
+
+        //            dictionary.Add("ToggleSlider", dataTableHelper
+        //                .GetEmployeeCheckbox(datatable, employee.Id));
+
+        //            dictionary.Add("Buttons", dataTableHelper
+        //                .GetCurrentDayButtons(employee));
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "ProjectionDifference")
+        //        {
+
+        //            //Βy RealWorkHour
+        //            if (datatable.FilterByRealWorkHour == true ||
+        //                (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
+        //                if (employee.RealWorkHours.Count() > 0)
+        //                    foreach (var realWorkHour in employee.RealWorkHours)
+        //                    {
+        //                        expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+        //                        dictionary = (IDictionary<string, object>)expandoObj;
+        //                        dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
+        //                        returnObjects.Add(expandoObj);
+
+        //                    }
+
+        //            //Βy WorkHour
+        //            if (datatable.FilterByWorkHour == true ||
+        //                (datatable.FilterByRealWorkHour == false && datatable.FilterByWorkHour == false))
+        //                if (employee.WorkHours.Count() > 0)
+        //                    foreach (var workHour in employee.WorkHours)
+        //                    {
+        //                        expandoObj = expandoObject.GetCopyFrom<Employee>(employee);
+        //                        dictionary = (IDictionary<string, object>)expandoObj;
+        //                        dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
+        //                        returnObjects.Add(expandoObj);
+        //                    }
+
+        //        }
+        //        else if (datatable.Predicate == "ProjectionConcentric")
+        //        {
+        //            var totalSeconds = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+        //            var totalSecondsDay = await _baseDataWork.RealWorkHours
+        //                   .GetEmployeeTotalSecondsDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+        //            var totalSecondsNight = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+
+        //            var totalSecondsSaturdayDay = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsSaturdayDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+        //            var totalSecondsSaturdayNight = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsSaturdayNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+        //            var totalSecondsSundayDay = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsSundayDayFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+        //            var totalSecondsSundayNight = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsSundayNightFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+        //            if (datatable.ShowHoursInPercentage)
+        //            {
+        //                dictionary.Add("TotalHours", totalSeconds / 60 / 60);
+        //                dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 60);
+        //                dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 60);
+        //                dictionary.Add("TotalHoursSaturdayDay", totalSecondsSaturdayDay / 60 / 60);
+        //                dictionary.Add("TotalHoursSaturdayNight", totalSecondsSaturdayNight / 60 / 60);
+        //                dictionary.Add("TotalHoursSundayDay", totalSecondsSundayDay / 60 / 60);
+        //                dictionary.Add("TotalHoursSundayNight", totalSecondsSundayNight / 60 / 60);
+        //            }
+        //            else
+        //            {
+        //                dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
+        //                dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
+        //                dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
+        //                dictionary.Add("TotalHoursSaturdayDay", ((int)totalSecondsSaturdayDay / 60 / 60).ToString() + ":" + ((int)totalSecondsSaturdayDay / 60 % 60).ToString());
+        //                dictionary.Add("TotalHoursSaturdayNight", ((int)totalSecondsSaturdayNight / 60 / 60).ToString() + ":" + ((int)totalSecondsSaturdayNight / 60 % 60).ToString());
+        //                dictionary.Add("TotalHoursSundayDay", ((int)totalSecondsSundayDay / 60 / 60).ToString() + ":" + ((int)totalSecondsSundayDay / 60 % 60).ToString());
+        //                dictionary.Add("TotalHoursSundayNight", ((int)totalSecondsSundayNight / 60 / 60).ToString() + ":" + ((int)totalSecondsSundayNight / 60 % 60).ToString());
+        //            }
+
+        //            returnObjects.Add(expandoObj);
+
+        //        }
+        //        else if (datatable.Predicate == "ProjectionRealWorkHoursAnalytically")
+        //        {
+        //            if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
+        //            {
+        //                dictionary.Add("Day_0", await dataTableHelper
+        //                       .GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(
+        //                       _baseDataWork, datatable.StartOn, datatable, employee.Id));
+        //            }
+        //            else
+        //                for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
+        //                {
+        //                    var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
+        //                    dictionary.Add("Day_" + i, await dataTableHelper
+        //                        .GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(
+        //                        _baseDataWork, compareDate, datatable, employee.Id));
+        //                }
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "ProjectionRealWorkHoursAnalyticallySum")
+        //        {
+        //            var totalSeconds = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsFromRange(employee.Id, datatable.StartOn, datatable.EndOn);
+
+
+        //            if ((datatable.EndOn.Date - datatable.StartOn.Date).TotalDays == 0.0)
+        //            {
+        //                var daySeconds = await _baseDataWork.RealWorkHours
+        //                         .GetEmployeeTotalSecondsForDay(employee.Id, datatable.StartOn);
+
+        //                var nightSeconds = await _baseDataWork.RealWorkHours
+        //                    .GetEmployeeTotalSecondsForNight(employee.Id, datatable.StartOn);
+
+        //                var dayTotalSeconds = daySeconds + nightSeconds;
+
+        //                if (datatable.ShowHoursInPercentage)
+        //                    dictionary.Add("Day_0", dayTotalSeconds / 60 / 60);
+        //                else
+        //                    dictionary.Add("Day_0", ((int)dayTotalSeconds / 60 / 60).ToString() + ":" + ((int)dayTotalSeconds / 60 % 60).ToString());
+        //            }
+        //            else
+        //                for (int i = 0; i <= (datatable.EndOn.Date - datatable.StartOn.Date).TotalDays; i++)
+        //                {
+        //                    var compareDate = new DateTime(datatable.StartOn.AddDays(i).Ticks);
+        //                    var daySeconds = await _baseDataWork.RealWorkHours
+        //                           .GetEmployeeTotalSecondsForDay(employee.Id, compareDate);
+
+        //                    var nightSeconds = await _baseDataWork.RealWorkHours
+        //                        .GetEmployeeTotalSecondsForNight(employee.Id, compareDate);
+        //                    var dayTotalSeconds = daySeconds + nightSeconds;
+
+
+        //                    if (datatable.ShowHoursInPercentage)
+        //                        dictionary.Add("Day_" + i, dayTotalSeconds / 60 / 60);
+        //                    else
+        //                        dictionary.Add("Day_" + i, ((int)dayTotalSeconds / 60 / 60).ToString() + ":" + ((int)dayTotalSeconds / 60 % 60).ToString());
+        //                }
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "ProjectionPresenceDaily")
+        //        {
+        //            var realWorkHours = await _baseDataWork.RealWorkHours
+        //                    .GetCurrentAssignedOnCell(DateTime.Now, employee.Id);
+
+        //            var todayCell = "";
+        //            foreach (var realWorkHour in realWorkHours)
+        //                todayCell += "<p style='white-space:nowrap;'>" +
+        //                    realWorkHour.StartOn.ToShortTimeString() +
+        //                    " - " +
+        //                    realWorkHour.EndOn.ToShortTimeString() +
+        //                    "</p></br>";
+        //            dictionary.Add("Today", todayCell);
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //        else if (datatable.Predicate == "ProjectionRealWorkHoursSpecific")
+        //        {
+
+        //            for (int i = 0; i < datatable.SpecificDates?.Count(); i++)
+        //            {
+        //                var realWorkHours = await _baseDataWork.RealWorkHours
+        //                  .GetCurrentAssignedOnCell(datatable.SpecificDates[i], employee.Id);
+
+        //                var hasLeave = _baseDataWork.Leaves
+        //                    .Where(x => x.EmployeeId == employee.Id)
+        //                    .Any(x => datatable.SpecificDates[i].Date >= x.StartOn.Date && datatable.SpecificDates[i].Date <= x.EndOn.Date);
+
+
+        //                var dayOffs = await _baseDataWork.WorkHours
+        //                  .GetCurrentDayOffAssignedOnCell(datatable.SpecificDates[i], employee.Id);
+
+        //                var dayCell = "";
+        //                foreach (var realWorkHour in realWorkHours)
+        //                    dayCell += "<p style='white-space:nowrap;'>" +
+        //                        realWorkHour.StartOn.ToShortTimeString() +
+        //                        " - " +
+        //                        realWorkHour.EndOn.ToShortTimeString() +
+        //                        "</p></br>";
+        //                if (dayOffs.Count > 0)
+        //                {
+        //                    dayCell += "<p style='white-space:nowrap;'>" +
+        //                        "Ρεπό" +
+        //                        "</p></br>";
+        //                }
+        //                if (hasLeave)
+        //                {
+        //                    dayCell += "<p style='white-space:nowrap;'>" +
+        //                        "Άδεια" +
+        //                        "</p></br>";
+        //                }
+        //                dictionary.Add("Day_" + i, dayCell);
+
+        //            }
+
+        //            returnObjects.Add(expandoObj);
+        //        }
+
+        //    }
+        //    return returnObjects;
+        //}
+
+        //private Func<IQueryable<Employee>, IOrderedQueryable<Employee>> SetOrderBy(string columnName, string orderDirection)
+        //{
+        //    if (columnName == "WorkHourDate")
+        //        return x => x.OrderBy(y => y.WorkHours.OrderBy(z => z.StartOn));
+        //    else if (columnName == "RealWorkHourDate")
+        //        return x => x.OrderBy(y => y.RealWorkHours.OrderBy(z => z.StartOn));
+        //    else if (columnName != "")
+        //        return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+        //    else
+        //        return null;
+        //}
+        //private Expression<Func<Employee, bool>> GetSearchFilter(Datatable datatable)
+        //{
+        //    var filter = PredicateBuilder.New<Employee>();
+
+        //    if (datatable.Search.Value != null)
+        //    {
+        //        foreach (var column in datatable.Columns)
+        //        {
+        //            if (column.Data == "FirstName")
+        //                filter = filter.Or(x => x.FirstName.Contains(datatable.Search.Value));
+        //            if (column.Data == "LastName")
+        //                filter = filter.Or(x => x.LastName.Contains(datatable.Search.Value));
+        //            if (column.Data == "DateOfBirth")
+        //                filter = filter.Or(x => x.DateOfBirth.ToString().Contains(datatable.Search.Value));
+        //            if (column.Data == "Afm")
+        //                filter = filter.Or(x => x.Afm.Contains(datatable.Search.Value));
+        //            if (column.Data == "SocialSecurityNumber")
+        //                filter = filter.Or(x => x.SocialSecurityNumber.Contains(datatable.Search.Value));
+        //            if (column.Data == "ErpCode")
+        //                filter = filter.Or(x => x.ErpCode.Contains(datatable.Search.Value));
+        //            if (column.Data == "Address")
+        //                filter = filter.Or(x => x.Address.Contains(datatable.Search.Value));
+        //            if (column.Data == "Email")
+        //                filter = filter.Or(x => x.Email.Contains(datatable.Search.Value));
+        //            if (column.Data == "SpecializationName")
+        //                filter = filter.Or(x => x.Specialization.Name.Contains(datatable.Search.Value));
+        //            if (column.Data == "CompanyTitle")
+        //                filter = filter.Or(x => x.Company.Title.Contains(datatable.Search.Value));
+        //        }
+
+        //    }
+        //    else
+        //        filter = filter.And(x => true);
+
+        //    return filter;
+        //}
 
 
     }

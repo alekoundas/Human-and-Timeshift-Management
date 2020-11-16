@@ -78,6 +78,13 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "TimeShift_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
 
+                    //WorkPlaceHourRestriction
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_View").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Create").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Delete").Wait();
+
                     //Leave
                     userManager.AddToRoleAsync(user, "Leave_View").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Create").Wait();
@@ -175,6 +182,13 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "TimeShift_Edit").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
+
+                    //WorkPlaceHourRestriction
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_View").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Create").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Delete").Wait();
 
                     //Leave
                     userManager.AddToRoleAsync(user, "Leave_View").Wait();

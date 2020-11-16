@@ -18,7 +18,7 @@
 
             <form asp-controller="WorkPlaceHourRestriction" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="Id" id="Month" style="display:none;" />
+                <input asp-for="Id" style="display:none;" />
                 <input asp-for="DaysInMonth" id="DaysInMonth" style="display:none;" />
                 <div class="box-body">
 
@@ -75,8 +75,7 @@
             var hourRestrictions = @(Html.Raw(Json.Serialize(Model.HourRestrictions)));
             var month = document.getElementById('Month').value;
             var year = document.getElementById('Year').value;
-
-            console.log(hourRestrictions);
+            console.log(month);
             document.getElementById('DaysDiv').innerHTML = '';
             AppendMonthDaysHtml(year, month, hourRestrictions);
             HandleSubmitButton();
@@ -140,7 +139,6 @@
         const NumberOfDigits = x =>
             (Math.log10((x ^ (x >> 31)) - (x >> 31)) | 0) + 1;
 
-
         const SetInputMaxHourValue = (num, value) =>
             document.getElementById('HourRestrictions[' + num + '].MaxTime')
                 .value = value;
@@ -177,7 +175,7 @@
             var returnStr = '';
             for (var i = 0; i < getDaysInMonth(year, month); i++) {
                 var day = i;
-                var currentDate = new Date(year, month, ++day);
+                var currentDate = new Date(year, month - 1, ++day);
                 var options = { weekday: 'long', day: 'numeric' };
 
                 returnStr +=

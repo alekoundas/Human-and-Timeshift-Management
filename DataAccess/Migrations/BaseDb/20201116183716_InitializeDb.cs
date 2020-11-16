@@ -13,6 +13,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Title = table.Column<string>(nullable: false),
                     Afm = table.Column<string>(nullable: false),
@@ -29,6 +30,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true)
@@ -44,6 +46,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
@@ -60,6 +63,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     ΙdentifyingΝame = table.Column<string>(nullable: false),
                     AFM = table.Column<string>(nullable: false),
@@ -78,7 +82,7 @@ namespace DataAccess.Migrations.BaseDb
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,6 +91,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     FirstName = table.Column<string>(nullable: false),
                     LastName = table.Column<string>(nullable: false),
@@ -122,6 +127,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Title = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
@@ -144,6 +150,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Title = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
@@ -232,6 +239,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Title = table.Column<string>(nullable: false),
                     Month = table.Column<int>(nullable: false),
@@ -338,6 +346,7 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Day = table.Column<int>(nullable: false),
                     MaxTicks = table.Column<double>(nullable: false),

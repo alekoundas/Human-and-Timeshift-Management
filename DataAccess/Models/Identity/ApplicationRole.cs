@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace DataAccess.Models.Identity
 {
@@ -12,7 +8,6 @@ namespace DataAccess.Models.Identity
         public string Permition { get; set; }
         public string WorkPlaceName { get; set; }
         public string WorkPlaceId { get; set; }
-        public ICollection<ApplicationUserRole> EmployeeWorkPlaces { get; set; }
-
+        public string GreekName { get; set; }
     }
 }

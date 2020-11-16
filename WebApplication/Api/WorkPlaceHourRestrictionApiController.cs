@@ -4,19 +4,12 @@ using DataAccess;
 using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
-using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
-
 namespace WebApplication.Api
 {
     [Route("api/WorkPlaceHourRestrictions")]
@@ -35,70 +28,97 @@ namespace WebApplication.Api
 
         // DELETE: api/LeaveTypeApi/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<LeaveType>> DeleteLeaveType(int id)
+        public async Task<ActionResult<DeleteViewModel>> Delete(int id)
         {
-            var leaveType = await _context.LeaveTypes.FindAsync(id);
-            if (leaveType == null)
+            var response = new DeleteViewModel();
+            var workPlaceRestriction = await _context.WorkPlaceHourRestrictions
+                .Include(x => x.HourRestrictions)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (workPlaceRestriction == null)
                 return NotFound();
 
-            _context.LeaveTypes.Remove(leaveType);
-            await _context.SaveChangesAsync();
+            _context.HourRestrictions.RemoveRange(workPlaceRestriction.HourRestrictions);
+            _context.WorkPlaceHourRestrictions.Remove(workPlaceRestriction);
+            var status = await _context.SaveChangesAsync();
 
-            return leaveType;
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Ο περιορισμός " +
+                    workPlaceRestriction.Year + "/" + workPlaceRestriction.Month +
+                    " διαγράφηκε με επιτυχία.";
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Ο περιορισμός " +
+                    workPlaceRestriction.Year + "/" + workPlaceRestriction.Month +
+                    " ΔΕΝ διαγράφηκε!";
+            }
+
+            response.ResponseTitle = "Διαγραφή περιορισμού";
+            response.Entity = workPlaceRestriction;
+            return response;
         }
 
 
         // POST: api/datatable
         [HttpPost("datatable")]
-        public async Task<ActionResult<LeaveType>> Datatable([FromBody] Datatable datatable)
+        public async Task<ActionResult<WorkPlaceHourRestriction>> Datatable([FromBody] Datatable datatable)
         {
-            var pageSize = datatable.Length;
-            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var orderDirection = datatable.Order[0].Dir;
-            var filter = PredicateBuilder.New<WorkPlaceHourRestriction>();
-            filter = filter.And(GetSearchFilter(datatable));
+            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext)
+                .ConvertData<WorkPlaceHourRestriction>())
+                .CompleteResponse<WorkPlaceHourRestriction>();
 
-            var includes = new List<Func<IQueryable<WorkPlaceHourRestriction>, IIncludableQueryable<WorkPlaceHourRestriction, object>>>();
-            var workPlaceHourRestrictions = new List<WorkPlaceHourRestriction>();
+            return Ok(results);
+            //var pageSize = datatable.Length;
+            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            //var orderDirection = datatable.Order[0].Dir;
+            //var filter = PredicateBuilder.New<WorkPlaceHourRestriction>();
+            //filter = filter.And(GetSearchFilter(datatable));
 
-            if (datatable.Predicate == "WorkPlaceHourRestrictionIndex")
-            {
-                includes.Add(x => x.Include(y => y.WorkPlace));
-                workPlaceHourRestrictions = await _baseDataWork.WorkPlaceHourRestrictions
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
+            //var includes = new List<Func<IQueryable<WorkPlaceHourRestriction>, IIncludableQueryable<WorkPlaceHourRestriction, object>>>();
+            //var workPlaceHourRestrictions = new List<WorkPlaceHourRestriction>();
 
-            var mapedData = MapResults(workPlaceHourRestrictions, datatable);
+            //if (datatable.Predicate == "WorkPlaceHourRestrictionIndex")
+            //{
+            //    includes.Add(x => x.Include(y => y.WorkPlace));
+            //    workPlaceHourRestrictions = await _baseDataWork.WorkPlaceHourRestrictions
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
 
-            var total = await _baseDataWork.WorkPlaceHourRestrictions.CountAllAsyncFiltered(filter);
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+            //var mapedData = MapResults(workPlaceHourRestrictions, datatable);
+
+            //var total = await _baseDataWork.WorkPlaceHourRestrictions.CountAllAsyncFiltered(filter);
+            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
+            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<WorkPlaceHourRestriction> results, Datatable datatable)
-        {
-            var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<WorkPlaceHourRestriction>(_securityDatawork);
-            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var workPlaceHourRestriction in results)
-            {
-                var expandoObj = expandoObject.GetCopyFrom<WorkPlaceHourRestriction>(workPlaceHourRestriction);
-                var dictionary = (IDictionary<string, object>)expandoObj;
+        //protected IEnumerable<ExpandoObject> MapResults(IEnumerable<WorkPlaceHourRestriction> results, Datatable datatable)
+        //{
+        //    var expandoObject = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<WorkPlaceHourRestriction>();
+        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+        //    foreach (var workPlaceHourRestriction in results)
+        //    {
+        //        var expandoObj = expandoObject.GetCopyFrom<WorkPlaceHourRestriction>(workPlaceHourRestriction);
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
 
-                if (datatable.Predicate == "WorkPlaceHourRestrictionIndex")
-                {
-                    dictionary.Add("Buttons", dataTableHelper.GetButtons("WorkPlaceHourRestriction", "WorkPlaceHourRestrictions", workPlaceHourRestriction.Id.ToString()));
-                    returnObjects.Add(expandoObj);
-                }
-            }
+        //        if (datatable.Predicate == "WorkPlaceHourRestrictionIndex")
+        //        {
+        //            dictionary.Add("Buttons", dataTableHelper.GetButtons("WorkPlaceHourRestriction", "WorkPlaceHourRestrictions", workPlaceHourRestriction.Id.ToString()));
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //    }
 
-            return returnObjects;
-        }
+        //    return returnObjects;
+        //}
 
 
 
-        // POST: api/datatable
+        // POST: api/ValidateHoursToWorkPlaceHourRestriction
         [HttpPost("ValidateHoursToWorkPlaceHourRestriction")]
         public async Task<ActionResult<RealWorkHour>> ValidateHoursToWorkPlaceHourRestriction([FromBody] ApiHourRestrictionValidate validateVM)
         {
@@ -127,37 +147,37 @@ namespace WebApplication.Api
             return Ok(dataToReturn);
         }
 
-        private Func<IQueryable<WorkPlaceHourRestriction>, IOrderedQueryable<WorkPlaceHourRestriction>> SetOrderBy(string columnName, string orderDirection)
-        {
-            if (columnName == "WorkPlaceName")
-                return x => x.OrderBy(y => y.WorkPlace.Title);
-            else if (columnName != "")
-                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
-            else
-                return null;
-        }
+        //private Func<IQueryable<WorkPlaceHourRestriction>, IOrderedQueryable<WorkPlaceHourRestriction>> SetOrderBy(string columnName, string orderDirection)
+        //{
+        //    if (columnName == "WorkPlaceName")
+        //        return x => x.OrderBy(y => y.WorkPlace.Title);
+        //    else if (columnName != "")
+        //        return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+        //    else
+        //        return null;
+        //}
 
-        private Expression<Func<WorkPlaceHourRestriction, bool>> GetSearchFilter(Datatable datatable)
-        {
-            var filter = PredicateBuilder.New<WorkPlaceHourRestriction>();
-            if (datatable.Search.Value != null)
-            {
-                foreach (var column in datatable.Columns)
-                {
-                    if (column.Data == "WorkPlaceName")
-                        filter = filter.Or(x => x.WorkPlace.Title.Contains(datatable.Search.Value));
-                    if (column.Data == "Month")
-                        filter = filter.Or(x => x.Month.ToString().Contains(datatable.Search.Value));
-                    if (column.Data == "Year")
-                        filter = filter.Or(x => x.Year.ToString().Contains(datatable.Search.Value));
-                }
+        //private Expression<Func<WorkPlaceHourRestriction, bool>> GetSearchFilter(Datatable datatable)
+        //{
+        //    var filter = PredicateBuilder.New<WorkPlaceHourRestriction>();
+        //    if (datatable.Search.Value != null)
+        //    {
+        //        foreach (var column in datatable.Columns)
+        //        {
+        //            if (column.Data == "WorkPlaceName")
+        //                filter = filter.Or(x => x.WorkPlace.Title.Contains(datatable.Search.Value));
+        //            if (column.Data == "Month")
+        //                filter = filter.Or(x => x.Month.ToString().Contains(datatable.Search.Value));
+        //            if (column.Data == "Year")
+        //                filter = filter.Or(x => x.Year.ToString().Contains(datatable.Search.Value));
+        //        }
 
-            }
-            else
-                filter = filter.And(x => true);
+        //    }
+        //    else
+        //        filter = filter.And(x => true);
 
-            return filter;
-        }
+        //    return filter;
+        //}
         private static string GetTime(double seconds)
         {
             var hours = (seconds / 3600).ToString();
@@ -170,10 +190,6 @@ namespace WebApplication.Api
 
             return hours + ":" + minutes;
 
-        }
-        private bool LeaveTypeExists(int id)
-        {
-            return _context.LeaveTypes.Any(e => e.Id == id);
         }
     }
 }

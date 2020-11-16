@@ -89,8 +89,7 @@
                             <th>ErpCode</th>
                             @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
-}
+                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>}
                         </tr>
                     </thead>
                     <tfoot>
@@ -101,8 +100,7 @@
                             <th>ErpCode</th>
                             @for (int i = 1; i <= Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
-}
+                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>}
                         </tr>
                     </tfoot>
                 </table>
@@ -1912,7 +1910,7 @@
                 processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
             },
             ajax: {
-                url: '/api/employees/datatable2',
+                url: '/api/employees/datatable',
                 type: 'POST',
                 contentType: "application/json",
                 data: (data, type, row, meta) => {

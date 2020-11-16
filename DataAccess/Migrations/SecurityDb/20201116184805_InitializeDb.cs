@@ -8,6 +8,20 @@ namespace DataAccess.Migrations.SecurityDb
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "ApplicationTags",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    Title = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationTags", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -18,7 +32,8 @@ namespace DataAccess.Migrations.SecurityDb
                     Controller = table.Column<string>(nullable: true),
                     Permition = table.Column<string>(nullable: true),
                     WorkPlaceName = table.Column<string>(nullable: true),
-                    WorkPlaceId = table.Column<string>(nullable: true)
+                    WorkPlaceId = table.Column<string>(nullable: true),
+                    GreekName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -46,8 +61,7 @@ namespace DataAccess.Migrations.SecurityDb
                     AccessFailedCount = table.Column<int>(nullable: false),
                     FirstName = table.Column<string>(nullable: false),
                     LastName = table.Column<string>(nullable: false),
-                    DateOfBirth = table.Column<DateTime>(nullable: true),
-                    Gender = table.Column<bool>(nullable: false),
+                    MemberSince = table.Column<DateTime>(nullable: true),
                     HasToChangePassword = table.Column<bool>(nullable: false),
                     IsEmployee = table.Column<bool>(nullable: false),
                     EmployeeId = table.Column<int>(nullable: true)
@@ -76,6 +90,31 @@ namespace DataAccess.Migrations.SecurityDb
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApplicationUserTag",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    ApplicationUserId = table.Column<string>(nullable: true),
+                    ApplicationTagId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationUserTag", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserTag_ApplicationTags_ApplicationTagId",
+                        column: x => x.ApplicationTagId,
+                        principalTable: "ApplicationTags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserTag_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -124,25 +163,11 @@ namespace DataAccess.Migrations.SecurityDb
                 columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
-                    RoleId = table.Column<string>(nullable: false),
-                    ApplicationUserId = table.Column<string>(nullable: true),
-                    ApplicationRoleId = table.Column<string>(nullable: true)
+                    RoleId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetRoles_ApplicationRoleId",
-                        column: x => x.ApplicationRoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
                         column: x => x.RoleId,
@@ -178,6 +203,16 @@ namespace DataAccess.Migrations.SecurityDb
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserTag_ApplicationTagId",
+                table: "ApplicationUserTag",
+                column: "ApplicationTagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserTag_ApplicationUserId",
+                table: "ApplicationUserTag",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -200,16 +235,6 @@ namespace DataAccess.Migrations.SecurityDb
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_ApplicationRoleId",
-                table: "AspNetUserRoles",
-                column: "ApplicationRoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_ApplicationUserId",
-                table: "AspNetUserRoles",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
@@ -230,6 +255,9 @@ namespace DataAccess.Migrations.SecurityDb
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ApplicationUserTag");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -243,6 +271,9 @@ namespace DataAccess.Migrations.SecurityDb
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "ApplicationTags");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

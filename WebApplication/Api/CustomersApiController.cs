@@ -7,13 +7,9 @@ using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WebApplication.Utilities;
 
@@ -169,91 +165,97 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<Customer>> Datatable([FromBody] Datatable datatable)
         {
-            var pageSize = datatable.Length;
-            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var orderDirection = datatable.Order[0].Dir;
-            var filter = PredicateBuilder.New<Customer>();
-            filter = filter.And(GetSearchFilter(datatable));
 
-            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Customer>(HttpContext);
+            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext)
+                .ConvertData<Customer>())
+                .CompleteResponse<Customer>();
 
-            if (!canShowDeactivated)
-                filter = filter.And(x => x.IsActive == true);
+            return Ok(results);
+            //var pageSize = datatable.Length;
+            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            //var orderDirection = datatable.Order[0].Dir;
+            //var filter = PredicateBuilder.New<Customer>();
+            //filter = filter.And(GetSearchFilter(datatable));
 
-            var includes = new List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>();
-            var customers = new List<Customer>();
+            //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Customer>(HttpContext);
 
-            if (datatable.Predicate == "CustomerIndex")
-            {
-                customers = await _baseDataWork.Customers
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
-                        filter, includes, pageSize, pageIndex);
-            }
+            //if (!canShowDeactivated)
+            //    filter = filter.And(x => x.IsActive == true);
+
+            //var includes = new List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>();
+            //var customers = new List<Customer>();
+
+            //if (datatable.Predicate == "CustomerIndex")
+            //{
+            //    customers = await _baseDataWork.Customers
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection),
+            //            filter, includes, pageSize, pageIndex);
+            //}
 
 
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            var mapedData = await MapResults(customers, datatable);
+            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
+            //var mapedData = await MapResults(customers, datatable);
 
-            var total = await _baseDataWork.Customers.CountAllAsyncFiltered(filter);
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+            //var total = await _baseDataWork.Customers.CountAllAsyncFiltered(filter);
+            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Customer> results, Datatable datatable)
-        {
-            var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<Customer>(_securityDatawork);
-            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var result in results)
-            {
-                var expandoObj = expandoObject.GetCopyFrom<Customer>(result);
-                var dictionary = (IDictionary<string, object>)expandoObj;
+        //protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Customer> results, Datatable datatable)
+        //{
+        //    var expandoObject = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<Customer>();
+        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+        //    foreach (var result in results)
+        //    {
+        //        var expandoObj = expandoObject.GetCopyFrom<Customer>(result);
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
 
-                if (datatable.Predicate == "CustomerIndex")
-                {
-                    dictionary.Add("Buttons", dataTableHelper.GetButtons("Customer", "Customers", result.Id.ToString()));
-                    returnObjects.Add(expandoObj);
-                }
-            }
+        //        if (datatable.Predicate == "CustomerIndex")
+        //        {
+        //            dictionary.Add("Buttons", dataTableHelper.GetButtons("Customer", "Customers", result.Id.ToString()));
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //    }
 
-            return returnObjects;
-        }
+        //    return returnObjects;
+        //}
 
-        private Func<IQueryable<Customer>, IOrderedQueryable<Customer>> SetOrderBy(string columnName, string orderDirection)
-        {
-            if (columnName != "")
-                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
-            else
-                return null;
-        }
+        //private Func<IQueryable<Customer>, IOrderedQueryable<Customer>> SetOrderBy(string columnName, string orderDirection)
+        //{
+        //    if (columnName != "")
+        //        return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+        //    else
+        //        return null;
+        //}
 
-        private Expression<Func<Customer, bool>> GetSearchFilter(Datatable datatable)
-        {
-            var filter = PredicateBuilder.New<Customer>();
-            if (datatable.Search.Value != null)
-            {
-                foreach (var column in datatable.Columns)
-                {
-                    if (column.Data == "ΙdentifyingΝame")
-                        filter = filter.Or(x => x.ΙdentifyingΝame.Contains(datatable.Search.Value));
-                    if (column.Data == "Profession")
-                        filter = filter.Or(x => x.Profession.Contains(datatable.Search.Value));
-                    if (column.Data == "Address")
-                        filter = filter.Or(x => x.Address.Contains(datatable.Search.Value));
-                    if (column.Data == "PostalCode")
-                        filter = filter.Or(x => x.PostalCode.Contains(datatable.Search.Value));
-                    if (column.Data == "DOY")
-                        filter = filter.Or(x => x.DOY.Contains(datatable.Search.Value));
-                    if (column.Data == "AFM")
-                        filter = filter.Or(x => x.AFM.Contains(datatable.Search.Value));
-                }
+        //private Expression<Func<Customer, bool>> GetSearchFilter(Datatable datatable)
+        //{
+        //    var filter = PredicateBuilder.New<Customer>();
+        //    if (datatable.Search.Value != null)
+        //    {
+        //        foreach (var column in datatable.Columns)
+        //        {
+        //            if (column.Data == "ΙdentifyingΝame")
+        //                filter = filter.Or(x => x.ΙdentifyingΝame.Contains(datatable.Search.Value));
+        //            if (column.Data == "Profession")
+        //                filter = filter.Or(x => x.Profession.Contains(datatable.Search.Value));
+        //            if (column.Data == "Address")
+        //                filter = filter.Or(x => x.Address.Contains(datatable.Search.Value));
+        //            if (column.Data == "PostalCode")
+        //                filter = filter.Or(x => x.PostalCode.Contains(datatable.Search.Value));
+        //            if (column.Data == "DOY")
+        //                filter = filter.Or(x => x.DOY.Contains(datatable.Search.Value));
+        //            if (column.Data == "AFM")
+        //                filter = filter.Or(x => x.AFM.Contains(datatable.Search.Value));
+        //        }
 
-            }
-            else
-                filter = filter.And(x => true);
+        //    }
+        //    else
+        //        filter = filter.And(x => true);
 
-            return filter;
-        }
+        //    return filter;
+        //}
 
     }
 }

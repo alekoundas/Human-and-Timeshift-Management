@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Bussiness.Repository.Security.Interface
@@ -11,14 +10,14 @@ namespace Bussiness.Repository.Security.Interface
     {
         TEntity Get(int id);
 
-         Task<List<TEntity>> GetWithPagging(
-          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-          Expression<Func<TEntity, bool>> filter,
-          int pageSize = 10,
-          int pageIndex = 1);
+        Task<List<TEntity>> GetWithPagging(
+         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+         Expression<Func<TEntity, bool>> filter,
+         int pageSize = 10,
+         int pageIndex = 1);
 
-      
 
+        Task<List<TEntity>> GetAllAsync();
         int CountAll();
 
         Task<int> CountAllAsync();

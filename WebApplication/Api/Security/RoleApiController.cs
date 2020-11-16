@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
@@ -9,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
 namespace WebApplication.Api.Security
 {
@@ -57,7 +57,7 @@ namespace WebApplication.Api.Security
 
             var mapedData = MapResults(applicationRoles, datatable);
 
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
+            var dataTableHelper = new DataTableHelper<ExpandoObject>();
             return Ok(dataTableHelper.CreateResponse(datatable, await mapedData, total));
 
 
@@ -66,33 +66,33 @@ namespace WebApplication.Api.Security
         protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<string> results, Datatable datatable)
         {
             var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<string>(_securityDatawork);
+            var dataTableHelper = new DataTableHelper<string>();
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var result in results)
             {
                 var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-
+                var applicationRoles = await _securityDatawork.ApplicationRoles.GetAllAsync();
                 if (datatable.Predicate == "UserEdit")
                 {
                     dictionary.Add("Name", result);
-                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId));
-                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId));
-                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId));
-                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId));
-                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId));
+                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId, applicationRoles));
+                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId, applicationRoles));
+                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, applicationRoles));
+                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, applicationRoles));
+                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, applicationRoles));
                     returnObjects.Add(expandoObj);
 
                 }
                 else if (datatable.Predicate == "UserProfile")
                 {
                     dictionary.Add("Name", result);
-                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId));
-                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId));
-                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId));
-                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId));
-                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId));
+                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId, applicationRoles));
+                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId, applicationRoles));
+                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, applicationRoles));
+                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, applicationRoles));
+                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, applicationRoles));
                     returnObjects.Add(expandoObj);
                 }
             }

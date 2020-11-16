@@ -6,13 +6,7 @@ using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WebApplication.Utilities;
 
@@ -128,88 +122,88 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<Specialization>> Datatable([FromBody] Datatable datatable)
         {
+            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext)
+                .ConvertData<Specialization>())
+                .CompleteResponse<Specialization>();
 
-            var pageSize = datatable.Length;
-            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var orderDirection = datatable.Order[0].Dir;
-            var filter = PredicateBuilder.New<Specialization>();
-            filter = filter.And(GetSearchFilter(datatable));
+            return Ok(results);
+            //var pageSize = datatable.Length;
+            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            //var orderDirection = datatable.Order[0].Dir;
+            //var filter = PredicateBuilder.New<Specialization>();
+            //filter = filter.And(GetSearchFilter(datatable));
 
-            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Specialization>(HttpContext);
+            //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Specialization>(HttpContext);
 
-            if (!canShowDeactivated)
-                filter = filter.And(x => x.IsActive == true);
+            //if (!canShowDeactivated)
+            //    filter = filter.And(x => x.IsActive == true);
 
-            var includes = new List<Func<IQueryable<Specialization>, IIncludableQueryable<Specialization, object>>>();
-            var specializations = new List<Specialization>();
+            //var includes = new List<Func<IQueryable<Specialization>, IIncludableQueryable<Specialization, object>>>();
+            //var specializations = new List<Specialization>();
 
-            if (datatable.Predicate == "SpecializationIndex")
-            {
-                specializations = await _baseDataWork.Specializations
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
+            //if (datatable.Predicate == "SpecializationIndex")
+            //{
+            //    specializations = await _baseDataWork.Specializations
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
 
-            var mapedData = MapResults(specializations, datatable);
+            //var mapedData = MapResults(specializations, datatable);
 
-            var total = await _baseDataWork.Specializations.CountAllAsyncFiltered(filter);
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+            //var total = await _baseDataWork.Specializations.CountAllAsyncFiltered(filter);
+            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
+            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Specialization> results, Datatable datatable)
-        {
-            var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<Specialization>(_securityDatawork);
-            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var specialization in results)
-            {
-                var expandoObj = expandoObject.GetCopyFrom<Specialization>(specialization);
-                var dictionary = (IDictionary<string, object>)expandoObj;
+        //protected IEnumerable<ExpandoObject> MapResults(IEnumerable<Specialization> results, Datatable datatable)
+        //{
+        //    var expandoObject = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<Specialization>();
+        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+        //    foreach (var specialization in results)
+        //    {
+        //        var expandoObj = expandoObject.GetCopyFrom<Specialization>(specialization);
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
 
-                if (datatable.Predicate == "SpecializationIndex")
-                {
+        //        if (datatable.Predicate == "SpecializationIndex")
+        //        {
 
-                    dictionary.Add("Buttons", dataTableHelper.GetButtons("Specialization", "Specializations", specialization.Id.ToString()));
-                    returnObjects.Add(expandoObj);
-                }
-            }
+        //            dictionary.Add("Buttons", dataTableHelper.GetButtons("Specialization", "Specializations", specialization.Id.ToString()));
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //    }
 
-            return returnObjects;
-        }
+        //    return returnObjects;
+        //}
 
 
-        private Func<IQueryable<Specialization>, IOrderedQueryable<Specialization>> SetOrderBy(string columnName, string orderDirection)
-        {
-            if (columnName != "")
-                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
-            else
-                return null;
-        }
-        private Expression<Func<Specialization, bool>> GetSearchFilter(Datatable datatable)
-        {
-            var filter = PredicateBuilder.New<Specialization>();
-            if (datatable.Search.Value != null)
-            {
-                foreach (var column in datatable.Columns)
-                {
-                    if (column.Data == "Name")
-                        filter = filter.Or(x => x.Name.Contains(datatable.Search.Value));
-                    if (column.Data == "Description")
-                        filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
-                }
+        //private Func<IQueryable<Specialization>, IOrderedQueryable<Specialization>> SetOrderBy(string columnName, string orderDirection)
+        //{
+        //    if (columnName != "")
+        //        return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+        //    else
+        //        return null;
+        //}
+        //private Expression<Func<Specialization, bool>> GetSearchFilter(Datatable datatable)
+        //{
+        //    var filter = PredicateBuilder.New<Specialization>();
+        //    if (datatable.Search.Value != null)
+        //    {
+        //        foreach (var column in datatable.Columns)
+        //        {
+        //            if (column.Data == "Name")
+        //                filter = filter.Or(x => x.Name.Contains(datatable.Search.Value));
+        //            if (column.Data == "Description")
+        //                filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
+        //        }
 
-            }
-            else
-                filter = filter.And(x => true);
+        //    }
+        //    else
+        //        filter = filter.And(x => true);
 
-            return filter;
-        }
+        //    return filter;
+        //}
 
-        private bool SpecializationExists(int id)
-        {
-            return _context.Specializations.Any(e => e.Id == id);
-        }
 
 
     }

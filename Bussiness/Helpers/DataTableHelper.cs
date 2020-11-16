@@ -1,7 +1,6 @@
-﻿using Bussiness;
-using Bussiness.Repository.Security.Interface;
-using DataAccess.Models.Datatable;
+﻿using DataAccess.Models.Datatable;
 using DataAccess.Models.Entity;
+using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -9,17 +8,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApplication.Utilities
+namespace Bussiness.Helpers
 {
     public class DataTableHelper<TEntity>
     {
         private IHttpContextAccessor _httpContext;
-        private ISecurityDatawork _securityDatawork;
-        //private IBaseDatawork _baseDatawork;
-        public DataTableHelper(SecurityDataWork securityDatawork/*, BaseDatawork baseDatawork*/)
+        public DataTableHelper()
         {
-            _securityDatawork = securityDatawork;
-            //_baseDatawork = baseDatawork;
         }
 
         public DatatableResponse<TEntity> CreateResponse(Datatable dataTable, IEnumerable<TEntity> model, int total, int filteredCount = -1)
@@ -70,70 +65,171 @@ namespace WebApplication.Utilities
             return stringToReturn;
         }
 
-        public async Task<string> GetButtonForRoles(string controller, string permition, string userId)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<string> GetButtonForRoles(string controller, string permition, string userId, List<ApplicationRole> applicationRoles)
         {
             var stringToReturn = "";
             if (controller != null)
             {
                 _httpContext = new HttpContextAccessor();
+                var isDisabled = true;
+
+                var roleId = applicationRoles.FirstOrDefault(x =>
+                    x.Controller == controller && x.Permition == permition)?.Id;
+
                 var currentUserRoles = _httpContext.HttpContext.User.Claims
                     .Select(x => x.Value).ToList();
-                var isDisabled = true;
-                var roles = _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
 
                 if (currentUserRoles.Contains("User_Edit"))
                     isDisabled = false;
 
                 if (permition == "View")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    var isChecked = currentUserRoles
+                        .Any(x => x.Contains(controller) && x.Contains(permition));
+
                     if (roleId != null)
-                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleCheckbox(true, userId, roleId, isDisabled)
-                            : RoleCheckbox(false, userId, roleId, isDisabled);
+                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
                 }
 
                 if (permition == "Edit")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    var isChecked = currentUserRoles
+                        .Any(x => x.Contains(controller) && x.Contains(permition));
+
                     if (roleId != null)
-                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                            ? RoleCheckbox(true, userId, roleId, isDisabled)
-                                : RoleCheckbox(false, userId, roleId, isDisabled);
+                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
                 }
 
                 if (permition == "Create")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    var isChecked = currentUserRoles
+                        .Any(x => x.Contains(controller) && x.Contains(permition));
+
                     if (roleId != null)
-                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleCheckbox(true, userId, roleId, isDisabled)
-                            : RoleCheckbox(false, userId, roleId, isDisabled);
+                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
                 }
 
                 if (permition == "Deactivate")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    var isChecked = currentUserRoles
+                        .Any(x => x.Contains(controller) && x.Contains(permition));
+
                     if (roleId != null)
-                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleCheckbox(true, userId, roleId, isDisabled)
-                            : RoleCheckbox(false, userId, roleId, isDisabled);
+                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
                 }
 
                 if (permition == "Delete")
                 {
-                    var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+                    var isChecked = currentUserRoles
+                        .Any(x => x.Contains(controller) && x.Contains(permition));
+
                     if (roleId != null)
-                        stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-                        ? RoleCheckbox(true, userId, roleId, isDisabled)
-                            : RoleCheckbox(false, userId, roleId, isDisabled);
+                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
                 }
-
-
             }
-
             return stringToReturn;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //public async Task<string> GetButtonForRoles(string controller, string permition, string userId)
+        //{
+        //    var stringToReturn = "";
+        //    if (controller != null)
+        //    {
+        //        _httpContext = new HttpContextAccessor();
+        //        var currentUserRoles = _httpContext.HttpContext.User.Claims
+        //            .Select(x => x.Value).ToList();
+        //        var isDisabled = true;
+        //        var roles = _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
+
+        //        if (currentUserRoles.Contains("User_Edit"))
+        //            isDisabled = false;
+
+        //        if (permition == "View")
+        //        {
+        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+        //            if (roleId != null)
+        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
+        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
+        //        }
+
+        //        if (permition == "Edit")
+        //        {
+        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+        //            if (roleId != null)
+        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+        //                    ? RoleCheckbox(true, userId, roleId, isDisabled)
+        //                        : RoleCheckbox(false, userId, roleId, isDisabled);
+        //        }
+
+        //        if (permition == "Create")
+        //        {
+        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+        //            if (roleId != null)
+        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
+        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
+        //        }
+
+        //        if (permition == "Deactivate")
+        //        {
+        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+        //            if (roleId != null)
+        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
+        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
+        //        }
+
+        //        if (permition == "Delete")
+        //        {
+        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
+        //            if (roleId != null)
+        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
+        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
+        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
+        //        }
+        //    }
+        //    return stringToReturn;
+        //}
 
         private static string ViewButton(string controller, string id)
            => @"<div style='width:20px; height:20px;'><a href='/" + controller + "/Details/" + id + "'><i class='fa fa-eye'></i></a></div>";

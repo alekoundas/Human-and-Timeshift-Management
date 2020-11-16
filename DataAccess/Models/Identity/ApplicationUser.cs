@@ -24,7 +24,7 @@ namespace DataAccess.Models.Identity
 
         public int? EmployeeId { get; set; }
 
-        public ICollection<ApplicationUserRole> EmployeeWorkPlaces { get; set; }
+        public ICollection<ApplicationUserTag> ApplicationUserTags { get; set; }
 
     }
 }

@@ -79,12 +79,27 @@ namespace WebApplication.Controllers
                 var workPlaceRestriction = WorkPlaceHourRestrictionCreate
                     .CreateFrom(workPlaceHourRestriction);
 
-                _baseDataWork.WorkPlaceHourRestrictions.Add(workPlaceRestriction);
-                await _baseDataWork.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["Title"] = "Προσθήκη νέου περιορισμού ";
+                var workPlaceRestrictionExists = _baseDataWork.WorkPlaceHourRestrictions
+                    .Where(x => x.Year == workPlaceRestriction.Year)
+                    .Where(x => x.Month == workPlaceRestriction.Month)
+                    .Where(x => x.WorkPlaceId == workPlaceRestriction.WorkPlaceId)
+                    .Any();
 
+                if (!workPlaceRestrictionExists)
+                {
+                    _baseDataWork.WorkPlaceHourRestrictions.Add(workPlaceRestriction);
+                    var status = await _context.SaveChangesAsync();
+
+                    if (status > 0)
+                        TempData["StatusMessage"] = "O περιορισμός δημιουργήθηκε με επιτυχία.";
+                    else
+                        TempData["StatusMessage"] = "Ωχ! O περιορισμός Δεν δημιουργήθηκε.";
+                    return RedirectToAction(nameof(Index));
+                }
+                TempData["StatusMessage"] = "Ωχ! O περιορισμός του επιλεγμένου μήνα φαίνεται να υπάρχει ήδη για αυτο το πόστο.";
+            }
+
+            ViewData["Title"] = "Προσθήκη νέου περιορισμού ";
             return View();
         }
 

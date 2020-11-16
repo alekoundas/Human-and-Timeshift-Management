@@ -136,7 +136,7 @@
             var returnStr = '';
             for (var i = 0; i < getDaysInMonth(year, month); i++) {
                 var day = i;
-                var currentDate = new Date(year, month, ++day);
+                var currentDate = new Date(year, month - 1, ++day);
                 var options = { weekday: 'long', day: 'numeric' };
 
                 returnStr +=
@@ -185,10 +185,7 @@
             document.getElementById('HourRestrictions[' + num + '].MaxTime')
                 .value;
 
-
-
         const AppendMonthDaysHtml = (year, month) => {
-
             document.getElementById('DaysDiv')
                 .insertAdjacentHTML('beforeend', GetDaysHtml(year, month));
 
@@ -198,9 +195,7 @@
             $.validator.unobtrusive.parse($("form"));
         }
 
-
         //Functions bellow will be called from window via string function name
-
         function AddMinutes(num, value) {
             value = parseInt(value);
             var currTime;

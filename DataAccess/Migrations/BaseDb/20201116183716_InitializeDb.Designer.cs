@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20201105154541_asdsdfsdfsdf")]
-    partial class asdsdfsdfsdf
+    [Migration("20201116183716_InitializeDb")]
+    partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

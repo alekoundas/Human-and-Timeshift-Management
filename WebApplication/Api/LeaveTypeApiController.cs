@@ -6,13 +6,7 @@ using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WebApplication.Utilities;
 
@@ -116,86 +110,86 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<LeaveType>> Datatable([FromBody] Datatable datatable)
         {
+            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext)
+                .ConvertData<LeaveType>())
+                .CompleteResponse<LeaveType>();
 
-            var pageSize = datatable.Length;
-            var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            var orderDirection = datatable.Order[0].Dir;
-            var filter = PredicateBuilder.New<LeaveType>();
-            filter = filter.And(GetSearchFilter(datatable));
+            return Ok(results);
+            //var pageSize = datatable.Length;
+            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+            //var orderDirection = datatable.Order[0].Dir;
+            //var filter = PredicateBuilder.New<LeaveType>();
+            //filter = filter.And(GetSearchFilter(datatable));
 
-            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<LeaveType>(HttpContext);
+            //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<LeaveType>(HttpContext);
 
-            if (!canShowDeactivated)
-                filter = filter.And(x => x.IsActive == true);
+            //if (!canShowDeactivated)
+            //    filter = filter.And(x => x.IsActive == true);
 
-            var includes = new List<Func<IQueryable<LeaveType>, IIncludableQueryable<LeaveType, object>>>();
-            var leaveTypes = new List<LeaveType>();
+            //var includes = new List<Func<IQueryable<LeaveType>, IIncludableQueryable<LeaveType, object>>>();
+            //var leaveTypes = new List<LeaveType>();
 
-            if (datatable.Predicate == "LeaveTypeIndex")
-            {
-                leaveTypes = await _baseDataWork.LeaveTypes
-                    .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            }
+            //if (datatable.Predicate == "LeaveTypeIndex")
+            //{
+            //    leaveTypes = await _baseDataWork.LeaveTypes
+            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
+            //}
 
-            var mapedData = MapResults(leaveTypes, datatable);
+            //var mapedData = MapResults(leaveTypes, datatable);
 
-            var total = await _baseDataWork.LeaveTypes.CountAllAsyncFiltered(filter);
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
-            return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+            //var total = await _baseDataWork.LeaveTypes.CountAllAsyncFiltered(filter);
+            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
+            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        protected IEnumerable<ExpandoObject> MapResults(IEnumerable<LeaveType> results, Datatable datatable)
-        {
-            var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<LeaveType>(_securityDatawork);
-            List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-            foreach (var leaveTypes in results)
-            {
-                var expandoObj = expandoObject.GetCopyFrom<LeaveType>(leaveTypes);
-                var dictionary = (IDictionary<string, object>)expandoObj;
+        //protected IEnumerable<ExpandoObject> MapResults(IEnumerable<LeaveType> results, Datatable datatable)
+        //{
+        //    var expandoObject = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<LeaveType>();
+        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
+        //    foreach (var leaveTypes in results)
+        //    {
+        //        var expandoObj = expandoObject.GetCopyFrom<LeaveType>(leaveTypes);
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
 
-                if (datatable.Predicate == "LeaveTypeIndex")
-                {
-                    dictionary.Add("Buttons", dataTableHelper.GetButtons("LeaveType", "LeaveTypes", leaveTypes.Id.ToString()));
-                    returnObjects.Add(expandoObj);
-                }
-            }
+        //        if (datatable.Predicate == "LeaveTypeIndex")
+        //        {
+        //            dictionary.Add("Buttons", dataTableHelper.GetButtons("LeaveType", "LeaveTypes", leaveTypes.Id.ToString()));
+        //            returnObjects.Add(expandoObj);
+        //        }
+        //    }
 
-            return returnObjects;
-        }
+        //    return returnObjects;
+        //}
 
 
-        private Func<IQueryable<LeaveType>, IOrderedQueryable<LeaveType>> SetOrderBy(string columnName, string orderDirection)
-        {
-            if (columnName != "")
-                return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
-            else
-                return null;
-        }
-        private Expression<Func<LeaveType, bool>> GetSearchFilter(Datatable datatable)
-        {
-            var filter = PredicateBuilder.New<LeaveType>();
-            if (datatable.Search.Value != null)
-            {
-                foreach (var column in datatable.Columns)
-                {
-                    if (column.Data == "Name")
-                        filter = filter.Or(x => x.Name.Contains(datatable.Search.Value));
-                    if (column.Data == "Description")
-                        filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
-                }
+        //private Func<IQueryable<LeaveType>, IOrderedQueryable<LeaveType>> SetOrderBy(string columnName, string orderDirection)
+        //{
+        //    if (columnName != "")
+        //        return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
+        //    else
+        //        return null;
+        //}
+        //private Expression<Func<LeaveType, bool>> GetSearchFilter(Datatable datatable)
+        //{
+        //    var filter = PredicateBuilder.New<LeaveType>();
+        //    if (datatable.Search.Value != null)
+        //    {
+        //        foreach (var column in datatable.Columns)
+        //        {
+        //            if (column.Data == "Name")
+        //                filter = filter.Or(x => x.Name.Contains(datatable.Search.Value));
+        //            if (column.Data == "Description")
+        //                filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
+        //        }
 
-            }
-            else
-                filter = filter.And(x => true);
+        //    }
+        //    else
+        //        filter = filter.And(x => true);
 
-            return filter;
-        }
+        //    return filter;
+        //}
 
-        private bool LeaveTypeExists(int id)
-        {
-            return _context.LeaveTypes.Any(e => e.Id == id);
-        }
     }
 }

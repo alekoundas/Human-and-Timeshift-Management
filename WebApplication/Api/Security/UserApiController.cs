@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
@@ -11,7 +12,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
 namespace WebApplication.Api.Security
 {
@@ -63,7 +63,7 @@ namespace WebApplication.Api.Security
 
             }
 
-            var dataTableHelper = new DataTableHelper<ExpandoObject>(_securityDatawork);
+            var dataTableHelper = new DataTableHelper<ExpandoObject>();
             var mapedData = MapResults(applicationUsers, datatable);
 
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
@@ -73,7 +73,7 @@ namespace WebApplication.Api.Security
         protected IEnumerable<ExpandoObject> MapResults(IEnumerable<ApplicationUser> results, Datatable datatable)
         {
             var expandoObject = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<ApplicationUser>(_securityDatawork);
+            var dataTableHelper = new DataTableHelper<ApplicationUser>();
             List<ExpandoObject> returnObjects = new List<ExpandoObject>();
             foreach (var user in results)
             {

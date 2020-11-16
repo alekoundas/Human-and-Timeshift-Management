@@ -117,5 +117,10 @@ namespace Bussiness.Repository
             _set.RemoveRange(entities);
         }
 
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            return await _set.ToListAsync();
+        }
+
     }
 }

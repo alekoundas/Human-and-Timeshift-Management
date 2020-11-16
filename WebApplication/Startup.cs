@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,11 +21,9 @@ namespace WebApplication
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public IWebHostEnvironment HostingEnviroment { get; }
-        public Startup(IConfiguration configuration, IWebHostEnvironment envirement)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            HostingEnviroment = envirement;
         }
 
 
@@ -32,6 +31,9 @@ namespace WebApplication
         public void ConfigureServices(IServiceCollection services)
         {
             //Seed Data
+            services.AddDbContext<BaseDbContext>(options =>
+               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDbContext<SecurityDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -46,11 +48,12 @@ namespace WebApplication
 
             services.Configure<IdentityOptions>(opts =>
             {
-                opts.Password.RequiredLength = 8;
-                opts.Password.RequireNonAlphanumeric = true;
+                opts.Password.RequiredLength = 6;
+                opts.Password.RequireNonAlphanumeric = false;
                 opts.Password.RequireLowercase = true;
                 opts.Password.RequireUppercase = true;
                 opts.Password.RequireDigit = true;
+
             });
 
             services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromDays(1));
@@ -66,10 +69,10 @@ namespace WebApplication
             });
 
             //Enable TempData[""] from API
-            //services.Configure<CookieTempDataProviderOptions>(options =>
-            //{
-            //    options.Cookie.IsEssential = true;
-            //});
+            services.Configure<CookieTempDataProviderOptions>(options =>
+            {
+                options.Cookie.IsEssential = true;
+            });
 
 
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("el-GR");
