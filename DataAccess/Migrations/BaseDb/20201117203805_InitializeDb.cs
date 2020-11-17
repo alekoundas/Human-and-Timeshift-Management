@@ -210,14 +210,15 @@ namespace DataAccess.Migrations.BaseDb
                 name: "EmployeeWorkPlaces",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
-                    EmployeeId = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedOn = table.Column<DateTime>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: false),
                     WorkPlaceId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeWorkPlaces", x => new { x.Id, x.EmployeeId });
+                    table.PrimaryKey("PK_EmployeeWorkPlaces", x => x.Id);
                     table.ForeignKey(
                         name: "FK_EmployeeWorkPlaces_Employees_EmployeeId",
                         column: x => x.EmployeeId,
@@ -418,15 +419,10 @@ namespace DataAccess.Migrations.BaseDb
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkPlaces_Id",
+                name: "IX_EmployeeWorkPlaces_WorkPlaceId_EmployeeId",
                 table: "EmployeeWorkPlaces",
-                column: "Id",
+                columns: new[] { "WorkPlaceId", "EmployeeId" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EmployeeWorkPlaces_WorkPlaceId",
-                table: "EmployeeWorkPlaces",
-                column: "WorkPlaceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HourRestrictions_Id",

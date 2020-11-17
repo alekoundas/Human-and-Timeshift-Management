@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20201117170715_InitializeDb")]
+    [Migration("20201117203805_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -205,25 +205,25 @@ namespace DataAccess.Migrations.BaseDb
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkPlace", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("WorkPlaceId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id", "EmployeeId");
+                    b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("WorkPlaceId", "EmployeeId")
                         .IsUnique();
-
-                    b.HasIndex("WorkPlaceId");
 
                     b.ToTable("EmployeeWorkPlaces");
                 });
