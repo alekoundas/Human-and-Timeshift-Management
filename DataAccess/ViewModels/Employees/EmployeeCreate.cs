@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.DataAnnotation.Unique;
+using DataAccess.Models.Entity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,10 +16,11 @@ namespace DataAccess.ViewModels
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string LastName { get; set; }
 
-        [Display(Name = "Ημερομηνίαα Γέννησης")]
+        [Display(Name = "Ημερομηνία Γέννησης")]
         public DateTime? DateOfBirth { get; set; }
 
         [Display(Name = "ΑΦΜ")]
+        [EmployeeValidateUnique]
         public string Afm { get; set; }
 
         [Display(Name = "Αριθμός Ταυτότητας")]

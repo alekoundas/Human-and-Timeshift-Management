@@ -8,17 +8,8 @@ namespace DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<Company> builder)
         {
-            builder.HasIndex(x => x.Id).IsUnique();
+            builder.HasIndex(x => x.Afm).IsUnique();
 
-            //builder.HasMany(x => x.Customers)
-            //    .WithOne(x => x.Company)
-            //    .HasForeignKey(x => x.CompanyId)
-            //    .OnDelete(DeleteBehavior.SetNull);
-
-            //builder.HasMany(x => x.Employees)
-            //    .WithOne(x => x.Company)
-            //    .HasForeignKey(x => x.CompanyId)
-            //    .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

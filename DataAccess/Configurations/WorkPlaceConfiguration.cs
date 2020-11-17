@@ -8,7 +8,7 @@ namespace DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkPlace> builder)
         {
-            builder.HasIndex(x => x.Id).IsUnique();
+            builder.HasIndex(x => x.Title).IsUnique();
 
             builder.HasOne(x => x.Customer)
              .WithMany(x => x.WorkPlaces)

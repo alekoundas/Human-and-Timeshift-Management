@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.DataAnnotation.Unique;
+using DataAccess.Models.Entity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +14,7 @@ namespace DataAccess.ViewModels
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "ΑΦΜ")]
+        [CustomerValidateUnique,]
         public string AFM { get; set; }
 
         [Display(Name = "Επάγγελμα")]
@@ -31,9 +33,8 @@ namespace DataAccess.ViewModels
         public string Description { get; set; }
 
         [Display(Name = "Εταιρία")]
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
         public Company Company { get; set; }
-
 
         [Display(Name = "Επαφές")]
         public ICollection<Contact> Contacts { get; set; }

@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.DataAnnotation.Unique;
+using DataAccess.Models.Entity;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,6 +9,7 @@ namespace DataAccess.ViewModels
     public class SpecializationCreate
     {
         [Required]
+        [SpecializationValidateUnique]
         public string Name { get; set; }
         public string Description { get; set; }
 

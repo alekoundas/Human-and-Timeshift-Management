@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
-    public class SpecializationController : Controller
+    public class SpecializationController : MasterController
     {
         private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;

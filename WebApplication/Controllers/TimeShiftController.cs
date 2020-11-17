@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
-    public class TimeShiftController : Controller
+    public class TimeShiftController : MasterController
     {
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;

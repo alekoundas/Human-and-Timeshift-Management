@@ -17,7 +17,7 @@ using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
-    public class WorkPlaceController : Controller
+    public class WorkPlaceController : MasterController
     {
         private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;

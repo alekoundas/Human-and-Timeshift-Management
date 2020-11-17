@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
-    public class RealWorkHourController : Controller
+    public class RealWorkHourController : MasterController
     {
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;

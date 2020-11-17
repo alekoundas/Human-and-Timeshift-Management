@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.DataAnnotation;
+using DataAccess.Models.Entity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,10 +13,12 @@ namespace DataAccess.ViewModels
         public int Month { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        [WorkPlaceHourRestrictionValidateUnique("Year")]
         [Display(Name = "Έτος")]
         public int Year { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        [WorkPlaceHourRestrictionValidateUnique("WorkPlaceId")]
         [Display(Name = "Πόστο")]
         public int WorkPlaceId { get; set; }
 

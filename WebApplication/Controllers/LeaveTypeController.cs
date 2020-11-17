@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
-    public class LeaveTypeController : Controller
+    public class LeaveTypeController : MasterController
     {
         private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
-    public class LeaveController : Controller
+    public class LeaveController : MasterController
     {
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;

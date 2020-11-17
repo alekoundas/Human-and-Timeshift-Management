@@ -1,8 +1,6 @@
-﻿@model DataAccess.Models.Entity.Customer
+﻿@model DataAccess.ViewModels.CustomerCreate
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -74,7 +72,7 @@
                     <div class="form-group">
                         <label asp-for="Description" class="control-label"></label>
                         <div class="input-group">
-                            <textarea asp-for="Description" class="form-control" ></textarea>
+                            <textarea asp-for="Description" class="form-control"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                     </div>
@@ -110,20 +108,13 @@
 
                 </div>
             </form>
-
         </div>
     </div>
     <div class="col-md-3"> </div>
 </div>
 
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     <script src="~/js/Custom/Contacts.js"></script>
-
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $('.Company_Select2').select2({

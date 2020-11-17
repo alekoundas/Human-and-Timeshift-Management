@@ -8,7 +8,7 @@ namespace DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkPlaceHourRestriction> builder)
         {
-            builder.HasIndex(x => x.Id).IsUnique();
+            builder.HasIndex(x => new { x.WorkPlaceId, x.Month, x.Year }).IsUnique();
         }
     }
 }

@@ -28,7 +28,7 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<string>("Afm")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -45,7 +45,7 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("Afm")
                         .IsUnique();
 
                     b.ToTable("Companies");
@@ -102,7 +102,7 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<string>("AFM")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
@@ -134,10 +134,10 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("Id")
+                    b.HasIndex("AFM")
                         .IsUnique();
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Customers");
                 });
@@ -153,7 +153,7 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Afm")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("CompanyId")
                         .HasColumnType("int");
@@ -189,10 +189,11 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("Afm")
+                        .IsUnique()
+                        .HasFilter("[Afm] IS NOT NULL");
 
-                    b.HasIndex("Id")
-                        .IsUnique();
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("SpecializationId");
 
@@ -202,9 +203,7 @@ namespace DataAccess.Migrations.BaseDb
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkPlace", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -291,11 +290,10 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("EmployeeId");
 
-                    b.HasIndex("EndOn");
-
                     b.HasIndex("LeaveTypeId");
 
-                    b.HasIndex("StartOn");
+                    b.HasIndex("StartOn", "EndOn", "EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("Leaves");
                 });
@@ -318,11 +316,11 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("LeaveTypes");
@@ -357,11 +355,10 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("EmployeeId");
 
-                    b.HasIndex("EndOn");
-
-                    b.HasIndex("StartOn");
-
                     b.HasIndex("TimeShiftId");
+
+                    b.HasIndex("StartOn", "EndOn", "EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("RealWorkHours");
                 });
@@ -384,14 +381,14 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("PayPerHour")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Specializations");
@@ -425,10 +422,8 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("WorkPlaceId", "Month", "Year")
                         .IsUnique();
-
-                    b.HasIndex("WorkPlaceId");
 
                     b.ToTable("TimeShifts");
                 });
@@ -465,11 +460,10 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("EmployeeId");
 
-                    b.HasIndex("EndOn");
-
-                    b.HasIndex("StartOn");
-
                     b.HasIndex("TimeShiftId");
+
+                    b.HasIndex("StartOn", "EndOn", "EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("WorkHours");
                 });
@@ -495,13 +489,13 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("Title")
                         .IsUnique();
 
                     b.ToTable("WorkPlaces");
@@ -528,10 +522,8 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id")
+                    b.HasIndex("WorkPlaceId", "Month", "Year")
                         .IsUnique();
-
-                    b.HasIndex("WorkPlaceId");
 
                     b.ToTable("WorkPlaceHourRestrictions");
                 });
@@ -571,7 +563,7 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasOne("DataAccess.Models.Entity.Employee", "Employee")
                         .WithMany("EmployeeWorkPlaces")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DataAccess.Models.Entity.WorkPlace", "WorkPlace")

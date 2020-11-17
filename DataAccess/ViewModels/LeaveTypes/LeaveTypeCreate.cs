@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.DataAnnotation.Unique;
+using DataAccess.Models.Entity;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,6 +9,7 @@ namespace DataAccess.ViewModels
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Είδος άδειας")]
+        [LeaveTypeValidateUnique]
         public string Name { get; set; }
 
         [Display(Name = "Περιγραφή")]
@@ -26,7 +28,4 @@ namespace DataAccess.ViewModels
             };
         }
     }
-
-
-
 }

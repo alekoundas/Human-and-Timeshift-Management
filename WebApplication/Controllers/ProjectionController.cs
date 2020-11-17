@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication.Controllers
 {
-    public class ProjectionController : Controller
+    public class ProjectionController : MasterController
     {
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;

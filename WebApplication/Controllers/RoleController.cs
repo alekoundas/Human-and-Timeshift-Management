@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication.Controllers
 {
-    public class RoleController : Controller
+    public class RoleController : MasterController
     {
         private RoleManager<ApplicationRole> roleManager;
         public RoleController(RoleManager<ApplicationRole> roleMgr)

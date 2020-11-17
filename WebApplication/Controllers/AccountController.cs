@@ -1,7 +1,7 @@
 ﻿using Bussiness;
-using Bussiness.Repository.Security.Interface;
 using DataAccess;
 using DataAccess.Models.Identity;
+using DataAccess.Repository.Security.Interface;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : MasterController
     {
         private readonly ISecurityDatawork _datawork;
         private readonly UserManager<ApplicationUser> _userManager;

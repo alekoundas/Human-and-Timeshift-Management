@@ -1,4 +1,4 @@
-﻿@model DataAccess.Models.Entity.Company
+﻿@model DataAccess.ViewModels.CompanyCreate
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -34,7 +34,7 @@
                     <div class="form-group">
                         <label asp-for="Afm" class="control-label"></label>
                         <div class="input-group">
-                            <textarea asp-for="Afm" class="form-control" ></textarea>
+                            <textarea asp-for="Afm" class="form-control"></textarea>
                             <span asp-validation-for="Afm" class="text-danger"></span>
                         </div>
                     </div>

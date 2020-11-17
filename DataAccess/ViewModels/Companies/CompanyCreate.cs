@@ -1,10 +1,12 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.DataAnnotation.Unique;
+using DataAccess.Models.Entity;
 using System;
 
 namespace DataAccess.ViewModels
 {
     public class CompanyCreate
     {
+        [CompanyValidateUnique]
         public string Afm { get; set; }
         public string Description { get; set; }
         public string Title { get; set; }

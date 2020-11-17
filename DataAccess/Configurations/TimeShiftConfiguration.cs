@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DataAccess.Models.Entity;
+﻿using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccess.Configurations
 {
-     public class TimeShiftConfiguration : IEntityTypeConfiguration<TimeShift>
+    public class TimeShiftConfiguration : IEntityTypeConfiguration<TimeShift>
     {
         public void Configure(EntityTypeBuilder<TimeShift> builder)
         {
-            builder.HasIndex(x => x.Id).IsUnique();
+            builder.HasIndex(x => new { x.WorkPlaceId, x.Month, x.Year }).IsUnique();
         }
     }
 }
