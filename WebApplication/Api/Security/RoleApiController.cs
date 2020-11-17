@@ -74,25 +74,28 @@ namespace WebApplication.Api.Security
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                 var applicationRoles = await _securityDatawork.ApplicationRoles.GetAllAsync();
+                var userRoles = _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(datatable.UserId);
                 if (datatable.Predicate == "UserEdit")
                 {
                     dictionary.Add("Name", result);
-                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId, applicationRoles));
-                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId, applicationRoles));
-                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, applicationRoles));
-                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, applicationRoles));
-                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, applicationRoles));
+                    dictionary.Add("GreekName", result);
+                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, userRoles, applicationRoles));
                     returnObjects.Add(expandoObj);
 
                 }
                 else if (datatable.Predicate == "UserProfile")
                 {
                     dictionary.Add("Name", result);
-                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId, applicationRoles));
-                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId, applicationRoles));
-                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, applicationRoles));
-                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, applicationRoles));
-                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, applicationRoles));
+                    dictionary.Add("GreekName", result);
+                    dictionary.Add("View", dataTableHelper.GetButtonForRoles(result, "View", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Edit", dataTableHelper.GetButtonForRoles(result, "Edit", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, userRoles, applicationRoles));
                     returnObjects.Add(expandoObj);
                 }
             }

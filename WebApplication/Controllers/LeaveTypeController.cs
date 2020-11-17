@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -12,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -135,7 +135,7 @@ namespace WebApplication.Controllers
                 "Name",
                 "Description" });
 
-            var excelPackage = (await (new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelService(_context)
             .CreateNewExcel("LeaveTypes"))
             .AddSheetAsync<LeaveType>(excelColumns))
             .CompleteExcel(out errors);
@@ -168,7 +168,7 @@ namespace WebApplication.Controllers
             var leaveTypes = await _baseDataWork.LeaveTypes.GetAllAsync();
 
 
-            var excelPackage = (await (new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelService(_context)
            .CreateNewExcel("LeaveTypes"))
            .AddSheetAsync<LeaveType>(excelColumns, leaveTypes))
            .CompleteExcel(out errors);

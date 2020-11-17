@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -43,6 +44,7 @@ namespace WebApplication.Controllers
                 return NotFound();
 
             var workPlace = await _context.WorkPlaces
+                .Include(x => x.Customer)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (workPlace == null)
@@ -141,7 +143,7 @@ namespace WebApplication.Controllers
                 "Description",
                 "CustomerId" });
 
-            var excelPackage = (await (new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelService(_context)
                 .CreateNewExcel("WorkPlaces"))
                 .AddSheetAsync<WorkPlace>(excelColumns))
                 .CompleteExcel(out errors);
@@ -174,7 +176,7 @@ namespace WebApplication.Controllers
 
             var workPlace = await _baseDataWork.WorkPlaces.GetAllAsync();
 
-            var excelPackage = (await (new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelService(_context)
                .CreateNewExcel("WorkPlaces"))
                .AddSheetAsync<WorkPlace>(excelColumns, workPlace))
                .CompleteExcel(out errors);

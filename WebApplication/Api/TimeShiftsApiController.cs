@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
@@ -15,7 +16,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -128,7 +128,7 @@ namespace WebApplication.Api
             var timeShifts = new List<TimeShift>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<TimeShift>();
-            filter = filter.And(await GetUserRoleFiltersAsync());
+            filter = filter.And(GetUserRoleFilters());
             var includes = new List<Func<IQueryable<TimeShift>, IIncludableQueryable<TimeShift, object>>>();
 
             includes.Add(x => x.Include(y => y.WorkPlace));
@@ -259,7 +259,7 @@ namespace WebApplication.Api
         //    return filter;
         //}
 
-        private async Task<Expression<Func<TimeShift, bool>>> GetUserRoleFiltersAsync()
+        private Expression<Func<TimeShift, bool>> GetUserRoleFilters()
         {
             //Get WorkPlaceId from user roles
             var workPlaceIds = HttpContext.User.Claims

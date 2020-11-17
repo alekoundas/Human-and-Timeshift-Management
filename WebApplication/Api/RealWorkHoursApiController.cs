@@ -280,7 +280,7 @@ namespace WebApplication.Api
 
         // POST: api/realworkhours/hasoverlap
         [HttpPost("hasoverlap")]
-        public async Task<ActionResult<RealWorkHour>> HasOverlap([FromBody] ApiRealWorkHourHasOverlap apiOverlap)
+        public ActionResult<RealWorkHour> HasOverlap([FromBody] ApiRealWorkHourHasOverlap apiOverlap)
         {
             var dataToReturn = new List<ApiRealWorkHourHasOverlapResponse>();
             foreach (var id in apiOverlap.EmployeeIds)
@@ -324,7 +324,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOverlapRange")]
-        public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
+        public ActionResult<WorkHour> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
         {
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
@@ -373,7 +373,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/hasovertime
         [HttpPost("HasOvertime")]
-        public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<ApiRealWorkHoursHasOvertimeRange> workHours)
+        public ActionResult<WorkHour> HasOvertime([FromBody] List<ApiRealWorkHoursHasOvertimeRange> workHours)
         {
             List<object> response = new List<object>();
             foreach (var workHour in workHours)

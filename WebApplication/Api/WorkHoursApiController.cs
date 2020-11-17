@@ -66,7 +66,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/employeebelongstoworkhour
         [HttpPost("employeebelongstoworkhour")]
-        public async Task<ActionResult<WorkHour>> EmployeeBelongsToWorkHour([FromBody] WorkHourApiViewModel workHour)
+        public ActionResult<WorkHour> EmployeeBelongsToWorkHour([FromBody] WorkHourApiViewModel workHour)
         {
             var filter = PredicateBuilder.New<WorkHour>();
             filter = filter.And(x => x.StartOn == workHour.StartOn);
@@ -108,7 +108,7 @@ namespace WebApplication.Api
         //RealWorkHour-Create view
         // POST: api/workhours/hasoverlap
         [HttpPost("hasoverlap")]
-        public async Task<ActionResult<WorkHour>> HasOverlap([FromBody] WorkHourApiViewModel workHour)
+        public ActionResult<WorkHour> HasOverlap([FromBody] WorkHourApiViewModel workHour)
         {
             if (workHour.EmployeeIds != null)
             {
@@ -144,7 +144,7 @@ namespace WebApplication.Api
 
         // POST: api/workhours/hasoverlap
         [HttpPost("HasOverlapRange")]
-        public async Task<ActionResult<WorkHour>> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
+        public ActionResult<WorkHour> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
         {
             List<object> response = new List<object>();
             foreach (var workHour in workHours)
@@ -174,9 +174,9 @@ namespace WebApplication.Api
 
         }
 
-        // POST: api/workhours/hasoverlap
+        // POST: api/workhours/hasovertime
         [HttpPost("HasOvertime")]
-        public async Task<ActionResult<WorkHour>> HasOvertime([FromBody] List<WorkHourHasOvertimeRange> workHours)
+        public ActionResult<WorkHour> HasOvertime([FromBody] List<WorkHourHasOvertimeRange> workHours)
         {
             List<object> response = new List<object>();
             foreach (var workHour in workHours)

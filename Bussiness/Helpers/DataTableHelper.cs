@@ -13,9 +13,6 @@ namespace Bussiness.Helpers
     public class DataTableHelper<TEntity>
     {
         private IHttpContextAccessor _httpContext;
-        public DataTableHelper()
-        {
-        }
 
         public DatatableResponse<TEntity> CreateResponse(Datatable dataTable, IEnumerable<TEntity> model, int total, int filteredCount = -1)
         {
@@ -65,171 +62,31 @@ namespace Bussiness.Helpers
             return stringToReturn;
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public async Task<string> GetButtonForRoles(string controller, string permition, string userId, List<ApplicationRole> applicationRoles)
+        public string GetButtonForRoles(string controller, string permition, string userId, List<ApplicationRole> userRoles, List<ApplicationRole> applicationRoles)
         {
             var stringToReturn = "";
-            if (controller != null)
-            {
-                _httpContext = new HttpContextAccessor();
-                var isDisabled = true;
+            var isDisabled = true;
 
-                var roleId = applicationRoles.FirstOrDefault(x =>
-                    x.Controller == controller && x.Permition == permition)?.Id;
+            //1.Check if loggedin user can edit roles
+            _httpContext = new HttpContextAccessor();
+            var currentUserRoles = _httpContext.HttpContext.User.Claims
+                   .Select(x => x.Value).ToList();
 
-                var currentUserRoles = _httpContext.HttpContext.User.Claims
-                    .Select(x => x.Value).ToList();
+            if (currentUserRoles.Contains("User_Edit"))
+                isDisabled = false;
 
-                if (currentUserRoles.Contains("User_Edit"))
-                    isDisabled = false;
+            var roleId = applicationRoles.FirstOrDefault(x =>
+                x.Controller == controller && x.Permition == permition)?.Id;
 
-                if (permition == "View")
-                {
-                    var isChecked = currentUserRoles
-                        .Any(x => x.Contains(controller) && x.Contains(permition));
+            //2.Check if user from id has specific role
+            var isChecked = userRoles
+                .Any(x => x.Controller == controller && x.Permition == permition);
 
-                    if (roleId != null)
-                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
-                }
+            if (roleId != null)
+                stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
 
-                if (permition == "Edit")
-                {
-                    var isChecked = currentUserRoles
-                        .Any(x => x.Contains(controller) && x.Contains(permition));
-
-                    if (roleId != null)
-                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
-                }
-
-                if (permition == "Create")
-                {
-                    var isChecked = currentUserRoles
-                        .Any(x => x.Contains(controller) && x.Contains(permition));
-
-                    if (roleId != null)
-                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
-                }
-
-                if (permition == "Deactivate")
-                {
-                    var isChecked = currentUserRoles
-                        .Any(x => x.Contains(controller) && x.Contains(permition));
-
-                    if (roleId != null)
-                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
-                }
-
-                if (permition == "Delete")
-                {
-                    var isChecked = currentUserRoles
-                        .Any(x => x.Contains(controller) && x.Contains(permition));
-
-                    if (roleId != null)
-                        stringToReturn += RoleCheckbox(isChecked, userId, roleId, isDisabled);
-                }
-            }
             return stringToReturn;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //public async Task<string> GetButtonForRoles(string controller, string permition, string userId)
-        //{
-        //    var stringToReturn = "";
-        //    if (controller != null)
-        //    {
-        //        _httpContext = new HttpContextAccessor();
-        //        var currentUserRoles = _httpContext.HttpContext.User.Claims
-        //            .Select(x => x.Value).ToList();
-        //        var isDisabled = true;
-        //        var roles = _securityDatawork.ApplicationUserRoles.GetRolesFormUserId(userId);
-
-        //        if (currentUserRoles.Contains("User_Edit"))
-        //            isDisabled = false;
-
-        //        if (permition == "View")
-        //        {
-        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
-        //            if (roleId != null)
-        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
-        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
-        //        }
-
-        //        if (permition == "Edit")
-        //        {
-        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
-        //            if (roleId != null)
-        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-        //                    ? RoleCheckbox(true, userId, roleId, isDisabled)
-        //                        : RoleCheckbox(false, userId, roleId, isDisabled);
-        //        }
-
-        //        if (permition == "Create")
-        //        {
-        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
-        //            if (roleId != null)
-        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
-        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
-        //        }
-
-        //        if (permition == "Deactivate")
-        //        {
-        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
-        //            if (roleId != null)
-        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
-        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
-        //        }
-
-        //        if (permition == "Delete")
-        //        {
-        //            var roleId = _securityDatawork.ApplicationRoles.SingleOrDefault(x => x.Controller == controller && x.Permition == permition)?.Id;
-        //            if (roleId != null)
-        //                stringToReturn += roles.Any(x => x.Controller == controller && x.Permition == permition)
-        //                ? RoleCheckbox(true, userId, roleId, isDisabled)
-        //                    : RoleCheckbox(false, userId, roleId, isDisabled);
-        //        }
-        //    }
-        //    return stringToReturn;
-        //}
 
         private static string ViewButton(string controller, string id)
            => @"<div style='width:20px; height:20px;'><a href='/" + controller + "/Details/" + id + "'><i class='fa fa-eye'></i></a></div>";
@@ -242,9 +99,6 @@ namespace Bussiness.Helpers
 
         private static string DeleteButton(string controller, string id)
             => @"<div style='width:20px; height:20px;'><a ><i urlAttr='/api/" + controller + "/" + id + "' class='fa fa-trash-o DatatableDeleteButton' ></i></a></div>";
-
-
-
 
         public string RoleCheckbox(bool isChecked, string userId, string roleId, bool isDisabled = false)
           =>
@@ -275,7 +129,6 @@ namespace Bussiness.Helpers
             else if (currentUserRoles.Contains(baseRole + "_View"))
                 stringToReturn += ViewToggle(toggleState, apiUrl);
 
-
             return stringToReturn;
         }
 
@@ -284,7 +137,6 @@ namespace Bussiness.Helpers
 
         private static string EditToggle(string toggleState, string link)
             => @"<input urlAttr='" + link + "' class='ToggleSliders' type='checkbox' data-onstyle='success' " + toggleState + ">";
-
 
         public string GetTimeShiftEditCellBodyWorkHours(List<WorkHour> workHours, List<Leave> leaves, int dayOfMonth, Datatable datatable, int employeeId)
         {
@@ -297,8 +149,6 @@ namespace Bussiness.Helpers
                    (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
                    x.EmployeeId == employeeId)
                 .ToList();
-
-
 
             var cellLeaves = leaves.Where(x =>
                    x.StartOn.Year == datatable.TimeShiftYear &&
@@ -350,7 +200,6 @@ namespace Bussiness.Helpers
                      "</div></div>";
 
                 }
-
 
             _httpContext = new HttpContextAccessor();
             var currentUserRoles = _httpContext.HttpContext.User.Claims
@@ -441,8 +290,6 @@ namespace Bussiness.Helpers
                                 0,
                                 0);
 
-
-
                     strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
                         celStartOn.ToShortTimeString() +
                         "</div>";
@@ -481,197 +328,6 @@ namespace Bussiness.Helpers
                     }
                 }
                 return strToReturn;
-
-            }
-        }
-
-
-        public async Task<string> GetTimeShiftEditCellBodyWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
-        {
-            var strToReturn = "";
-
-            var cellWorkHours = await baseDatawork.WorkHours.GetCurrentAssignedOnCell(
-                datatable.GenericId,
-                datatable.TimeShiftYear,
-                datatable.TimeShiftMonth,
-                dayOfMonth,
-                employeeId);
-
-            var cellLeaves = await baseDatawork.Leaves.GetCurrentAssignedOnCell(
-               datatable.TimeShiftYear,
-               datatable.TimeShiftMonth,
-               dayOfMonth,
-               employeeId);
-
-            if (cellWorkHours.Any(x => x.IsDayOff))
-                strToReturn +=
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                    "<center><p><b>Ρεπό</b></p></center>" +
-                     "</div>";
-            else if (cellLeaves.Count() > 0)
-                return
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                    "<center><p><b>Άδεια</b></p></center>" +
-                     "</div>";
-            else
-                foreach (var cellWorkHour in cellWorkHours)
-                {
-                    var celStartOn = cellWorkHour.StartOn;
-                    if (celStartOn.Day != dayOfMonth)
-                        celStartOn = new DateTime(
-                            cellWorkHour.StartOn.Year,
-                            cellWorkHour.StartOn.Month,
-                            cellWorkHour.StartOn.Day,
-                            0,
-                            0,
-                            0,
-                            0);
-
-                    var celEndOn = cellWorkHour.EndOn;
-                    if (celEndOn.Day != dayOfMonth)
-                        celEndOn = new DateTime(
-                                cellWorkHour.EndOn.Year,
-                                cellWorkHour.EndOn.Month,
-                                cellWorkHour.EndOn.Day,
-                                23,
-                                59,
-                                0,
-                                0);
-                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
-                        celStartOn.ToShortTimeString() +
-                  "</div>";
-
-                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
-                        celEndOn.ToShortTimeString() +
-                     "</div></div>";
-
-                }
-
-
-            _httpContext = new HttpContextAccessor();
-            var currentUserRoles = _httpContext.HttpContext.User.Claims
-                .Select(x => x.Value).ToList();
-
-            strToReturn += "</div>";
-            if (datatable.Predicate != "TimeShiftDetail")
-            {
-
-                if (currentUserRoles.Contains("TimeShift_Create"))
-                    strToReturn += FaIconAdd(dayOfMonth, "", employeeId);
-
-                if (currentUserRoles.Contains("TimeShift_Edit"))
-                    if (cellWorkHours.Count() > 0)
-                        strToReturn += FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId);
-            }
-
-            return strToReturn;
-        }
-
-        public async Task<string> GetTimeShiftEditCellBodyRealWorkHoursAsync(BaseDatawork baseDatawork, int dayOfMonth, Datatable datatable, int employeeId)
-        {
-            var compareMonth = 0;
-            var compareYear = 0;
-            var strToReturn = "";
-
-            if (datatable.SelectedMonth == null || datatable.SelectedYear == null)
-            {
-                var timeShift = await baseDatawork.TimeShifts.FirstOrDefaultAsync(x => x.Id == datatable.GenericId);
-                compareMonth = timeShift.Month;
-                compareYear = timeShift.Year;
-            }
-            else
-            {
-                compareMonth = (int)datatable.SelectedMonth;
-                compareYear = (int)datatable.SelectedYear;
-            }
-
-            var cellRealWorkHours = await baseDatawork.RealWorkHours.GetCurrentAssignedOnCell(
-              datatable.GenericId,
-              compareYear,
-              compareMonth,
-              dayOfMonth,
-              employeeId);
-
-            var cellWorkHours = await baseDatawork.WorkHours.GetCurrentAssignedOnCell(
-               datatable.GenericId,
-              compareYear,
-               compareMonth,
-               dayOfMonth,
-               employeeId);
-
-            if (cellWorkHours.Any(x => x.IsDayOff))
-                strToReturn +=
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                    "<center><p><b>Ρεπό</b></p></center>" +
-                     "</div>";
-
-            var cellLeaves = await baseDatawork.Leaves.GetCurrentAssignedOnCell(
-               compareYear,
-               compareMonth,
-               dayOfMonth,
-               employeeId);
-
-
-            if (cellLeaves.Count() > 0)
-                return
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                        "<center><p><b>Άδεια</b></p></center>" +
-                     "</div>";
-            else
-            {
-                foreach (var cellWorkHour in cellRealWorkHours)
-                {
-                    var celStartOn = cellWorkHour.StartOn;
-                    if (celStartOn.Day != dayOfMonth)
-                        celStartOn = new DateTime(
-                            cellWorkHour.StartOn.Year,
-                            cellWorkHour.StartOn.Month,
-                            cellWorkHour.StartOn.Day,
-                            0,
-                            0,
-                            0,
-                            0);
-
-                    var celEndOn = cellWorkHour.EndOn;
-                    if (celEndOn.Day != dayOfMonth)
-                        celEndOn = new DateTime(
-                                cellWorkHour.EndOn.Year,
-                                cellWorkHour.EndOn.Month,
-                                cellWorkHour.EndOn.Day,
-                                23,
-                                59,
-                                0,
-                                0);
-                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
-                        celStartOn.ToShortTimeString() +
-                  "</div>";
-
-                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
-                        celEndOn.ToShortTimeString() +
-                     "</div></div>";
-                }
-
-                _httpContext = new HttpContextAccessor();
-                var currentUserRoles = _httpContext.HttpContext.User.Claims
-                    .Select(x => x.Value).ToList();
-
-                if (datatable.GenericId != 0)
-                {
-                    if (!cellWorkHours.Any(x => x.IsDayOff))
-                    {
-
-                        if (currentUserRoles.Contains("RealWorkHour_Create"))
-                            strToReturn += FaIconAdd(dayOfMonth, "", employeeId,
-                                compareMonth, compareYear);
-
-                        if (currentUserRoles.Contains("RealWorkHour_Edit"))
-                            if (cellRealWorkHours.Count() > 0)
-                                strToReturn += FaIconEdit(dayOfMonth, "green", employeeId,
-                                       datatable.GenericId, compareMonth, compareYear);
-                    }
-                }
-                return strToReturn;
-
             }
         }
 
@@ -714,5 +370,17 @@ namespace Bussiness.Helpers
         private static string CurrentDayFaIconEdit(int employeeId)
            => @"<i class='fa fa-pencil faIconEdit' employeeid='" + employeeId + "'></i>";
 
+
+        public string GetProjectionDifferenceWorkHourLink(int id, string value)
+        {
+            return RedirectButton("TimeShift/Edit/" + id, value);
+        }
+        public string GetProjectionDifferenceRealWorkHourLink(int id, string value)
+        {
+            return RedirectButton("RealWorkHour/Index", value);
+        }
+
+        private string RedirectButton(string url, string value)
+             => @"<a href='/" + url + "'><div style='width:100%; height:100%;'>" + value + "</div></a>";
     }
 }

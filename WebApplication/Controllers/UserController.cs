@@ -54,7 +54,7 @@ namespace WebApplication.Controllers
 
         // GET: Account/ChangePassword
         [HttpGet]
-        public async Task<IActionResult> ChangePassword(string userId, string returnUrl)
+        public IActionResult ChangePassword(string userId, string returnUrl)
         {
             var viewModel = new ApplicationUserChangePassword();
             viewModel.UserId = userId;

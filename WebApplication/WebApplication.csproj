@@ -5,6 +5,10 @@
     <UserSecretsId>bf114041-7963-4534-9c70-86aaaf9e9f21</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="5.3.2" />
     <PackageReference Include="LinqKit" Version="1.1.17" />

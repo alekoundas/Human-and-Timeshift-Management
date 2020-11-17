@@ -120,7 +120,7 @@ namespace WebApplication.Api
 
         // POST: api/ValidateHoursToWorkPlaceHourRestriction
         [HttpPost("ValidateHoursToWorkPlaceHourRestriction")]
-        public async Task<ActionResult<RealWorkHour>> ValidateHoursToWorkPlaceHourRestriction([FromBody] ApiHourRestrictionValidate validateVM)
+        public ActionResult<RealWorkHour> ValidateHoursToWorkPlaceHourRestriction([FromBody] ApiHourRestrictionValidate validateVM)
         {
             var dataToReturn = new ApiHourRestrictionValidateResponse();
             var day = validateVM.StartOn.Day;

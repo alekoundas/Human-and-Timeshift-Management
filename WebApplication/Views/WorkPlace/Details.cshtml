@@ -13,7 +13,7 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
                     @Html.ButtonBackToList("WorkPlace")
-                    @Html.ButtonGoToEdit("WorkPlace",Model.Id)
+                    @Html.ButtonGoToEdit("WorkPlace", Model.Id)
                 </div>
             </div>
 
@@ -34,6 +34,15 @@
                         <input asp-for="Description" class="form-control" readonly="readonly" disabled />
                     </div>
                 </div>
+
+                @if (Model.Customer != null)
+                {
+                    <div class="form-group">
+                        <label asp-for="CustomerId" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Customer.ΙdentifyingΝame" class="form-control" readonly="readonly" disabled />
+                        </div>
+                    </div>}
 
             </div>
 
@@ -214,4 +223,4 @@
             });
     </script>
 
-    }
+}

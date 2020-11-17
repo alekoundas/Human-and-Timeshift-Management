@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
@@ -8,7 +9,6 @@ using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DataAccess.Models.Entity;
+﻿using DataAccess.Models.Entity;
 using DataAccess.Models.Select2;
+using System.Collections.Generic;
 
-namespace WebApplication.Utilities
+namespace Bussiness.Helpers
 {
     public class Select2Helper
     {

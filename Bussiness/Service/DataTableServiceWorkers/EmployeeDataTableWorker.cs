@@ -18,7 +18,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
     public class EmployeeDataTableWorker : DataTableService
     {
         private BaseDatawork _baseDatawork { get; }
-        private Datatable _datatable { get; }
+        private new Datatable _datatable { get; }
         private HttpContext _httpContext { get; }
 
         public List<ExpandoObject> EntitiesMapped { get; set; }
@@ -549,31 +549,37 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                 //Βy RealWorkHour
-                if (_datatable.FilterByRealWorkHour == true ||
-                    (_datatable.FilterByRealWorkHour == false && _datatable.FilterByWorkHour == false))
+                if (_datatable.FilterByRealWorkHour == true)
+
                     if (result.RealWorkHours.Count() > 0)
                         foreach (var realWorkHour in result.RealWorkHours)
                         {
                             expandoObj = expandoService.GetCopyFrom<Employee>(result);
                             dictionary = (IDictionary<string, object>)expandoObj;
-                            dictionary.Add("RealWorkHourDate", realWorkHour.StartOn + " - " + realWorkHour.EndOn);
+                            dictionary.Add("RealWorkHourDate",
+                                dataTableHelper.GetProjectionDifferenceRealWorkHourLink(
+                                    1,
+                                    realWorkHour.StartOn + " - " + realWorkHour.EndOn));
+
                             returnObjects.Add(expandoObj);
 
                         }
 
                 //Βy WorkHour
-                if (_datatable.FilterByWorkHour == true ||
-                    (_datatable.FilterByRealWorkHour == false && _datatable.FilterByWorkHour == false))
+                if (_datatable.FilterByWorkHour == true)
                     if (result.WorkHours.Count() > 0)
                         foreach (var workHour in result.WorkHours)
                         {
                             expandoObj = expandoService.GetCopyFrom<Employee>(result);
                             dictionary = (IDictionary<string, object>)expandoObj;
-                            dictionary.Add("WorkHourDate", workHour.StartOn + " - " + workHour.EndOn);
+                            dictionary.Add("WorkHourDate", dataTableHelper.
+                                GetProjectionDifferenceWorkHourLink(
+                                workHour.TimeShiftId,
+                                workHour.StartOn + " - " + workHour.EndOn));
+
                             returnObjects.Add(expandoObj);
                         }
 
-                returnObjects.Add(expandoObj);
             }
             EntitiesMapped = returnObjects;
             EntitiesTotal = await _baseDatawork.Employees.CountAllAsyncFiltered(_filter);

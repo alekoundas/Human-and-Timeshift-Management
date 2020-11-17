@@ -469,13 +469,12 @@
                 order: [[0, 'desc']],
                 columns: [
                     {
-                        data: "Name",
+                        data: "GreekName",
                         searchable: true,
                         orderable: true,
                         render: (a, b, data, d) => {
-                            //console.log(data);
-                            if (data.Name != null)
-                                return data.Name;
+                            if (data.GreekName != null)
+                                return data.GreekName ;
                             else
                                 return "";
                         }
@@ -486,7 +485,7 @@
                         orderable: false,
                         render: (a, b, data, d) => {
                             if (data.View != null)
-                                return data.View.result;
+                                return data.View;
                             else
                                 return "";
                         }
@@ -497,7 +496,7 @@
                         orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Edit != null)
-                                return data.Edit.result ;
+                                return data.Edit ;
                             else
                                 return "";
                         }
@@ -508,7 +507,7 @@
                         orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Create != null)
-                                return data.Create.result;
+                                return data.Create;
                             else
                                 return "";
                         }
@@ -519,7 +518,7 @@
                         orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Deactivate!= null)
-                                return data.Deactivate.result;
+                                return data.Deactivate;
                             else
                                 return "";
                         }
@@ -530,7 +529,7 @@
                         orderable: false,
                         render: (a, b, data, d) => {
                             if (data.Delete != null)
-                                return data.Delete.result;
+                                return data.Delete;
                             else
                                 return "";
                         }

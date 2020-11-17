@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DataAccess;
-using Business.Repository.Interface;
-using DataAccess.Models;
+﻿using Business.Repository.Interface;
 using Bussiness.Repository;
-using DataAccess.Models.Entity;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query;
-using LinqKit;
+using DataAccess;
 using DataAccess.Models.Datatable;
+using DataAccess.Models.Entity;
+using LinqKit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Business.Repository
 {
@@ -34,36 +32,26 @@ namespace Business.Repository
             int pageSize = 10,
             int pageIndex = 1)
         {
-
-
             var filterRealWorkHours = PredicateBuilder.New<RealWorkHour>();
             var filterOrRealWorkHours = PredicateBuilder.New<RealWorkHour>();
             var filterWorkHours = PredicateBuilder.New<WorkHour>();
             var filterOrWorkHours = PredicateBuilder.New<WorkHour>();
-
 
             filterOrRealWorkHours = filterOrRealWorkHours.Or(x => x.StartOn <= datatable.StartOn && datatable.StartOn <= x.EndOn);
             filterOrRealWorkHours = filterOrRealWorkHours.Or(x => x.StartOn <= datatable.EndOn && datatable.EndOn <= x.EndOn);
             filterOrRealWorkHours = filterOrRealWorkHours.Or(x => datatable.StartOn < x.StartOn && x.EndOn < datatable.EndOn);
             filterRealWorkHours = filterRealWorkHours.And(filterOrRealWorkHours);
 
-
-
-
             filterOrWorkHours = filterOrWorkHours.Or(x => x.StartOn <= datatable.StartOn && datatable.StartOn <= x.EndOn);
             filterOrWorkHours = filterOrWorkHours.Or(x => x.StartOn <= datatable.EndOn && datatable.EndOn <= x.EndOn);
             filterOrWorkHours = filterOrWorkHours.Or(x => datatable.StartOn < x.StartOn && x.EndOn < datatable.EndOn);
             filterWorkHours = filterWorkHours.And(filterOrWorkHours);
-
-
 
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
 
             includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(z => z.TimeShift));
             includes.Add(x => x.Include(y => y.WorkHours).ThenInclude(z => z.TimeShift));
             includes.Add(x => x.Include(y => y.Specialization));
-
-
 
             //filter = filter.And(x =>
             //x.RealWorkHours.Any(filterOrRealWorkHours) || x.WorkHours.Any(filterOrWorkHours));
@@ -88,19 +76,6 @@ namespace Business.Repository
                 .Where(x => x.IsDayOff == false)
                 as IQueryable<WorkHour>;
 
-            //var realWorkHours = Context.RealWorkHours.Include(x => x.TimeShift).Where(x =>
-            //          (x.StartOn <= datatable.StartOn && datatable.StartOn <= x.EndOn) ||
-            //          (x.StartOn <= datatable.EndOn && datatable.EndOn <= x.EndOn) ||
-            //          (datatable.StartOn < x.StartOn && x.EndOn < datatable.EndOn)
-            //           ).ToList();
-
-            //var workHours = Context.WorkHours.Include(x => x.TimeShift).Where(x =>
-            //         ((x.StartOn <= datatable.StartOn && datatable.StartOn <= x.EndOn) ||
-            //         (x.StartOn <= datatable.EndOn && datatable.EndOn <= x.EndOn) ||
-            //         (datatable.StartOn < x.StartOn && x.EndOn < datatable.EndOn)) &&
-            //         x.IsDayOff == false
-            //       ).ToList();
-
 
             if (datatable.GenericId != 0)//workplaceId
             {
@@ -118,9 +93,9 @@ namespace Business.Repository
             if (orderingInfo != null)
                 qry = orderingInfo(qry);
 
-             qry = qry.Where(filter);
+            qry = qry.Where(filter);
             var DbF = Microsoft.EntityFrameworkCore.EF.Functions;
-             qry = qry.Select(x => new Employee
+            qry = qry.Select(x => new Employee
             {
                 Id = x.Id,
                 Afm = x.Afm,
@@ -133,26 +108,26 @@ namespace Business.Repository
                         (z.StartOn <= datatable.StartOn && datatable.StartOn <= z.EndOn) ||
                         (z.StartOn <= datatable.EndOn && datatable.EndOn <= z.EndOn) ||
                         (datatable.StartOn < z.StartOn && z.EndOn < datatable.EndOn))
-                            .Where(y => !workHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn))
-                            .Where(y =>!workHours.Any(z => Math.Abs(DbF.DateDiffMinute(z.StartOn, y.StartOn)) <= datatable.FilterByOffsetMinutes && Math.Abs(DbF.DateDiffMinute(z.EndOn, y.EndOn)) <= datatable.FilterByOffsetMinutes ))
-                            .ToList(),
+                           .Where(y => !workHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn))
+                           .Where(y => !workHours.Any(z => Math.Abs(DbF.DateDiffMinute(z.StartOn, y.StartOn)) <= datatable.FilterByOffsetMinutes && Math.Abs(DbF.DateDiffMinute(z.EndOn, y.EndOn)) <= datatable.FilterByOffsetMinutes))
+                           .ToList(),
                 WorkHours = x.WorkHours.Where(z =>
                         (z.StartOn <= datatable.StartOn && datatable.StartOn <= z.EndOn) ||
                         (z.StartOn <= datatable.EndOn && datatable.EndOn <= z.EndOn) ||
                         (datatable.StartOn < z.StartOn && z.EndOn < datatable.EndOn))
-                            .Where(y => !realWorkHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn) && y.IsDayOff == false)
-                            .Where(y => !realWorkHours.Any(z => Math.Abs(DbF.DateDiffMinute(z.StartOn, y.StartOn)) <= datatable.FilterByOffsetMinutes && Math.Abs(DbF.DateDiffMinute(z.EndOn, y.EndOn)) <= datatable.FilterByOffsetMinutes))
+                           .Where(y => !realWorkHours.Any(z => z.StartOn == y.StartOn && z.EndOn == y.EndOn) && y.IsDayOff == false)
+                           .Where(y => !realWorkHours.Any(z => Math.Abs(DbF.DateDiffMinute(z.StartOn, y.StartOn)) <= datatable.FilterByOffsetMinutes && Math.Abs(DbF.DateDiffMinute(z.EndOn, y.EndOn)) <= datatable.FilterByOffsetMinutes))
 
-                             //.Where(y =>
-                             //{
-                             //    return !realWorkHours.Any(z =>
-                             //    {
-                             //        var aaa = System.Math.Abs(DbF.DateDiffMinute(z.StartOn, y.StartOn)) <= datatable.FilterByOffsetMinutes && System.Math.Abs(DbF.DateDiffMinute(z.EndOn, y.EndOn)) <= datatable.FilterByOffsetMinutes;
-                             //        return aaa;
-                             //    });
-                             //})
-                            //.Where(y => !realWorkHours.Any(z => z.StartOn.Subtract(y.StartOn).TotalMinutes <= datatable.FilterByOffsetMinutes && z.EndOn.Subtract(y.EndOn).TotalMinutes <= datatable.FilterByOffsetMinutes))
-                            .ToList(),
+                           //.Where(y =>
+                           //{
+                           //    return !realWorkHours.Any(z =>
+                           //    {
+                           //        var aaa = System.Math.Abs(DbF.DateDiffMinute(z.StartOn, y.StartOn)) <= datatable.FilterByOffsetMinutes && System.Math.Abs(DbF.DateDiffMinute(z.EndOn, y.EndOn)) <= datatable.FilterByOffsetMinutes;
+                           //        return aaa;
+                           //    });
+                           //})
+                           //.Where(y => !realWorkHours.Any(z => z.StartOn.Subtract(y.StartOn).TotalMinutes <= datatable.FilterByOffsetMinutes && z.EndOn.Subtract(y.EndOn).TotalMinutes <= datatable.FilterByOffsetMinutes))
+                           .ToList(),
                 Specialization = x.Specialization
             });
             //qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);

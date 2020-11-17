@@ -1,25 +1,24 @@
-﻿using Bussiness;
-using DataAccess;
+﻿using DataAccess;
 using OfficeOpenXml;
 using OfficeOpenXml.DataValidation;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace WebApplication.Utilities
+namespace Bussiness.Service
 {
-    public class ExcelHelper
+    public class ExcelService
     {
         private BaseDatawork _baseDataWork;
         private List<string> Errors;
 
         private ExcelPackage ExcelPackage { get; set; }
-        public ExcelHelper(BaseDbContext BaseDbContext)
+        public ExcelService(BaseDbContext BaseDbContext)
         {
             _baseDataWork = new BaseDatawork(BaseDbContext);
         }
 
-        public ExcelHelper CreateNewExcel(string fileName)
+        public ExcelService CreateNewExcel(string fileName)
         {
             this.Errors = new List<string>();
 
@@ -32,7 +31,7 @@ namespace WebApplication.Utilities
             return this;
         }
 
-        public async Task<ExcelHelper> AddSheetAsync<TEntity>(List<string> colTitles, List<TEntity> results = null)
+        public async Task<ExcelService> AddSheetAsync<TEntity>(List<string> colTitles, List<TEntity> results = null)
         {
             var colCount = 1;
             var rowCount = 1;

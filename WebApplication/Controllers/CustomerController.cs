@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -12,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
 namespace WebApplication.Controllers
 {
@@ -144,7 +144,7 @@ namespace WebApplication.Controllers
                 "Description",
                 "CompanyId" });
 
-            var excelPackage = (await (new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelService(_context)
                .CreateNewExcel("Customers"))
                .AddSheetAsync<Customer>(excelColumns))
                .CompleteExcel(out errors);
@@ -183,7 +183,7 @@ namespace WebApplication.Controllers
 
             var customer = await _baseDataWork.Customers.GetAllAsync();
 
-            var excelPackage = (await (new ExcelHelper(_context)
+            var excelPackage = (await (new ExcelService(_context)
            .CreateNewExcel("Customers"))
            .AddSheetAsync<Customer>(excelColumns, customer))
            .CompleteExcel(out errors);

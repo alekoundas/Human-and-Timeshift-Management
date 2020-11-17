@@ -18,7 +18,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
     public class WorkPlaceDataTableWorker : DataTableService
     {
         private BaseDatawork _baseDatawork { get; }
-        private Datatable _datatable { get; }
+        private new Datatable _datatable { get; }
         private HttpContext _httpContext { get; }
 
         public List<ExpandoObject> EntitiesMapped { get; set; }

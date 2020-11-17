@@ -1,4 +1,5 @@
 ﻿using Bussiness;
+using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Datatable;
@@ -34,7 +35,7 @@ namespace WebApplication.Api
         }
 
         [HttpGet("testapi")]
-        public async Task<ActionResult<Employee>> testapi()
+        public ActionResult<Employee> testapi()
         {
             var select = new SelectLambdaBuilder<Employee>()
                 .CreateSelect()

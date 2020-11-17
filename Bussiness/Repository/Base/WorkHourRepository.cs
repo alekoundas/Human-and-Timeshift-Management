@@ -21,6 +21,7 @@ namespace Bussiness.Repository.Base
         {
             get { return Context as BaseDbContext; }
         }
+
         public async Task<List<WorkHour>> GetCurrentDayOffAssignedOnCell(DateTime compareDate, int employeeId)
         {
             var filter = PredicateBuilder.New<WorkHour>();
@@ -71,7 +72,6 @@ namespace Bussiness.Repository.Base
         }
         public bool IsDateOverlaping(ApiRealWorkHoursHasOverlapRange workHour, int employeeId)
         {
-
             var filterOr = PredicateBuilder.New<WorkHour>();
             var filter = PredicateBuilder.New<WorkHour>();
 
@@ -90,25 +90,7 @@ namespace Bussiness.Repository.Base
             filter = filter.And(x => !(workHour.StartOn.Day != x.StartOn.Day && x.IsDayOff == true));
             filter = filter.And(filterOr);
 
-
-
             return Context.WorkHours.Any(filter);
-
-
-            //if (workHour.IsEdit)
-            //    return Context.WorkHours.Where(x =>
-            //    (x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn))
-            //            .Where(x =>
-            //          (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-            //          (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-            //          (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-            //            .Any(y => y.Employee.Id == employeeId);
-            //else
-            //    return Context.WorkHours.Where(x =>
-            //    (x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn) ||
-            //    (x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn) ||
-            //    (workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn))
-            //      .Any(y => y.Employee.Id == employeeId);
         }
 
         public bool IsDateOvertime(WorkHourHasOvertimeRange workHour, int employeeId)
@@ -117,7 +99,7 @@ namespace Bussiness.Repository.Base
             var filter = PredicateBuilder.New<WorkHour>();
             var filterOr = PredicateBuilder.New<WorkHour>();
             workHour.StartOn = workHour.StartOn.AddHours(-11);
-            workHour.EndOn = workHour.StartOn.AddHours(11);
+            workHour.EndOn = workHour.EndOn.AddHours(11);
 
             filterOr = filterOr.Or(x => x.StartOn <= workHour.StartOn && workHour.StartOn <= x.EndOn);
             filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
