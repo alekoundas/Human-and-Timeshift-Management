@@ -9,11 +9,14 @@ namespace DataAccess.ViewModels
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Τίτλος")]
-        [WorkPlaceValidateUnique]
+        [WorkPlaceValidateUnique("Title")]
         public string Title { get; set; }
+
         [Display(Name = "Περιγραφή")]
         public string Description { get; set; }
+
         [Display(Name = "Πελάτης")]
+        [WorkPlaceValidateUnique("CustomerId")]
         public int? CustomerId { get; set; }
 
 

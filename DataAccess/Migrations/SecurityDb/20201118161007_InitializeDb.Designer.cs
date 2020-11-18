@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.SecurityDb
 {
     [DbContext(typeof(SecurityDbContext))]
-    [Migration("20201117170723_InitializeDb")]
+    [Migration("20201118161007_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

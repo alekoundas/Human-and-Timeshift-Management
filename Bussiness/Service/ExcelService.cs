@@ -71,6 +71,7 @@ namespace Bussiness.Service
             Errors = this.Errors;
             return this.ExcelPackage;
         }
+
         private async Task GetLookUpAsync(string colTitle, ExcelWorksheet worksheet, int colCount)
         {
             var colData = await GetLookUpDataAsync(colTitle);
@@ -79,8 +80,8 @@ namespace Bussiness.Service
             if (colData.Count > 0)
                 foreach (var response in colData)
                     dd.Formula.Values.Add(response.ToString());
-
         }
+
         private async Task<List<int>> GetLookUpDataAsync(string colTitle)
         {
             var response = new List<int>();

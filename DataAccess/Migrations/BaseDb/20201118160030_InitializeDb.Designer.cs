@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20201117203805_InitializeDb")]
+    [Migration("20201118160030_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -497,8 +497,9 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("Title")
-                        .IsUnique();
+                    b.HasIndex("Title", "CustomerId")
+                        .IsUnique()
+                        .HasFilter("[CustomerId] IS NOT NULL");
 
                     b.ToTable("WorkPlaces");
                 });

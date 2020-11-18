@@ -513,10 +513,11 @@ namespace DataAccess.Migrations.BaseDb
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkPlaces_Title",
+                name: "IX_WorkPlaces_Title_CustomerId",
                 table: "WorkPlaces",
-                column: "Title",
-                unique: true);
+                columns: new[] { "Title", "CustomerId" },
+                unique: true,
+                filter: "[CustomerId] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

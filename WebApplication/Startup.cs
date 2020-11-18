@@ -64,7 +64,7 @@ namespace WebApplication
                 options.Cookie.MaxAge = TimeSpan.FromDays(1);
                 options.LoginPath = "/Account/LogIn";
                 options.AccessDeniedPath = "/Account/LogIn";
-                options.ExpireTimeSpan = TimeSpan.FromDays(1);
+                options.ExpireTimeSpan = TimeSpan.FromHours(1);// logout after inncativity
                 options.SlidingExpiration = true;
             });
 

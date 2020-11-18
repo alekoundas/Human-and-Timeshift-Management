@@ -495,8 +495,9 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("Title")
-                        .IsUnique();
+                    b.HasIndex("Title", "CustomerId")
+                        .IsUnique()
+                        .HasFilter("[CustomerId] IS NOT NULL");
 
                     b.ToTable("WorkPlaces");
                 });
