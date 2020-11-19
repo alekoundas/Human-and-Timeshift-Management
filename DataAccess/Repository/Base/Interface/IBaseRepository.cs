@@ -15,8 +15,6 @@ namespace DataAccess.Repository.Interface
              Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
              int pageSize = 10,
              int pageIndex = 1);
-        Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter = null,
-       List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
 
 
         Task<int> CountAllAsync();
@@ -61,8 +59,8 @@ namespace DataAccess.Repository.Interface
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter, List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
         void Select(Func<TEntity, TEntity> predicate);
-        //void Select(Expression<Func<TEntity, bool>> predicate);
+        void Select(Expression<Func<TEntity, bool>> predicate);
 
-
+        //BaseRepository<TEntity> ToListAsyncs();
     }
 }

@@ -1,5 +1,4 @@
-﻿using Bussiness;
-using Bussiness.Service;
+﻿using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -8,11 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting.Internal;
-using OfficeOpenXml;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
@@ -117,10 +112,6 @@ namespace WebApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SpecializationExists(specialization.Id))
-                        return NotFound();
-                    else
-                        throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -133,88 +124,59 @@ namespace WebApplication.Controllers
             var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                 "Name",
-                "Description" });
+                "Description",
+                "IsActive"  });
 
-            var excelPackage = (await (new ExcelService(_context)
-                 .CreateNewExcel("LeaveTypes"))
-                 .AddSheetAsync<Specialization>(excelColumns))
+            var excelPackage = (await (new ExcelService<Specialization>(_context)
+                 .CreateNewExcel("Specializations"))
+                 .AddSheetAsync(excelColumns))
                  .CompleteExcel(out errors);
 
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Specializations.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "Specializations.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
+
         [HttpGet]
         public async Task<ActionResult> DownloadExcelWithData()
         {
-            var errors = new List<string>();
-            var specialization = await _baseDataWork.Specializations.GetAllAsync();
             var excelColumns = new List<string>(new string[] {
                 "Name",
-                "Description" });
+                "Description",
+                "IsActive" });
 
-            var excelPackage = (await (new ExcelService(_context)
-                .CreateNewExcel("LeaveTypes"))
-                .AddSheetAsync<Specialization>(excelColumns, specialization))
-                .CompleteExcel(out errors);
+            var excelPackage = (await (new ExcelService<Specialization>(_context)
+                .CreateNewExcel("Specializations"))
+                .AddSheetAsync(excelColumns, "Specializations"))
+                .CompleteExcel(out var errors);
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Specializations.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "Specializations.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
+
         [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImportExcel)
         {
             if (ImportExcel == null)
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
-                using (MemoryStream stream = new MemoryStream())
+            {
+                var specializations = (await (await (new ExcelService<Specialization>(_context)
+                    .ExtractDataFromExcel(ImportExcel)))
+                    .ValidateExtractedData())
+                    .RetrieveExtractedData(out var errors);
+                if (errors.Count == 0)
                 {
-                    var specializations = new List<Specialization>();
-                    var specialization = new Specialization();
-                    await ImportExcel.CopyToAsync(stream);
-                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
-                    {
-
-                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
-                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
-                            {
-                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                                    specialization
-                                        .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(specialization, worksheet.Cells[i, j].Value?.ToString(), null);
-
-                                specialization.CreatedOn = DateTime.Now;
-                                specializations.Add(specialization);
-                                specialization = new Specialization();
-                            }
-                    }
                     _baseDataWork.Specializations.AddRange(specializations);
                     var status = await _baseDataWork.SaveChangesAsync();
                     if (status > 0)
@@ -223,13 +185,11 @@ namespace WebApplication.Controllers
                     else
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }
-
+                else
+                    TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+            }
 
             return View("Index");
-        }
-        private bool SpecializationExists(int id)
-        {
-            return _context.Specializations.Any(e => e.Id == id);
         }
     }
 }

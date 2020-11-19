@@ -1,5 +1,4 @@
-﻿using Bussiness;
-using Bussiness.Service;
+﻿using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -7,11 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
@@ -120,10 +115,6 @@ namespace WebApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.Id))
-                        return NotFound();
-                    else
-                        throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -133,7 +124,6 @@ namespace WebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult> DownloadExcelTemplate()
         {
-            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                 "ΙdentifyingΝame",
                 "AFM",
@@ -142,35 +132,27 @@ namespace WebApplication.Controllers
                 "PostalCode",
                 "DOY",
                 "Description",
+                "IsActive",
                 "CompanyId" });
 
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<Customer>(_context)
                .CreateNewExcel("Customers"))
-               .AddSheetAsync<Customer>(excelColumns))
-               .CompleteExcel(out errors);
+               .AddSheetAsync(excelColumns))
+               .CompleteExcel(out var errors);
 
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Customers.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "Customers.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
 
         [HttpGet]
         public async Task<ActionResult> DownloadExcelWithData()
         {
-            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                 "ΙdentifyingΝame",
                 "AFM",
@@ -179,65 +161,37 @@ namespace WebApplication.Controllers
                 "PostalCode",
                 "DOY",
                 "Description",
+                "IsActive",
                 "CompanyId" });
 
-            var customer = await _baseDataWork.Customers.GetAllAsync();
-
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<Customer>(_context)
            .CreateNewExcel("Customers"))
-           .AddSheetAsync<Customer>(excelColumns, customer))
-           .CompleteExcel(out errors);
+           .AddSheetAsync(excelColumns, "Customers"))
+           .CompleteExcel(out var errors);
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Customers.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "Customers.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
+
         [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImportExcel)
         {
             if (ImportExcel == null)
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
-                using (MemoryStream stream = new MemoryStream())
+            {
+                var customers = (await (await (new ExcelService<Customer>(_context)
+                    .ExtractDataFromExcel(ImportExcel)))
+                    .ValidateExtractedData())
+                    .RetrieveExtractedData(out var errors);
+                if (errors.Count == 0)
                 {
-                    var customers = new List<Customer>();
-                    var customer = new Customer();
-                    await ImportExcel.CopyToAsync(stream);
-                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
-                    {
 
-                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
-                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
-                            {
-                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                                    if (worksheet.Cells[1, j].Value.ToString().Contains("Id"))//Filter integers
-                                        customer
-                                          .GetType()
-                                      .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                      .SetValue(customer, Int32.Parse(worksheet.Cells[i, j].Value?.ToString()), null);
-                                    else
-                                        customer
-                                            .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(customer, worksheet.Cells[i, j].Value?.ToString(), null);
-
-                                customer.CreatedOn = DateTime.Now;
-                                customers.Add(customer);
-                                customer = new Customer();
-                            }
-                    }
                     _baseDataWork.Customers.AddRange(customers);
                     var status = await _baseDataWork.SaveChangesAsync();
                     if (status > 0)
@@ -246,14 +200,11 @@ namespace WebApplication.Controllers
                     else
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }
-
+                else
+                    TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+            }
 
             return View("Index");
-        }
-
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.Id == id);
         }
     }
 }

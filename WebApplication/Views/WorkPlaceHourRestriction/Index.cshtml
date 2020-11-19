@@ -12,6 +12,7 @@
                 <div class="pull-right">
                     @Html.ButtonCreateNew("WorkPlaceHourRestriction")
                     @Html.ButtonImport("WorkPlaceHourRestriction")
+                    @Html.ButtonExport("WorkPlaceHourRestriction")
                 </div>
             </div>
             <hr />
@@ -41,7 +42,7 @@
     <div class="col-md-3"> </div>
 
 </div>
-<partial name="_ImportModal" model='new {Entity = "WorkPlaceHourRestriction" }'>
+<partial name="_ExcelModals" model='new {Entity = "WorkPlaceHourRestriction" }'>
     @section Scripts {
         <script>
             $('#WorkPlaceHourRestrictionDatatable').DataTable({

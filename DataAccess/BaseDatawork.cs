@@ -1,5 +1,4 @@
 ﻿using DataAccess.Models.Entity;
-using DataAccess.Repository;
 using DataAccess.Repository.Base;
 using DataAccess.Repository.Base.Interface;
 using DataAccess.Repository.Interface;
@@ -109,15 +108,5 @@ namespace DataAccess
 
             return response;
         }
-
-
-        private Func<T, bool> GetDateOverlapFilter<T>(DateTime startOn, DateTime endOn) =>
-             x =>
-                 ((DateTime)x.GetType().GetProperty("StartOn").GetValue(x) <= startOn && startOn <= (DateTime)x.GetType().GetProperty("EndOn").GetValue(x)) ||
-                     ((DateTime)x.GetType().GetProperty("StartOn").GetValue(x) <= endOn && endOn <= (DateTime)x.GetType().GetProperty("EndOn").GetValue(x)) ||
-                     (startOn < (DateTime)x.GetType().GetProperty("StartOn").GetValue(x) && (DateTime)x.GetType().GetProperty("EndOn").GetValue(x) < endOn);
-
-        private Func<T, bool> GetFilter<T>(int employeeId) =>
-            x => (int)x.GetType().GetProperty("Employee").PropertyType.GetProperty("Id").GetValue(x) == employeeId;
     }
 }

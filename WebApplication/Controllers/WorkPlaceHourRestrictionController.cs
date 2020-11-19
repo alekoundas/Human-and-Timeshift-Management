@@ -1,5 +1,4 @@
-﻿using Bussiness;
-using Bussiness.Service;
+﻿using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -73,7 +72,6 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WorkPlaceHourRestrictionCreate workPlaceHourRestriction)
         {
-
             if (ModelState.IsValid)
             {
                 var workPlaceRestriction = WorkPlaceHourRestrictionCreate
@@ -147,10 +145,6 @@ namespace WebApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CompanyExists(workPlaceHourRestriction.Id))
-                        return NotFound();
-                    else
-                        throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -165,9 +159,9 @@ namespace WebApplication.Controllers
                 "Afm",
                 "Description" });
 
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<Company>(_context)
                .CreateNewExcel("Companies"))
-               .AddSheetAsync<Company>(excelColumns))
+               .AddSheetAsync(excelColumns))
                .CompleteExcel(out errors);
 
             if (errors.Count == 0)
@@ -197,9 +191,9 @@ namespace WebApplication.Controllers
                 "Description" });
 
 
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<Company>(_context)
              .CreateNewExcel("Companies"))
-             .AddSheetAsync<Company>(excelColumns, companies))
+             .AddSheetAsync(excelColumns, "Companies"))
              .CompleteExcel(out errors);
 
             if (errors.Count == 0)
@@ -254,16 +248,7 @@ namespace WebApplication.Controllers
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }
 
-
             return View("Index");
-        }
-
-
-
-
-        private bool CompanyExists(int id)
-        {
-            return _context.Companies.Any(e => e.Id == id);
         }
     }
 }

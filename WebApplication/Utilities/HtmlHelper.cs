@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using Microsoft.AspNetCore.Html;
+﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Linq;
 
 namespace WebApplication.Utilities
 {
@@ -51,6 +51,15 @@ namespace WebApplication.Utilities
             var onClick = "onclick = \"$('#ImportModal').modal('show')\"";
             if (IsOkToShow(controller + "_Create"))
                 return new HtmlString("<a " + onClick + " class='button'> <button class='btn btn-primary'>Import</button> </a>");
+
+            return new HtmlString("");
+        }
+
+        public static IHtmlContent ButtonExport(this IHtmlHelper html, string controller)
+        {
+            var onClick = "onclick = \"$('#ExportModal').modal('show')\"";
+            if (IsOkToShow(controller + "_View"))
+                return new HtmlString("<a " + onClick + " class='button'> <button class='btn btn-primary'>Export</button> </a>");
 
             return new HtmlString("");
         }

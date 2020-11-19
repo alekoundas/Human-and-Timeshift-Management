@@ -1,5 +1,4 @@
-﻿using Bussiness;
-using Bussiness.Service;
+﻿using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -7,11 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
@@ -120,10 +115,6 @@ namespace WebApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CompanyExists(company.Id))
-                        return NotFound();
-                    else
-                        throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -132,111 +123,76 @@ namespace WebApplication.Controllers
 
         public async Task<ActionResult> DownloadExcelTemplate()
         {
-            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                 "Title",
                 "Afm",
+                 "IsActive",
                 "Description" });
 
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<Company>(_context)
                .CreateNewExcel("Companies"))
-               .AddSheetAsync<Company>(excelColumns))
-               .CompleteExcel(out errors);
+               .AddSheetAsync(excelColumns))
+               .CompleteExcel(out var errors);
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Companies.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "Companies.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
 
         public async Task<ActionResult> DownloadExcelWithData()
         {
-            var errors = new List<string>();
-            var companies = await _baseDataWork.Companies.GetAllAsync();
             var excelColumns = new List<string>(new string[] {
                 "Title",
                 "Afm",
+                 "IsActive",
                 "Description" });
 
 
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<Company>(_context)
              .CreateNewExcel("Companies"))
-             .AddSheetAsync<Company>(excelColumns, companies))
-             .CompleteExcel(out errors);
+             .AddSheetAsync(excelColumns, "Companies"))
+             .CompleteExcel(out var errors);
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Companies.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "Companies.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
+
         public async Task<ActionResult> Import(IFormFile ImportExcel)
         {
             if (ImportExcel == null)
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
-                using (MemoryStream stream = new MemoryStream())
+            {
+                var companies = (await (await (new ExcelService<Company>(_context)
+                    .ExtractDataFromExcel(ImportExcel)))
+                    .ValidateExtractedData())
+                    .RetrieveExtractedData(out var errors);
+
+                if (errors.Count == 0)
                 {
-                    var companies = new List<Company>();
-                    var company = new Company();
-                    await ImportExcel.CopyToAsync(stream);
-                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
-                    {
-
-                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
-                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
-                            {
-                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                                    company
-                                        .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(company, worksheet.Cells[i, j].Value?.ToString(), null);
-
-                                company.CreatedOn = DateTime.Now;
-                                companies.Add(company);
-                                company = new Company();
-                            }
-                    }
                     _baseDataWork.Companies.AddRange(companies);
                     var status = await _baseDataWork.SaveChangesAsync();
+
                     if (status > 0)
                         TempData["StatusMessage"] = companies.Count +
-                        " εγγραφές προστέθηκαν με επιτυχία";
+                    " εγγραφές προστέθηκαν με επιτυχία";
                     else
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }
-
+                else
+                    TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+            }
 
             return View("Index");
-        }
-
-
-
-
-        private bool CompanyExists(int id)
-        {
-            return _context.Companies.Any(e => e.Id == id);
         }
     }
 }

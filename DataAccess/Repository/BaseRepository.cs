@@ -1,5 +1,4 @@
 ﻿using DataAccess.Repository.Interface;
-using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -110,20 +109,6 @@ namespace DataAccess.Repository
 
             return await qry.ToListAsync();
         }
-        //    TEntity SelectObject(List<string> fields,TEntity value)
-        //    {
-        //        TEntity classTEntity = (TEntity)Activator.CreateInstance(typeof(TEntity));
-
-        //        foreach (var field in fields)
-        //        classTEntity.GetType().GetProperty(field).SetValue(classTEntity, value.GetType().get);
-
-
-        //        return classTEntity
-
-
-        //}
-
-
 
         public int Count(Expression<Func<TEntity, bool>> predicate)
         {
@@ -150,10 +135,10 @@ namespace DataAccess.Repository
             _set.Add(entity);
         }
 
-        //public void Select(Expression<Func<TEntity, bool>> predicate)
-        //{
-        //    _set.Select(predicate);
-        //}
+        public void Select(Expression<Func<TEntity, bool>> predicate)
+        {
+            _set.Select(predicate);
+        }
         public void Select(Func<TEntity, TEntity> predicate)
         {
             _set.Select(predicate);
@@ -201,18 +186,7 @@ namespace DataAccess.Repository
             return _set.Where(expression);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter = null,
-        List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
-        {
-            var qry = (IQueryable<TEntity>)_set;
-            if (includes != null)
-                foreach (var include in includes)
-                    qry = include(qry);
 
-            if (filter != null)
-                qry = qry.Where(filter);
-            return await qry.ToListAsync();
-        }
 
     }
 }

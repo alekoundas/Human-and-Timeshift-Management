@@ -27,8 +27,10 @@ namespace DataAccess.DataAnnotation.Unique
 
             var customerIdValue = customerIdProperty.GetValue(validationContext.ObjectInstance);
             var titleValue = titleProperty.GetValue(validationContext.ObjectInstance);
+
             if ((int?)customerIdValue != null)
                 filter = filter.And(x => x.CustomerId == (int?)customerIdValue);
+
             filter = filter.And(x => x.Title == titleValue);
 
             if (baseDataWork.WorkPlaces.Any(filter))

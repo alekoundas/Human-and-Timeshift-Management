@@ -1,5 +1,4 @@
-﻿using Bussiness;
-using Bussiness.Service;
+﻿using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -7,11 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
@@ -117,10 +112,6 @@ namespace WebApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LeaveTypeExists(leaveType.Id))
-                        return NotFound();
-                    else
-                        throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -130,116 +121,74 @@ namespace WebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult> DownloadExcelTemplate()
         {
-            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                 "Name",
+                "IsActive",
                 "Description" });
 
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<LeaveType>(_context)
             .CreateNewExcel("LeaveTypes"))
-            .AddSheetAsync<LeaveType>(excelColumns))
-            .CompleteExcel(out errors);
+            .AddSheetAsync(excelColumns))
+            .CompleteExcel(out var errors);
 
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "LeaveTypes.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "LeaveTypes.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
+
         [HttpGet]
         public async Task<ActionResult> DownloadExcelWithData()
         {
-            var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
                "Name",
+               "IsActive",
                 "Description" });
 
-            var leaveTypes = await _baseDataWork.LeaveTypes.GetAllAsync();
-
-
-            var excelPackage = (await (new ExcelService(_context)
+            var excelPackage = (await (new ExcelService<LeaveType>(_context)
            .CreateNewExcel("LeaveTypes"))
-           .AddSheetAsync<LeaveType>(excelColumns, leaveTypes))
-           .CompleteExcel(out errors);
+           .AddSheetAsync(excelColumns, "LeaveTypes"))
+           .CompleteExcel(out var errors);
 
             if (errors.Count == 0)
-            {
-                byte[] reportBytes;
                 using (var package = excelPackage)
-                {
-                    reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "LeaveTypes.xlsx");
-                }
-            }
+                    return File(package.GetAsByteArray(), XlsxContentType, "LeaveTypes.xlsx");
             else
-            {
-                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως εχουν πρόβλημα οι κολόνες: " +
-                    string.Join("", errors);
-                return View();
-            }
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
         }
+
         [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImportExcel)
         {
             if (ImportExcel == null)
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
-                using (MemoryStream stream = new MemoryStream())
+            {
+                var leaveTypes = (await (await (new ExcelService<LeaveType>(_context)
+                    .ExtractDataFromExcel(ImportExcel)))
+                    .ValidateExtractedData())
+                    .RetrieveExtractedData(out var errors);
+
+                if (errors.Count == 0)
                 {
-                    var leaveTypes = new List<LeaveType>();
-                    var leaveType = new LeaveType();
-                    await ImportExcel.CopyToAsync(stream);
-                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
-                    {
-
-                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
-                        {
-                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
-                            {
-                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                                    if (worksheet.Cells[1, j].Value.ToString().Contains("Id"))//Filter integers
-                                        leaveType
-                                          .GetType()
-                                      .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                      .SetValue(leaveType, Int32.Parse(worksheet.Cells[i, j].Value?.ToString()), null);
-                                    else
-                                        leaveType
-                                            .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(leaveType, worksheet.Cells[i, j].Value?.ToString(), null);
-
-                                leaveType.CreatedOn = DateTime.Now;
-                                leaveTypes.Add(leaveType);
-                                leaveType = new LeaveType();
-                            }
-                        }
-                    }
                     _baseDataWork.LeaveTypes.AddRange(leaveTypes);
                     var status = await _baseDataWork.SaveChangesAsync();
                     if (status > 0)
                         TempData["StatusMessage"] = leaveTypes.Count +
-                        " εγγραφές προστέθηκαν με επιτυχία";
+                                    " εγγραφές προστέθηκαν με επιτυχία";
                     else
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }
-
-
+                else
+                    TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+            }
             return View("Index");
-        }
-        private bool LeaveTypeExists(int id)
-        {
-            return _context.LeaveTypes.Any(e => e.Id == id);
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿@model IEnumerable<DataAccess.Models.Entity.LeaveType>
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 <div class="row">
@@ -16,6 +14,7 @@
                 <div class="pull-right">
                     @Html.ButtonCreateNew("LeaveType")
                     @Html.ButtonImport("LeaveType")
+                    @Html.ButtonExport("LeaveType")
                 </div>
             </div>
             <hr />

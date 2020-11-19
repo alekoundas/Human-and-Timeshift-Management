@@ -18,6 +18,7 @@
                 <div class="pull-right">
                     @Html.ButtonCreateNew("Company")
                     @Html.ButtonImport("Company")
+                    @Html.ButtonExport("Company")
                 </div>
             </div>
             <hr />
@@ -46,7 +47,7 @@
     <div class="col-md-3"> </div>
 
 </div>
-<partial name="_ImportModal" model='new {Entity = "Company" }'>
+<partial name="_ExcelModals" model='new {Entity = "Company" }'>
 
     @section Scripts {
         <script src="~/js/Custom/DatatableDeleteButton.js"></script>

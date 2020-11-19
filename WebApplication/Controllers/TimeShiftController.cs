@@ -1,11 +1,13 @@
-﻿using Bussiness;
+﻿using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +16,7 @@ namespace WebApplication.Controllers
 {
     public class TimeShiftController : MasterController
     {
+        private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         public TimeShiftController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
@@ -123,9 +126,7 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Edit(int id, TimeShift timeShift)
         {
             if (id != timeShift.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -136,14 +137,6 @@ namespace WebApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TimeShiftExists(timeShift.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -151,11 +144,83 @@ namespace WebApplication.Controllers
             return View(timeShift);
         }
 
-
-
-        private bool TimeShiftExists(int id)
+        [HttpGet]
+        public async Task<ActionResult> DownloadExcelTemplate()
         {
-            return _context.TimeShifts.Any(e => e.Id == id);
+            var excelColumns = new List<string>(new string[] {
+                "Title",
+                "Month",
+                "Year",
+                "WorkPlaceId",
+                "IsActive"});
+
+
+            var excelPackage = (await (new ExcelService<TimeShift>(_context)
+             .CreateNewExcel("Employees"))
+             .AddSheetAsync(excelColumns))
+             .CompleteExcel(out var errors);
+
+            if (errors.Count == 0)
+                using (var package = excelPackage)
+                    return File(package.GetAsByteArray(), XlsxContentType, "TimeShifts.xlsx");
+            else
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> DownloadExcelWithData()
+        {
+            var excelColumns = new List<string>(new string[] {
+                "Title",
+                "Month",
+                "Year",
+                "WorkPlaceId",
+                "IsActive"});
+
+
+            var excelPackage = (await (new ExcelService<TimeShift>(_context)
+                .CreateNewExcel("TimeShifts"))
+                .AddSheetAsync(excelColumns, "TimeShifts"))
+                .CompleteExcel(out var errors);
+
+            if (errors.Count == 0)
+                using (var package = excelPackage)
+                    return File(package.GetAsByteArray(), XlsxContentType, "TimeShifts.xlsx");
+            else
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Import(IFormFile ImportExcel)
+        {
+            if (ImportExcel == null)
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
+            else
+            {
+                var timeShifts = (await (await (new ExcelService<TimeShift>(_context)
+                    .ExtractDataFromExcel(ImportExcel)))
+                    .ValidateExtractedData())
+                    .RetrieveExtractedData(out var errors);
+
+                if (errors.Count == 0)
+                {
+                    _baseDataWork.TimeShifts.AddRange(timeShifts);
+                    var status = await _baseDataWork.SaveChangesAsync();
+                    if (status > 0)
+                        TempData["StatusMessage"] = timeShifts.Count +
+                            " εγγραφές προστέθηκαν με επιτυχία";
+                    else
+                        TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+                }
+                else
+                    TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+            }
+
+            return View("Index");
         }
     }
 }
