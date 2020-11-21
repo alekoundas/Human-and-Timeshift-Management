@@ -22,13 +22,16 @@ namespace DataAccess
         public IWorkHourRepository WorkHours { get; private set; }
         public ICustomerRepository Customers { get; private set; }
         public IEmployeeRepository Employees { get; private set; }
+        public IContractRepository Contracts { get; private set; }
         public IWorkplaceRepository WorkPlaces { get; private set; }
         public ITimeShiftRepository TimeShifts { get; private set; }
         public ILeaveTypeRepository LeaveTypes { get; private set; }
+        public IContractTypeRepository ContractTypes { get; private set; }
         public IRealWorkHourRepository RealWorkHours { get; private set; }
         public ISpecializationRepository Specializations { get; private set; }
         public IHourRestrictionRepository HourRestrictions { get; private set; }
         public IEmployeeWorkPlaceRepository EmployeeWorkPlaces { get; private set; }
+        public IContractMembershipRepository ContractMemberships { get; private set; }
         public IWorkPlaceHourRestrictionRepository WorkPlaceHourRestrictions { get; private set; }
 
         public BaseDatawork(BaseDbContext baseDbContext)
@@ -39,13 +42,16 @@ namespace DataAccess
             Customers = new CustomerRepository(_dbcontext);
             Employees = new EmployeeRepository(_dbcontext);
             WorkHours = new WorkHourRepository(_dbcontext);
+            Contracts = new ContractRepository(_dbcontext);
             WorkPlaces = new WorkPlaceRepository(_dbcontext);
             LeaveTypes = new LeaveTypeRepository(_dbcontext);
             TimeShifts = new TimeShiftRepository(_dbcontext);
+            ContractTypes = new ContractTypeRepository(_dbcontext);
             RealWorkHours = new RealWorkHourRepository(_dbcontext);
             Specializations = new SpecializationRepository(_dbcontext);
             HourRestrictions = new HourRestrictionRepository(_dbcontext);
             EmployeeWorkPlaces = new EmployeeWorkPlaceRepository(_dbcontext);
+            ContractMemberships = new ContractMembershipRepository(_dbcontext);
             WorkPlaceHourRestrictions = new WorkPlaceHourRestrictionRepository(_dbcontext);
         }
 

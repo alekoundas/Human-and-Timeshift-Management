@@ -12,8 +12,8 @@ namespace DataAccess.Models.Entity
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "ΑΦΜ")]
         public string Afm { get; set; }
-        [Display(Name = "Περιγραφή")]
 
+        [Display(Name = "Περιγραφή")]
         public string Description { get; set; }
 
 

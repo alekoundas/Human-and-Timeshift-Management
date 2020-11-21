@@ -30,12 +30,18 @@ namespace WebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Seed Data
+
+
             services.AddDbContext<BaseDbContext>(options =>
-               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDbContext<SecurityDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            //Seed Data
+            //var context = services.BuildServiceProvider()
+            //           .GetService<BaseDbContext>();
+            //InitializeBaseData.SeedData(context);
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {

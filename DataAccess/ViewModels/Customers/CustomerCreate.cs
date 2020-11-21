@@ -10,11 +10,11 @@ namespace DataAccess.ViewModels
     {
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Επωνυμία")]
-        public string ΙdentifyingΝame { get; set; }
+        public string IdentifyingName { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "ΑΦΜ")]
-        [CustomerValidateUnique,]
+        [CustomerValidateUnique]
         public string AFM { get; set; }
 
         [Display(Name = "Επάγγελμα")]
@@ -44,7 +44,7 @@ namespace DataAccess.ViewModels
         {
             return new Customer()
             {
-                ΙdentifyingΝame = viewModel.ΙdentifyingΝame,
+                IdentifyingName = viewModel.IdentifyingName,
                 AFM = viewModel.AFM,
                 Address = viewModel.Address,
                 PostalCode = viewModel.PostalCode,

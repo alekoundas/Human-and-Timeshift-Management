@@ -148,8 +148,10 @@ namespace WebApplication.Controllers
                 "Email",
                 "Address",
                 "SpecializationId",
+                "ContractId",
                 "IsActive",
-                "CompanyId" });
+                "CompanyId"
+            });
 
 
             var excelPackage = (await (new ExcelService<Employee>(_context)
@@ -179,8 +181,10 @@ namespace WebApplication.Controllers
                 "Address",
                 "IsActive",
                 "SpecializationId",
+                "ContractId",
                 "IsActive",
-                "CompanyId" });
+                "CompanyId"
+            });
 
 
             var excelPackage = (await (new ExcelService<Employee>(_context)

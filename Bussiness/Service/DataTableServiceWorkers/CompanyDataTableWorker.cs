@@ -69,8 +69,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
         }
 
 
-
-
         public async Task<CompanyDataTableWorker> CompanyIndex()
         {
             var includes = new List<Func<IQueryable<Company>, IIncludableQueryable<Company, object>>>();
@@ -99,24 +97,5 @@ namespace Bussiness.Service.DataTableServiceWorkers
             return this;
         }
 
-        //public CompanyDataTableWorker CompanyIndexDataMap()
-        //{
-        //    var expandoService = new ExpandoService();
-        //    var dataTableHelper = new DataTableHelper<Company>();
-        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-
-        //    foreach (var result in _entities)
-        //    {
-        //        var expandoObj = expandoService.GetCopyFrom<Company>(result);
-        //        var dictionary = (IDictionary<string, object>)expandoObj;
-
-        //        dictionary.Add("Buttons", dataTableHelper.GetButtons("Company", "Companies", result.Id.ToString()));
-
-        //        returnObjects.Add(expandoObj);
-        //    }
-
-        //    EntitiesMapped = returnObjects;
-        //    return this;
-        //}
     }
 }

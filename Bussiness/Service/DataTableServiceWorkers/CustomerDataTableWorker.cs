@@ -56,8 +56,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
             {
                 foreach (var column in _datatable.Columns)
                 {
-                    if (column.Data == "ΙdentifyingΝame")
-                        filter = filter.Or(x => x.ΙdentifyingΝame.Contains(_datatable.Search.Value));
+                    if (column.Data == "IdentifyingName")
+                        filter = filter.Or(x => x.IdentifyingName.Contains(_datatable.Search.Value));
                     if (column.Data == "Profession")
                         filter = filter.Or(x => x.Profession.Contains(_datatable.Search.Value));
                     if (column.Data == "Address")

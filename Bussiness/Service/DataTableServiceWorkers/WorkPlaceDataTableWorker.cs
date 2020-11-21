@@ -64,8 +64,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         filter = filter.Or(x => x.Title.Contains(_datatable.Search.Value));
                     if (column.Data == "Description")
                         filter = filter.Or(x => x.Description.Contains(_datatable.Search.Value));
-                    if (column.Data == "ΙdentifyingΝame")
-                        filter = filter.Or(x => x.Customer.ΙdentifyingΝame.Contains(_datatable.Search.Value));
+                    if (column.Data == "IdentifyingName")
+                        filter = filter.Or(x => x.Customer.IdentifyingName.Contains(_datatable.Search.Value));
                     if (column.Data == "Customer.company.title")
                         filter = filter.Or(x => x.Customer.Company.Title.Contains(_datatable.Search.Value));
                 }
@@ -112,7 +112,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                 dictionary.Add("Buttons", dataTableHelper
                     .GetButtons("WorkPlace", "WorkPlaces", result.Id.ToString()));
-                dictionary.Add("ΙdentifyingΝame", result.Customer?.ΙdentifyingΝame);
+                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
 
                 returnObjects.Add(expandoObj);
             }
@@ -227,7 +227,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(_datatable.GenericId, result.Id);
 
-                dictionary.Add("ΙdentifyingΝame", result.Customer?.ΙdentifyingΝame);
+                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
 
                 if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == _datatable.GenericId))
                     dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -266,7 +266,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(_datatable.GenericId, result.Id);
 
-                dictionary.Add("ΙdentifyingΝame", result.Customer?.ΙdentifyingΝame);
+                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
 
                 if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == _datatable.GenericId))
                     dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -302,7 +302,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                dictionary.Add("ΙdentifyingΝame", result.Customer?.ΙdentifyingΝame);
+                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
 
                 returnObjects.Add(expandoObj);
             }

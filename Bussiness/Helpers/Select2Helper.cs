@@ -58,6 +58,57 @@ namespace Bussiness.Helpers
 
         }
 
+        public Select2Response CreateContractsResponse(IEnumerable<Contract> contracts, bool hasMore)
+        {
+            var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
+            foreach (var result in contracts)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.Title
+                });
+
+            pegination.More = hasMore;
+            return new Select2Response() { Results = results, Pagination = pegination };
+
+        }
+
+        public Select2Response CreateContractTypesResponse(IEnumerable<ContractType> contractTypes, bool hasMore)
+        {
+            var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
+            foreach (var result in contractTypes)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.Name
+                });
+
+            pegination.More = hasMore;
+            return new Select2Response() { Results = results, Pagination = pegination };
+
+        }
+
+        public Select2Response CreateContractMembershipResponse(IEnumerable<ContractMembership> contractTypes, bool hasMore)
+        {
+            var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
+            foreach (var result in contractTypes)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.Name
+                });
+
+            pegination.More = hasMore;
+            return new Select2Response() { Results = results, Pagination = pegination };
+
+        }
+
         public Select2Response CreateCustomersResponse(IEnumerable<Customer> customers, bool hasMore)
         {
             var results = new List<Select2Result>();
@@ -67,7 +118,7 @@ namespace Bussiness.Helpers
                 results.Add(new Select2Result()
                 {
                     id = result.Id,
-                    Text = result.ΙdentifyingΝame
+                    Text = result.IdentifyingName
                 });
 
             pegination.More = hasMore;

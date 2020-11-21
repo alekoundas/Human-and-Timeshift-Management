@@ -25,6 +25,38 @@ namespace DataAccess.Migrations.BaseDb
                 });
 
             migrationBuilder.CreateTable(
+                name: "ContractMemberships",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContractMemberships", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ContractTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContractTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LeaveTypes",
                 columns: table => new
                 {
@@ -65,7 +97,7 @@ namespace DataAccess.Migrations.BaseDb
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    ΙdentifyingΝame = table.Column<string>(nullable: false),
+                    IdentifyingName = table.Column<string>(nullable: false),
                     AFM = table.Column<string>(nullable: false),
                     Profession = table.Column<string>(nullable: true),
                     Address = table.Column<string>(nullable: true),
@@ -86,39 +118,41 @@ namespace DataAccess.Migrations.BaseDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employees",
+                name: "Contracts",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    FirstName = table.Column<string>(nullable: false),
-                    LastName = table.Column<string>(nullable: false),
-                    DateOfBirth = table.Column<DateTime>(nullable: true),
-                    Afm = table.Column<string>(nullable: true),
-                    SocialSecurityNumber = table.Column<string>(nullable: true),
-                    ErpCode = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    Address = table.Column<string>(nullable: true),
-                    SpecializationId = table.Column<int>(nullable: true),
-                    CompanyId = table.Column<int>(nullable: true)
+                    Title = table.Column<string>(nullable: false),
+                    HoursPerWeek = table.Column<int>(nullable: false),
+                    HoursPerDay = table.Column<int>(nullable: false),
+                    WorkingDaysPerWeek = table.Column<int>(nullable: false),
+                    DayOfDaysPerWeek = table.Column<int>(nullable: false),
+                    StartOn = table.Column<DateTime>(nullable: false),
+                    EndOn = table.Column<DateTime>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    GrossSalaryPerHour = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NetSalaryPerHour = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ContractMembershipId = table.Column<int>(nullable: false),
+                    ContractTypeId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.PrimaryKey("PK_Contracts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Employees_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
+                        name: "FK_Contracts_ContractMemberships_ContractMembershipId",
+                        column: x => x.ContractMembershipId,
+                        principalTable: "ContractMemberships",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Employees_Specializations_SpecializationId",
-                        column: x => x.SpecializationId,
-                        principalTable: "Specializations",
+                        name: "FK_Contracts_ContractTypes_ContractTypeId",
+                        column: x => x.ContractTypeId,
+                        principalTable: "ContractTypes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -145,92 +179,47 @@ namespace DataAccess.Migrations.BaseDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "Contacts",
+                name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsActive = table.Column<bool>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    Title = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(nullable: true),
-                    PhoneNumber = table.Column<string>(nullable: false),
-                    EmployeeId = table.Column<int>(nullable: true),
-                    CustomerId = table.Column<int>(nullable: true)
+                    FirstName = table.Column<string>(nullable: false),
+                    LastName = table.Column<string>(nullable: false),
+                    DateOfBirth = table.Column<DateTime>(nullable: true),
+                    Afm = table.Column<string>(nullable: true),
+                    SocialSecurityNumber = table.Column<string>(nullable: true),
+                    ErpCode = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    Address = table.Column<string>(nullable: true),
+                    HireDate = table.Column<DateTime>(nullable: false),
+                    SpecializationId = table.Column<int>(nullable: true),
+                    CompanyId = table.Column<int>(nullable: true),
+                    ContractId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Contacts", x => x.Id);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Contacts_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
+                        name: "FK_Employees_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Employees_Contracts_ContractId",
+                        column: x => x.ContractId,
+                        principalTable: "Contracts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Contacts_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
+                        name: "FK_Employees_Specializations_SpecializationId",
+                        column: x => x.SpecializationId,
+                        principalTable: "Specializations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Leaves",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedOn = table.Column<DateTime>(nullable: false),
-                    StartOn = table.Column<DateTime>(nullable: false),
-                    EndOn = table.Column<DateTime>(nullable: false),
-                    Description = table.Column<string>(nullable: true),
-                    ApprovedBy = table.Column<string>(nullable: true),
-                    EmployeeId = table.Column<int>(nullable: false),
-                    LeaveTypeId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Leaves", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Leaves_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Leaves_LeaveTypes_LeaveTypeId",
-                        column: x => x.LeaveTypeId,
-                        principalTable: "LeaveTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EmployeeWorkPlaces",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedOn = table.Column<DateTime>(nullable: false),
-                    EmployeeId = table.Column<int>(nullable: false),
-                    WorkPlaceId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeWorkPlaces", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_EmployeeWorkPlaces_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EmployeeWorkPlaces_WorkPlaces_WorkPlaceId",
-                        column: x => x.WorkPlaceId,
-                        principalTable: "WorkPlaces",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -275,6 +264,95 @@ namespace DataAccess.Migrations.BaseDb
                         name: "FK_WorkPlaceHourRestrictions_WorkPlaces_WorkPlaceId",
                         column: x => x.WorkPlaceId,
                         principalTable: "WorkPlaces",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Contacts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsActive = table.Column<bool>(nullable: false),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    Title = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: true),
+                    CustomerId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Contacts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Contacts_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Contacts_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmployeeWorkPlaces",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: false),
+                    WorkPlaceId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeWorkPlaces", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeWorkPlaces_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EmployeeWorkPlaces_WorkPlaces_WorkPlaceId",
+                        column: x => x.WorkPlaceId,
+                        principalTable: "WorkPlaces",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Leaves",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    StartOn = table.Column<DateTime>(nullable: false),
+                    EndOn = table.Column<DateTime>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    ApprovedBy = table.Column<string>(nullable: true),
+                    EmployeeId = table.Column<int>(nullable: false),
+                    LeaveTypeId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Leaves", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Leaves_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Leaves_LeaveTypes_LeaveTypeId",
+                        column: x => x.LeaveTypeId,
+                        principalTable: "LeaveTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -386,6 +464,35 @@ namespace DataAccess.Migrations.BaseDb
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ContractMemberships_Name",
+                table: "ContractMemberships",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contracts_ContractMembershipId",
+                table: "Contracts",
+                column: "ContractMembershipId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contracts_ContractTypeId",
+                table: "Contracts",
+                column: "ContractTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contracts_Title",
+                table: "Contracts",
+                column: "Title",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContractTypes_Name",
+                table: "ContractTypes",
+                column: "Name",
+                unique: true,
+                filter: "[Name] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Customers_AFM",
                 table: "Customers",
                 column: "AFM",
@@ -407,6 +514,11 @@ namespace DataAccess.Migrations.BaseDb
                 name: "IX_Employees_CompanyId",
                 table: "Employees",
                 column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_ContractId",
+                table: "Employees",
+                column: "ContractId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_SpecializationId",
@@ -553,10 +665,19 @@ namespace DataAccess.Migrations.BaseDb
                 name: "TimeShifts");
 
             migrationBuilder.DropTable(
+                name: "Contracts");
+
+            migrationBuilder.DropTable(
                 name: "Specializations");
 
             migrationBuilder.DropTable(
                 name: "WorkPlaces");
+
+            migrationBuilder.DropTable(
+                name: "ContractMemberships");
+
+            migrationBuilder.DropTable(
+                name: "ContractTypes");
 
             migrationBuilder.DropTable(
                 name: "Customers");

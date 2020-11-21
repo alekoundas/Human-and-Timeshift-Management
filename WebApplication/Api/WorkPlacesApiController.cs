@@ -388,7 +388,7 @@ namespace WebApplication.Api
         //        {
         //            dictionary.Add("Buttons", dataTableHelper.GetButtons(
         //                "WorkPlace", "WorkPlaces", workplace.Id.ToString()));
-        //            dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
+        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
         //            returnObjects.Add(expandoObj);
         //        }
         //        if (datatable.Predicate == "CustomerDetails")
@@ -424,7 +424,7 @@ namespace WebApplication.Api
         //            var apiUrl = UrlHelper.EmployeeWorkPlace(datatable.GenericId,
         //                workplace.Id);
 
-        //            dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
+        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
 
         //            if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
         //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -440,7 +440,7 @@ namespace WebApplication.Api
         //            var apiUrl = UrlHelper.EmployeeWorkPlace(datatable.GenericId,
         //                workplace.Id);
 
-        //            dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
+        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
 
         //            if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
         //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -453,7 +453,7 @@ namespace WebApplication.Api
         //        }
         //        else if (datatable.Predicate == "TimeShiftIndex")
         //        {
-        //            dictionary.Add("ΙdentifyingΝame", workplace.Customer?.ΙdentifyingΝame);
+        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
         //            returnObjects.Add(expandoObj);
         //        }
         //        else if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
@@ -524,8 +524,8 @@ namespace WebApplication.Api
         //                filter = filter.Or(x => x.Title.Contains(datatable.Search.Value));
         //            if (column.Data == "Description")
         //                filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
-        //            if (column.Data == "ΙdentifyingΝame")
-        //                filter = filter.Or(x => x.Customer.ΙdentifyingΝame.Contains(datatable.Search.Value));
+        //            if (column.Data == "IdentifyingName")
+        //                filter = filter.Or(x => x.Customer.IdentifyingName.Contains(datatable.Search.Value));
         //            if (column.Data == "Customer.company.title")
         //                filter = filter.Or(x => x.Customer.Company.Title.Contains(datatable.Search.Value));
         //        }

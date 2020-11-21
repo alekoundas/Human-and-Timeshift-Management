@@ -28,8 +28,13 @@ namespace DataAccess.Models.Entity
         public string ErpCode { get; set; }
 
         public string Email { get; set; }
+
         [Display(Name = "Διεύθυνση")]
         public string Address { get; set; }
+
+        [Required]
+        [Display(Name = "Ημερομηνία πρόσληψης")]
+        public DateTime HireDate { get; set; }
 
 
         [Display(Name = "Ειδικότητα")]
@@ -53,6 +58,9 @@ namespace DataAccess.Models.Entity
 
         public ICollection<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
         public ICollection<Leave> Leaves { get; set; }
+
+        public int? ContractId { get; set; }
+        public Contract Contract { get; set; }
 
         [NotMapped]
         public string FullName { get { return FirstName + " - " + LastName; } }

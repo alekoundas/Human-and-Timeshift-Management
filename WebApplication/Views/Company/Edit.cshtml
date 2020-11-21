@@ -1,8 +1,6 @@
 ﻿@model DataAccess.Models.Entity.Company
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -20,6 +18,9 @@
 
             <form asp-controller="Company" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="IsActive" />
+
 
                 <div class="box-body">
 
@@ -34,7 +35,7 @@
                     <div class="form-group">
                         <label asp-for="Afm" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Afm" class="form-control" />
+                            <input asp-for="Afm" class="form-control" readonly="readonly" />
                             <span asp-validation-for="Afm" class="text-danger"></span>
                         </div>
                     </div>
@@ -105,7 +106,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-<script>
+    <script>
 
          $('#CompanyEmployeesDatatable').DataTable({
              serverSide: true,
@@ -232,7 +233,7 @@
                     });
                 },
             });
-</script>
+    </script>
 
     <script>
 

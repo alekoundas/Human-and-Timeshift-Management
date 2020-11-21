@@ -4,6 +4,7 @@ namespace DataAccess.DataAnnotation.Unique
 {
     public class CustomerValidateUnique : ValidationAttribute
     {
+
         protected override ValidationResult IsValid(
             object value, ValidationContext validationContext)
         {

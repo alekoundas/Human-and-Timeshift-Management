@@ -18,6 +18,9 @@
 
             <form asp-controller="TimeShift" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="IsActive" />
+
 
                 <div class="box-body">
 
@@ -33,7 +36,7 @@
                     <div class="form-group">
                         <label asp-for="Year" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Year" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="Year" class="form-control" readonly="readonly" />
                             <input asp-for="Year" class="form-control hidden" />
                             <span asp-validation-for="Year" class="text-danger"></span>
                         </div>
@@ -42,7 +45,7 @@
                     <div class="form-group">
                         <label asp-for="Month" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Month" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="Month" class="form-control" readonly="readonly" />
                             <input asp-for="Month" class="form-control hidden" />
                             <span asp-validation-for="Month" class="text-danger"></span>
                         </div>
@@ -51,7 +54,7 @@
                     <div class="form-group">
                         <label asp-for="WorkPlaceId" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="WorkPlace.Title" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="WorkPlace.Title" class="form-control" readonly="readonly" />
                             <input asp-for="WorkPlaceId" class="form-control hidden" />
                         </div>
                     </div>

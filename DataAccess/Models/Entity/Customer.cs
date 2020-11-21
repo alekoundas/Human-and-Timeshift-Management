@@ -8,7 +8,7 @@ namespace DataAccess.Models.Entity
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Επωνυμία")]
-        public string ΙdentifyingΝame { get; set; }
+        public string IdentifyingName { get; set; }
 
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "ΑΦΜ")]

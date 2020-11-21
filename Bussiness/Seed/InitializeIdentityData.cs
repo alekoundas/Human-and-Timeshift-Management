@@ -36,6 +36,27 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
 
+                    //Contract
+                    userManager.AddToRoleAsync(user, "Contract_View").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Delete").Wait();
+
+                    //ContractType
+                    userManager.AddToRoleAsync(user, "ContractType_View").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Create").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Delete").Wait();
+
+                    //ContractMembership
+                    userManager.AddToRoleAsync(user, "ContractMembership_View").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Create").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Delete").Wait();
+
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
@@ -141,6 +162,27 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
 
+                    //Contract
+                    userManager.AddToRoleAsync(user, "Contract_View").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Create").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Delete").Wait();
+
+                    //ContractType
+                    userManager.AddToRoleAsync(user, "ContractType_View").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Create").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Delete").Wait();
+
+                    //ContractMembership
+                    userManager.AddToRoleAsync(user, "ContractMembership_View").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Create").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Delete").Wait();
+
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
                     userManager.AddToRoleAsync(user, "User_Create").Wait();
@@ -231,6 +273,27 @@ namespace Business.Seed
             CreateRole(roleManager, "Employee", "Υπάλλήλου", "Edit");
             CreateRole(roleManager, "Employee", "Υπάλλήλου", "Deactivate");
             CreateRole(roleManager, "Employee", "Υπάλλήλου", "Delete");
+
+            //Contract
+            CreateRole(roleManager, "Contract", "Σύμβαση", "View");
+            CreateRole(roleManager, "Contract", "Σύμβαση", "Create");
+            CreateRole(roleManager, "Contract", "Σύμβαση", "Edit");
+            CreateRole(roleManager, "Contract", "Σύμβαση", "Deactivate");
+            CreateRole(roleManager, "Contract", "Σύμβαση", "Delete");
+
+            //ContractType
+            CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "View");
+            CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Create");
+            CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Edit");
+            CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Deactivate");
+            CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Delete");
+
+            //ContractMembership
+            CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "View");
+            CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Create");
+            CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Edit");
+            CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Deactivate");
+            CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Delete");
 
             //User
             CreateRole(roleManager, "User", "Χρήστη", "View");

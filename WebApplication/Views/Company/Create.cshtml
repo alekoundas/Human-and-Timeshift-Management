@@ -1,8 +1,6 @@
 ﻿@model DataAccess.ViewModels.CompanyCreate
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -34,7 +32,7 @@
                     <div class="form-group">
                         <label asp-for="Afm" class="control-label"></label>
                         <div class="input-group">
-                            <textarea asp-for="Afm" class="form-control"></textarea>
+                            <input asp-for="Afm" class="form-control" />
                             <span asp-validation-for="Afm" class="text-danger"></span>
                         </div>
                     </div>
@@ -42,7 +40,7 @@
                     <div class="form-group">
                         <label asp-for="Description" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Description" class="form-control" />
+                            <textarea asp-for="Description" class="form-control"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                     </div>

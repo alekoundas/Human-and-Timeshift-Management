@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20201118160030_InitializeDb")]
+    [Migration("20201121140915_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,6 +95,124 @@ namespace DataAccess.Migrations.BaseDb
                     b.ToTable("Contacts");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Entity.Contract", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ContractMembershipId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContractTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DayOfDaysPerWeek")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("GrossSalaryPerHour")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("HoursPerDay")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HoursPerWeek")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("NetSalaryPerHour")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("WorkingDaysPerWeek")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractMembershipId");
+
+                    b.HasIndex("ContractTypeId");
+
+                    b.HasIndex("Title")
+                        .IsUnique();
+
+                    b.ToTable("Contracts");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.ContractMembership", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("ContractMemberships");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.ContractType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
+
+                    b.ToTable("ContractTypes");
+                });
+
             modelBuilder.Entity("DataAccess.Models.Entity.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -121,6 +239,10 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("IdentifyingName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -128,10 +250,6 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Profession")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ΙdentifyingΝame")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -160,6 +278,9 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<int?>("CompanyId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ContractId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -175,6 +296,9 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("HireDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -196,6 +320,8 @@ namespace DataAccess.Migrations.BaseDb
                         .HasFilter("[Afm] IS NOT NULL");
 
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("ContractId");
 
                     b.HasIndex("SpecializationId");
 
@@ -542,6 +668,21 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("EmployeeId");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Entity.Contract", b =>
+                {
+                    b.HasOne("DataAccess.Models.Entity.ContractMembership", "ContractMembership")
+                        .WithMany()
+                        .HasForeignKey("ContractMembershipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Models.Entity.ContractType", "ContractType")
+                        .WithMany()
+                        .HasForeignKey("ContractTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("DataAccess.Models.Entity.Customer", b =>
                 {
                     b.HasOne("DataAccess.Models.Entity.Company", "Company")
@@ -555,6 +696,10 @@ namespace DataAccess.Migrations.BaseDb
                         .WithMany("Employees")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DataAccess.Models.Entity.Contract", "Contract")
+                        .WithMany()
+                        .HasForeignKey("ContractId");
 
                     b.HasOne("DataAccess.Models.Entity.Specialization", "Specialization")
                         .WithMany()

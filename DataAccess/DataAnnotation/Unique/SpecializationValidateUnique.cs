@@ -2,6 +2,7 @@
 
 namespace DataAccess.DataAnnotation.Unique
 {
+
     public class SpecializationValidateUnique : ValidationAttribute
     {
         protected override ValidationResult IsValid(

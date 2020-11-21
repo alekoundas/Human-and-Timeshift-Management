@@ -10,9 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
-namespace WebApplication.Controllers
+namespace WebApplication.Api
 {
     [Route("api/companies")]
     [ApiController]
@@ -167,34 +166,34 @@ namespace WebApplication.Controllers
                 .ConvertData<Company>())
                 .CompleteResponse<Company>();
             return Ok(results);
-
-            //var pageSize = datatable.Length;
-            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            //var orderDirection = datatable.Order[0].Dir;
-            //var filter = PredicateBuilder.New<Company>();
-            //filter = filter.And(GetSearchFilter(datatable));
-            //var includes = new List<Func<IQueryable<Company>, IIncludableQueryable<Company, object>>>();
-
-            //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Company>(HttpContext);
-
-            //if (!canShowDeactivated)
-            //    filter = filter.And(x => x.IsActive == true);
-
-            //var companies = new List<Company>();
-            //if (datatable.Predicate == "CompanyIndex")
-            //{
-            //    companies = await _baseDataWork.Companies.GetPaggingWithFilter(
-            //        SetOrderBy(columnName, orderDirection), filter, includes,
-            //            pageSize, pageIndex);
-            //}
-
-            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
-            //var total = await _baseDataWork.Companies.CountAllAsyncFiltered(filter);
-            //var mapedData = await MapResults(companies, datatable);
-
-            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
+        //var pageSize = datatable.Length;
+        //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
+        //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
+        //var orderDirection = datatable.Order[0].Dir;
+        //var filter = PredicateBuilder.New<Company>();
+        //filter = filter.And(GetSearchFilter(datatable));
+        //var includes = new List<Func<IQueryable<Company>, IIncludableQueryable<Company, object>>>();
+
+        //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Company>(HttpContext);
+
+        //if (!canShowDeactivated)
+        //    filter = filter.And(x => x.IsActive == true);
+
+        //var companies = new List<Company>();
+        //if (datatable.Predicate == "CompanyIndex")
+        //{
+        //    companies = await _baseDataWork.Companies.GetPaggingWithFilter(
+        //        SetOrderBy(columnName, orderDirection), filter, includes,
+        //            pageSize, pageIndex);
+        //}
+
+        //var dataTableHelper = new DataTableHelper<ExpandoObject>();
+        //var total = await _baseDataWork.Companies.CountAllAsyncFiltered(filter);
+        //var mapedData = await MapResults(companies, datatable);
+
+        //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
+        //}
 
         //protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<Company> results, Datatable datatable)
         //{

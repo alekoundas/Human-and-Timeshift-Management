@@ -46,7 +46,7 @@ namespace WebApplication.Api
             {
                 response.IsSuccessful = true;
                 response.ResponseBody = "Ο πελάτης " +
-                    customer.ΙdentifyingΝame +
+                    customer.IdentifyingName +
                     (customer.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
                     "με επιτυχία.";
             }
@@ -54,7 +54,7 @@ namespace WebApplication.Api
             {
                 response.IsSuccessful = false;
                 response.ResponseBody = "Ωχ! Ο πελάτης " +
-                     customer.ΙdentifyingΝame +
+                     customer.IdentifyingName +
                     " ΔΕΝ " +
                     (customer.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
                     "με επιτυχία";
@@ -107,7 +107,7 @@ namespace WebApplication.Api
             {
                 response.IsSuccessful = true;
                 response.ResponseBody = "Ο πελάτης " +
-                    customer.ΙdentifyingΝame +
+                    customer.IdentifyingName +
                     " διαγράφηκε με επιτυχία" +
                     "Επίσης διαγράφηκαν για αυτον τον πελάτη: " +
                     " Πόστα:" + customerWorkPlaces.Count().ToString() +
@@ -121,7 +121,7 @@ namespace WebApplication.Api
             {
                 response.IsSuccessful = false;
                 response.ResponseBody = "Ωχ! Ο πελάτης " +
-                    customer.ΙdentifyingΝame +
+                    customer.IdentifyingName +
                     " ΔΕΝ διαγράφηκε!";
             }
 
@@ -150,7 +150,7 @@ namespace WebApplication.Api
                     .GetPaggingWithFilter(null, null, null, 10, page);
             else
             {
-                filter = filter.And(x => x.ΙdentifyingΝame.Contains(search));
+                filter = filter.And(x => x.IdentifyingName.Contains(search));
 
                 customers = await _baseDataWork.Customers
                     .GetPaggingWithFilter(null, filter, null, 10, page);
@@ -236,8 +236,8 @@ namespace WebApplication.Api
         //    {
         //        foreach (var column in datatable.Columns)
         //        {
-        //            if (column.Data == "ΙdentifyingΝame")
-        //                filter = filter.Or(x => x.ΙdentifyingΝame.Contains(datatable.Search.Value));
+        //            if (column.Data == "IdentifyingName")
+        //                filter = filter.Or(x => x.IdentifyingName.Contains(datatable.Search.Value));
         //            if (column.Data == "Profession")
         //                filter = filter.Or(x => x.Profession.Contains(datatable.Search.Value));
         //            if (column.Data == "Address")

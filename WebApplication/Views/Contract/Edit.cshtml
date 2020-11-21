@@ -1,0 +1,185 @@
+﻿@model DataAccess.Models.Entity.Contract
+
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+
+<div class="row">
+    <div class="col-md-1"> </div>
+    <div class="col-md-4">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonBackToList("Employee")
+                </div>
+            </div>
+
+            <hr />
+
+            <form asp-controller="Contract" asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="box-body">
+
+
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Title" class="form-control" readonly="readonly" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="HoursPerWeek" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="HoursPerWeek" class="form-control"></input>
+                            <span asp-validation-for="HoursPerWeek" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="HoursPerDay" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="HoursPerDay" class="form-control"></input>
+                            <span asp-validation-for="HoursPerDay" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="GrossSalaryPerHour" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="GrossSalaryPerHour" class="form-control"></input>
+                            <span asp-validation-for="GrossSalaryPerHour" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="NetSalaryPerHour" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="NetSalaryPerHour" class="form-control"></input>
+                            <span asp-validation-for="NetSalaryPerHour" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="ContractMembershipId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="Specialization_Select2" asp-for="ContractMembershipId" style="width:50%">
+                                @if (Model.ContractMembership != null)
+                                {
+                    <option value="@Model.ContractMembershipId" selected="selected">@Model.ContractMembership.Name</option>
+}
+                            </select>
+                            <span asp-validation-for="ContractMembershipId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ContractTypeId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="Company_Select2" asp-for="ContractTypeId" style="width:50%">
+                                @if (Model.ContractType != null)
+                                {
+                    <option value="@Model.ContractTypeId" selected="selected">@Model.ContractType.Name</option>
+}
+                            </select>
+                            <span asp-validation-for="ContractTypeId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="StartOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="StartOn" type="text" class="form-control"></input>
+                            <span asp-validation-for="StartOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="EndOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="EndOn" type="text" class="form-control"></input>
+                            <span asp-validation-for="EndOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <div class="input-group">
+                            <textarea asp-for="Description" class="form-control"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-1"> </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+
+    <script>
+        $('.ContractMembership_Select2').select2({
+            allowClear: true,
+            ajax: {
+                url: '/api/ContractMemberships/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
+        $('.ContractType_Select2').select2({
+            allowClear: true,
+            ajax: {
+                url: '/api/contractTypes/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
+        $('#HireDate').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showHeader: true,
+            showButtons: true,
+            singleDate: true,
+            startDate: Date.now(),
+            endDate: Date.now(),
+            format: "DD/MM/YYYY",
+            calendarCount: 1,
+            locale: "el",
+            showOn: "right",
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        })
+    </script>
+
+}

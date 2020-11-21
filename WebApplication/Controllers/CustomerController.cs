@@ -69,7 +69,7 @@ namespace WebApplication.Controllers
                 var status = await _baseDataWork.SaveChangesAsync();
                 if (status > 0)
                     TempData["StatusMessage"] = "Ο πελάτης " +
-                        customer.ΙdentifyingΝame +
+                        customer.IdentifyingName +
                     " δημιουργήθηκε με επιτυχία";
                 else
                     TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
@@ -125,7 +125,7 @@ namespace WebApplication.Controllers
         public async Task<ActionResult> DownloadExcelTemplate()
         {
             var excelColumns = new List<string>(new string[] {
-                "ΙdentifyingΝame",
+                "IdentifyingName",
                 "AFM",
                 "Profession",
                 "Address",
@@ -133,7 +133,8 @@ namespace WebApplication.Controllers
                 "DOY",
                 "Description",
                 "IsActive",
-                "CompanyId" });
+                "CompanyId"
+            });
 
             var excelPackage = (await (new ExcelService<Customer>(_context)
                .CreateNewExcel("Customers"))
@@ -154,7 +155,7 @@ namespace WebApplication.Controllers
         public async Task<ActionResult> DownloadExcelWithData()
         {
             var excelColumns = new List<string>(new string[] {
-                "ΙdentifyingΝame",
+                "IdentifyingName",
                 "AFM",
                 "Profession",
                 "Address",
@@ -162,7 +163,8 @@ namespace WebApplication.Controllers
                 "DOY",
                 "Description",
                 "IsActive",
-                "CompanyId" });
+                "CompanyId"
+            });
 
             var excelPackage = (await (new ExcelService<Customer>(_context)
            .CreateNewExcel("Customers"))

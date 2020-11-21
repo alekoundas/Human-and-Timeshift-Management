@@ -1,8 +1,6 @@
 ﻿@model DataAccess.Models.Entity.LeaveType
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -22,13 +20,15 @@
             <form asp-controller="Specialization" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="IsActive" />
+
 
                 <div class="box-body">
 
                     <div class="form-group">
                         <label asp-for="Name" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Name" class="form-control" />
+                            <input asp-for="Name" class="form-control" readonly="readonly" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                     <div class="form-group">
                         <label asp-for="Description" class="control-label"></label>
                         <div class="input-group">
-                            <textarea asp-for="Description" class="form-control" ></textarea>
+                            <textarea asp-for="Description" class="form-control"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                     </div>

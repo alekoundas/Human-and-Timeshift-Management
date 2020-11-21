@@ -46,7 +46,7 @@ namespace Bussiness.Service
             foreach (var colTitle in colTitles)
             {
                 _worksheet.Cells[rowCount, colCount++].Value = colTitle;
-                if (colTitle.Contains("Id"))
+                if (colTitle.EndsWith("Id"))
                     await GetLookUpAsync(colTitle, colCount - 1);
                 else if (colTitle.Contains("IsActive"))
                     GetIsActive(colTitle, colCount - 1);
@@ -189,6 +189,45 @@ namespace Bussiness.Service
                             AddError("Name", "Validation");
                     }
                     break;
+                case "Contract":
+                    foreach (var exportedInstance in _exportedInstances)
+                    {
+                        var title = (exportedInstance.GetType().GetProperty("Title"))
+                            .GetValue(exportedInstance);
+
+                        hasValidationError = _baseDataWork.Contracts
+                            .Any(x => x.Title.Trim() == title.ToString().Trim());
+
+                        if (hasValidationError)
+                            AddError("Title", "Validation");
+                    }
+                    break;
+                case "ContractType":
+                    foreach (var exportedInstance in _exportedInstances)
+                    {
+                        var Name = (exportedInstance.GetType().GetProperty("Name"))
+                            .GetValue(exportedInstance);
+
+                        hasValidationError = _baseDataWork.ContractTypes
+                            .Any(x => x.Name.Trim() == Name.ToString().Trim());
+
+                        if (hasValidationError)
+                            AddError("Name", "Validation");
+                    }
+                    break;
+                case "ContractMembership":
+                    foreach (var exportedInstance in _exportedInstances)
+                    {
+                        var Name = (exportedInstance.GetType().GetProperty("Name"))
+                            .GetValue(exportedInstance);
+
+                        hasValidationError = _baseDataWork.ContractMemberships
+                            .Any(x => x.Name.Trim() == Name.ToString().Trim());
+
+                        if (hasValidationError)
+                            AddError("Name", "Validation");
+                    }
+                    break;
                 default:
                     AddError("error", "error");
                     break;
@@ -219,7 +258,7 @@ namespace Bussiness.Service
                             genericEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
 
                             for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                                if (worksheet.Cells[1, j].Value.ToString().Contains("Id"))//Filter integers
+                                if (worksheet.Cells[1, j].Value.ToString().EndsWith("Id"))//Filter integers
                                     genericEntityInstance
                                         .GetType()
                                         .GetProperty(worksheet.Cells[1, j].Value.ToString())
@@ -247,6 +286,7 @@ namespace Bussiness.Service
             }
             return this;
         }
+
         private async Task<int> GetIdForEntity(ExcelWorksheet worksheet, int row, int column)
         {
             var id = 0;
@@ -266,7 +306,7 @@ namespace Bussiness.Service
                 var afm = excelCellValue.Split("_")[0].Split(":")[1];
                 var identifyingName = excelCellValue.Split("_")[1].Split(":")[1];
                 id = (await _baseDataWork.Customers
-                    .FirstAsync(x => x.AFM == afm && x.ΙdentifyingΝame == identifyingName))
+                    .FirstAsync(x => x.AFM == afm && x.IdentifyingName == identifyingName))
                     .Id;
             }
             if (entityName == "Employee")
@@ -287,6 +327,35 @@ namespace Bussiness.Service
             {
                 var name = excelCellValue.Split("_")[0].Split(":")[1];
                 id = (await _baseDataWork.LeaveTypes
+                    .FirstAsync(x => x.Name == name))
+                    .Id;
+            }
+            if (entityName == "WorkPlace")
+            {
+                var title = excelCellValue.Split("_")[0].Split(":")[1];
+                var customerAFM = excelCellValue.Split("_")[1].Split(":")[1];
+                id = (await _baseDataWork.WorkPlaces
+                    .FirstAsync(x => x.Title == title && x.Customer.AFM == customerAFM))
+                    .Id;
+            }
+            if (entityName == "Contract")
+            {
+                var title = excelCellValue.Split("_")[0].Split(":")[1];
+                id = (await _baseDataWork.Contracts
+                    .FirstAsync(x => x.Title == title))
+                    .Id;
+            }
+            if (entityName == "ContractType")
+            {
+                var name = excelCellValue.Split("_")[0].Split(":")[1];
+                id = (await _baseDataWork.ContractTypes
+                    .FirstAsync(x => x.Name == name))
+                    .Id;
+            }
+            if (entityName == "ContractMembership")
+            {
+                var name = excelCellValue.Split("_")[0].Split(":")[1];
+                id = (await _baseDataWork.ContractMemberships
                     .FirstAsync(x => x.Name == name))
                     .Id;
             }
@@ -333,13 +402,21 @@ namespace Bussiness.Service
             if (colTitle == "CompanyId")
                 response = await _baseDataWork.Companies.SelectAllAsync(x => "[Afm]:" + x.Afm + "_[Title]:" + x.Title);
             else if (colTitle == "CustomerId")
-                response = await _baseDataWork.Customers.SelectAllAsync(x => "[AFM]:" + x.AFM + "_[ΙdentifyingΝame]:" + x.ΙdentifyingΝame);
+                response = await _baseDataWork.Customers.SelectAllAsync(x => "[AFM]:" + x.AFM + "_[IdentifyingName]:" + x.IdentifyingName);
             else if (colTitle == "EmployeeId")
                 response = await _baseDataWork.Employees.SelectAllAsync(x => "[AFM]:" + x.Afm + "_[FullName]:" + x.FullName);
             else if (colTitle == "SpecializationId")
                 response = await _baseDataWork.Specializations.SelectAllAsync(x => "[Name]:" + x.Name);
             else if (colTitle == "LeaveTypeId")
                 response = await _baseDataWork.LeaveTypes.SelectAllAsync(x => "[Name]:" + x.Name);
+            else if (colTitle == "WorkPlaceId")
+                response = await _baseDataWork.WorkPlaces.SelectAllAsync(x => "[Title]:" + x.Title + "_[CustomerAFM]:" + x.Customer.AFM);
+            else if (colTitle == "ContractId")
+                response = await _baseDataWork.Contracts.SelectAllAsync(x => "[Title]:" + x.Title);
+            else if (colTitle == "ContractTypeId")
+                response = await _baseDataWork.ContractTypes.SelectAllAsync(x => "[Name]:" + x.Name);
+            else if (colTitle == "ContractMembershipId")
+                response = await _baseDataWork.ContractMemberships.SelectAllAsync(x => "[Name]:" + x.Name);
 
             if (response.Count == 0)
                 AddError(colTitle, "LookupEmpty");

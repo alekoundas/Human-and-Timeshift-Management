@@ -10,9 +10,11 @@ namespace DataAccess.Models.Entity
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Τίτλος")]
         public string Title { get; set; }
+
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Μήνας")]
         public int Month { get; set; }
+
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Έτος")]
         public int Year { get; set; }
@@ -20,8 +22,11 @@ namespace DataAccess.Models.Entity
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Πόστο")]
         public int WorkPlaceId { get; set; }
+
         public WorkPlace WorkPlace { get; set; }
+
         public ICollection<WorkHour> WorkHours { get; set; }
+
         public ICollection<RealWorkHour> RealWorkHours { get; set; }
 
 

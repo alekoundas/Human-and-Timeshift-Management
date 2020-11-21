@@ -33,24 +33,29 @@ namespace DataAccess.ViewModels
         [Display(Name = "Διεύθυνση")]
         public string Address { get; set; }
 
+        [Required]
+        [Display(Name = "Ημερομηνία πρόσληψης")]
+        public DateTime HireDate { get; set; }
+
 
         [Display(Name = "Ειδικότητα")]
         public int? SpecializationId { get; set; }
         public Specialization Specialization { get; set; }
 
-
         [Display(Name = "Εταιρία")]
         public int? CompanyId { get; set; }
         public Company Company { get; set; }
 
+        [Display(Name = "Σύμβαση")]
+        public int? ContractId { get; set; }
+        public Contract Contract { get; set; }
 
         [Display(Name = "Επαφές")]
         public ICollection<Contact> Contacts { get; set; }
 
 
-        public static Employee CreateFrom(EmployeeCreate viewModel)
-        {
-            return new Employee()
+        public static Employee CreateFrom(EmployeeCreate viewModel) =>
+            new Employee()
             {
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
@@ -61,11 +66,11 @@ namespace DataAccess.ViewModels
                 SocialSecurityNumber = viewModel.SocialSecurityNumber,
                 SpecializationId = viewModel.SpecializationId,
                 CompanyId = viewModel.CompanyId,
-                Contacts = viewModel.Contacts,
+                ContractId = viewModel.ContractId,
                 Address = viewModel.Address,
+                HireDate = viewModel.HireDate,
                 IsActive = true,
                 CreatedOn = DateTime.Now
             };
-        }
     }
 }

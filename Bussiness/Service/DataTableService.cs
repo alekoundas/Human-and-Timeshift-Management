@@ -36,6 +36,15 @@ namespace Bussiness.Service
                 case "Company":
                     _currentWorker = new CompanyDataTableWorker(_datatable, _baseDatawork, _httpContext);
                     break;
+                case "Contract":
+                    _currentWorker = new ContractDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                    break;
+                case "ContractType":
+                    _currentWorker = new ContractTypeDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                    break;
+                case "ContractMembership":
+                    _currentWorker = new ContractMembershipDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                    break;
                 case "Employee":
                     _currentWorker = new EmployeeDataTableWorker(_datatable, _baseDatawork, _httpContext);
                     break;

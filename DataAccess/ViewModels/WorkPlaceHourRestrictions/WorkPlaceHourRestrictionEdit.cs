@@ -47,6 +47,7 @@ namespace DataAccess.ViewModels
                 WorkPlaceId = viewModel.WorkPlaceId,
                 HourRestrictions = HourRestrictionEdit.CreateFrom(viewModel.HourRestrictions),
                 CreatedOn = DateTime.Now
+
             };
         }
 
