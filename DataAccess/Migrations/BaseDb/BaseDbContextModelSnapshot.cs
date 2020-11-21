@@ -200,13 +200,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasFilter("[Name] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("ContractTypes");
                 });
@@ -659,25 +659,27 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     b.HasOne("DataAccess.Models.Entity.Customer", "Customer")
                         .WithMany("Contacts")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("DataAccess.Models.Entity.Employee", "Employee")
                         .WithMany("Contacts")
-                        .HasForeignKey("EmployeeId");
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Contract", b =>
                 {
                     b.HasOne("DataAccess.Models.Entity.ContractMembership", "ContractMembership")
-                        .WithMany()
+                        .WithMany("Contracts")
                         .HasForeignKey("ContractMembershipId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DataAccess.Models.Entity.ContractType", "ContractType")
-                        .WithMany()
+                        .WithMany("Contracts")
                         .HasForeignKey("ContractTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -685,7 +687,8 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     b.HasOne("DataAccess.Models.Entity.Company", "Company")
                         .WithMany("Customers")
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Employee", b =>
@@ -693,15 +696,17 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasOne("DataAccess.Models.Entity.Company", "Company")
                         .WithMany("Employees")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("DataAccess.Models.Entity.Contract", "Contract")
-                        .WithMany()
-                        .HasForeignKey("ContractId");
+                        .WithMany("Employees")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("DataAccess.Models.Entity.Specialization", "Specialization")
-                        .WithMany()
-                        .HasForeignKey("SpecializationId");
+                        .WithMany("Employees")
+                        .HasForeignKey("SpecializationId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkPlace", b =>
@@ -737,9 +742,9 @@ namespace DataAccess.Migrations.BaseDb
                         .IsRequired();
 
                     b.HasOne("DataAccess.Models.Entity.LeaveType", "LeaveType")
-                        .WithMany()
+                        .WithMany("Leaves")
                         .HasForeignKey("LeaveTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -786,7 +791,8 @@ namespace DataAccess.Migrations.BaseDb
                 {
                     b.HasOne("DataAccess.Models.Entity.Customer", "Customer")
                         .WithMany("WorkPlaces")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.WorkPlaceHourRestriction", b =>

@@ -8,7 +8,6 @@ using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApplication.Api
@@ -73,17 +72,6 @@ namespace WebApplication.Api
             if (company == null)
                 return NotFound();
 
-            var companyEmployees = _baseDataWork.Employees
-                .Where(x => x.CompanyId == id).ToList();
-
-            var companyCustomers = _baseDataWork.Customers
-               .Where(x => x.CompanyId == id).ToList();
-
-            companyEmployees.ForEach(x => x.CompanyId = null);
-            companyCustomers.ForEach(x => x.CompanyId = null);
-
-            _baseDataWork.UpdateRange(companyEmployees);
-            _baseDataWork.UpdateRange(companyCustomers);
             _baseDataWork.Companies.Remove(company);
 
             var status = await _context.SaveChangesAsync();

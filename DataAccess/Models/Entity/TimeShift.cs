@@ -22,7 +22,6 @@ namespace DataAccess.Models.Entity
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Πόστο")]
         public int WorkPlaceId { get; set; }
-
         public WorkPlace WorkPlace { get; set; }
 
         public ICollection<WorkHour> WorkHours { get; set; }

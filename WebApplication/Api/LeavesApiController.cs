@@ -110,7 +110,7 @@ namespace WebApplication.Api
 
         // DELETE: api/leaves/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<DeleteViewModel>> DeleteLeave(int id)
+        public async Task<ActionResult<DeleteViewModel>> Delete(int id)
         {
             var response = new DeleteViewModel();
             var leave = await _context.Leaves

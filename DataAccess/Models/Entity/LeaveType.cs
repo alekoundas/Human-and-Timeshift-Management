@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models.Entity
 {
@@ -8,8 +9,10 @@ namespace DataAccess.Models.Entity
         [Display(Name = "Είδος άδειας")]
         public string Name { get; set; }
 
-
         [Display(Name = "Περιγραφή")]
         public string Description { get; set; }
+
+        public ICollection<Leave> Leaves { get; set; }
+
     }
 }

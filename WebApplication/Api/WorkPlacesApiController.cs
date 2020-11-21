@@ -76,7 +76,7 @@ namespace WebApplication.Api
 
         // DELETE: api/workplaces/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<DeleteViewModel>> DeleteWorkPlace(int id)
+        public async Task<ActionResult<DeleteViewModel>> Delete(int id)
         {
             var response = new DeleteViewModel();
             var workPlace = await _context.WorkPlaces
@@ -95,11 +95,6 @@ namespace WebApplication.Api
             var workPlaceTimeShiftsRealWorkHours = workPlace.TimeShifts.SelectMany(x => x.RealWorkHours);
             var workPlaceTimeShiftsWorkHours = workPlace.TimeShifts.SelectMany(x => x.WorkHours);
 
-            _context.WorkHours.RemoveRange(workPlaceTimeShiftsWorkHours);
-            _context.RealWorkHours.RemoveRange(workPlaceTimeShiftsRealWorkHours);
-            _context.TimeShifts.RemoveRange(workPlaceTimeShifts);
-            _context.HourRestrictions.RemoveRange(workPlaceHourRestrictionsHourrestrictions);
-            _context.WorkPlaceHourRestrictions.RemoveRange(workPlaceHourRestrictions);
             _context.WorkPlaces.Remove(workPlace);
             var status = await _context.SaveChangesAsync();
 

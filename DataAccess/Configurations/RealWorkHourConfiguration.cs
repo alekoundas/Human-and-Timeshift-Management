@@ -8,7 +8,19 @@ namespace DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<RealWorkHour> builder)
         {
-            builder.HasIndex(x => new { x.StartOn, x.EndOn, x.EmployeeId }).IsUnique();
+            builder.HasIndex(x => new { x.StartOn, x.EndOn, x.EmployeeId })
+                .IsUnique();
+
+
+            builder.HasOne(x => x.Employee)
+                .WithMany(x => x.RealWorkHours)
+                .HasForeignKey(x => x.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.TimeShift)
+                .WithMany(x => x.RealWorkHours)
+                .HasForeignKey(x => x.TimeShiftId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

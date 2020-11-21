@@ -91,14 +91,6 @@ namespace WebApplication.Api
             if (customer == null)
                 return NotFound();
 
-            _context.WorkHours.RemoveRange(customerTimeShiftsWorHours);
-            _context.RealWorkHours.RemoveRange(customerTimeShiftsRealWorHours);
-            _context.TimeShifts.RemoveRange(customerTimeShifts);
-            _context.HourRestrictions.RemoveRange(customerWorkPlacesWorkHourRestrictionsHourRestictions);
-            _context.WorkPlaceHourRestrictions.RemoveRange(customerWorkPlacesWorkHourRestrictions);
-            _context.Contacts.RemoveRange(customerContacts);
-            _context.WorkPlaces.RemoveRange(customerWorkPlaces);
-            _context.EmployeeWorkPlaces.RemoveRange(customerWorkPlacesEmployeeWorkPlaces);
             _context.Customers.Remove(customer);
 
             var status = await _context.SaveChangesAsync();

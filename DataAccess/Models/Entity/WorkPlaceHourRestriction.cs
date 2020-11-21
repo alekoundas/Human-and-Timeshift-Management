@@ -9,14 +9,15 @@ namespace DataAccess.Models.Entity
         [Display(Name = "Μήνας")]
         public int Month { get; set; }
 
+
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Έτος")]
         public int Year { get; set; }
 
+
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         [Display(Name = "Πόστο")]
         public int WorkPlaceId { get; set; }
-
         public WorkPlace WorkPlace { get; set; }
 
 

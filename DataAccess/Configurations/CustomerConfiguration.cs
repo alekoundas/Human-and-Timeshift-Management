@@ -12,7 +12,8 @@ namespace DataAccess.Configurations
 
             builder.HasOne(x => x.Company)
                .WithMany(x => x.Customers)
-               .HasForeignKey(x => x.CompanyId);
+               .HasForeignKey(x => x.CompanyId)
+               .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

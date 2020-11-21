@@ -15,11 +15,15 @@ namespace DataAccess.Configurations
 
             builder.HasOne(u => u.Employee)
                 .WithMany(u => u.EmployeeWorkPlaces)
+                .HasForeignKey(u => u.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
             builder.HasOne(pt => pt.WorkPlace)
                 .WithMany(p => p.EmployeeWorkPlaces)
-                .HasForeignKey(pt => pt.WorkPlaceId);
+                .HasForeignKey(pt => pt.WorkPlaceId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
 
         }
     }

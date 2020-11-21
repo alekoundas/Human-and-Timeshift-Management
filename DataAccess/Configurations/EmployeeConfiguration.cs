@@ -13,8 +13,17 @@ namespace DataAccess.Configurations
             builder.HasOne(x => x.Company)
                 .WithMany(x => x.Employees)
                 .HasForeignKey(x => x.CompanyId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
 
+            builder.HasOne(x => x.Contract)
+                .WithMany(x => x.Employees)
+                .HasForeignKey(x => x.ContractId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(x => x.Specialization)
+                .WithMany(x => x.Employees)
+                .HasForeignKey(x => x.SpecializationId)
+                .OnDelete(DeleteBehavior.SetNull);
 
         }
     }

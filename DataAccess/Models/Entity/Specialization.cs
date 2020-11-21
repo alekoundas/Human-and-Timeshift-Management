@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity
@@ -14,5 +15,6 @@ namespace DataAccess.Models.Entity
         [Column(TypeName = "decimal(18,2)")]
         public decimal PayPerHour { get; set; }
 
+        public ICollection<Employee> Employees { get; set; }
     }
 }

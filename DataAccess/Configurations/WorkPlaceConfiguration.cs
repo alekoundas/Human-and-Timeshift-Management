@@ -11,8 +11,9 @@ namespace DataAccess.Configurations
             builder.HasIndex(x => new { x.Title, x.CustomerId }).IsUnique();
 
             builder.HasOne(x => x.Customer)
-             .WithMany(x => x.WorkPlaces)
-             .HasForeignKey(x => x.CustomerId);
+                .WithMany(x => x.WorkPlaces)
+                .HasForeignKey(x => x.CustomerId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

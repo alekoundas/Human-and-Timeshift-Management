@@ -96,31 +96,24 @@ namespace WebApplication.Api
 
         // DELETE: api/employees/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<DeleteViewModel>> DeleteEmployee(int id)
+        public async Task<ActionResult<DeleteViewModel>> Delete(int id)
         {
             var response = new DeleteViewModel();
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _context
+                .Employees
+                .Include(x => x.EmployeeWorkPlaces)
+                .Include(x => x.Leaves)
+                .Include(x => x.WorkHours)
+                .Include(x => x.RealWorkHours)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (employee == null)
                 return NotFound();
 
-            var employeeWorkplaces = _baseDataWork.EmployeeWorkPlaces
-                .Where(x => x.EmployeeId == id).ToList();
-
-            var employeeLeaves = _baseDataWork.Leaves
-                .Where(x => x.EmployeeId == id).ToList();
-
-            var employeeWorkHours = _baseDataWork.WorkHours
-                .Where(x => x.EmployeeId == id).ToList();
-
-            var employeeRealWorkHours = _baseDataWork.RealWorkHours
-                .Where(x => x.EmployeeId == id).ToList();
-
-
-            _baseDataWork.EmployeeWorkPlaces.RemoveRange(employeeWorkplaces);
-            _baseDataWork.Leaves.RemoveRange(employeeLeaves);
-            _baseDataWork.WorkHours.RemoveRange(employeeWorkHours);
-            _baseDataWork.RealWorkHours.RemoveRange(employeeRealWorkHours);
+            var employeeWorkplaces = employee.EmployeeWorkPlaces;
+            var employeeLeaves = employee.Leaves;
+            var employeeWorkHours = employee.WorkHours;
+            var employeeRealWorkHours = employee.RealWorkHours;
 
             _baseDataWork.Employees.Remove(employee);
             var status = await _context.SaveChangesAsync();
@@ -145,7 +138,6 @@ namespace WebApplication.Api
                     employee.FullName +
                     " ΔΕΝ διαγράφηκε!";
             }
-
 
             response.ResponseTitle = "Διαγραφή υπαλλήλου";
             response.Entity = employee;

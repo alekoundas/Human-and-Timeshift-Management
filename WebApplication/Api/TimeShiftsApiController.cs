@@ -87,7 +87,10 @@ namespace WebApplication.Api
         public async Task<ActionResult<DeleteViewModel>> DeleteTimeShift(int id)
         {
             var response = new DeleteViewModel();
-            var timeShift = await _context.TimeShifts.Include(x => x.WorkHours).FirstOrDefaultAsync(x => x.Id == id);
+            var timeShift = await _context.TimeShifts
+                .Include(x => x.WorkHours)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (timeShift == null)
                 return NotFound();
 
@@ -103,7 +106,6 @@ namespace WebApplication.Api
                     " διαγράφηκε με επιτυχία." +
                     " Επίσης διαγράφηκαν για αυτο το χρονοδιάγραμμα:" +
                     "Βάρδιες:" + timeShift.WorkHours.Count;
-
             }
             else
             {
@@ -117,8 +119,6 @@ namespace WebApplication.Api
             response.Entity = timeShift;
             return response;
         }
-
-
 
 
         // GET: api/timeshifts/select2

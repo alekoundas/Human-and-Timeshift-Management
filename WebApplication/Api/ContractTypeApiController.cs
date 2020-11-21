@@ -64,49 +64,39 @@ namespace WebApplication.Api
         }
 
         // DELETE: api/ContractTypes/id
-        //[HttpDelete("{id}")]
-        //public async Task<ActionResult<DeleteViewModel>> Delete(int id)
-        //{
-        //    var response = new DeleteViewModel();
-        //    var ContractType = await _context.ContractTypes.FindAsync(id);
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<DeleteViewModel>> Delete(int id)
+        {
+            var response = new DeleteViewModel();
+            var ContractType = await _context.ContractTypes.FindAsync(id);
 
-        //    if (ContractType == null)
-        //        return NotFound();
+            if (ContractType == null)
+                return NotFound();
 
-        //    var companyEmployees = _baseDataWork.Employees
-        //        .Where(x => x.CompanyId == id).ToList();
 
-        //    var companyCustomers = _baseDataWork.Customers
-        //       .Where(x => x.CompanyId == id).ToList();
+            _baseDataWork.ContractTypes.Remove(ContractType);
 
-        //    companyEmployees.ForEach(x => x.CompanyId = null);
-        //    companyCustomers.ForEach(x => x.CompanyId = null);
+            var status = await _context.SaveChangesAsync();
 
-        //    _baseDataWork.UpdateRange(companyEmployees);
-        //    _baseDataWork.UpdateRange(companyCustomers);
-        //    _baseDataWork.Companies.Remove(ContractType);
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Η εταιρία " +
+                    ContractType.Name +
+                    " διαγράφηκε με επιτυχία.";
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Η εταιρία " +
+                    ContractType.Name +
+                    " ΔΕΝ διαγράφηκε!";
+            }
 
-        //    var status = await _context.SaveChangesAsync();
-
-        //    if (status >= 1)
-        //    {
-        //        response.IsSuccessful = true;
-        //        response.ResponseBody = "Η εταιρία " +
-        //            company.Title +
-        //            " διαγράφηκε με επιτυχία.";
-        //    }
-        //    else
-        //    {
-        //        response.IsSuccessful = false;
-        //        response.ResponseBody = "Ωχ! Η εταιρία " +
-        //            company.Title +
-        //            " ΔΕΝ διαγράφηκε!";
-        //    }
-
-        //    response.ResponseTitle = "Διαγραφή εταιρίας";
-        //    response.Entity = company;
-        //    return response;
-        //}
+            response.ResponseTitle = "Διαγραφή εταιρίας";
+            response.Entity = ContractType;
+            return response;
+        }
 
         // GET: api/ContractTypes/select2
         [HttpGet("select2")]

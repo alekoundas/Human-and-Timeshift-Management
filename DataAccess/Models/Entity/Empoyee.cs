@@ -46,6 +46,11 @@ namespace DataAccess.Models.Entity
         public int? CompanyId { get; set; }
         public Company Company { get; set; }
 
+        [Display(Name = "Σύμβαση")]
+        public int? ContractId { get; set; }
+        public Contract Contract { get; set; }
+
+
 
         [Display(Name = "Επαφές")]
         public ICollection<Contact> Contacts { get; set; }
@@ -59,8 +64,6 @@ namespace DataAccess.Models.Entity
         public ICollection<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
         public ICollection<Leave> Leaves { get; set; }
 
-        public int? ContractId { get; set; }
-        public Contract Contract { get; set; }
 
         [NotMapped]
         public string FullName { get { return FirstName + " - " + LastName; } }

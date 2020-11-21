@@ -8,7 +8,19 @@ namespace DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<Leave> builder)
         {
-            builder.HasIndex(x => new { x.StartOn, x.EndOn, x.EmployeeId }).IsUnique();
+            builder
+                .HasIndex(x => new { x.StartOn, x.EndOn, x.EmployeeId })
+                .IsUnique();
+
+            builder.HasOne(x => x.Employee)
+                .WithMany(x => x.Leaves)
+                .HasForeignKey(x => x.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.LeaveType)
+                .WithMany(x => x.Leaves)
+                .HasForeignKey(x => x.LeaveTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

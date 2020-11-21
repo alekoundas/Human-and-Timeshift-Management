@@ -9,6 +9,11 @@ namespace DataAccess.Configurations
         public void Configure(EntityTypeBuilder<HourRestriction> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
+
+            builder.HasOne(x => x.WorkPlaceHourRestriction)
+                .WithMany(x => x.HourRestrictions)
+                .HasForeignKey(x => x.WorkPlaceHourRestrictionId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

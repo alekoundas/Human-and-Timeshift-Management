@@ -38,7 +38,6 @@ namespace WebApplication.Api
             if (workPlaceRestriction == null)
                 return NotFound();
 
-            _context.HourRestrictions.RemoveRange(workPlaceRestriction.HourRestrictions);
             _context.WorkPlaceHourRestrictions.Remove(workPlaceRestriction);
             var status = await _context.SaveChangesAsync();
 

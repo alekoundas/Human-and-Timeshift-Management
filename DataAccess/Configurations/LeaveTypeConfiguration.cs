@@ -9,6 +9,9 @@ namespace DataAccess.Configurations
         public void Configure(EntityTypeBuilder<LeaveType> builder)
         {
             builder.HasIndex(x => x.Name).IsUnique();
+
+
+         
         }
     }
 }

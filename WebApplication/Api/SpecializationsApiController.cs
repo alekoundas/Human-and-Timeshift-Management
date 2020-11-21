@@ -64,7 +64,7 @@ namespace WebApplication.Api
 
         // DELETE: api/specializations/id
         [HttpDelete("{id}")]
-        public async Task<ActionResult<DeleteViewModel>> DeleteSpecialization(int id)
+        public async Task<ActionResult<DeleteViewModel>> Delete(int id)
         {
             var response = new DeleteViewModel();
             var specialization = await _context.Specializations.FindAsync(id);
