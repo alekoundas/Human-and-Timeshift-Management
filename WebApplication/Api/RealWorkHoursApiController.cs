@@ -5,7 +5,6 @@ using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -57,14 +56,10 @@ namespace WebApplication.Api
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _baseDataWork.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RealWorkHourExists(id))
-                    return NotFound();
-                else
-                    throw;
             }
 
             return NoContent();
@@ -75,7 +70,7 @@ namespace WebApplication.Api
         public async Task<ActionResult<RealWorkHour>> PostRealWorkHour(RealWorkHour realWorkHour)
         {
             _context.RealWorkHours.Add(realWorkHour);
-            await _context.SaveChangesAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return CreatedAtAction("GetRealWorkHour", new { id = realWorkHour.Id }, realWorkHour);
         }
@@ -89,7 +84,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _context.RealWorkHours.Remove(realWorkHour);
-            await _context.SaveChangesAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return realWorkHour;
         }
@@ -201,8 +196,7 @@ namespace WebApplication.Api
                         EndOn = realWorkHour.EndOn,
                         Comments = realWorkHour.Comments,
                         TimeShiftId = realWorkHour.TimeShiftId,
-                        EmployeeId = realWorkHour.EmployeeId,
-                        CreatedOn = DateTime.Now
+                        EmployeeId = realWorkHour.EmployeeId
                     });
 
                 }
@@ -226,8 +220,7 @@ namespace WebApplication.Api
                             EndOn = realWorkHour.NewEndOn,
                             TimeShiftId = realWorkHour.TimeShiftId,
                             EmployeeId = realWorkHour.EmployeeId,
-                            Comments = realWorkHour.Comments,
-                            CreatedOn = DateTime.Now
+                            Comments = realWorkHour.Comments
                         });
                     }
                 }
@@ -257,8 +250,7 @@ namespace WebApplication.Api
                         TimeShiftId = realWorkHour.TimeShiftId,
                         EmployeeId = realWorkHour.EmployeeId,
                         IsDayOff = realWorkHour.IsDayOff,
-                        Comments = realWorkHour.Comments,
-                        CreatedOn = DateTime.Now
+                        Comments = realWorkHour.Comments
                     });
                 else
                     realWorkHoursToSaveRange.Add(new RealWorkHour()
@@ -267,8 +259,7 @@ namespace WebApplication.Api
                         EndOn = realWorkHour.EndOn,
                         TimeShiftId = realWorkHour.TimeShiftId,
                         EmployeeId = realWorkHour.EmployeeId,
-                        Comments = realWorkHour.Comments,
-                        CreatedOn = DateTime.Now
+                        Comments = realWorkHour.Comments
                     });
             }
             _baseDataWork.WorkHours.AddRange(workHoursToSaveRange);

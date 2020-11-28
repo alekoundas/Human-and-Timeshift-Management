@@ -1,19 +1,14 @@
 ﻿using Bussiness;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
-using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace WebApplication.Api
@@ -74,7 +69,7 @@ namespace WebApplication.Api
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _baseDataWork.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -100,10 +95,9 @@ namespace WebApplication.Api
                         ApprovedBy = apiLeave.ApprovedBy,
                         Description = apiLeave.Description,
                         EmployeeId = id,
-                        LeaveTypeId = apiLeave.LeaveTypeId,
-                        CreatedOn = DateTime.Now
+                        LeaveTypeId = apiLeave.LeaveTypeId
                     }));
-            await _context.SaveChangesAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return Ok("Success my dudes");
         }
@@ -121,7 +115,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _context.Leaves.Remove(leave);
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {

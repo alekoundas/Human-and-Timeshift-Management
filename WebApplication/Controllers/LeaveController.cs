@@ -1,5 +1,4 @@
-﻿using Bussiness;
-using DataAccess;
+﻿using DataAccess;
 using DataAccess.Models.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -118,7 +117,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(leave);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

@@ -2,7 +2,7 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -70,7 +70,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _context.LeaveTypes.Remove(leaveType);
-            await _context.SaveChangesAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return leaveType;
         }

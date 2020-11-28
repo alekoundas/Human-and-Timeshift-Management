@@ -63,7 +63,6 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CompanyCreate company)
         {
-
             if (ModelState.IsValid)
             {
                 _baseDataWork.Companies.Add(
@@ -111,7 +110,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(company);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -125,7 +124,7 @@ namespace WebApplication.Controllers
         {
             var excelColumns = new List<string>(new string[] {
                 "Title",
-                "Afm",
+                "VatNumber",
                  "IsActive",
                 "Description" });
 
@@ -147,7 +146,7 @@ namespace WebApplication.Controllers
         {
             var excelColumns = new List<string>(new string[] {
                 "Title",
-                "Afm",
+                "VatNumber",
                  "IsActive",
                 "Description" });
 
@@ -172,9 +171,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var companies = (await (await (new ExcelService<Company>(_context)
+                var companies = (await (new ExcelService<Company>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
 
                 if (errors.Count == 0)

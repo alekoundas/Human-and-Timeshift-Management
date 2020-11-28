@@ -114,7 +114,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(workPlace);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -156,7 +156,8 @@ namespace WebApplication.Controllers
                 "Title",
                 "Description",
                 "IsActive",
-                "CustomerId" });
+                "CustomerId" 
+            });
 
             var excelPackage = (await (new ExcelService<WorkPlace>(_context)
                .CreateNewExcel("WorkPlaces"))
@@ -180,9 +181,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var workPlaces = (await (await (new ExcelService<WorkPlace>(_context)
+                var workPlaces = (await (new ExcelService<WorkPlace>(_context)
                        .ExtractDataFromExcel(ImportExcel)))
-                       .ValidateExtractedData())
+                       .ValidateExtractedData()
                        .RetrieveExtractedData(out var errors);
 
                 if (errors.Count == 0)

@@ -33,7 +33,7 @@ namespace WebApplication.Api
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _baseDataWork.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -51,7 +51,7 @@ namespace WebApplication.Api
         public async Task<ActionResult<Contact>> PostContact(Contact contact)
         {
             _context.Contacts.Add(contact);
-            await _context.SaveChangesAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return CreatedAtAction("GetContact", new { id = contact.Id }, contact);
         }
@@ -65,7 +65,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _context.Contacts.Remove(contact);
-            await _context.SaveChangesAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return contact;
         }

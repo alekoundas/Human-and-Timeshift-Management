@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -101,6 +99,7 @@
             return moment(newDate);
         }
     </script>
+
     <script>
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
@@ -118,93 +117,22 @@
         }).on('change', () =>
             $('#PresenceDailyDatatable').DataTable().ajax.reload());
 
-
-
-
-        $('#PresenceDailyDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-            iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 2
-            },
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-            dom: 'Bfrtlp',
-            ajax: {
-                url: '/api/employees/datatable',
-                type: 'POST',
-                contentType: "application/json",
-                data: (data, type, row, meta) => {
-
+        $(() => {
+            var dataTable = new DataTableService('#PresenceDailyDatatable')
+                .ForApiController('employees')
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumn(true, true, "VatNumber")
+                .AddColumn(true, true, "Today")
+                .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionPresenceDaily';
                     if (GetSelectedWorkPlaceId() != '')
                         data.genericId = GetSelectedWorkPlaceId();
-
                     return JSON.stringify(data);
-                }
-            },
-            order: [[1, 'desc']],
-            columns: [
-                {
-                    data: "FirstName",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        //console.log(data);
-                        if (data.FirstName != null)
-                            return data.FirstName;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "LastName",
-                    searchable: false,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.LastName != null)
-                            return data.LastName;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "ErpCode",
-                    searchable: false,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.ErpCode != null)
-                            return data.ErpCode;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "Afm",
-                    searchable: false,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.Afm != null)
-                            return data.Afm;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "Today",
-                    searchable: false,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.Today != null)
-                            return data.Today;
-                        else
-                            return "";
-                    }
-                }
-            ]
-        });
+                })
+                .CompleteDataTable();
+        })
 
     </script>
 }

@@ -1,7 +1,7 @@
 ﻿using Bussiness;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +39,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _context.WorkPlaceHourRestrictions.Remove(workPlaceRestriction);
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {

@@ -7,10 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -86,7 +84,7 @@ namespace WebApplication.Controllers
                 if (!workPlaceRestrictionExists)
                 {
                     _baseDataWork.WorkPlaceHourRestrictions.Add(workPlaceRestriction);
-                    var status = await _context.SaveChangesAsync();
+                    var status = await _baseDataWork.SaveChangesAsync();
 
                     if (status > 0)
                         TempData["StatusMessage"] = "O περιορισμός δημιουργήθηκε με επιτυχία.";
@@ -141,7 +139,7 @@ namespace WebApplication.Controllers
                     _context.Update(WorkPlaceHourRestrictionEdit
                         .CreateFrom(workPlaceHourRestriction));
 
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -155,12 +153,13 @@ namespace WebApplication.Controllers
         {
             var errors = new List<string>();
             var excelColumns = new List<string>(new string[] {
-                "Title",
-                "Afm",
-                "Description" });
+                "Month",
+                "Year",
+                "WorkPlaceId"
+            });
 
-            var excelPackage = (await (new ExcelService<Company>(_context)
-               .CreateNewExcel("Companies"))
+            var excelPackage = (await (new ExcelService<WorkPlaceHourRestriction>(_context)
+               .CreateNewExcel("WorkPlaceHourRestrictions"))
                .AddSheetAsync(excelColumns))
                .CompleteExcel(out errors);
 
@@ -170,7 +169,7 @@ namespace WebApplication.Controllers
                 using (var package = excelPackage)
                 {
                     reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Companies.xlsx");
+                    return File(reportBytes, XlsxContentType, "WorkPlaceHourRestrictions.xlsx");
                 }
             }
             else
@@ -184,16 +183,17 @@ namespace WebApplication.Controllers
         public async Task<ActionResult> DownloadExcelWithData()
         {
             var errors = new List<string>();
-            var companies = await _baseDataWork.Companies.GetAllAsync();
+            var workPlaceHourRestrictions = await _baseDataWork.WorkPlaceHourRestrictions.GetAllAsync();
             var excelColumns = new List<string>(new string[] {
-                "Title",
-                "Afm",
-                "Description" });
+              "Month",
+                "Year",
+                "WorkPlaceId"
+            });
 
 
-            var excelPackage = (await (new ExcelService<Company>(_context)
-             .CreateNewExcel("Companies"))
-             .AddSheetAsync(excelColumns, "Companies"))
+            var excelPackage = (await (new ExcelService<WorkPlaceHourRestriction>(_context)
+             .CreateNewExcel("WorkPlaceHourRestrictions"))
+             .AddSheetAsync(excelColumns, "WorkPlaceHourRestrictions"))
              .CompleteExcel(out errors);
 
             if (errors.Count == 0)
@@ -202,7 +202,7 @@ namespace WebApplication.Controllers
                 using (var package = excelPackage)
                 {
                     reportBytes = package.GetAsByteArray();
-                    return File(reportBytes, XlsxContentType, "Companies.xlsx");
+                    return File(reportBytes, XlsxContentType, "WorkPlaceHourRestrictions.xlsx");
                 }
             }
             else
@@ -212,41 +212,32 @@ namespace WebApplication.Controllers
                 return View();
             }
         }
+
         public async Task<ActionResult> Import(IFormFile ImportExcel)
         {
             if (ImportExcel == null)
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
-                using (MemoryStream stream = new MemoryStream())
+            {
+                var workPlaceHourRestrictions = (await (new ExcelService<WorkPlaceHourRestriction>(_context)
+                       .ExtractDataFromExcel(ImportExcel)))
+                       .ValidateExtractedData()
+                       .RetrieveExtractedData(out var errors);
+
+                if (errors.Count == 0)
                 {
-                    var companies = new List<Company>();
-                    var company = new Company();
-                    await ImportExcel.CopyToAsync(stream);
-                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
-                    {
-
-                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
-                            for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
-                            {
-                                for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                                    company
-                                        .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(company, worksheet.Cells[i, j].Value?.ToString(), null);
-
-                                company.CreatedOn = DateTime.Now;
-                                companies.Add(company);
-                                company = new Company();
-                            }
-                    }
-                    _baseDataWork.Companies.AddRange(companies);
+                    _baseDataWork.WorkPlaceHourRestrictions.AddRange(workPlaceHourRestrictions);
                     var status = await _baseDataWork.SaveChangesAsync();
+
                     if (status > 0)
-                        TempData["StatusMessage"] = companies.Count +
-                        " εγγραφές προστέθηκαν με επιτυχία";
+                        TempData["StatusMessage"] = workPlaceHourRestrictions.Count +
+                    " εγγραφές προστέθηκαν με επιτυχία";
                     else
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }
+                else
+                    TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+            }
 
             return View("Index");
         }

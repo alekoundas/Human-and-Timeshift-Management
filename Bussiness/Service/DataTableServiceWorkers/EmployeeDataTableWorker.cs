@@ -1,6 +1,6 @@
 ﻿using Bussiness.Helpers;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
@@ -66,18 +66,14 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         filter = filter.Or(x => x.FirstName.Contains(_datatable.Search.Value));
                     if (column.Data == "LastName")
                         filter = filter.Or(x => x.LastName.Contains(_datatable.Search.Value));
-                    if (column.Data == "DateOfBirth")
-                        filter = filter.Or(x => x.DateOfBirth.ToString().Contains(_datatable.Search.Value));
-                    if (column.Data == "Afm")
-                        filter = filter.Or(x => x.Afm.Contains(_datatable.Search.Value));
+                    if (column.Data == "VatNumber")
+                        filter = filter.Or(x => x.VatNumber.Contains(_datatable.Search.Value));
                     if (column.Data == "SocialSecurityNumber")
                         filter = filter.Or(x => x.SocialSecurityNumber.Contains(_datatable.Search.Value));
                     if (column.Data == "ErpCode")
                         filter = filter.Or(x => x.ErpCode.Contains(_datatable.Search.Value));
                     if (column.Data == "Address")
                         filter = filter.Or(x => x.Address.Contains(_datatable.Search.Value));
-                    if (column.Data == "Email")
-                        filter = filter.Or(x => x.Email.Contains(_datatable.Search.Value));
                     if (column.Data == "SpecializationName")
                         filter = filter.Or(x => x.Specialization.Name.Contains(_datatable.Search.Value));
                     if (column.Data == "CompanyTitle")
@@ -107,13 +103,17 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
+
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                 dictionary.Add("SpecializationName", result.Specialization?.Name);
 
                 if (result.Company != null)
+                {
+                    result.Company.Employees = null;
                     dictionary.Add("CompanyTitle", result.Company.Title);
+                }
 
                 dictionary.Add("Buttons", dataTableHelper
                     .GetButtons("Employee", "Employees", result.Id.ToString()));
@@ -153,6 +153,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                 if (result.Company != null)
                 {
+                    result.Company.Employees = null;
                     dictionary.Add("CompanyTitle", result.Company.Title);
                     dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
                         "Employee", apiUrl, "checked"));
@@ -193,10 +194,12 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
+
                 var apiUrl = UrlHelper.EmployeeCompany(result.Id, _datatable.GenericId);
 
                 if (result.Company != null)
                 {
+                    result.Company.Employees = null;
                     dictionary.Add("CompanyTitle", result.Company.Title);
                     dictionary.Add("IsInCompany", dataTableHelper.GetToggle(
                         "Employee", apiUrl, "checked", true));
@@ -238,10 +241,14 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
+
                 var apiUrl = UrlHelper.EmployeeWorkPlace(result.Id, _datatable.GenericId);
 
                 if (result.Company != null)
+                {
+                    result.Company.Employees = null;
                     dictionary.Add("CompanyTitle", result.Company.Title);
+                }
 
                 if (_baseDatawork.EmployeeWorkPlaces
                     .Any(x => x.EmployeeId == result.Id &&
@@ -287,10 +294,14 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
+
                 var apiUrl = UrlHelper.EmployeeWorkPlace(result.Id, _datatable.GenericId);
 
                 if (result.Company != null)
+                {
+                    result.Company.Employees = null;
                     dictionary.Add("CompanyTitle", result.Company.Title);
+                }
 
                 if (_baseDatawork.EmployeeWorkPlaces
                     .Any(x => x.EmployeeId == result.Id &&
@@ -343,12 +354,14 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
+                result.WorkHours = null;
+                result.RealWorkHours = null;
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                for (int i = 1; i <= DateTime.DaysInMonth(_datatable.TimeShiftYear, _datatable.TimeShiftMonth); i++)
-                    dictionary.Add("Day" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
-                        (workHours, leaves, i, _datatable, result.Id));
+                for (int i = 0; i < DateTime.DaysInMonth(_datatable.TimeShiftYear, _datatable.TimeShiftMonth); i++)
+                    dictionary.Add("Day_" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
+                        (workHours, leaves, i + 1, _datatable, result.Id));
 
                 dictionary.Add("ToggleSlider", dataTableHelper
                     .GetEmployeeCheckbox(_datatable, result.Id));
@@ -389,12 +402,14 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
+                result.WorkHours = null;
+                result.RealWorkHours = null;
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                for (int i = 1; i <= DateTime.DaysInMonth(_datatable.TimeShiftYear, _datatable.TimeShiftMonth); i++)
-                    dictionary.Add("Day" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
-                        (workHours, leaves, i, _datatable, result.Id));
+                for (int i = 0; i < DateTime.DaysInMonth(_datatable.TimeShiftYear, _datatable.TimeShiftMonth); i++)
+                    dictionary.Add("Day_" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
+                        (workHours, leaves, i + 1, _datatable, result.Id));
 
                 dictionary.Add("ToggleSlider", dataTableHelper
                     .GetEmployeeCheckbox(_datatable, result.Id));
@@ -440,7 +455,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                      x.TimeShiftId == _datatable.GenericId &&
                      x.StartOn.Year == compareYear &&
                      x.StartOn.Month == compareMonth)
-                 .ToDynamicListAsync<WorkHour>();
+                .ToDynamicListAsync<WorkHour>();
 
             var leaves = await _baseDatawork.Leaves.Where(x =>
                      x.StartOn.Year == compareYear &&
@@ -451,7 +466,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     x.StartOn.Year == compareYear &&
                     x.TimeShiftId == _datatable.GenericId &&
                     x.StartOn.Month == compareMonth)
-            .ToDynamicListAsync<RealWorkHour>();
+                .ToDynamicListAsync<RealWorkHour>();
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -460,13 +475,15 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
+                result.WorkHours = null;
+                result.RealWorkHours = null;
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                for (int i = 1; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
-                    dictionary.Add("Day" + i,
+                for (int i = 0; i < DateTime.DaysInMonth(compareYear, compareMonth); i++)
+                    dictionary.Add("Day_" + i,
                          dataTableHelper.GetTimeShiftEditCellBodyRealWorkHours(
-                             realWorkHours, workHours, leaves, compareMonth, compareYear, i, _datatable, result.Id));
+                             realWorkHours, workHours, leaves, compareMonth, compareYear, i + 1, _datatable, result.Id));
 
                 dictionary.Add("ToggleSlider", dataTableHelper
                     .GetEmployeeCheckbox(_datatable, result.Id));
@@ -597,8 +614,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     .Any(y => y.WorkPlaceId == _datatable.GenericId));
 
             var entities = await _baseDatawork.Employees
-                .ProjectionDifference(SetOrderBy(), _datatable, _filter, _pageSize, _pageIndex);
-
+                .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Employee>();
@@ -609,25 +625,25 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                var totalSeconds = await _baseDatawork.RealWorkHours
+                var totalSeconds = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
-                var totalSecondsDay = await _baseDatawork.RealWorkHours
+                var totalSecondsDay = _baseDatawork.RealWorkHours
                        .GetEmployeeTotalSecondsDayFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
-                var totalSecondsNight = await _baseDatawork.RealWorkHours
+                var totalSecondsNight = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsNightFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
-                var totalSecondsSaturdayDay = await _baseDatawork.RealWorkHours
+                var totalSecondsSaturdayDay = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsSaturdayDayFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
-                var totalSecondsSaturdayNight = await _baseDatawork.RealWorkHours
+                var totalSecondsSaturdayNight = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsSaturdayNightFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
-                var totalSecondsSundayDay = await _baseDatawork.RealWorkHours
+                var totalSecondsSundayDay = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsSundayDayFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
-                var totalSecondsSundayNight = await _baseDatawork.RealWorkHours
+                var totalSecondsSundayNight = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsSundayNightFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
                 if (_datatable.ShowHoursInPercentage)
@@ -669,7 +685,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     .Any(y => y.WorkPlaceId == _datatable.GenericId));
 
             var entities = await _baseDatawork.Employees
-                .ProjectionDifference(SetOrderBy(), _datatable, _filter, _pageSize, _pageIndex);
+               .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -713,7 +729,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     .Any(y => y.WorkPlaceId == _datatable.GenericId));
 
             var entities = await _baseDatawork.Employees
-                .ProjectionDifference(SetOrderBy(), _datatable, _filter, _pageSize, _pageIndex);
+               .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -725,16 +741,16 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                var totalSeconds = await _baseDatawork.RealWorkHours
+                var totalSeconds = _baseDatawork.RealWorkHours
                     .GetEmployeeTotalSecondsFromRange(result.Id, _datatable.StartOn, _datatable.EndOn);
 
 
                 if ((_datatable.EndOn.Date - _datatable.StartOn.Date).TotalDays == 0.0)
                 {
-                    var daySeconds = await _baseDatawork.RealWorkHours
+                    var daySeconds = _baseDatawork.RealWorkHours
                              .GetEmployeeTotalSecondsForDay(result.Id, _datatable.StartOn);
 
-                    var nightSeconds = await _baseDatawork.RealWorkHours
+                    var nightSeconds = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsForNight(result.Id, _datatable.StartOn);
 
                     var dayTotalSeconds = daySeconds + nightSeconds;
@@ -748,10 +764,10 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     for (int i = 0; i <= (_datatable.EndOn.Date - _datatable.StartOn.Date).TotalDays; i++)
                     {
                         var compareDate = new DateTime(_datatable.StartOn.AddDays(i).Ticks);
-                        var daySeconds = await _baseDatawork.RealWorkHours
+                        var daySeconds = _baseDatawork.RealWorkHours
                                .GetEmployeeTotalSecondsForDay(result.Id, compareDate);
 
-                        var nightSeconds = await _baseDatawork.RealWorkHours
+                        var nightSeconds = _baseDatawork.RealWorkHours
                             .GetEmployeeTotalSecondsForNight(result.Id, compareDate);
                         var dayTotalSeconds = daySeconds + nightSeconds;
 
@@ -778,7 +794,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     .Any(y => y.WorkPlaceId == _datatable.GenericId));
 
             var entities = await _baseDatawork.Employees
-                .ProjectionDifference(SetOrderBy(), _datatable, _filter, _pageSize, _pageIndex);
+                .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
             //Extra needed data
 
             //Mapping
@@ -811,7 +827,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
         }
 
 
-        public async Task<EmployeeDataTableWorker> ProjectionRealWorkHoursSpecific()
+        public async Task<EmployeeDataTableWorker> ProjectionRealWorkHoursSpecificDates()
         {
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
 
@@ -820,7 +836,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     .Any(y => y.WorkPlaceId == _datatable.GenericId));
 
             var entities = await _baseDatawork.Employees
-                .ProjectionDifference(SetOrderBy(), _datatable, _filter, _pageSize, _pageIndex);
+               .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
             //Mapping
             var expandoService = new ExpandoService();

@@ -22,6 +22,7 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="IsActive" />
+                <input type="hidden" asp-for="CreatedBy_Id" />
 
                 <div class="box-body">
 
@@ -48,17 +49,23 @@
             <div class="input-group">
                 <input asp-for="Customer.IdentifyingName" class="form-control" readonly />
             </div>
-        </div> } @*<div class="form-group">
-                <label asp-for="CustomerId" class="control-label"></label>
-                <div class="input-group" style="width:100%">
-                    <select class="Customer_Select2" asp-for="CustomerId" style="width:70%">
-                        @if (Model.Customer != null)
-                        {
-            <option value="@Model.CustomerId" selected="selected">@Model.Customer.IdentifyingName</option>}
-                    </select>
-                    <span asp-validation-for="CustomerId" class="text-danger"></span>
-                </div>
-            </div>*@
+        </div>}
+
+                    <div class="form-group">
+                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedBy_FullName" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedOn" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <hr />
 
                     <div class="form-group pull-right">
                         <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
@@ -89,7 +96,6 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -101,7 +107,6 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -119,132 +124,26 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-
-             $('#WorkPlaceEmployeesDatatable').DataTable({
-                 serverSide: true,
-                 responsive: true,
-                 processing: true,
-                 lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150,"Όλα"]],
-             iDisplayLength: 150,
-                 colReorder: {
-                     fixedColumnsLeft: 2
-                 },
-                 dom: 'Bfrtlp',
-                 buttons: ['excel', 'pdf', 'print'],
-                 language: {
-                     processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                 },
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'WorkPlaceEdit';
-                        data.genericId =@Model.Id;
-
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                         data: "FirstName",
-                         searchable: true,
-                         orderable: true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.FirstName != null)
-                                return data.FirstName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "LastName",
-                         searchable: true,
-                         orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.LastName != null)
-                                return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "Email",
-                         searchable: true,
-                         orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.Email != null)
-                                return data.Email;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "ErpCode",
-                         searchable: true,
-                         orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.ErpCode != null)
-                                return data.ErpCode;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "Afm",
-                         searchable: true,
-                         orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.Afm != null)
-                                return data.Afm;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "ScpecializationName",
-                         searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.ScpecializationName != null)
-                                return data.ScpecializationName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "CompanyTitle",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.CompanyTitle != null)
-                                return data.CompanyTitle;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                         data: "IsInWorkPlace",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IsInWorkPlace != null)
-                                return data.IsInWorkPlace;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                fnDrawCallback:  ()=> {
-                    $('.ToggleSliders').bootstrapToggle({
-                        on: 'Ναί',
-                        off: 'Όχι'
-                    });
-                },
-            });
+        $(() => new DataTableService('#WorkPlaceEmployeesDatatable')
+            .ForApiController('employees')
+            .AddColumn(true, true, "FirstName")
+            .AddColumn(true, true, "LastName")
+            .AddColumn(true, true, "ErpCode")
+            .AddColumn(true, true, "VatNumber")
+            .AddColumn(true, true, "ScpecializationName")
+            .AddColumn(true, true, "CompanyTitle")
+            .AddColumn(true, true, "IsInWorkPlace")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'WorkPlaceEdit';
+                data.genericId =@Model.Id;
+                return JSON.stringify(data);
+            })
+            .FnDrawCallback(() =>
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                }))
+            .CompleteDataTable());
     </script>
 
     <script>

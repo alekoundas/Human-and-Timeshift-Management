@@ -19,7 +19,8 @@
 
             <form asp-controller="User" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="text" asp-for="Id" class="hidden" disabled />
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CreatedBy_Id" />
 
                 <div class="box-body">
 
@@ -65,6 +66,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label asp-for="BirthDay" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="BirthDay" class="form-control" />
+                            <span asp-validation-for="BirthDay" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label asp-for="IsEmployee" class="control-label"></label>
                         <div class="input-group">
                             <input type="checkbox" asp-for="IsEmployee" class="form-control IsEmployeeSlider" />
@@ -75,29 +84,45 @@
                     @if (Model.IsEmployee)
                     {
 
-        <div class="form-group" id="EmployeeIdDiv">
-            <label asp-for="EmployeeId" class="control-label"></label>
-            <div class="input-group" style="width:100%">
-                <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
-                    @if (Model.EmployeeId != null)
-                    {
-    <option value="@Model.EmployeeId" selected="selected">@Model.EmployeeOption</option>
+                <div class="form-group" id="EmployeeIdDiv">
+                    <label asp-for="EmployeeId" class="control-label"></label>
+                    <div class="input-group" style="width:100%">
+                        <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
+                            @if (Model.EmployeeId != null)
+                            {
+                <option value="@Model.EmployeeId" selected="selected">@Model.EmployeeOption</option>
 }
-                </select>
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
-            </div>
-        </div>}
-    else
-    {
-<div class="form-group" id="EmployeeIdDiv" style="display:none;">
-    <label asp-for="EmployeeId" class="control-label"></label>
-    <div class="input-group" style="width:100%">
-        <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
-            }
-        </select>
-        <span asp-validation-for="EmployeeId" class="text-danger"></span>
-    </div>
-</div>}
+                        </select>
+                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                    </div>
+                </div>}
+            else
+            {
+                <div class="form-group" id="EmployeeIdDiv" style="display:none;">
+                    <label asp-for="EmployeeId" class="control-label"></label>
+                    <div class="input-group" style="width:100%">
+                        <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
+                            }
+                        </select>
+                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                    </div>
+                </div>}
+
+                    <div class="form-group">
+                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedBy_FullName" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedOn" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <hr />
 
                     <div class="form-group pull-right">
                         <input type="submit" value="Αποθήκευση" class="btn btn-primary " />

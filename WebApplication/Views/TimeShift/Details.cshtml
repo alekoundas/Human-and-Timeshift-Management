@@ -1,8 +1,6 @@
 ﻿@model DataAccess.Models.Entity.TimeShift
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -29,14 +27,14 @@
 
                         <div class="input-group">
                             <input asp-for="Title" class="form-control" />
-                            <span asp-validation-for="Title" class="text-danger" readonly="readonly"  disabled></span>
+                            <span asp-validation-for="Title" class="text-danger" readonly disabled></span>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label asp-for="Year" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Year" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="Year" class="form-control" readonly disabled />
                             <span asp-validation-for="Year" class="text-danger"></span>
                         </div>
                     </div>
@@ -44,7 +42,7 @@
                     <div class="form-group">
                         <label asp-for="Month" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Month" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="Month" class="form-control" readonly disabled />
                             <span asp-validation-for="Month" class="text-danger"></span>
                         </div>
                     </div>
@@ -52,11 +50,24 @@
                     <div class="form-group">
                         <label asp-for="WorkPlaceId" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="WorkPlace.Title" class="form-control" readonly="readonly" disabled />
+                            <input asp-for="WorkPlace.Title" class="form-control" readonly disabled />
                         </div>
                     </div>
 
 
+                    <div class="form-group">
+                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedBy_FullName" class="form-control" readonly disabled />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedOn" class="form-control" readonly disabled />
+                        </div>
+                    </div>
 
                 </div>
             </form>
@@ -84,10 +95,10 @@
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
                             <th>ErpCode</th>
-                            @for (int i = 1; i <= Model.DaysInMonth; i++)
+                            @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
-                            }
+                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
+}
                         </tr>
                     </thead>
                     <tfoot>
@@ -96,10 +107,10 @@
                             <th data-searchable="false">Όνομα</th>
                             <th data-searchable="false">Επίθετο</th>
                             <th data-searchable="false">ErpCode</th>
-                            @for (int i = 1; i <= Model.DaysInMonth; i++)
+                            @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
-                            }
+                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
+}
                         </tr>
                     </tfoot>
                 </table>
@@ -1460,8 +1471,6 @@
                 }
             })
 
-
-
         //Employees Select2
         const EmployeeSelect2 = (workHourId, num) => {
             $('#EmployeesSelect2Num_' + workHourId + '_EmployeeNum_' + num).select2({
@@ -1540,7 +1549,6 @@
                         end: moment("31/12/4000", "DD/MM/YYYY")//Latest date in docs
                     }],
                 onbeforehide: () => {
-
                     //Handle Loading
                     ButtonLoadingToggle("SaveWorkHours")
                         .then(() => {
@@ -1568,157 +1576,59 @@
             })
         };
 
-
-        const CustomizeExcel = (xlsx) => {
-            var sheet = xlsx.xl.worksheets['sheet1.xml'];
-            sheet.documentElement
-            $('c[r=A1] t', sheet).text('Custom text');
-        }
-
         //Datatable
-        var Datatable = () => $('#EmployeesWorkhoursDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
-            iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 3
-            },
-            dom: 'Bfrtlp',
-            //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-            buttons: [
-                {
-                    extend: 'excelHtml5',
-                    text: 'Excel',
-                    exportOptions: { orthogonal: 'ExcelExport' }
-                }
-            ],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-            ajax: {
-                url: '/api/employees/datatable',
-                type: 'POST',
-                contentType: "application/json",
-                data: (data, type, row, meta) => {
-
-                    data.predicate = 'TimeShiftDetail';
+        var Datatable = () =>
+            new DataTableService('#EmployeesWorkhoursDatatable')
+                .ForApiController('employees')
+                .StartOrderFromCol(1)
+                .AddColumn(true, true, "ToggleSlider")
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumnsFromCount(DateConstants().DaysInMonth, "Day_")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'TimeShiftEdit';
                     data.genericId = DateConstants().TimeShiftId;
                     data.timeShiftYear = DateConstants().Year;
                     data.timeShiftMonth = DateConstants().Month;
-
                     return JSON.stringify(data);
-                }
-            },
-            order: [[1, 'desc']],
-            columns: CreateDatatableColumns(),
-            columnDefs: [{
-                targets: '_all',
-                render: (data, type, row) => {
-                    if (type == 'ExcelExport') {
-                        console.log(data);
-                        return data;
-                    }
-                    else
-                        return data;
-                }
-            }],
-            rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
-                for (var i = 1; i <= DateConstants().DaysInMonth; i++) {
-                    row.querySelectorAll('td')[i + 3]
-                        .setAttribute("class", "DataTableHoverCell")
-
-                    row.querySelectorAll('td')[i + 3]
-                        .setAttribute('style', 'background-color:' +
-                            $(data["Day" + i])
-                                .attr('cellcolor'))
-                }
-            },
-            fnDrawCallback: () => {
-                $('.ToggleSliders').bootstrapToggle({
-                    on: 'Ναί',
-                    off: 'Όχι'
                 })
-            },
-            initComplete: () => {
-                [...document.getElementsByClassName('TableDays')]
-                    .forEach(tableHead => {
-                        var options = { weekday: 'long', day: 'numeric' };
-                        var day = tableHead.id.split('_')[1];
+                .FnDrawCallback(() => {
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    })
+                })
+                .RowCallback((row, data, displayNum, displayIndex, dataIndex) => {
+                    for (var i = 1; i <= DateConstants().DaysInMonth; i++) {
+                        row.querySelectorAll('td')[i + 3]
+                            .setAttribute("class", "DataTableHoverCell")
 
-                        var currDate = new Date(Date.UTC(DateConstants().Year,
-                            DateConstants().Month - 1, day, 0, 0, 0));
+                        row.querySelectorAll('td')[i + 3]
+                            .setAttribute('style', 'background-color:' +
+                                $(data["Day" + i])
+                                    .attr('cellcolor'))
+                    }
+                })
+                .InitComplete(() => {
+                    [...document.getElementsByClassName('TableDays')]
+                        .forEach(tableHead => {
+                            var options = { weekday: 'long', day: 'numeric' };
+                            var day = tableHead.id.split('_')[1];
 
-                        var dayToShow = currDate.toLocaleString('el-GR',
-                            options);
+                            var currDate = new Date(Date.UTC(DateConstants().Year,
+                                DateConstants().Month - 1, day + 1, 0, 0, 0));
 
-                        document.getElementById('thDayNum_' + day)
-                            .innerHTML = dayToShow;
+                            var dayToShow = currDate.toLocaleString('el-GR', options);
 
-                        document.getElementById('tbDayNum_' + day)
-                            .innerHTML = dayToShow;
-                    });
-            }
-        });
+                            document.getElementById('thDayNum_' + day)
+                                .innerHTML = dayToShow;
 
-        const RenderDataFromDatatable = (data, property) => {
-            if (data[property] != null) {
-                return data[property];
-            }
-            else
-                return "";
-        }
-
-        const RenderDay = (data, type, row, meta, index) => {
-            console.log(index);
-            if (type == 'ExcelExport') {
-                console.log('μαδαφακα');
-            }
-            return data;
-        }
-
-        const CreateDatatableColumns = () => {
-            var columns = []
-            columns.push({
-                data: "ToggleSlider",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ToggleSlider')
-            });
-            columns.push({
-                data: "FirstName",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'FirstName')
-            });
-            columns.push({
-                data: "LastName",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'LastName')
-            });
-            columns.push({
-                data: "ErpCode",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ErpCode')
-            });
-            //Add days of month
-            for (var i = 1; i <= DateConstants().DaysInMonth; i++)
-                columns.push({
-                    data: "Day" + i,
-                    searchable: false,
-                    orderable: false
-                });
-
-
-            return columns;
-        }
+                            document.getElementById('tbDayNum_' + day)
+                                .innerHTML = dayToShow;
+                        });
+                })
+                .CompleteDataTable();
     </script>
 
     <!--    Html Append -->

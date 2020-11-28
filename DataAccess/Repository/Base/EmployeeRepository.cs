@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Datatable;
+﻿using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.Repository.Interface;
 using LinqKit;
@@ -93,10 +93,8 @@ namespace DataAccess.Repository.Base
             qry = qry.Select(x => new Employee
             {
                 Id = x.Id,
-                Afm = x.Afm,
-                DateOfBirth = x.DateOfBirth,
+                VatNumber = x.VatNumber,
                 ErpCode = x.ErpCode,
-                Email = x.Email,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 RealWorkHours = x.RealWorkHours.Where(z =>

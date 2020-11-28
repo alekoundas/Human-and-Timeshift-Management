@@ -35,7 +35,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "ContractMembership_View")]
         public async Task<ActionResult> Details(int id)
         {
-            if (id == null)
+            if (id == 0)
                 return NotFound();
 
             var ContractMembership = await _baseDataWork.ContractMemberships
@@ -84,7 +84,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "Company_Edit")]
         public async Task<ActionResult> Edit(int id)
         {
-            if (id == null)
+            if (id == 0)
                 return NotFound();
 
             var company = await _context.ContractMemberships.FindAsync(id);
@@ -108,7 +108,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(ContractMembership);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -169,9 +169,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var contractMemberships = (await (await (new ExcelService<ContractMembership>(_context)
+                var contractMemberships = (await (new ExcelService<ContractMembership>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
 
                 if (errors.Count == 0)

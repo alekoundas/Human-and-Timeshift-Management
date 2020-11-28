@@ -2,7 +2,7 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -57,7 +57,7 @@ namespace WebApplication.Api
             timeshift.IsActive = !timeshift.IsActive;
             _baseDataWork.Update(timeshift);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
             if (status >= 1)
             {
                 response.IsSuccessful = true;
@@ -96,7 +96,7 @@ namespace WebApplication.Api
 
             _context.WorkHours.RemoveRange(timeShift.WorkHours);
             _context.TimeShifts.Remove(timeShift);
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {

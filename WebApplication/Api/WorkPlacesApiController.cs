@@ -2,10 +2,10 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
+using DataAccess.Libraries.Select2;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Identity;
-using DataAccess.Models.Select2;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
@@ -48,7 +48,7 @@ namespace WebApplication.Api
             workPlace.IsActive = !workPlace.IsActive;
             _baseDataWork.Update(workPlace);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
             if (status >= 1)
             {
                 response.IsSuccessful = true;
@@ -96,7 +96,7 @@ namespace WebApplication.Api
             var workPlaceTimeShiftsWorkHours = workPlace.TimeShifts.SelectMany(x => x.WorkHours);
 
             _context.WorkPlaces.Remove(workPlace);
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {
@@ -233,8 +233,7 @@ namespace WebApplication.Api
                 _baseDataWork.EmployeeWorkPlaces.Add(new EmployeeWorkPlace()
                 {
                     EmployeeId = employeeId,
-                    WorkPlaceId = workPlaceId,
-                    CreatedOn = DateTime.Now
+                    WorkPlaceId = workPlaceId
                 });
 
             else
@@ -242,7 +241,6 @@ namespace WebApplication.Api
                      _baseDataWork.EmployeeWorkPlaces
                         .Where(x => x.EmployeeId == employeeId && x.WorkPlaceId == workPlaceId)
                         .FirstOrDefault());
-
 
             await _baseDataWork.SaveChangesAsync();
 
@@ -277,209 +275,7 @@ namespace WebApplication.Api
               .CompleteResponse<WorkPlace>();
 
             return Ok(results);
-
-            //var pageSize = datatable.Length;
-            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            //var orderDirection = datatable.Order[0].Dir;
-
-            //var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
-            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
-            //var filter = PredicateBuilder.New<WorkPlace>();
-            //filter = filter.And(GetUserRoleFiltersAsync());
-            //filter = filter.And(GetSearchFilter(datatable));
-
-            //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
-
-            //if (!canShowDeactivated)
-            //    filter = filter.And(x => x.IsActive == true);
-
-            //var workPlaces = new List<WorkPlace>();
-
-
-            //if (datatable.Predicate == "WorkPlaceIndex")
-            //{
-            //    includes.Add(x => x.Include(y => y.Customer));
-
-            //    workPlaces = await _baseDataWork.WorkPlaces
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            //}
-            //if (datatable.Predicate == "CustomerDetails")
-            //{
-            //    includes.Add(x => x.Include(y => y.Customer));
-
-            //    workPlaces = await _baseDataWork.WorkPlaces
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            //}
-            //if (datatable.Predicate == "CustomerEdit")
-            //{
-            //    includes.Add(x => x.Include(y => y.Customer));
-
-            //    workPlaces = await _baseDataWork.WorkPlaces
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            //}
-            //if (datatable.Predicate == "EmployeeEdit")
-            //{
-            //    includes.Add(x => x.Include(y => y.Customer));
-            //    includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
-            //    filter = filter.And(x => x.Customer.Company != null);
-
-            //    workPlaces = await _baseDataWork.WorkPlaces
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-
-            //    workPlaces = workPlaces.Select(X => new WorkPlace
-            //    {
-            //        CustomerId = X.CustomerId,
-            //        Title = X.Title,
-            //        EmployeeWorkPlaces = X.EmployeeWorkPlaces.Select(y => new EmployeeWorkPlace
-            //        {
-            //            Id = y.Id,
-            //            WorkPlaceId = y.WorkPlaceId,
-            //            EmployeeId = y.EmployeeId
-            //        }).ToList()
-            //    }).ToList();
-            //}
-            //if (datatable.Predicate == "EmployeeDetails")
-            //{
-            //    includes.Add(x => x.Include(y => y.Customer));
-            //    includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
-            //    filter = filter.And(x => x.Customer.Company != null);
-
-            //    workPlaces = await _baseDataWork.WorkPlaces
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            //}
-            //if (datatable.Predicate == "TimeShiftIndex")
-            //{
-            //    includes.Add(x => x.Include(y => y.Customer).ThenInclude(z => z.Company));
-
-            //    workPlaces = await _baseDataWork.WorkPlaces
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            //}
-            //if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
-            //{
-            //    if (datatable.GenericId != 0)
-            //        filter = filter.And(x => x.EmployeeWorkPlaces.Any(y => y.EmployeeId == datatable.GenericId));
-
-            //    workPlaces = await _baseDataWork.WorkPlaces
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            //}
-
-            //var mapedData = await MapResults(workPlaces, datatable);
-
-            //var total = _baseDataWork.WorkPlaces.Where(filter).Count();
-            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
-
-        //protected async Task<IEnumerable<ExpandoObject>> MapResults(IEnumerable<WorkPlace> results, Datatable datatable)
-        //{
-        //    var expandoObject = new ExpandoService();
-        //    var dataTableHelper = new DataTableHelper<WorkPlace>();
-        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-        //    foreach (var workplace in results)
-        //    {
-        //        var expandoObj = expandoObject.GetCopyFrom<WorkPlace>(workplace);
-        //        var dictionary = (IDictionary<string, object>)expandoObj;
-        //        if (datatable.Predicate == "WorkPlaceIndex")
-        //        {
-        //            dictionary.Add("Buttons", dataTableHelper.GetButtons(
-        //                "WorkPlace", "WorkPlaces", workplace.Id.ToString()));
-        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
-        //            returnObjects.Add(expandoObj);
-        //        }
-        //        if (datatable.Predicate == "CustomerDetails")
-        //        {
-        //            var apiUrl = UrlHelper.CustomerWorkPlace(datatable.GenericId,
-        //                 workplace.Id);
-
-        //            if (workplace.Customer?.Id == datatable.GenericId)
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, "checked", true));
-        //            else
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, "", true));
-
-        //            returnObjects.Add(expandoObj);
-        //        }
-        //        else if (datatable.Predicate == "CustomerEdit")
-        //        {
-        //            var apiUrl = UrlHelper.CustomerWorkPlace(datatable.GenericId,
-        //                workplace.Id);
-
-        //            if (workplace.Customer?.Id == datatable.GenericId)
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, "checked"));
-        //            else
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, ""));
-
-        //            returnObjects.Add(expandoObj);
-        //        }
-        //        else if (datatable.Predicate == "EmployeeEdit")
-        //        {
-        //            var apiUrl = UrlHelper.EmployeeWorkPlace(datatable.GenericId,
-        //                workplace.Id);
-
-        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
-
-        //            if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, "checked"));
-        //            else
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, ""));
-
-        //            returnObjects.Add(expandoObj);
-        //        }
-        //        else if (datatable.Predicate == "EmployeeDetails")
-        //        {
-        //            var apiUrl = UrlHelper.EmployeeWorkPlace(datatable.GenericId,
-        //                workplace.Id);
-
-        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
-
-        //            if (workplace.EmployeeWorkPlaces.Any(x => x.EmployeeId == datatable.GenericId))
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, "checked", true));
-        //            else
-        //                dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
-        //                    "WorkPlace", apiUrl, "", true));
-
-        //            returnObjects.Add(expandoObj);
-        //        }
-        //        else if (datatable.Predicate == "TimeShiftIndex")
-        //        {
-        //            dictionary.Add("IdentifyingName", workplace.Customer?.IdentifyingName);
-        //            returnObjects.Add(expandoObj);
-        //        }
-        //        else if (datatable.Predicate == "ProjectionEmployeeRealHoursSum")
-        //        {
-        //            var totalSeconds = await _baseDataWork.RealWorkHours
-        //                   .GetEmployeeTotalSecondsFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn, workplace.Id);
-
-        //            var totalSecondsDay = await _baseDataWork.RealWorkHours
-        //                   .GetEmployeeTotalSecondsDayFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn, workplace.Id);
-
-        //            var totalSecondsNight = await _baseDataWork.RealWorkHours
-        //                    .GetEmployeeTotalSecondsNightFromRange(datatable.GenericId, datatable.StartOn, datatable.EndOn, workplace.Id);
-        //            if (datatable.ShowHoursInPercentage)
-        //            {
-        //                dictionary.Add("TotalHours", totalSeconds / 60 / 60);
-        //                dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 60);
-        //                dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 60);
-        //            }
-        //            else
-        //            {
-        //                dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
-        //                dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
-        //                dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
-        //            }
-        //            returnObjects.Add(expandoObj);
-        //        }
-
-        //    }
-
-        //    return returnObjects;
-        //}
 
         private Expression<Func<WorkPlace, bool>> GetUserRoleFiltersAsync()
         {
@@ -497,39 +293,5 @@ namespace WebApplication.Api
 
             return filter;
         }
-
-        //private Func<IQueryable<WorkPlace>, IOrderedQueryable<WorkPlace>> SetOrderBy(string columnName, string orderDirection)
-        //{
-        //    if (columnName != "")
-        //        return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
-        //    //else if(columnName == "IsInWorkPlace")
-        //    //return x => x.OrderBy(x=>x. + " " + orderDirection.ToUpper());
-        //    else
-        //        return null;
-        //}
-
-        //private Expression<Func<WorkPlace, bool>> GetSearchFilter(Datatable datatable)
-        //{
-        //    var filter = PredicateBuilder.New<WorkPlace>();
-        //    if (datatable.Search.Value != null)
-        //    {
-        //        foreach (var column in datatable.Columns)
-        //        {
-        //            if (column.Data == "Title")
-        //                filter = filter.Or(x => x.Title.Contains(datatable.Search.Value));
-        //            if (column.Data == "Description")
-        //                filter = filter.Or(x => x.Description.Contains(datatable.Search.Value));
-        //            if (column.Data == "IdentifyingName")
-        //                filter = filter.Or(x => x.Customer.IdentifyingName.Contains(datatable.Search.Value));
-        //            if (column.Data == "Customer.company.title")
-        //                filter = filter.Or(x => x.Customer.Company.Title.Contains(datatable.Search.Value));
-        //        }
-        //    }
-        //    else
-        //        filter = filter.And(x => true);
-
-        //    return filter;
-        //}
-
     }
 }

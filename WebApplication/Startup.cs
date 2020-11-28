@@ -85,8 +85,7 @@ namespace WebApplication
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling =
-                        Newtonsoft.Json.ReferenceLoopHandling.Ignore
-);
+                        Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddRazorPages();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }

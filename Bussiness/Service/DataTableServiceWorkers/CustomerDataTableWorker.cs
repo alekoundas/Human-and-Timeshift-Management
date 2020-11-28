@@ -1,6 +1,6 @@
 ﻿using Bussiness.Helpers;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
@@ -66,8 +66,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         filter = filter.Or(x => x.PostalCode.Contains(_datatable.Search.Value));
                     if (column.Data == "DOY")
                         filter = filter.Or(x => x.DOY.Contains(_datatable.Search.Value));
-                    if (column.Data == "AFM")
-                        filter = filter.Or(x => x.AFM.Contains(_datatable.Search.Value));
+                    if (column.Data == "VatNumber")
+                        filter = filter.Or(x => x.VatNumber.Contains(_datatable.Search.Value));
                 }
             }
             else

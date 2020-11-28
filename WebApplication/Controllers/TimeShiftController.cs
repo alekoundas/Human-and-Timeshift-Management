@@ -89,7 +89,7 @@ namespace WebApplication.Controllers
                             ")";
 
                     _context.Add(newTimeShift);
-                    var status = await _context.SaveChangesAsync();
+                    var status = await _baseDataWork.SaveChangesAsync();
                     if (status > 0)
                         TempData["StatusMessage"] = "Το χρονοδιάγραμμα δημιουργήθηκε με επιτυχία.";
                     else
@@ -133,7 +133,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(timeShift);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -201,9 +201,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var timeShifts = (await (await (new ExcelService<TimeShift>(_context)
+                var timeShifts = (await (new ExcelService<TimeShift>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
 
                 if (errors.Count == 0)

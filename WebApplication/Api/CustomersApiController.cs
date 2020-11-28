@@ -2,7 +2,7 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -41,7 +41,7 @@ namespace WebApplication.Api
             customer.IsActive = !customer.IsActive;
             _baseDataWork.Update(customer);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
             if (status >= 1)
             {
                 response.IsSuccessful = true;
@@ -93,7 +93,7 @@ namespace WebApplication.Api
 
             _context.Customers.Remove(customer);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {

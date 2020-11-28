@@ -1,7 +1,7 @@
 ﻿using Bussiness.Helpers;
 using Bussiness.Service.DataTableServiceWorkers;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;

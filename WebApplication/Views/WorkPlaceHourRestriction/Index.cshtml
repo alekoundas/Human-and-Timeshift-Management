@@ -45,75 +45,19 @@
 <partial name="_ExcelModals" model='new {Entity = "WorkPlaceHourRestriction" }'>
     @section Scripts {
         <script>
-            $('#WorkPlaceHourRestrictionDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                colReorder: false,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                dom: 'Bfrtlp',
-                buttons: ['excel', 'print'],
-                language: {
-                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                },
-                ajax: {
-                    url: '/api/WorkPlaceHourRestrictions/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
+            $(() => {
+                var dataTable = new DataTableService('#WorkPlaceHourRestrictionDatatable')
+                    .ForApiController('WorkPlaceHourRestrictions')
+                    .StartOrderFromCol(1)
+                    .AddColumn(true, true, "WorkPlaceName")
+                    .AddColumn(true, true, "Month")
+                    .AddColumn(true, true, "Year")
+                    .AddColumn(false, false, "Buttons")
+                    .AjaxData((data, type, row, meta) => {
                         data.Predicate = 'WorkPlaceHourRestrictionIndex';
                         return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: [
-                    {
-                        data: "WorkPlaceName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.WorkPlaceName != null)
-                                return data.WorkPlaceName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Month",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Month != null)
-                                return data.Month;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Year",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Year != null)
-                                return data.Year;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Button",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
-                    }
-                ]
-            });
+                    })
+                    .CompleteDataTable();
+            })
         </script>
     }

@@ -2,7 +2,7 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -37,7 +37,7 @@ namespace WebApplication.Api
             specialization.IsActive = !specialization.IsActive;
             _baseDataWork.Update(specialization);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
             if (status >= 1)
             {
                 response.IsSuccessful = true;
@@ -72,7 +72,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _context.Specializations.Remove(specialization);
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
                 response.ResponseBody = "Η ειδικότητα" +

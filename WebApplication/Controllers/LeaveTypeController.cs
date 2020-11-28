@@ -108,7 +108,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(leaveType);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -170,9 +170,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var leaveTypes = (await (await (new ExcelService<LeaveType>(_context)
+                var leaveTypes = (await (new ExcelService<LeaveType>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
 
                 if (errors.Count == 0)

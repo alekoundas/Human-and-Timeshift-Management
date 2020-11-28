@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -65,7 +63,6 @@
 
 @section Scripts {
     <script>
-
         var Count = 0;
         const ConvertDateForApi = timeStamp =>
             CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
@@ -83,13 +80,13 @@
 
             return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
         }
+
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
         const GetSelectedDate = (num) =>
             new Date(moment(document.getElementById('CalnentimNum_' + num).value
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
-
 
         const GetDaysToAppentNums = () =>
             [...document.getElementsByClassName('CalentimInputs')]
@@ -103,57 +100,6 @@
             var newDate = new Date(date);
             newDate.setHours(23, 59, 59);
             return moment(newDate);
-        }
-
-        const CreateDatatableColumns = () => {
-            var columns = []
-            columns.push({
-                data: "FirstName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'FirstName')
-            });
-            columns.push({
-                data: "LastName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'LastName')
-            });
-            columns.push({
-                data: "ErpCode",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ErpCode')
-            });
-            columns.push({
-                data: "Afm",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'Afm')
-            });
-
-            [...document.getElementsByClassName('CalentimInputs')]
-                .filter(input => input.value != '')
-                .map(input => input.id.split('_')[1]);
-            for (var i = 0; i < GetDaysToAppentNums().length; i++)
-                columns.push({
-                    "data": "Day_" + i,
-                    "searchable": false,
-                    "orderable": true
-                });
-            return columns;
-        }
-
-
-        const RenderDataFromDatatable = (data, property) => {
-            if (data[property] != null)
-                return data[property];
-            else
-                return "";
         }
 
         const GetDaysColumns = () =>
@@ -184,8 +130,8 @@
             document.getElementById('CalnentimDivNum_' + e.target.id.split('_')[1])
                 .remove())
     </script>
-    <script>
 
+    <script>
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
             allowClear: true,
@@ -228,36 +174,22 @@
             });
 
         var CreateDataTable = () =>
-            $('#RealWorkHoursSpecificDatesDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 2
-                },
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                dom: 'Bfrtlp',
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
+            new DataTableService('#RealWorkHoursSpecificDatesDatatable')
+                .ForApiController('employees')
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumn(true, true, "VatNumber")
+                .AddColumnsFromCount(GetDaysToAppentNums().length, "Day_")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionRealWorkHoursSpecificDates';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.genericId = GetSelectedWorkPlaceId();
 
-                        data.predicate = 'ProjectionRealWorkHoursSpecific';
-                        if (GetSelectedWorkPlaceId() != '')
-                            data.genericId = GetSelectedWorkPlaceId();
-
-                        data.specificDates = GetCalentimValuesForApi()
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: CreateDatatableColumns()
-            });
-
-
+                    data.specificDates = GetCalentimValuesForApi()
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
 
         const AppendNewDataTableHTML = () =>
             document.getElementById('AppendHere_Datatable').insertAdjacentHTML('beforeend', '' +
@@ -299,10 +231,7 @@
                 '</div>' +
                 '');
 
-
-
         $(document).ready(AppendNewDataTableHTML());
         $(document).ready(CreateDataTable());
-
     </script>
 }

@@ -1,5 +1,5 @@
-﻿using DataAccess.Repository.Interface;
-using DataAccess.Models.Entity;
+﻿using DataAccess.Models.Entity;
+using DataAccess.Repository.Interface;
 using DataAccess.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,15 +16,15 @@ namespace DataAccess.Repository.Base.Interface
         bool AreDatesOverlaping(DateTime startOn, DateTime endOn, int employeeId);
         bool AreDatesOverlapingLeaves(DateTime startOn, DateTime endOn, int employeeId);
         bool AreDatesOverlapingDayOff(DateTime startOn, DateTime endOn, bool isDayOff, int employeeId);
-        Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
-        Task<double> GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
+        double GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
+        double GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
         Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId);
-        Task<double> GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        Task<double> GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        Task<double> GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        Task<double> GetEmployeeTotalSecondsSaturdayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        Task<double> GetEmployeeTotalSecondsSaturdayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        Task<double> GetEmployeeTotalSecondsSundayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
-        Task<double> GetEmployeeTotalSecondsSundayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        double GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        double GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        double GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        double GetEmployeeTotalSecondsSaturdayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        double GetEmployeeTotalSecondsSaturdayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        double GetEmployeeTotalSecondsSundayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
+        double GetEmployeeTotalSecondsSundayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0);
     }
 }

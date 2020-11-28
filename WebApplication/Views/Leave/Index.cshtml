@@ -1,8 +1,6 @@
 ﻿@model IEnumerable<DataAccess.Models.Entity.Leave>
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 <div class="row">
@@ -19,7 +17,6 @@
             </div>
             <hr />
             <div class="box-body table-responsive">
-
                 <table id="LeaveDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
@@ -42,7 +39,6 @@
                         </tr>
                     </tfoot>
                 </table>
-
             </div>
         </div>
     </div>
@@ -51,99 +47,31 @@
 </div>
 @section Scripts {
     <script>
-        $('#LeaveDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-            iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 1
-            },
-            dom: 'Bfrtlp',
-            buttons: ['excel', 'pdf', 'print'],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-            ajax: {
-                url: '/api/leaves/datatable',
-                type: 'POST',
-                contentType: "application/json",
-                data: (data, type, row, meta) => {
+        $(() => {
+            var dataTable = new DataTableService('#LeaveDatatable')
+                .ForApiController('leaves')
+                .StartOrderFromCol(1)
+                .AddColumn(true, true, "EmployeeFullName")
+                .AddColumn(true, true, "StartOn", (a, b, data, d) => {
+                    if (data.StartOn != null)
+                        return moment(new Date(data.StartOn)).format('DD/MM/YYYY');
+                    else
+                        return "";
+                })
+                .AddColumn(true, true, "EndOn", (a, b, data, d) => {
+                    if (data.EndOn != null)
+                        return moment(new Date(data.EndOn)).format('DD/MM/YYYY');
+                    else
+                        return "";
+                })
+                .AddColumn(true, true, "ApprovedBy")
+                .AddColumn(true, true, "LeaveTypeName")
+                .AddColumn(false, false, "Buttons")
+                .AjaxData((data, type, row, meta) => {
                     data.Predicate = 'LeaveIndex';
                     return JSON.stringify(data);
-                }
-            },
-            order: [[1, 'desc']],
-            columns: [
-                {
-                    data: "EmployeeFullName",
-                    searchable: false,
-                    orderable: false,
-                    className: "dt-nowrap",
-                    render: (a, b, data, d) => {
-                        //console.log(data);
-                        if (data.EmployeeFullName != null)
-                            return data.EmployeeFullName;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "StartOn",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.StartOn != null)
-                            return moment(new Date(data.StartOn)).format('DD/MM/YYYY');
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "EndOn",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.EndOn != null)
-                            return moment(new Date(data.EndOn)).format('DD/MM/YYYY');
-                        else
-                            return "";
-                    }
-                }, {
-                    data: "ApprovedBy",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.ApprovedBy != null)
-                            return data.ApprovedBy;
-                        else
-                            return "";
-                    }
-                }
-                , {
-                    data: "LeaveTypeName",
-                    searchable: false,
-                    orderable: false,
-                    render: (a, b, data, d) => {
-                        if (data.LeaveTypeName != null)
-                            return data.LeaveTypeName;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "Buttons",
-                    searchable: false,
-                    orderable: false,
-                    render: (a, b, data, d) => {
-                        if (data.Buttons != null)
-                            return data.Buttons;
-                        else
-                            return "";
-                    }
-                }
-            ]
-        });
+                })
+                .CompleteDataTable();
+        })
     </script>
 }

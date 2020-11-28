@@ -24,7 +24,6 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -36,7 +35,6 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -54,127 +52,22 @@
 <partial name="_ExcelModals" model='new {Entity = "Employee" }'>
 
     @section Scripts {
-        <script src="~/js/Custom/DatatableDeleteButton.js"></script>
-
         <script>
-            $('#EmployeesDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                colReorder: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                dom: 'Bfrtlp',
-                buttons: ['excel', 'pdf', 'print'],
-                language: {
-                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                },
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        data.Predicate = 'EmployeeIndex'
+            $(() => {
+                var dataTable = new DataTableService('#EmployeesDatatable')
+                    .ForApiController('employees')
+                    .AddColumn(true, true, "FirstName")
+                    .AddColumn(true, true, "LastName")
+                    .AddColumn(true, true, "ErpCode")
+                    .AddColumn(true, true, "VatNumber")
+                    .AddColumn(true, true, "SpecializationName")
+                    .AddColumn(true, true, "CompanyTitle")
+                    .AddColumn(false, false, "Buttons")
+                    .AjaxData((data, type, row, meta) => {
+                        data.Predicate = 'EmployeeIndex';
                         return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "FirstName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            //console.log(data);
-                            if (data.FirstName != null)
-                                return data.FirstName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "LastName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.LastName != null)
-                                return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Email",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.Email != null)
-                                return data.Email;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "ErpCode",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.ErpCode != null)
-                                return data.ErpCode;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Afm",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.Afm != null)
-                                return data.Afm;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "SpecializationName",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.SpecializationName != null)
-                                return data.SpecializationName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "CompanyTitle",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.CompanyTitle != null)
-                                return data.CompanyTitle;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Buttons",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                createdRow: (row, data, dataIndex) => {
-                    if (!data.IsActive) {
-                        $(row).css('background-color', '#AAAFB4');
-                    }
-                }
-            });
+                    })
+                    .CompleteDataTable();
+            })
         </script>
     }

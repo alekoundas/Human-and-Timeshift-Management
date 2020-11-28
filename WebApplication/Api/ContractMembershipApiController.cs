@@ -2,7 +2,7 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -38,7 +38,7 @@ namespace WebApplication.Api
             ContractType.IsActive = !ContractType.IsActive;
             _baseDataWork.Update(ContractType);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
             if (status >= 1)
             {
                 response.IsSuccessful = true;
@@ -76,7 +76,7 @@ namespace WebApplication.Api
 
             _baseDataWork.ContractMemberships.Remove(contractMembership);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {

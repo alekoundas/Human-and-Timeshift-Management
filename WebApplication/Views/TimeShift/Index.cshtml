@@ -20,7 +20,6 @@
                 <table id="WorkPlaceDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
-
                             <th></th>
                             <th>Πόστο</th>
                             <th>Πελάτης</th>
@@ -46,6 +45,43 @@
 <partial name="_ExcelModals" model='new {Entity = "TimeShift" }'>
 
     @section Scripts {
+
+        <script>
+            $(() => {
+                var dataTable = new DataTableService('#WorkPlaceDatatable')
+                    .ForApiController('workplaces')
+                    .StartOrderFromCol(1)
+                    .AddColumn(false, false, "", (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>')
+                    .AddColumn(true, true, "Title")
+                    .AddColumn(true, true, "IdentifyingName")
+                    .AddColumn(true, true, "CompanyTitle")
+                    .AjaxData((data, type, row, meta) => {
+                        data.Predicate = 'TimeShiftIndex';
+                        return JSON.stringify(data);
+                    })
+                    .CompleteDataTable();
+
+                $('#WorkPlaceDatatable tbody').on('click', 'td.details-control', function () {
+                    var tr = $(this).closest('tr');
+                    var row = dataTable.row(tr);
+                    if (row.child.isShown()) {
+                        // This row is already open - close it
+                        DestroyTimeShiftDatatable(row.data().Id);
+                        row.child.hide();
+                        tr.removeClass('shown');
+                        SetDetailsButtonOff(row.data().Id);
+                    }
+                    else {
+                        // Open this row
+                        row.child(format(row.data().Id)).show();
+                        CreateTimeShiftDatatable(row.data().Id);
+                        SetDetailsButtonOn(row.data().Id);
+                        tr.addClass('shown');
+                    }
+                });
+
+            })
+        </script>
         <script>
 
             const SetDetailsButtonOn = id => {
@@ -67,98 +103,8 @@
             }
 
 
-            var table = $('#WorkPlaceDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
-                iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 2
-                },
-                dom: 'Bfrtlp',
-                language: {
-                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                },
-                ajax: {
-                    url: '/api/workplaces/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        data.predicate = 'TimeShiftIndex';
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: [
-                    {
-                        className: 'details-control',
-                        orderable: false,
-                        data: null,
-                        render: (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>'
-                    },
-                    {
-                        data: "Title",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.Title != null)
-                                return data.Title;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "IdentifyingName",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IdentifyingName != null)
-                                return data.IdentifyingName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Customer.company.title",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Customer != null)
-                                if (data.Customer?.company != null)
-                                    return data.Customer.company?.title;
-                                else
-                                    return "";
-                            else
-                                return "";
-                        }
-                    }
-                ]
-            });
-            // Add event listener for opening and closing details
-            $('#WorkPlaceDatatable tbody').on('click', 'td.details-control', function () {
-                var tr = $(this).closest('tr');
-                var row = table.row(tr);
-
-                if (row.child.isShown()) {
-                    // This row is already open - close it
-                    DestroyTimeShiftDatatable(row.data().Id);
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    SetDetailsButtonOff(row.data().Id);
-                }
-                else {
-                    // Open this row
-                    row.child(format(row.data().Id)).show();
-                    CreateTimeShiftDatatable(row.data().Id);
-                    SetDetailsButtonOn(row.data().Id);
-                    tr.addClass('shown');
-                }
-            });
 
             const format = id => {
-                console.log(id);
                 return '<p>Χρονοδιαγράμματα πόστου</p>' +
                     '<div style="width:100%">' +
                     '<div style="float:left; width:2% ">&nbsp</div>' +
@@ -189,82 +135,20 @@
             const DestroyTimeShiftDatatable = id =>
                 $('#TimeShiftsDatatableNum_' + id).DataTable().destroy();
 
-            const CreateTimeShiftDatatable = id => {
-                $('#TimeShiftsDatatableNum_' + id).DataTable({
-                    serverSide: true,
-                    responsive: true,
-                    colReorder: true,
-                    processing: true,
-                    dom: 'Bfrtlp',
-                    lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                    iDisplayLength: 150,
-                    language: {
-                        processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                    },
-                    ajax: {
-                        url: '/api/timeshifts/datatable',
-                        type: 'POST',
-                        contentType: "application/json",
-                        data: (data, type, row, meta) => {
-                            data.predicate = 'TimeShiftIndex';
-                            data.GenericId = id;//WorkPlaceId
-                            return JSON.stringify(data);
-                        }
-                    },
-                    order: [[0, 'desc']],
-                    columns: [
-                        {
-                            data: "Title",
-                            searchable: true,
-                            orderable: true,
-                            render: (a, b, data, d) => {
-                                console.log(data);
-                                if (data.Title != null)
-                                    return data.Title;
-                                else
-                                    return "";
-                            }
-                        },
-                        {
-                            data: "Month",
-                            searchable: false,
-                            orderable: true,
-                            render: (a, b, data, d) => {
-                                if (data.Month != null)
-                                    return data.Month;
-                                else
-                                    return "";
-                            }
-                        },
-                        {
-                            data: "Year",
-                            searchable: false,
-                            orderable: true,
-                            render: (a, b, data, d) => {
-                                if (data.Year != null)
-                                    return data.Year;
-                                else
-                                    return "";
-                            }
-                        },
-                        {
-                            data: "Buttons",
-                            searchable: false,
-                            orderable: false,
-                            render: (a, b, data, d) => {
-                                if (data.Buttons != null)
-                                    return data.Buttons;
-                                else
-                                    return "";
-                            }
-                        }
-                    ],
-                    createdRow: (row, data, dataIndex) => {
-                        if (!data.IsActive) {
-                            $(row).css('background-color', '#AAAFB4');
-                        }
-                    }
-                });
-            }
+            const CreateTimeShiftDatatable = id =>
+                new DataTableService('#TimeShiftsDatatableNum_' + id)
+                    .ForApiController('timeshifts')
+                    .AddColumn(true, true, "Title")
+                    .AddColumn(true, true, "Month")
+                    .AddColumn(true, true, "Year")
+                    .AddColumn(false, false, "Buttons")
+                    .AjaxData((data, type, row, meta) => {
+                        data.predicate = 'TimeShiftIndex';
+                        data.GenericId = id;//WorkPlaceId
+                        return JSON.stringify(data);
+                    })
+                    .CompleteDataTable();
+
+
         </script>
     }

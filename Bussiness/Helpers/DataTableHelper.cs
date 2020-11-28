@@ -1,5 +1,5 @@
 ﻿using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Http;

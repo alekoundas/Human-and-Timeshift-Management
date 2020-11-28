@@ -1,8 +1,6 @@
 ﻿@model DataAccess.Models.Entity.Employee
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -26,70 +24,70 @@
                 <div class="form-group">
                     <label asp-for="FirstName" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="FirstName" class="form-control" readonly="readonly" disabled />
+                        <input asp-for="FirstName" class="form-control" readonly disabled />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="LastName" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="LastName" class="form-control" readonly="readonly" disabled />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="DateOfBirth" class="control-label"></label>
-                    <div class="input-group">
-                        <input asp-for="DateOfBirth" class="form-control" readonly="readonly" disabled />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Email" class="control-label"></label>
-                    <div class="input-group">
-                        <input asp-for="Email" class="form-control" readonly="readonly" disabled />
+                        <input asp-for="LastName" class="form-control" readonly disabled />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="ErpCode" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="ErpCode" class="form-control" readonly="readonly" disabled />
+                        <input asp-for="ErpCode" class="form-control" readonly disabled />
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Afm" class="control-label"></label>
+                    <label asp-for="VatNumber" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="Afm" class="form-control" readonly="readonly" disabled />
+                        <input asp-for="VatNumber" class="form-control" readonly disabled />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="SocialSecurityNumber" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="SocialSecurityNumber" class="form-control" readonly="readonly" disabled />
+                        <input asp-for="SocialSecurityNumber" class="form-control" readonly disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="HireDate" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="HireDate" type="text" class="form-control" readonly disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ContractStartOn" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="ContractStartOn" type="text" class="form-control" readonly disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ContractEndOn" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="ContractEndOn" type="text" class="form-control" readonly disabled />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="Specialization" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="Specialization.Name" class="form-control" readonly="readonly" disabled />
+                        <input asp-for="Specialization.Name" class="form-control" readonly disabled />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="Company" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="Company.Title" class="form-control" readonly="readonly" disabled />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="CreatedOn" class="control-label"></label>
-                    <div class="input-group">
-                        <input asp-for="CreatedOn" class="form-control" readonly="readonly" disabled />
+                        <input asp-for="Company.Title" class="form-control" readonly disabled />
                     </div>
                 </div>
 
@@ -142,75 +140,21 @@
     <script src="~/js/Custom/Contacts.js"></script>
 
     <script>
-        $('#WorkPlacesDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150,"Όλα"]],
-             iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 1
-            },
-            dom: 'Bfrtlp',
-            buttons: ['excel', 'pdf', 'print'],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-                ajax: {
-                    url: '/api/workplaces/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'EmployeeDetails';
-                        data.genericId =@Model.Id;
-
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "Title",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            //console.log(data);
-                            if (data.Title != null)
-                                return data.Title;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "IdentifyingName",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IdentifyingName != null)
-                                return data.IdentifyingName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "IsInWorkPlace",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IsInWorkPlace != null)
-                                return data.IsInWorkPlace;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                fnDrawCallback:  () =>
-                    $('.ToggleSliders').bootstrapToggle({
-                        on: 'Ναί',
-                        off: 'Όχι'
-                    }),
-            });
-
+        $(() => new DataTableService('#WorkPlacesDatatable')
+            .ForApiController('workplaces')
+            .AddColumn(true, true, "Title")
+            .AddColumn(true, true, "IdentifyingName")
+            .AddColumn(true, true, "IsInWorkPlace")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'EmployeeDetails';
+                data.genericId =@Model.Id;
+                return JSON.stringify(data);
+            })
+            .FnDrawCallback(()=>
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                }))
+            .CompleteDataTable());
     </script>
 }

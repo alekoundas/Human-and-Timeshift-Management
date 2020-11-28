@@ -1,7 +1,5 @@
 ﻿@model DataAccess.ViewModels.ApplicationUserViewModel
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -44,65 +42,18 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $('#UsersDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            colReorder: false,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-            iDisplayLength: 150,
-            dom: 'Bfrtlp',
-            buttons: ['excel', 'pdf', 'print'],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-            "ajax": {
-                url: '/api/users/datatable',
-                type: 'POST',
-                contentType: "application/json",
-                data: (data, type, row, meta) => {
-                    data.predicate = "UserIndex";
+        $(() => {
+            var dataTable = new DataTableService('#UsersDatatable')
+                .ForApiController('users')
+                .StartOrderFromCol(1)
+                .AddColumn(true, true, "UserName")
+                .AddColumn(true, true, "Email")
+                .AddColumn(false, false, "Buttons")
+                .AjaxData((data, type, row, meta) => {
+                    data.Predicate = 'UserIndex';
                     return JSON.stringify(data);
-                }
-            },
-            order: [[0, 'desc']],
-            columns: [
-                {
-                    data: "UserName",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.UserName != null)
-                            return data.UserName;
-                        else
-                            return "";
-                    }
-
-                },
-                {
-                    data: "Email",
-                    searchable: true,
-                    orderable: true,
-                    render: (a, b, data, d) => {
-                        if (data.Email != null)
-
-                            return data.Email;
-                        else
-                            return "";
-                    }
-                },
-                {
-                    data: "Buttons",
-                    searchable: false,
-                    orderable: false,
-                    render: (a, b, data, d) => {
-                        if (data.Buttons != null)
-                            return data.Buttons;
-                        else
-                            return "";
-                    }
-                }
-            ]
-        });
+                })
+                .CompleteDataTable();
+        })
     </script>
 }

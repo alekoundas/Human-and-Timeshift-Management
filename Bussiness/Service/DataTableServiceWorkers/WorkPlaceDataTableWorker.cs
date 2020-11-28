@@ -1,6 +1,6 @@
 ﻿using Bussiness.Helpers;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
@@ -302,6 +302,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
+                dictionary.Add("CompanyTitle", result.Customer?.Company?.Title);
                 dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
 
                 returnObjects.Add(expandoObj);
@@ -335,13 +336,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                var totalSeconds = await _baseDatawork.RealWorkHours
+                var totalSeconds =  _baseDatawork.RealWorkHours
                        .GetEmployeeTotalSecondsFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
 
-                var totalSecondsDay = await _baseDatawork.RealWorkHours
+                var totalSecondsDay =  _baseDatawork.RealWorkHours
                        .GetEmployeeTotalSecondsDayFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
 
-                var totalSecondsNight = await _baseDatawork.RealWorkHours
+                var totalSecondsNight =  _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsNightFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
                 if (_datatable.ShowHoursInPercentage)
                 {

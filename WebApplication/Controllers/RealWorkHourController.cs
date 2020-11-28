@@ -1,5 +1,4 @@
-﻿using Bussiness;
-using DataAccess;
+﻿using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -128,7 +127,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(realWorkHour);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

@@ -20,6 +20,7 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="IsActive" />
+                <input type="hidden" asp-for="CreatedBy_Id" />
 
                 <div class="box-body">
 
@@ -32,10 +33,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="AFM" class="control-label"></label>
+                        <label asp-for="VatNumber" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="AFM" class="form-control" readonly="readonly" />
-                            <span asp-validation-for="AFM" class="text-danger"></span>
+                            <input asp-for="VatNumber" class="form-control" readonly="readonly" />
+                            <span asp-validation-for="VatNumber" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -85,10 +86,23 @@
                             <select class="Company_Select2" asp-for="CompanyId" style="width:70%">
                                 @if (Model.Company != null)
                                 {
-                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>
-}
+                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>}
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedBy_FullName" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedOn" class="form-control" readonly />
                         </div>
                     </div>
 
@@ -155,62 +169,21 @@
     </script>
 
     <script>
-        $('#WorkPlacesDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            colReorder: true,
-            processing: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150,"Όλα"]],
-             iDisplayLength: 150,
-            dom: 'Bfrtlp',
-            buttons: ['excel', 'pdf', 'print'],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-                ajax: {
-                    url: '/api/workplaces/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'CustomerEdit';
-                        data.genericId =@Model.Id;
-
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "Title",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            //console.log(data);
-                            if (data.Title != null)
-                                return data.Title;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "IsInWorkPlace",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IsInWorkPlace != null)
-                                return data.IsInWorkPlace;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                fnDrawCallback:  () =>
-                    $('.ToggleSliders').bootstrapToggle({
-                        on: 'Ναί',
-                        off: 'Όχι'
-                    }),
-            });
+        $(() => new DataTableService('#WorkPlacesDatatable')
+            .ForApiController('workplaces')
+            .AddColumn(true, true, "Title")
+            .AddColumn(true, true, "IsInWorkPlace")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'CustomerEdit';
+                data.genericId =@Model.Id;
+                return JSON.stringify(data);
+            })
+            .FnDrawCallback(()=>
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                }))
+            .CompleteDataTable());
 
         $('#WorkPlacesDatatable').on('change', '.ToggleSliders', (element) => {
             var apiUrl = element.target.getAttribute('urlattr');

@@ -1,18 +1,22 @@
-﻿using System;
+﻿using DataAccess.Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using DataAccess.Models.Entity;
 
 namespace WebApplication.Utilities
 {
     public class SelectLambdaBuilder<TEntity>
     {
-        private static Dictionary<Type, PropertyInfo[]> _typePropertyInfoMappings = new Dictionary<Type, PropertyInfo[]>();
         private ParameterExpression _xParameter = null;
         private readonly Type _typeOfBaseClass = typeof(TEntity);
-        private List<MemberAssignment> _selectedProperies = new List<MemberAssignment>();
+
+        private static Dictionary<Type, PropertyInfo[]> _typePropertyInfoMappings =
+            new Dictionary<Type, PropertyInfo[]>();
+
+        private List<MemberAssignment> _selectedProperies =
+            new List<MemberAssignment>();
 
         public SelectLambdaBuilder<TEntity> CreateSelect()
         {
@@ -22,16 +26,29 @@ namespace WebApplication.Utilities
 
         public SelectLambdaBuilder<TEntity> WithProperty(string field)
         {
-            Expression xParam = this._xParameter;
-            xParam = Expression.PropertyOrField(xParam, field);
+            Expression xParam = Expression.PropertyOrField(this._xParameter, field);
             PropertyInfo mi = _typeOfBaseClass.GetProperty(((MemberExpression)xParam).Member.Name);
-            var xOriginal = Expression.Property(this._xParameter, mi);
-            this._selectedProperies.Add(Expression.Bind(mi, xOriginal));
+            this._selectedProperies.Add(Expression.Bind(mi, xParam));
 
             return this;
         }
 
-        public SelectLambdaBuilder<TEntity> AddClass<TSelectClass>(string field)
+        public SelectLambdaBuilder<TEntity> WithProperty2<TProperty>(Expression<Func<TEntity, TProperty>> selector)
+        {
+            //if(selector.Body.)
+
+            var sssssss = selector.Body;
+            var dotEntries = selector.ToString().Split('.');
+            var aaa = dotEntries.ElementAt(1).GetType();
+            var bbb = dotEntries.ElementAt(2).GetType();
+            //Expression xParam = Expression.PropertyOrField(this._xParameter, field);
+            //PropertyInfo mi = _typeOfBaseClass.GetProperty(((MemberExpression)xParam).Member.Name);
+            //this._selectedProperies.Add(Expression.Bind(mi, xParam));
+
+            return this;
+        }
+
+        public SelectLambdaBuilder<TEntity> WithClass<TSelectClass, TProperty>(string field)
         {
 
 
@@ -79,11 +96,6 @@ namespace WebApplication.Utilities
 
             return lambda.Compile();
         }
-
-
-
-
-
 
 
         private Dictionary<string, List<string>> GetFieldMapping(string fields)

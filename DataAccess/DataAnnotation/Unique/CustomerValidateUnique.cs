@@ -10,7 +10,7 @@ namespace DataAccess.DataAnnotation.Unique
         {
             var baseDbContext = (BaseDbContext)validationContext.GetService(typeof(BaseDbContext));
             var baseDataWork = new BaseDatawork(baseDbContext);
-            if (baseDataWork.Customers.Any(x => x.AFM == value.ToString().Trim()))
+            if (baseDataWork.Customers.Any(x => x.VatNumber == value.ToString().Trim()))
                 return new ValidationResult("Το ΑΦΜ πρέπει να είναι μοναδικό");
 
             return ValidationResult.Success;

@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -15,7 +13,6 @@
 
             <hr />
 
-
             <div class="box-body">
                 <div style="width:100%;">
                     <div style="width:50%; float:left;">
@@ -25,7 +22,6 @@
                                 <select id="WorkPlace_Select2" style="width:70%"></select>
                             </div>
                         </div>
-
                     </div>
                     <div style="width:50%; float:left;">
                         <label class="control-label">Χρονικό έυρος</label>
@@ -41,7 +37,6 @@
     <div class="col-md-3"> </div>
 </div>
 
-
 <div class="row">
     <div class="col-md-12">
         <div class="box box-danger" style="margin-top:5%;">
@@ -54,18 +49,12 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     <script>
-
-
         const ConvertDateForApi = timeStamp =>
             CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
-        CompleteTimeWithZerosForApiPost = date => {
+        const CompleteTimeWithZerosForApiPost = date => {
             var year = date.getFullYear();
             var month = String((date.getMonth() + 1)).length == 1 ?
                 '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
@@ -78,6 +67,7 @@
 
             return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
         }
+
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
@@ -100,10 +90,9 @@
             newDate.setHours(23, 59, 59);
             return moment(newDate);
         }
-
     </script>
-    <script>
 
+    <script>
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
             allowClear: true,
@@ -119,7 +108,6 @@
             }
         }).on('change', () =>
             $('#EmployeesRealWorkHoursAnalytically').DataTable().ajax.reload());
-
 
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
@@ -148,74 +136,21 @@
             .DataTable().destroy();
 
         var CreateDataTable = () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 2
-                },
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                dom: 'Bfrtlp',
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'ProjectionRealWorkHoursAnalytically';
-                        if (GetSelectedWorkPlaceId() != '')
-                            data.genericId = GetSelectedWorkPlaceId();
-                        data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
-                        data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: CreateDatatableColumns(),
-            });
-
-        const CreateDatatableColumns = () => {
-            var columns = []
-            columns.push({
-                data: "FirstName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'FirstName')
-            });
-            columns.push({
-                data: "LastName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'LastName')
-            });
-            columns.push({
-                data: "ErpCode",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ErpCode')
-            });
-            //Add days of month
-            for (var i = 0; i < GetDaysDifferenceFromRange(); i++)
-                columns.push({
-                    "data": "Day_" + i,
-                    "searchable": false,
-                    "orderable": true
-                });
-
-            return columns;
-        }
-        const RenderDataFromDatatable = (data, property) => {
-            if (data[property] != null)
-                return data[property];
-            else
-                return "";
-        }
+            new DataTableService('#EmployeesRealWorkHoursAnalytically')
+                .ForApiController('employees')
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionRealWorkHoursAnalytically';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.genericId = GetSelectedWorkPlaceId();
+                    data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
+                    data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
 
         const GetDaysColumns = () => {
             var thElements = '';
@@ -239,8 +174,7 @@
         const DeleteDataTableHTML = () =>
             document.getElementById('EmployeesRealWorkHoursAnalytically').remove();
 
-        const AppendNewDataTableHTML = () => {
-
+        const AppendNewDataTableHTML = () =>
             document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
                 '<div class="box-body table-responsive">' +
                 '<table id="EmployeesRealWorkHoursAnalytically" class="table table-bordered table-hover table-responsive stripe">' +
@@ -263,8 +197,6 @@
                 '</table>' +
                 '</div>' +
                 '');
-
-        }
 
         $(document).ready(AppendNewDataTableHTML());
         $(document).ready(CreateDataTable());

@@ -1,5 +1,6 @@
 ﻿using Bussiness.Service;
 using DataAccess;
+using DataAccess.Models.Audit;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -65,6 +66,7 @@ namespace WebApplication.Controllers
             if (ModelState.IsValid)
             {
                 _baseDataWork.Customers.Add(CustomerCreate.CreateFrom(customer));
+                _context.EnsureAutoHistory(() => new AuditAutoHistory { });
 
                 var status = await _baseDataWork.SaveChangesAsync();
                 if (status > 0)
@@ -111,7 +113,8 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(customer);
-                    await _context.SaveChangesAsync();
+                    _context.EnsureAutoHistory(() => new AuditAutoHistory { });
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -126,7 +129,7 @@ namespace WebApplication.Controllers
         {
             var excelColumns = new List<string>(new string[] {
                 "IdentifyingName",
-                "AFM",
+                "VatNumber",
                 "Profession",
                 "Address",
                 "PostalCode",
@@ -156,7 +159,7 @@ namespace WebApplication.Controllers
         {
             var excelColumns = new List<string>(new string[] {
                 "IdentifyingName",
-                "AFM",
+                "VatNumber",
                 "Profession",
                 "Address",
                 "PostalCode",
@@ -187,9 +190,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var customers = (await (await (new ExcelService<Customer>(_context)
+                var customers = (await (new ExcelService<Customer>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
                 if (errors.Count == 0)
                 {

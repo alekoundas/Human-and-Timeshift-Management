@@ -13,8 +13,7 @@ namespace Bussiness.Seed
                 context.Add(new ContractType
                 {
                     Name = "Άλλο",
-                    IsActive = true,
-                    CreatedOn = DateTime.Now
+                    IsActive = true
                 });
 
             context.SaveChanges();

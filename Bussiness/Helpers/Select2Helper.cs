@@ -1,5 +1,5 @@
-﻿using DataAccess.Models.Entity;
-using DataAccess.Models.Select2;
+﻿using DataAccess.Libraries.Select2;
+using DataAccess.Models.Entity;
 using System.Collections.Generic;
 
 namespace Bussiness.Helpers

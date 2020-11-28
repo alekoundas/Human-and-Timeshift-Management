@@ -21,6 +21,7 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="IsActive" />
+                <input type="hidden" asp-for="CreatedBy_Id" />
 
                 <div class="box-body">
 
@@ -41,22 +42,6 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="DateOfBirth" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="DateOfBirth" class="form-control" />
-                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="Email" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
                         <label asp-for="ErpCode" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="ErpCode" class="form-control" />
@@ -65,10 +50,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Afm" class="control-label"></label>
+                        <label asp-for="VatNumber" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Afm" class="form-control" readonly="readonly" />
-                            <span asp-validation-for="Afm" class="text-danger"></span>
+                            <input asp-for="VatNumber" class="form-control" readonly="readonly" />
+                            <span asp-validation-for="VatNumber" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -77,6 +62,30 @@
                         <div class="input-group">
                             <input asp-for="SocialSecurityNumber" class="form-control" />
                             <span asp-validation-for="SocialSecurityNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="HireDate" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="HireDate" type="text" class="form-control CalentimInput" />
+                            <span asp-validation-for="HireDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ContractStartOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="ContractStartOn" type="text" class="form-control CalentimInput" />
+                            <span asp-validation-for="ContractStartOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ContractEndOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="ContractEndOn" type="text" class="form-control CalentimInput" />
+                            <span asp-validation-for="ContractEndOn" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -103,6 +112,20 @@
 }
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedBy_FullName" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedOn" class="form-control" readonly />
                         </div>
                     </div>
 
@@ -234,79 +257,47 @@
                 }
             }
         });
+
+        $(() => new DataTableService('#WorkPlacesDatatable')
+            .ForApiController('workplaces')
+            .AddColumn(true, true, "Title")
+            .AddColumn(true, true, "IdentifyingName")
+            .AddColumn(true, true, "IsInWorkPlace")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'EmployeeEdit';
+                data.genericId =@Model.Id;
+                return JSON.stringify(data);
+            })
+            .FnDrawCallback(()=>
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                }))
+            .CompleteDataTable());
+
+
+        $('.CalentimInput').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showButtons: true,
+            singleDate: true,
+            showHeader: true,
+            startEmpty:true,
+            startDate: Date.now(),
+            endDate: Date.now(),
+            format: "DD/MM/YYYY",
+            calendarCount: 1,
+            locale: "el",
+            showOn: "right",
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        })
     </script>
 
     <script>
-        $('#WorkPlacesDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150,"Όλα"]],
-             iDisplayLength: 150,
-            colReorder: {
-                fixedColumnsLeft: 1
-            },
-            dom: 'Bfrtlp',
-            buttons: ['excel', 'pdf', 'print'],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-                ajax: {
-                    url: '/api/workplaces/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'EmployeeEdit';
-                        data.genericId =@Model.Id;
-
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "Title",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            //console.log(data);
-                            if (data.Title != null)
-                                return data.Title;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "IdentifyingName",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IdentifyingName != null)
-                                return data.IdentifyingName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "IsInWorkPlace",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IsInWorkPlace != null)
-                                return data.IsInWorkPlace;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                fnDrawCallback:  () =>
-                    $('.ToggleSliders').bootstrapToggle({
-                        on: 'Ναί',
-                        off: 'Όχι'
-                    }),
-            });
-
         $('#WorkPlacesDatatable').on('change', '.ToggleSliders', (element) => {
             var apiUrl = element.target.getAttribute('urlattr');
             $.ajax({

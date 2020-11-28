@@ -1,8 +1,10 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.Models.Audit;
+using DataAccess.Models.Entity;
 using DataAccess.Repository.Base;
 using DataAccess.Repository.Base.Interface;
 using DataAccess.Repository.Interface;
 using DataAccess.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ namespace DataAccess
     public class BaseDatawork : IBaseDatawork
     {
         private readonly BaseDbContext _dbcontext;
-
+        private IHttpContextAccessor _httpContext;
 
         public ILeaveRepository Leaves { get; private set; }
         public ICompanyRepository Companies { get; private set; }
@@ -57,6 +59,23 @@ namespace DataAccess
 
         public async Task<int> SaveChangesAsync()
         {
+            //AutoHistory will fill with user values on Edit and Delete
+            _httpContext = new HttpContextAccessor();
+            var firstNameValue = _httpContext.HttpContext.User
+                .Claims
+                .FirstOrDefault(x => x.Type == "FirstName")
+                .Value;
+
+            var lastNameValue = _httpContext.HttpContext.User
+                .Claims
+                .FirstOrDefault(x => x.Type == "LastName")
+                .Value;
+
+            _dbcontext.EnsureAutoHistory(() => new AuditAutoHistory
+            {
+                ModifiedBy = firstNameValue + lastNameValue,
+                ModifiedOn = DateTime.Now
+            });
             return await _dbcontext.SaveChangesAsync();
         }
 

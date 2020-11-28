@@ -2,7 +2,7 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -38,11 +38,11 @@ namespace WebApplication.Api
             ContractType.IsActive = !ContractType.IsActive;
             _baseDataWork.Update(ContractType);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
             if (status >= 1)
             {
                 response.IsSuccessful = true;
-                response.ResponseBody = "Η σύμβαση " +
+                response.ResponseBody = "Ο τύπος σύμβασης " +
                     ContractType.Name +
                     (ContractType.IsActive ? " ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : " ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
                     "με επιτυχία.";
@@ -50,14 +50,14 @@ namespace WebApplication.Api
             else
             {
                 response.IsSuccessful = false;
-                response.ResponseBody = "Ωχ! Η σύμβαση " +
+                response.ResponseBody = "Ωχ! Ο τύπος σύμβασης " +
                      ContractType.Name +
                     " ΔΕΝ " +
                     (ContractType.IsActive ? "ΕΝΕΡΓΟΠΟΙΗΘΗΚΕ " : "ΑΠΕΝΕΡΓΟΠΟΙΗΘΗΚΕ ") +
                     "με επιτυχία";
             }
 
-            response.ResponseTitle = "Αλλαγή κατάστασης σύμβασης";
+            response.ResponseTitle = "Αλλαγή κατάστασης τύπου σύμβασης";
             response.Entity = ContractType;
 
             return Ok(response);
@@ -76,24 +76,24 @@ namespace WebApplication.Api
 
             _baseDataWork.ContractTypes.Remove(ContractType);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {
                 response.IsSuccessful = true;
-                response.ResponseBody = "Η εταιρία " +
+                response.ResponseBody = "Ο τύπος σύμβασης " +
                     ContractType.Name +
                     " διαγράφηκε με επιτυχία.";
             }
             else
             {
                 response.IsSuccessful = false;
-                response.ResponseBody = "Ωχ! Η εταιρία " +
+                response.ResponseBody = "Ωχ! Ο τύπος σύμβασης " +
                     ContractType.Name +
                     " ΔΕΝ διαγράφηκε!";
             }
 
-            response.ResponseTitle = "Διαγραφή εταιρίας";
+            response.ResponseTitle = "Διαγραφή τύπου σύμβασης";
             response.Entity = ContractType;
             return response;
         }

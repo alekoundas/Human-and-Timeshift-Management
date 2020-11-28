@@ -32,7 +32,21 @@
                 <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
                     <div class="input-group">
-                        <textarea asp-for="Description" class="form-control" readonly="readonly" disabled ></textarea>
+                        <textarea asp-for="Description" class="form-control" readonly="readonly" disabled></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="CreatedBy_FullName" class="form-control" readonly disabled />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CreatedOn" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="CreatedOn" class="form-control" readonly disabled />
                     </div>
                 </div>
 

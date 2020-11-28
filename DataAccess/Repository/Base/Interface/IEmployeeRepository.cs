@@ -1,12 +1,10 @@
-﻿using System;
+﻿using DataAccess.Libraries.Datatable;
+using DataAccess.Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using DataAccess.Repository.Interface;
-using DataAccess.Models.Datatable;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.Repository.Interface
 {

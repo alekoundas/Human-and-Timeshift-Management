@@ -35,7 +35,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _context.WorkHours.Remove(workHour);
-            await _context.SaveChangesAsync();
+            await _baseDataWork.SaveChangesAsync();
 
             return workHour;
         }
@@ -222,8 +222,7 @@ namespace WebApplication.Api
                     TimeShiftId = workHour.TimeShiftId,
                     EmployeeId = workHour.EmployeeId,
                     IsDayOff = workHour.IsDayOff,
-                    Comments = workHour.Comments,
-                    CreatedOn = DateTime.Now
+                    Comments = workHour.Comments
                 });
             }
             _baseDataWork.WorkHours.AddRange(dataToSaveRange);
@@ -264,8 +263,7 @@ namespace WebApplication.Api
                         StartOn = workHour.NewStartOn,
                         EndOn = workHour.NewEndOn,
                         TimeShiftId = workHour.TimeShiftId,
-                        EmployeeId = workHour.EmployeeId,
-                        CreatedOn = DateTime.Now
+                        EmployeeId = workHour.EmployeeId
                     });
                 }
 

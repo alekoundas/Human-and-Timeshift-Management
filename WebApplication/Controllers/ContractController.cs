@@ -34,10 +34,12 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "Contract_View")]
         public async Task<ActionResult> Details(int id)
         {
-            if (id == null)
+            if (id == 0)
                 return NotFound();
 
-            var Contract = await _baseDataWork.Contracts
+            var Contract = await _context.Contracts
+                .Include(x => x.ContractMembership)
+                .Include(x => x.ContractType)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (Contract == null)
@@ -81,18 +83,22 @@ namespace WebApplication.Controllers
         }
 
         // GET: Contracts/Edit/5
-        [Authorize(Roles = "Company_Edit")]
+        [Authorize(Roles = "Contract_Edit")]
         public async Task<ActionResult> Edit(int id)
         {
-            if (id == null)
+            if (id == 0)
                 return NotFound();
 
-            var company = await _context.Contracts.FindAsync(id);
-            if (company == null)
+            var contract = await _context.Contracts
+                .Include(x => x.ContractMembership)
+                .Include(x => x.ContractType)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (contract == null)
                 return NotFound();
 
             ViewData["Title"] = "Επεξεργασία σύμβασης ";
-            return View(company);
+            return View(contract);
         }
 
         // POST: Contracts/Edit/5
@@ -108,7 +114,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(Contract);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -191,9 +197,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var contracts = (await (await (new ExcelService<Contract>(_context)
+                var contracts = (await (new ExcelService<Contract>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
 
                 if (errors.Count == 0)

@@ -111,7 +111,7 @@
 
         //Append new workhour to modal
         const AppendRealWorkHour = employeeId => {
-          
+
 
             var prependEmployeeIds = GetSliderCheckedEmployeeIds();
             WorkHourId++;
@@ -202,116 +202,31 @@
                 .map((data) => data.value)
                 .filter((val) => val != "");
 
-       
+
     </script>
-
-
-
-
-
-
 
     <!--///////////////////////////////////////-->
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
-        jQuery(() => {
-            $('#EmployeesCurrentDayDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 3
-                },
-                dom: 'frtlp',
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        data.predicate = 'RealWorkHourCurrentDay';
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: [
-                    {
-                        "data": "ToggleSlider",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.ToggleSlider != null)
-                                return data.ToggleSlider;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "FirstName",
-                        "searchable": true,
-                        "orderable": true,
-                        render: (a, b, data, d) => {
-                            if (data.FirstName != null)
-                                return data.FirstName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "LastName",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.LastName != null)
-                                return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "StartOn",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.StartOn != null)
-                                return data.StartOn;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "EndOn",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.EndOn != null)
-                                return data.EndOn;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        "data": "Buttons",
-                        "searchable": false,
-                        "orderable": false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                fnDrawCallback: function () {
-                    $('.ToggleSliders').bootstrapToggle({
-                        on: 'Ναί',
-                        off: 'Όχι'
-                    });
-                },
-            });
-        });
+        $(() => new DataTableService('#EmployeesCurrentDayDatatable')
+            .ForApiController('employees')
+            .StartOrderFromCol(1)
+            .AddColumn(true, true, "ToggleSlider")
+            .AddColumn(true, true, "FirstName")
+            .AddColumn(true, true, "LastName")
+            .AddColumn(true, true, "StartOn")
+            .AddColumn(true, true, "EndOn")
+            .AddColumn(false, false, "Buttons")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'RealWorkHourCurrentDay';
+                return JSON.stringify(data);
+            })
+            .FnDrawCallback(()=>
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                }))
+            .CompleteDataTable());
     </script>
 }

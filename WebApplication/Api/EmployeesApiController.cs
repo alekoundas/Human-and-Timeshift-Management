@@ -2,9 +2,9 @@
 using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
+using DataAccess.Libraries.Select2;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Select2;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
@@ -42,11 +42,13 @@ namespace WebApplication.Api
                 .WithProperty("Id")
                 .WithProperty("FirstName")
                 .WithProperty("LastName")
-                .AddClass<WorkHour>("workhours")
+                .WithProperty2(x => x.Company.Id)
+                //.WithClass<WorkHour>("workhours")
                 //.AddClass<Specialization>("Id")
                 .CompleteSelect();
 
 
+            //var aaaa = _context.Employees.Select(x => new Employee { FirstName = x.FirstName, LastName = x.LastName }).ToList();
             var aaa = _context.Employees
                 .Include(x => x.EmployeeWorkPlaces)
                 .Include(x => x.Specialization)
@@ -54,6 +56,7 @@ namespace WebApplication.Api
                 .Select(select)
                 .ToList();
 
+            //return Ok(aaaa);
             return Ok(aaa);
         }
 
@@ -68,7 +71,7 @@ namespace WebApplication.Api
             employee.IsActive = !employee.IsActive;
             _baseDataWork.Update(employee);
 
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
             if (status >= 1)
             {
                 response.IsSuccessful = true;
@@ -116,7 +119,7 @@ namespace WebApplication.Api
             var employeeRealWorkHours = employee.RealWorkHours;
 
             _baseDataWork.Employees.Remove(employee);
-            var status = await _context.SaveChangesAsync();
+            var status = await _baseDataWork.SaveChangesAsync();
 
             if (status >= 1)
             {

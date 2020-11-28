@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -64,14 +62,8 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     <script>
-
-
         const ConvertDateForApi = timeStamp =>
             CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
@@ -118,47 +110,6 @@
         var DestroyDataTable = () => $('#RealWorkHoursAnalyticallySumDatatable')
             .DataTable().destroy();
 
-        const CreateDatatableColumns = () => {
-            var columns = []
-            columns.push({
-                data: "FirstName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'FirstName')
-            });
-            columns.push({
-                data: "LastName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'LastName')
-            });
-            columns.push({
-                data: "ErpCode",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ErpCode')
-            });
-
-            //Add days of month
-            for (var i = 0; i < GetDaysDifferenceFromRange(); i++)
-                columns.push({
-                    "data": "Day_" + i,
-                    "searchable": false,
-                    "orderable": true
-                });
-
-            return columns;
-        }
-        const RenderDataFromDatatable = (data, property) => {
-            if (data[property] != null)
-                return data[property];
-            else
-                return "";
-        }
-
         const GetDaysColumns = () => {
             var thElements = '';
             for (var i = 0; i < GetDaysDifferenceFromRange(); i++) {
@@ -180,10 +131,9 @@
 
         const DeleteDataTableHTML = () =>
             document.getElementById('RealWorkHoursAnalyticallySumDatatable').remove();
-
     </script>
-    <script>
 
+    <script>
         $('#SliderHourChoice').bootstrapToggle({
             on: 'HH:mm',
             off: '%',
@@ -210,7 +160,6 @@
         }).on('change', () =>
             $('#RealWorkHoursAnalyticallySumDatatable').DataTable().ajax.reload());
 
-
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
             startOnMonday: true,
@@ -221,7 +170,6 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            //oninit: () => AppendNewDataTableHTML();,
             onafterselect: () => {
                 DestroyDataTable();
                 DeleteDataTableHTML();
@@ -236,39 +184,24 @@
         });
 
         var CreateDataTable = () =>
-            $('#RealWorkHoursAnalyticallySumDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 2
-                },
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                dom: 'Bfrtlp',
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
+            new DataTableService('#RealWorkHoursAnalyticallySumDatatable')
+                .ForApiController('employees')
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionRealWorkHoursAnalyticallySum';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.genericId = GetSelectedWorkPlaceId();
+                    data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
+                    data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                    data.ShowHoursInPercentage = GetSliderHourChoiceValue();
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
 
-                        data.predicate = 'ProjectionRealWorkHoursAnalyticallySum';
-                        if (GetSelectedWorkPlaceId() != '')
-                            data.genericId = GetSelectedWorkPlaceId();
-                        data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
-                        data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
-                        data.ShowHoursInPercentage = GetSliderHourChoiceValue();
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: CreateDatatableColumns(),
-            });
-
-
-        const AppendNewDataTableHTML = () => {
-
+        const AppendNewDataTableHTML = () =>
             document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
                 '<div class="box-body table-responsive">' +
                 '<table id="RealWorkHoursAnalyticallySumDatatable" class="table table-bordered table-hover table-responsive stripe">' +
@@ -292,10 +225,7 @@
                 '</div>' +
                 '');
 
-        }
-
         $(document).ready(AppendNewDataTableHTML());
         $(document).ready(CreateDataTable());
-
     </script>
 }

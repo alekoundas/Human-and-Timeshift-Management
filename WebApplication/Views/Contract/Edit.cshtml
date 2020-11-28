@@ -11,7 +11,7 @@
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
-                    @Html.ButtonBackToList("Employee")
+                    @Html.ButtonBackToList("Contract")
                 </div>
             </div>
 
@@ -19,9 +19,10 @@
 
             <form asp-controller="Contract" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="CreatedBy_Id" />
+                <input type="hidden" asp-for="IsActive" />
 
                 <div class="box-body">
-
 
                     <div class="form-group">
                         <label asp-for="Title" class="control-label"></label>
@@ -67,11 +68,10 @@
                     <div class="form-group">
                         <label asp-for="ContractMembershipId" class="control-label"></label>
                         <div class="input-group" style="width:100%">
-                            <select class="Specialization_Select2" asp-for="ContractMembershipId" style="width:50%">
+                            <select class="ContractMembership_Select2" asp-for="ContractMembershipId" style="width:50%">
                                 @if (Model.ContractMembership != null)
                                 {
-                    <option value="@Model.ContractMembershipId" selected="selected">@Model.ContractMembership.Name</option>
-}
+                    <option value="@Model.ContractMembershipId" selected="selected">@Model.ContractMembership.Name</option>}
                             </select>
                             <span asp-validation-for="ContractMembershipId" class="text-danger"></span>
                         </div>
@@ -80,29 +80,12 @@
                     <div class="form-group">
                         <label asp-for="ContractTypeId" class="control-label"></label>
                         <div class="input-group" style="width:100%">
-                            <select class="Company_Select2" asp-for="ContractTypeId" style="width:50%">
+                            <select class="ContractType_Select2" asp-for="ContractTypeId" style="width:50%">
                                 @if (Model.ContractType != null)
                                 {
-                    <option value="@Model.ContractTypeId" selected="selected">@Model.ContractType.Name</option>
-}
+                    <option value="@Model.ContractTypeId" selected="selected">@Model.ContractType.Name</option>}
                             </select>
                             <span asp-validation-for="ContractTypeId" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="StartOn" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="StartOn" type="text" class="form-control"></input>
-                            <span asp-validation-for="StartOn" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="EndOn" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="EndOn" type="text" class="form-control"></input>
-                            <span asp-validation-for="EndOn" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -112,6 +95,20 @@
                         <div class="input-group">
                             <textarea asp-for="Description" class="form-control"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedBy_FullName" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedOn" class="form-control" readonly />
                         </div>
                     </div>
 

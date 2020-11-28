@@ -15,8 +15,8 @@ namespace DataAccess.Models.Identity
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string LastName { get; set; }
 
-        [Display(Name = "Μέλος από")]
-        public DateTime? MemberSince { get; set; }
+        [Display(Name = "Ημερομηνία γέννησης")]
+        public DateTime BirthDay { get; set; }
 
         public bool HasToChangePassword { get; set; }
 
@@ -25,6 +25,16 @@ namespace DataAccess.Models.Identity
         public int? EmployeeId { get; set; }
 
         public ICollection<ApplicationUserTag> ApplicationUserTags { get; set; }
+
+        //Audit
+        [Display(Name = "Δημηουργήθηκε απο")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        public string CreatedBy_Id { get; set; }
+        public string CreatedBy_FullName { get; set; }
+
+        [Display(Name = "Δημηουργήθηκε στις")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
+        public DateTime CreatedOn { get; set; }
 
     }
 }

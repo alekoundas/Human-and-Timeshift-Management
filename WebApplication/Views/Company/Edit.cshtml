@@ -20,7 +20,7 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="IsActive" />
-
+                <input type="hidden" asp-for="CreatedBy_Id" />
 
                 <div class="box-body">
 
@@ -33,10 +33,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Afm" class="control-label"></label>
+                        <label asp-for="VatNumber" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Afm" class="form-control" readonly="readonly" />
-                            <span asp-validation-for="Afm" class="text-danger"></span>
+                            <input asp-for="VatNumber" class="form-control" readonly />
+                            <span asp-validation-for="VatNumber" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -47,6 +47,22 @@
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedBy_FullName" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="CreatedOn" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <hr />
 
                     <div class="form-group pull-right">
                         <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
@@ -77,7 +93,6 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -89,7 +104,6 @@
                         <tr>
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
-                            <th>Email</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -105,135 +119,29 @@
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
     <script>
-
-         $('#CompanyEmployeesDatatable').DataTable({
-             serverSide: true,
-             responsive: true,
-             processing: true,
-             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150,"Όλα"]],
-             iDisplayLength: 150,
-             colReorder: {
-                 fixedColumnsLeft: 2
-             },
-             dom: 'Bfrtlp',
-             buttons: ['excel', 'pdf', 'print'],
-             language: {
-                 processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-             },
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'CompanyEdit';
-                        data.genericId =@Model.Id;
-
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "FirstName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            //console.log(data);
-                            if (data.FirstName != null)
-                                return data.FirstName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "LastName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.LastName != null)
-                                return data.LastName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Email",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.Email != null)
-                                return data.Email;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "ErpCode",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.ErpCode != null)
-                                return data.ErpCode;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Afm",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.Afm != null)
-                                return data.Afm;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "ScpecializationName",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.ScpecializationName != null)
-                                return data.ScpecializationName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "CompanyTitle",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.CompanyTitle != null)
-                                return data.CompanyTitle;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "IsInCompany",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.IsInCompany != null)
-                                return data.IsInCompany;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                fnDrawCallback: function () {
-                    $('.ToggleSliders').bootstrapToggle({
-                        on: 'Ναί',
-                        off: 'Όχι'
-                    });
-                },
-            });
+        $(() => new DataTableService('#CompanyEmployeesDatatable')
+            .ForApiController('employees')
+            .AddColumn(true, true, "FirstName")
+            .AddColumn(true, true, "LastName")
+            .AddColumn(true, true, "ErpCode")
+            .AddColumn(true, true, "VatNumber")
+            .AddColumn(true, true, "ScpecializationName")
+            .AddColumn(true, true, "CompanyTitle")
+            .AddColumn(true, true, "IsInCompany")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'CompanyEdit';
+                data.genericId =@Model.Id;
+                return JSON.stringify(data);
+            })
+            .FnDrawCallback(()=>
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                }))
+            .CompleteDataTable());
     </script>
+
 
     <script>
 

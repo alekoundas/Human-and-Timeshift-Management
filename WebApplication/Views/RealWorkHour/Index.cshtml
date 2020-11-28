@@ -1947,41 +1947,18 @@
         }
 
         //Datatable
-        const InitDatatable = () => $('#EmployeesWorkhoursDatatable').DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            colReorder: false,
-            scrollX: true,
-            scrollCollapse: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-            iDisplayLength: 150,
-            fixedColumns: {
-                leftColumns: 2,
-                rightColumns: 0
-            },
-            dom: 'Bfrtlp',
-            //buttons: ['excel', 'pdf', 'print'],
-            buttons: [
-                {
-                    extend: 'excelHtml5',
-                    text: 'Excel',
-                    exportOptions: { orthogonal: 'ExcelExport' }
-                }
-            ],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-            ajax: {
-                url: '/api/employees/datatable',
-                type: 'POST',
-                contentType: "application/json",
-                data: (data, type, row, meta) => {
-
+        const InitDatatable = () =>
+            new DataTableService('#EmployeesWorkhoursDatatable')
+                .ForApiController('employees')
+                .StartOrderFromCol(1)
+                .AddColumn(true, true, "ToggleSlider")
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumnsFromCount(GetDaysInMonth(), "Day_")
+                .AjaxData((data, type, row, meta) => {
                     data.predicate = 'RealWorkHourIndex';
-
-                    if (GetTimeShiftFilterValue() == undefined || GetTimeShiftFilterValue() == '') {
-
+                    if (GetTimeShiftFilterValue() == undefined || GetTimeShiftFilterValue() == '')
                         if (GetMonthFilterValue() != '') {
                             data.selectedYear = GetMonthFilterValueYear();
                             data.selectedMonth = GetMonthFilterValueMonth();
@@ -1990,122 +1967,46 @@
                             data.selectedYear = new Date().getFullYear();
                             data.selectedMonth = new Date().getMonth() + 1;
                         }
-                    }
                     else
                         data.genericId = GetTimeShiftFilterValue();
-
                     return JSON.stringify(data);
-                }
-            },
-            order: [[1, 'desc']],
-            columns: CreateDatatableColumns(),
-            columnDefs: [{
-                targets: '_all',
-                render: (data, type, row) => {
-                    if (type == 'ExcelExport') {
-                        console.log(data);
-                        return data;
-                    }
-                    else
-                        return data;
-                }
-            }],
-            rowCallback: (row, data, displayNum, displayIndex, dataIndex) => {
-                for (var i = 1; i <= GetDaysInMonth(); i++) {
-                    row.querySelectorAll('td')[i + 3]
-                        .setAttribute("class", "DataTableHoverCell")
-
-                    row.querySelectorAll('td')[i + 3]
-                        .setAttribute('style', 'background-color:' +
-                            $(data["Day" + i])
-                                .attr('cellcolor'))
-                }
-            },
-            fnDrawCallback: () => {
-                $('.ToggleSliders').bootstrapToggle({
-                    on: 'Ναι',
-                    off: 'Όχι'
                 })
-            }
-            //,
-            //initComplete: () => {
-            //    [...document.getElementsByClassName('TableDays')]
-            //        .forEach(tableHead => {
-            //            var options = { weekday: 'long', day: 'numeric' };
-            //            var day = tableHead.id.split('_')[1];
+                .FnDrawCallback(() => {
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    })
+                })
+                .RowCallback((row, data, displayNum, displayIndex, dataIndex) => {
+                    for (var i = 1; i <= GetDaysInMonth(); i++) {
+                        row.querySelectorAll('td')[i + 3]
+                            .setAttribute("class", "DataTableHoverCell")
 
-            //            var currDate = new Date(GetColumnStartOn().setDate(day));
+                        row.querySelectorAll('td')[i + 3]
+                            .setAttribute('style', 'background-color:' +
+                                $(data["Day" + i])
+                                    .attr('cellcolor'))
+                    }
+                })
+                //.InitComplete(() => {
+                //    [...document.getElementsByClassName('TableDays')]
+                //        .forEach(tableHead => {
+                //            var options = { weekday: 'long', day: 'numeric' };
+                //            var day = tableHead.id.split('_')[1];
 
-            //            var dayToShow = currDate.toLocaleString('el-GR',
-            //                options);
+                //            var currDate = new Date(GetColumnStartOn().setDate(day));
 
-            //            document.getElementById('thDayNum_' + day)
-            //                .innerHTML = dayToShow;
+                //            var dayToShow = currDate.toLocaleString('el-GR',
+                //                options);
 
-            //            document.getElementById('tbDayNum_' + day)
-            //                .innerHTML = dayToShow;
-            //        });
-            //}
-        });
+                //            document.getElementById('thDayNum_' + day)
+                //                .innerHTML = dayToShow;
 
-        const RenderDataFromDatatable = (data, property) => {
-            if (data[property] != null) {
-                return data[property];
-            }
-            else
-                return "";
-        }
-
-        const RenderDay = (data, type, row, meta, index) => {
-            console.log(index);
-            if (type == 'ExcelExport') {
-                console.log('asdhfijhbasdfibsdfa');
-            }
-            return data;
-        }
-
-        const CreateDatatableColumns = () => {
-            var columns = []
-            columns.push({
-                data: "ToggleSlider",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ToggleSlider')
-            });
-            columns.push({
-                data: "FirstName",
-                searchable: true,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'FirstName')
-            });
-            columns.push({
-                data: "LastName",
-                searchable: true,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'LastName')
-            });
-            columns.push({
-                data: "ErpCode",
-                searchable: true,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ErpCode')
-            });
-            //Add days of month
-
-            for (var i = 1; i <= GetDaysInMonth(); i++)
-                columns.push({
-                    data: "Day" + i,
-                    searchable: false,
-                    orderable: false
-                });
-
-
-            return columns;
-        }
+                //            document.getElementById('tbDayNum_' + day)
+                //                .innerHTML = dayToShow;
+                //        });
+                //})
+                .CompleteDataTable();
     </script>
 
     <!--    Html Append -->
@@ -2357,8 +2258,8 @@
             );
 
 
-                                                                //$(document).ready(AppendNewDataTableHTML());
-                                                                //$(document).ready(InitDatatable());
+                                                                                                            //$(document).ready(AppendNewDataTableHTML());
+                                                                                                            //$(document).ready(InitDatatable());
 
     </script>
 }

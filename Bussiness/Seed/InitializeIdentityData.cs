@@ -1,5 +1,6 @@
 ﻿using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Identity;
+using System;
 
 namespace Business.Seed
 {
@@ -22,7 +23,10 @@ namespace Business.Seed
                     Email = "Admin@Admin.gr",
                     FirstName = "Admin",
                     LastName = "User",
-                    HasToChangePassword = false
+                    HasToChangePassword = false,
+                    CreatedBy_Id = "000",
+                    CreatedBy_FullName = "System",
+                    CreatedOn = DateTime.Now
                 };
 
                 IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd").Result;
@@ -147,7 +151,10 @@ namespace Business.Seed
                     Email = "Super@Admin.gr",
                     FirstName = "Super",
                     LastName = "User",
-                    HasToChangePassword = false
+                    HasToChangePassword = false,
+                    CreatedBy_Id = "000",
+                    CreatedBy_FullName = "System",
+                    CreatedOn = DateTime.Now
 
                 };
 

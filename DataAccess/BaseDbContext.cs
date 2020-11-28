@@ -1,4 +1,5 @@
 ﻿using DataAccess.Configurations;
+using DataAccess.Models.Audit;
 using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,8 @@ namespace DataAccess
         {
             base.OnModelCreating(builder);
 
+            builder.EnableAutoHistory<AuditAutoHistory>(x => { });
+
 
             builder.ApplyConfiguration(new LeaveConfiguration());
             builder.ApplyConfiguration(new CompanyConfiguration());
@@ -52,5 +55,7 @@ namespace DataAccess
             builder.ApplyConfiguration(new ContractMembershipConfiguration());
             builder.ApplyConfiguration(new WorkPlaceHourRestrictionConfiguration());
         }
+
     }
+    
 }

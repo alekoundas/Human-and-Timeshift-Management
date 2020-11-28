@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -58,7 +56,26 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
             </div>
             <hr />
-            <div id="DataTableDiv"></div>
+            <div class="box-body table-responsive">
+                <table id="EmployeeRealHoursSumDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Πόστο</th>
+                            <th>Σύνολο ώρες</th>
+                            <th>Σύνολο ώρες μέρα</th>
+                            <th>Σύνολο ώρες νύχτα</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Πόστο</th>
+                            <th>Σύνολο ώρες</th>
+                            <th>Σύνολο ώρες μέρα</th>
+                            <th>Σύνολο ώρες νύχτα</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -69,11 +86,11 @@
 
 @section Scripts {
     <script>
-
         const BuildSelect2Dto = (params) => ({
             search: params.term,
             page: params.page || 1
         });
+
         const ConvertDateForApi = timeStamp =>
             CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
@@ -90,6 +107,7 @@
 
             return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
         }
+
         const GetSelectedEmployeeId = () =>
             document.getElementById('Employee_Select2').value;
 
@@ -101,7 +119,6 @@
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
 
         const GetEndOn = () => {
-
             var date = new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
             date.setHours(23, 59, 59, 59);
@@ -116,10 +133,9 @@
             newDate.setHours(23, 59, 59);
             return moment(newDate);
         }
-
     </script>
-    <script>
 
+    <script>
         $('#SliderHourChoice').bootstrapToggle({
             on: 'HH:mm',
             off: '%',
@@ -129,7 +145,6 @@
 
         $('.filterSlider').change(e =>
             $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
-
 
         $('#Employee_Select2').select2({
             placeholder: "Επέλεξε υπάλληλο",
@@ -144,8 +159,6 @@
         }).on('change', () =>
             $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
 
-
-
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
             startOnMonday: true,
@@ -156,7 +169,6 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            //oninit: () => AppendNewDataTableHTML();,
             onafterselect: () => {
                 DestroyDataTable();
                 DeleteDataTableHTML();
@@ -174,107 +186,26 @@
             .DataTable().destroy();
 
         var CreateDataTable = () =>
-            $('#EmployeeRealHoursSumDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 1
-                },
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                dom: 'Bfrtlp',
-                ajax: {
-                    url: '/api/workplaces/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-
-                        data.predicate = 'ProjectionEmployeeRealHoursSum';
-                        if (GetSelectedEmployeeId() != '')
-                            data.genericId = GetSelectedEmployeeId();
-                        data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
-                        data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
-                        data.ShowHoursInPercentage = GetSliderHourChoiceValue();
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: CreateDatatableColumns(),
-            });
-
-        const CreateDatatableColumns = () => {
-            var columns = []
-            columns.push({
-                data: "Title",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'Title')
-            });
-            columns.push({
-                data: "",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHours')
-            });
-            columns.push({
-                data: "TotalHoursDay",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursDay')
-            });
-            columns.push({
-                data: "TotalHoursNight",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursNight')
-            });
-            return columns;
-        }
-        const RenderDataFromDatatable = (data, property) => {
-            if (data[property] != null)
-                return data[property];
-            else
-                return "";
-        }
-
+            new DataTableService('#EmployeeRealHoursSumDatatable')
+                .ForApiController('workplaces')
+                .AddColumn(true, true, "Title")
+                .AddColumn(false, false, "TotalHours")
+                .AddColumn(false, false, "TotalHoursDay")
+                .AddColumn(false, false, "TotalHoursNight")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionEmployeeRealHoursSum';
+                    if (GetSelectedEmployeeId() != '')
+                        data.genericId = GetSelectedEmployeeId();
+                    data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
+                    data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                    data.ShowHoursInPercentage = GetSliderHourChoiceValue();
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
 
         const DeleteDataTableHTML = () =>
             document.getElementById('EmployeeRealHoursSumDatatable').remove();
 
-        const AppendNewDataTableHTML = () => {
-
-            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
-                '<div class="box-body table-responsive">' +
-                '<table id="EmployeeRealHoursSumDatatable" class="table table-bordered table-hover table-responsive stripe">' +
-                '<thead>' +
-                '<tr>' +
-                '<th>Πόστο</th>' +
-                '<th>Σύνολο ώρες</th>' +
-                '<th>Σύνολο ώρες μέρα</th>' +
-                '<th>Σύνολο ώρες νύχτα</th>' +
-                '</tr>' +
-                '</thead>' +
-                '<tfoot>' +
-                '<tr>' +
-                '<th>Πόστο</th>' +
-                '<th>Σύνολο ώρες</th>' +
-                '<th>Σύνολο ώρες μέρα</th>' +
-                '<th>Σύνολο ώρες νύχτα</th>' +
-                '</tr>' +
-                '</tfoot>' +
-                '</table>' +
-                '</div>' +
-                '');
-
-        }
-
-        $(document).ready(AppendNewDataTableHTML());
         $(document).ready(CreateDataTable());
 
     </script>

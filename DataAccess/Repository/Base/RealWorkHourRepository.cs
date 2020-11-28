@@ -135,7 +135,7 @@ namespace DataAccess.Repository.Base
             return await Context.RealWorkHours.Where(filter).ToListAsync();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        public double GetEmployeeTotalSecondsFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
@@ -154,7 +154,7 @@ namespace DataAccess.Repository.Base
                 .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsSaturdayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        public double GetEmployeeTotalSecondsSaturdayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
@@ -172,7 +172,7 @@ namespace DataAccess.Repository.Base
                    .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsSaturdayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        public double GetEmployeeTotalSecondsSaturdayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
@@ -190,7 +190,7 @@ namespace DataAccess.Repository.Base
                 .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsSundayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        public double GetEmployeeTotalSecondsSundayDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
@@ -208,7 +208,7 @@ namespace DataAccess.Repository.Base
                  .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsSundayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        public double GetEmployeeTotalSecondsSundayNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
@@ -226,7 +226,7 @@ namespace DataAccess.Repository.Base
                  .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        public double GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
             var endOnNightTimeSpan = new TimeSpan(6, 0, 0);
             var startOnNightTimeSpan = new TimeSpan(22, 0, 0);
@@ -247,7 +247,7 @@ namespace DataAccess.Repository.Base
               .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
+        public double GetEmployeeTotalSecondsNightFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
             var endOnNightTimeSpan = new TimeSpan(6, 0, 0);
             var startOnNightTimeSpan = new TimeSpan(22, 0, 0);
@@ -268,7 +268,7 @@ namespace DataAccess.Repository.Base
                .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate)
+        public double GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate)
         {
             var endOnNight = new DateTime(compareDate.Year, compareDate.Month, compareDate.Day, 6, 0, 0);
             var startOnNight = new DateTime(compareDate.Year, compareDate.Month, compareDate.Day, 22, 0, 0);
@@ -285,7 +285,7 @@ namespace DataAccess.Repository.Base
                 .Sum();
         }
 
-        public async Task<double> GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate)
+        public double GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate)
         {
             var endOnNight = new DateTime(compareDate.Year, compareDate.Month, compareDate.Day, 6, 0, 0);
             var startOnNight = new DateTime(compareDate.Year, compareDate.Month, compareDate.Day, 22, 0, 0);

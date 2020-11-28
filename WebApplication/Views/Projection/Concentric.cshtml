@@ -49,7 +49,6 @@
     <div class="col-md-3"> </div>
 </div>
 
-
 <div class="row">
     <div class="col-md-12">
         <div class="box box-danger" style="margin-top:5%;">
@@ -57,19 +56,47 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
             </div>
             <hr />
-            <div id="DataTableDiv"></div>
+            <div id="DataTableDiv">
+                <div class="box-body table-responsive">
+                    <table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive stripe">
+                        <thead>
+                            <tr>
+                                <th>Όνομα</th>
+                                <th>Επίθετο</th>
+                                <th>Erp Code</th>
+                                <th>Σύνολο ώρες</th>
+                                <th>Σύνολο ώρες Μέρα</th>
+                                <th>Σύνολο ώρες Νύχτα</th>
+                                <th>Σύνολο ώρες Σάββατο Μέρα</th>
+                                <th>Σύνολο ώρες Σάββατο Νύχτα</th>
+                                <th>Σύνολο ώρες Κυριακή Μέρα</th>
+                                <th>Σύνολο ώρες Κυριακή Νύχτα</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Όνομα</th>
+                                <th>Επίθετο</th>
+                                <th>Erp Code</th>
+                                <th>Σύνολο ώρες</th>
+                                <th>Σύνολο ώρες Μέρα</th>
+                                <th>Σύνολο ώρες Νύχτα</th>
+                                <th>Σύνολο ώρες Σάββατο Μέρα</th>
+                                <th>Σύνολο ώρες Σάββατο Νύχτα</th>
+                                <th>Σύνολο ώρες Κυριακή Μέρα</th>
+                                <th>Σύνολο ώρες Κυριακή Νύχτα</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     <script>
-
-
         const ConvertDateForApi = timeStamp =>
             CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
@@ -97,7 +124,6 @@
                 .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
 
         const GetEndOn = () => {
-
             var date = new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
             date.setHours(23, 59, 59, 59);
@@ -112,10 +138,9 @@
             newDate.setHours(23, 59, 59);
             return moment(newDate);
         }
-
     </script>
-    <script>
 
+    <script>
         $('#SliderHourChoice').bootstrapToggle({
             on: 'HH:mm',
             off: '%',
@@ -154,9 +179,7 @@
             dateSeparator: '/-/',
             locale: "el",
             onafterselect: () => {
-                DestroyDataTable();
-                DeleteDataTableHTML();
-                AppendNewDataTableHTML();
+                new DataTableService('#EmployeesWorkHourConcentricDatatable').Destroy();
                 CreateDataTable();
             },
             onaftershow: () =>
@@ -166,165 +189,30 @@
                         calentim.setAttribute('style', 'width: 400px;'))
         });
 
-        var DestroyDataTable = () => $('#EmployeesWorkHourConcentricDatatable')
-            .DataTable().destroy();
-
         var CreateDataTable = () =>
-            $('#EmployeesWorkHourConcentricDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                colReorder: {
-                    fixedColumnsLeft: 2
-                },
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                dom: 'Bfrtlp',
-                ajax: {
-                    url: '/api/employees/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
+            new DataTableService('#EmployeesWorkHourConcentricDatatable')
+                .ForApiController('employees')
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumn(false, false, "TotalHours")
+                .AddColumn(false, false, "TotalHoursDay")
+                .AddColumn(false, false, "TotalHoursNight")
+                .AddColumn(false, false, "TotalHoursSaturdayDay")
+                .AddColumn(false, false, "TotalHoursSaturdayNight")
+                .AddColumn(false, false, "TotalHoursSundayDay")
+                .AddColumn(false, false, "TotalHoursSundayNight")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionConcentric';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.genericId = GetSelectedWorkPlaceId();
+                    data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
+                    data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
+                    data.ShowHoursInPercentage = GetSliderHourChoiceValue();
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
 
-                        data.predicate = 'ProjectionConcentric';
-                        if (GetSelectedWorkPlaceId() != '')
-                            data.genericId = GetSelectedWorkPlaceId();
-                        data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
-                        data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
-                        data.ShowHoursInPercentage = GetSliderHourChoiceValue();
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[1, 'desc']],
-                columns: CreateDatatableColumns()
-            });
-
-        const CreateDatatableColumns = () => {
-            var columns = []
-            columns.push({
-                data: "FirstName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'FirstName')
-            });
-            columns.push({
-                data: "LastName",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'LastName')
-            });
-            columns.push({
-                data: "ErpCode",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'ErpCode')
-            });
-            columns.push({
-                data: "TotalHours",
-                searchable: false,
-                orderable: true,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHours')
-            });
-            columns.push({
-                data: "TotalHoursDay",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursDay')
-            });
-            columns.push({
-                data: "TotalHoursNight",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursNight')
-            });
-            columns.push({
-                data: "TotalHoursSaturdayDay",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursSaturdayDay')
-            });
-            columns.push({
-                data: "TotalHoursSaturdayNight",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursSaturdayNight')
-            });
-            columns.push({
-                data: "TotalHoursSundayDay",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursSundayDay')
-            });
-            columns.push({
-                data: "TotalHoursSundayNight",
-                searchable: false,
-                orderable: false,
-                render: (a, b, data, d) => RenderDataFromDatatable(data,
-                    'TotalHoursSundayNight')
-            });
-
-            return columns;
-        }
-
-        const RenderDataFromDatatable = (data, property) => {
-            if (data[property] != null)
-                return data[property];
-            else
-                return "";
-        }
-        const DeleteDataTableHTML = () =>
-            document.getElementById('EmployeesWorkHourConcentricDatatable').remove();
-
-        const AppendNewDataTableHTML = () =>
-            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
-                '<div class="box-body table-responsive">' +
-                '<table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive stripe">' +
-                '<thead>' +
-                '<tr>' +
-                '<th>Όνομα</th>' +
-                '<th>Επίθετο</th>' +
-                '<th>Erp Code</th>' +
-                '<th>Σύνολο ώρες</th>' +
-                '<th>Σύνολο ώρες Μέρα</th>' +
-                '<th>Σύνολο ώρες Νύχτα</th>' +
-                '<th>Σύνολο ώρες Σάββατο Μέρα</th>' +
-                '<th>Σύνολο ώρες Σάββατο Νύχτα</th>' +
-                '<th>Σύνολο ώρες Κυριακή Μέρα</th>' +
-                '<th>Σύνολο ώρες Κυριακή Νύχτα</th>' +
-                '</tr>' +
-                '</thead>' +
-                '<tfoot>' +
-                '<tr>' +
-                '<th>Όνομα</th>' +
-                '<th>Επίθετο</th>' +
-                '<th>Erp Code</th>' +
-                '<th>Σύνολο ώρες</th>' +
-                '<th>Σύνολο ώρες Μέρα</th>' +
-                '<th>Σύνολο ώρες Νύχτα</th>' +
-                '<th>Σύνολο ώρες Σάββατο Μέρα</th>' +
-                '<th>Σύνολο ώρες Σάββατο Νύχτα</th>' +
-                '<th>Σύνολο ώρες Κυριακή Μέρα</th>' +
-                '<th>Σύνολο ώρες Κυριακή Νύχτα</th>' +
-                '</tr>' +
-                '</tfoot>' +
-                '</table>' +
-                '</div>' +
-                '');
-
-
-
-        $(document).ready(AppendNewDataTableHTML());
         $(document).ready(CreateDataTable());
-
     </script>
 }

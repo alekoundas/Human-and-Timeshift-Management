@@ -68,6 +68,13 @@ namespace DataAccess.Migrations.SecurityDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -87,9 +94,22 @@ namespace DataAccess.Migrations.SecurityDb
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("BirthDay")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
@@ -120,9 +140,6 @@ namespace DataAccess.Migrations.SecurityDb
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTime?>("MemberSince")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("nvarchar(256)")

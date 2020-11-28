@@ -20,7 +20,6 @@
             </div>
             <hr />
             <div class="box-body table-responsive">
-
                 <table id="CustomersDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
@@ -40,77 +39,23 @@
             </div>
         </div>
     </div>
-
     <div class="col-md-3"> </div>
-
 </div>
 <partial name="_ExcelModals" model='new {Entity = "Customer" }'>
 
     @section Scripts {
         <script>
-
-            $('#CustomersDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                colReorder: true,
-                dom: 'Bfrtlp',
-                buttons: ['excel', 'print'],
-                language: {
-                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                },
-                ajax: {
-                    url: '/api/customers/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
+            $(() => {
+                var dataTable = new DataTableService('#CustomersDatatable')
+                    .ForApiController('customers')
+                    .AddColumn(true, true, "IdentifyingName")
+                    .AddColumn(true, true, "VatNumber")
+                    .AddColumn(false, false, "Buttons")
+                    .AjaxData((data, type, row, meta) => {
                         data.Predicate = 'CustomerIndex';
                         return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "IdentifyingName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.IdentifyingName!= null)
-                                return data.IdentifyingName;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "AFM",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.AFM != null)
-                                return data.AFM
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Buttons",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                createdRow: (row, data, dataIndex) => {
-                    if (!data.IsActive) {
-                        $(row).css('background-color', '#AAAFB4');
-                    }
-                }
-            });
+                    })
+                    .CompleteDataTable();
+            })
         </script>
     }

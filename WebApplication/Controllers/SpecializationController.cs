@@ -108,7 +108,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _baseDataWork.Update(specialization);
-                    await _context.SaveChangesAsync();
+                    await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -171,9 +171,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var specializations = (await (await (new ExcelService<Specialization>(_context)
+                var specializations = (await (new ExcelService<Specialization>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
                 if (errors.Count == 0)
                 {

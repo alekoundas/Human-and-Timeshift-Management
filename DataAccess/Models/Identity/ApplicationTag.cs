@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DataAccess.Models.Audit;
+using System.Collections.Generic;
 
 namespace DataAccess.Models.Identity
 {

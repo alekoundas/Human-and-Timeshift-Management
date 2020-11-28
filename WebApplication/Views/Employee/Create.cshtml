@@ -39,22 +39,6 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="DateOfBirth" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="DateOfBirth" type="text" class="form-control" />
-                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="Email" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
                         <label asp-for="ErpCode" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="ErpCode" class="form-control" />
@@ -63,10 +47,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Afm" class="control-label"></label>
+                        <label asp-for="VatNumber" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="Afm" class="form-control" />
-                            <span asp-validation-for="Afm" class="text-danger"></span>
+                            <input asp-for="VatNumber" class="form-control" />
+                            <span asp-validation-for="VatNumber" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -75,6 +59,30 @@
                         <div class="input-group">
                             <input asp-for="SocialSecurityNumber" class="form-control" />
                             <span asp-validation-for="SocialSecurityNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="HireDate" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="HireDate" type="text" class="form-control CalentimInput" />
+                            <span asp-validation-for="HireDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ContractStartOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="ContractStartOn" type="text" class="form-control CalentimInput" />
+                            <span asp-validation-for="ContractStartOn" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ContractEndOn" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="ContractEndOn" type="text" class="form-control CalentimInput" />
+                            <span asp-validation-for="ContractEndOn" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -93,7 +101,6 @@
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>
                     </div>
-
 
                     <div class="form-group">
                         <label asp-for="Contacts" class="control-label"></label>
@@ -160,12 +167,13 @@
             }
         });
 
-        $('#DateOfBirth').calentim({
+        $('.CalentimInput').calentim({
             showTimePickers: false,
             startOnMonday: true,
-            showHeader: true,
             showButtons: true,
             singleDate: true,
+            showHeader: true,
+            startEmpty: true,
             startDate: Date.now(),
             endDate: Date.now(),
             format: "DD/MM/YYYY",

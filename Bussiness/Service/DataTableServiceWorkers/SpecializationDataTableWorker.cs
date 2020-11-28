@@ -1,6 +1,6 @@
 ﻿using Bussiness.Helpers;
 using DataAccess;
-using DataAccess.Models.Datatable;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using LinqKit;
 using Microsoft.AspNetCore.Http;

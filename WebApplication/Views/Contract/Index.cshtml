@@ -57,147 +57,25 @@
 <partial name="_ExcelModals" model='new {Entity = "Employee" }'>
 
     @section Scripts {
-
         <script>
-            $('#ContractMembershipsDatatable').DataTable({
-                serverSide: true,
-                responsive: true,
-                processing: true,
-                colReorder: true,
-                lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                iDisplayLength: 150,
-                dom: 'Bfrtlp',
-                buttons: ['excel', 'pdf', 'print'],
-                language: {
-                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                },
-                ajax: {
-                    url: '/api/contracts/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        data.Predicate = 'ContractIndex'
+            $(() => {
+                var dataTable = new DataTableService('#ContractMembershipsDatatable')
+                    .ForApiController('contracts')
+                    .AddColumn(true, true, "Title")
+                    .AddColumn(true, true, "HoursPerWeek")
+                    .AddColumn(true, true, "HoursPerDay")
+                    .AddColumn(true, true, "WorkingDaysPerWeek")
+                    .AddColumn(true, true, "DayOfDaysPerWeek")
+                    .AddColumn(true, true, "ContractMembershipId")
+                    .AddColumn(true, true, "ContractTypeId")
+                    .AddColumn(true, true, "GrossSalaryPerHour")
+                    .AddColumn(true, true, "NetSalaryPerHour")
+                    .AddColumn(false, false, "Buttons")
+                    .AjaxData((data, type, row, meta) => {
+                        data.Predicate = 'ContractIndex';
                         return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "Title",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            console.log(data);
-                            if (data.Title != null)
-                                return data.Title;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "HoursPerWeek",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.HoursPerWeek != null)
-                                return data.HoursPerWeek;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "HoursPerDay",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.HoursPerDay != null)
-                                return data.HoursPerDay;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "WorkingDaysPerWeek",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.WorkingDaysPerWeek != null)
-                                return data.WorkingDaysPerWeek;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "DayOfDaysPerWeek",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.DayOfDaysPerWeek != null)
-                                return data.DayOfDaysPerWeek;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "ContractMembershipId",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.ContractMembershipId != null)
-                                return data.ContractMembershipId;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "ContractTypeId",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.ContractTypeId != null)
-                                return data.ContractTypeId;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "GrossSalaryPerHour",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.GrossSalaryPerHour != null)
-                                return data.GrossSalaryPerHour;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "NetSalaryPerHour",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.NetSalaryPerHour != null)
-                                return data.NetSalaryPerHour;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Buttons",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Buttons != null)
-                                return data.Buttons;
-                            else
-                                return "";
-                        }
-                    }
-                ],
-                createdRow: (row, data, dataIndex) => {
-                    if (!data.IsActive) {
-                        $(row).css('background-color', '#AAAFB4');
-                    }
-                }
-            });</script>
+                    })
+                    .CompleteDataTable();
+            })
+        </script>
     }

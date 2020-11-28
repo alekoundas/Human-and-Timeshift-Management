@@ -128,7 +128,7 @@ namespace WebApplication.Controllers
                 try
                 {
                     _context.Update(employee);
-                    var zzz = await _context.SaveChangesAsync();
+                    var zzz = await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -142,7 +142,7 @@ namespace WebApplication.Controllers
             var excelColumns = new List<string>(new string[] {
                 "FirstName",
                 "LastName",
-                "Afm",
+                "VatNumber",
                 "SocialSecurityNumber",
                 "ErpCode",
                 "Email",
@@ -174,7 +174,7 @@ namespace WebApplication.Controllers
             var excelColumns = new List<string>(new string[] {
                 "FirstName",
                 "LastName",
-                "Afm",
+                "VatNumber",
                 "SocialSecurityNumber",
                 "ErpCode",
                 "Email",
@@ -208,9 +208,9 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var employees = (await (await (new ExcelService<Employee>(_context)
+                var employees = (await (new ExcelService<Employee>(_context)
                     .ExtractDataFromExcel(ImportExcel)))
-                    .ValidateExtractedData())
+                    .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
 
                 if (errors.Count == 0)

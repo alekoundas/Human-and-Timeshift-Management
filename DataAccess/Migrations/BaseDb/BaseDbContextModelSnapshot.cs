@@ -19,6 +19,44 @@ namespace DataAccess.Migrations.BaseDb
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("DataAccess.Models.Audit.AuditAutoHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Changed")
+                        .HasColumnType("nvarchar(2048)")
+                        .HasMaxLength(2048);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RowId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditAutoHistory");
+                });
+
             modelBuilder.Entity("DataAccess.Models.Entity.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -26,9 +64,12 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Afm")
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -43,9 +84,13 @@ namespace DataAccess.Migrations.BaseDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("VatNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Afm")
+                    b.HasIndex("VatNumber")
                         .IsUnique();
 
                     b.ToTable("Companies");
@@ -57,6 +102,13 @@ namespace DataAccess.Migrations.BaseDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -106,6 +158,13 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<int>("ContractTypeId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -114,9 +173,6 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("EndOn")
-                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("GrossSalaryPerHour")
                         .HasColumnType("decimal(18,2)");
@@ -132,9 +188,6 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<decimal>("NetSalaryPerHour")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("StartOn")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -161,6 +214,13 @@ namespace DataAccess.Migrations.BaseDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -190,6 +250,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -218,15 +285,18 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AFM")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CompanyId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -250,12 +320,16 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("Profession")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("VatNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AFM")
-                        .IsUnique();
-
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("VatNumber")
+                        .IsUnique();
 
                     b.ToTable("Customers");
                 });
@@ -270,23 +344,27 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Afm")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int?>("CompanyId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("ContractEndOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("ContractId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ContractStartOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ErpCode")
                         .HasColumnType("nvarchar(max)");
@@ -311,17 +389,20 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<string>("VatNumber")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("Afm")
-                        .IsUnique()
-                        .HasFilter("[Afm] IS NOT NULL");
+                    b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("ContractId");
 
                     b.HasIndex("SpecializationId");
+
+                    b.HasIndex("VatNumber")
+                        .IsUnique()
+                        .HasFilter("[VatNumber] IS NOT NULL");
 
                     b.ToTable("Employees");
                 });
@@ -332,6 +413,13 @@ namespace DataAccess.Migrations.BaseDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -358,6 +446,13 @@ namespace DataAccess.Migrations.BaseDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -392,6 +487,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ApprovedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
@@ -431,6 +533,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -460,6 +569,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
@@ -496,6 +612,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -526,6 +649,13 @@ namespace DataAccess.Migrations.BaseDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -562,6 +692,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
@@ -601,6 +738,13 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -634,6 +778,13 @@ namespace DataAccess.Migrations.BaseDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
