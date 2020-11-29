@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20201128214933_InitializeDb")]
+    [Migration("20201129163444_InitializeDb")]
     partial class InitializeDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,12 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<int>("Kind")
                         .HasColumnType("int");
 
-                    b.Property<string>("ModifiedBy")
+                    b.Property<string>("ModifiedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedBy_Id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedOn")
@@ -392,6 +397,7 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int");
 
                     b.Property<string>("VatNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -403,8 +409,7 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasIndex("SpecializationId");
 
                     b.HasIndex("VatNumber")
-                        .IsUnique()
-                        .HasFilter("[VatNumber] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Employees");
                 });

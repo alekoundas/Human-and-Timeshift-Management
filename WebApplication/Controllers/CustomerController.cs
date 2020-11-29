@@ -196,7 +196,6 @@ namespace WebApplication.Controllers
                     .RetrieveExtractedData(out var errors);
                 if (errors.Count == 0)
                 {
-
                     _baseDataWork.Customers.AddRange(customers);
                     var status = await _baseDataWork.SaveChangesAsync();
                     if (status > 0)

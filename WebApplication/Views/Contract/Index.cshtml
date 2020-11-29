@@ -12,7 +12,7 @@
                 <div class="pull-right">
                     @Html.ButtonCreateNew("Contract")
                     @Html.ButtonImport("Contract")
-                    @Html.ButtonImport("Contract")
+                    @Html.ButtonExport("Contract")
                 </div>
             </div>
             <hr />
@@ -54,7 +54,7 @@
     <div class="col-md-2"> </div>
 
 </div>
-<partial name="_ExcelModals" model='new {Entity = "Employee" }'>
+<partial name="_ExcelModals" model='new {Entity = "Contract" }'>
 
     @section Scripts {
         <script>

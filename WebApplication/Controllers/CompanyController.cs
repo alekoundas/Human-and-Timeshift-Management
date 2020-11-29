@@ -125,8 +125,9 @@ namespace WebApplication.Controllers
             var excelColumns = new List<string>(new string[] {
                 "Title",
                 "VatNumber",
-                 "IsActive",
-                "Description" });
+                "Description",
+                 "IsActive"
+            });
 
             var excelPackage = (await (new ExcelService<Company>(_context)
                .CreateNewExcel("Companies"))
@@ -147,8 +148,9 @@ namespace WebApplication.Controllers
             var excelColumns = new List<string>(new string[] {
                 "Title",
                 "VatNumber",
-                 "IsActive",
-                "Description" });
+                "Description",
+                 "IsActive"
+            });
 
 
             var excelPackage = (await (new ExcelService<Company>(_context)

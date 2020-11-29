@@ -68,7 +68,7 @@ namespace WebApplication.Controllers
                 var sss =
                        ContractCreate.CreateFrom(Contract);
                 _baseDataWork.Contracts.Add(
-    ContractCreate.CreateFrom(Contract));
+                    ContractCreate.CreateFrom(Contract));
                 var status = await _baseDataWork.SaveChangesAsync();
                 if (status > 0)
                     TempData["StatusMessage"] = "H σύμβαση " +
@@ -133,12 +133,9 @@ namespace WebApplication.Controllers
                 "HoursPerDay",
                 "WorkingDaysPerWeek",
                 "DayOfDaysPerWeek",
-                "HireDate",
                 "Description",
                 "GrossSalaryPerHour",
                 "NetSalaryPerHour",
-                "StartOn",
-                "EndOn",
                 "ContractMembershipId",
                 "ContractTypeId",
                 "IsActive"
@@ -161,7 +158,7 @@ namespace WebApplication.Controllers
         public async Task<ActionResult> DownloadExcelWithData()
         {
             var excelColumns = new List<string>(new string[] {
-                "Title",
+               "Title",
                 "HoursPerWeek",
                 "HoursPerDay",
                 "WorkingDaysPerWeek",
@@ -169,8 +166,6 @@ namespace WebApplication.Controllers
                 "Description",
                 "GrossSalaryPerHour",
                 "NetSalaryPerHour",
-                "StartOn",
-                "EndOn",
                 "ContractMembershipId",
                 "ContractTypeId",
                 "IsActive"

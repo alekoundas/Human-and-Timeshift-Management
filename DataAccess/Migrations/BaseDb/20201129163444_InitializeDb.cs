@@ -18,7 +18,8 @@ namespace DataAccess.Migrations.BaseDb
                     Changed = table.Column<string>(maxLength: 2048, nullable: true),
                     Kind = table.Column<int>(nullable: false),
                     Created = table.Column<DateTime>(nullable: false),
-                    ModifiedBy = table.Column<string>(nullable: true),
+                    ModifiedBy_FullName = table.Column<string>(nullable: false),
+                    ModifiedBy_Id = table.Column<string>(nullable: false),
                     ModifiedOn = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -223,7 +224,7 @@ namespace DataAccess.Migrations.BaseDb
                     IsActive = table.Column<bool>(nullable: false),
                     FirstName = table.Column<string>(nullable: false),
                     LastName = table.Column<string>(nullable: false),
-                    VatNumber = table.Column<string>(nullable: true),
+                    VatNumber = table.Column<string>(nullable: false),
                     SocialSecurityNumber = table.Column<string>(nullable: true),
                     ErpCode = table.Column<string>(nullable: true),
                     Address = table.Column<string>(nullable: true),
@@ -572,8 +573,7 @@ namespace DataAccess.Migrations.BaseDb
                 name: "IX_Employees_VatNumber",
                 table: "Employees",
                 column: "VatNumber",
-                unique: true,
-                filter: "[VatNumber] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeWorkPlaces_EmployeeId",

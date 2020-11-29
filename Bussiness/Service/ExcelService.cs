@@ -1,4 +1,5 @@
-﻿using DataAccess;
+﻿using Bussiness.Service.ExcelServiceWorkers;
+using DataAccess;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using OfficeOpenXml.DataValidation;
@@ -12,6 +13,7 @@ namespace Bussiness.Service
     public class ExcelService<TEntity>
     {
         private BaseDatawork _baseDataWork;
+        private BaseDbContext _baseDbContext;
         private List<string> Errors;
         private ExcelWorksheet _worksheet;
 
@@ -22,6 +24,7 @@ namespace Bussiness.Service
         {
             this.Errors = new List<string>();
             _baseDataWork = new BaseDatawork(BaseDbContext);
+            _baseDbContext = BaseDbContext;
         }
 
         public ExcelService<TEntity> CreateNewExcel(string fileName)
@@ -47,7 +50,7 @@ namespace Bussiness.Service
             {
                 _worksheet.Cells[rowCount, colCount++].Value = colTitle;
                 if (colTitle.EndsWith("Id"))
-                    await GetLookUpAsync(colTitle, colCount - 1);
+                    await GetLookUpValueAsync(colTitle, colCount - 1);
                 else if (colTitle.Contains("IsActive"))
                     GetIsActive(colTitle, colCount - 1);
             }
@@ -103,145 +106,13 @@ namespace Bussiness.Service
             return this.ExcelPackage;
         }
 
-        public ExcelService<TEntity> ValidateExtractedData()
-        {
-            var hasValidationError = false;
-            switch (typeof(TEntity).Name)
-            {
-                case "Company":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var VatNumber = (exportedInstance.GetType().GetProperty("VatNumber"))
-                            .GetValue(exportedInstance);
 
-                        hasValidationError = _baseDataWork.Companies
-                            .Any(x => x.VatNumber.Trim() == VatNumber.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("VatNumber", "Validation");
-                    }
-                    break;
-                case "Customer":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var VatNumber = (exportedInstance.GetType().GetProperty("VatNumber"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.Customers
-                            .Any(x => x.VatNumber.Trim() == VatNumber.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("VatNumber", "Validation");
-                    }
-                    break;
-                case "WorkPlace":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var title = (exportedInstance.GetType().GetProperty("Title"))
-                            .GetValue(exportedInstance);
-
-                        var customerId = (int?)(exportedInstance.GetType().GetProperty("CustomerId"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.WorkPlaces
-                            .Any(x => x.Title.Trim() == title.ToString().Trim() && x.CustomerId == customerId);
-
-                        if (hasValidationError)
-                            AddError("Title και CustomerId", "Validation");
-                    }
-                    break;
-                case "Employee":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var VatNumber = (exportedInstance.GetType().GetProperty("VatNumber"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.Employees
-                            .Any(x => x.VatNumber.Trim() == VatNumber.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("VatNumber", "Validation");
-                    }
-                    break;
-                case "Specialization":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var Name = (exportedInstance.GetType().GetProperty("Name"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.Specializations
-                            .Any(x => x.Name.Trim() == Name.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("Name", "Validation");
-                    }
-                    break;
-                case "LeaveType":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var Name = (exportedInstance.GetType().GetProperty("Name"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.LeaveTypes
-                            .Any(x => x.Name.Trim() == Name.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("Name", "Validation");
-                    }
-                    break;
-                case "Contract":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var title = (exportedInstance.GetType().GetProperty("Title"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.Contracts
-                            .Any(x => x.Title.Trim() == title.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("Title", "Validation");
-                    }
-                    break;
-                case "ContractType":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var Name = (exportedInstance.GetType().GetProperty("Name"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.ContractTypes
-                            .Any(x => x.Name.Trim() == Name.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("Name", "Validation");
-                    }
-                    break;
-                case "ContractMembership":
-                    foreach (var exportedInstance in _exportedInstances)
-                    {
-                        var Name = (exportedInstance.GetType().GetProperty("Name"))
-                            .GetValue(exportedInstance);
-
-                        hasValidationError = _baseDataWork.ContractMemberships
-                            .Any(x => x.Name.Trim() == Name.ToString().Trim());
-
-                        if (hasValidationError)
-                            AddError("Name", "Validation");
-                    }
-                    break;
-                default:
-                    AddError("error", "error");
-                    break;
-            }
-
-            return this;
-        }
 
         public List<TEntity> RetrieveExtractedData(out List<string> Errors)
         {
             Errors = this.Errors;
             return _exportedInstances;
         }
-
 
         public async Task<ExcelService<TEntity>> ExtractDataFromExcel(IFormFile ImportExcel)
         {
@@ -252,33 +123,78 @@ namespace Bussiness.Service
                 await ImportExcel.CopyToAsync(stream);
                 using (ExcelPackage excelPackage = new ExcelPackage(stream))
                 {
+
                     foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
                         for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
                         {
                             genericEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
 
-                            for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                                if (worksheet.Cells[1, j].Value.ToString().EndsWith("Id"))//Filter integers
-                                    genericEntityInstance
-                                        .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(genericEntityInstance, await GetIdForEntity(worksheet, i, j), null);
-                                else if (worksheet.Cells[1, j].Value.ToString().Contains("IsActive"))
-                                    genericEntityInstance
-                                        .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(genericEntityInstance, GetBoolValue(worksheet, i, j), null);
-                                else
-                                    genericEntityInstance
-                                        .GetType()
-                                        .GetProperty(worksheet.Cells[1, j].Value.ToString())
-                                        .SetValue(genericEntityInstance, worksheet.Cells[i, j].Value?.ToString(), null);
+                            //TODO:convert to arrow
+                            void AddPropertyValueToInstance<TValue>(TEntity instance, TValue value, string propertyName)
+                            {
+                                instance.GetType().GetProperty(propertyName).SetValue(instance, value, null);
+                            }
 
-                            //Add CreatedOn extra non existant in excel column
-                            genericEntityInstance
-                                .GetType()
-                                .GetProperty("CreatedOn")
-                                .SetValue(genericEntityInstance, DateTime.Now, null);
+
+
+                            for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
+                            {
+
+                                var propertyName = worksheet.Cells[1, j].Value.ToString();
+
+                                if (worksheet.Cells[1, j].Value.ToString().EndsWith("Id"))//Filter relation
+                                {
+                                    if (await GetIdForExtractedEntity(worksheet, i, j) != 0)
+                                    {
+                                        var propertyValue = await GetIdForExtractedEntity(worksheet, i, j);
+
+                                        AddPropertyValueToInstance(genericEntityInstance, propertyValue, propertyName);
+                                    }
+                                }
+                                else if (worksheet.Cells[1, j].Value.ToString().Contains("IsActive"))
+                                {
+                                    var propertyValue = GetBoolValue(worksheet, i, j);
+
+                                    AddPropertyValueToInstance(genericEntityInstance, propertyValue, propertyName);
+                                }
+                                else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "DateTime")
+                                {
+                                    var value = worksheet.Cells[i, j].Value?.ToString();
+                                    var setValue = default(DateTime);
+
+                                    if (value?.Length <= 0)
+                                        DateTime.TryParse(value, out setValue);
+
+                                    AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
+                                }
+                                else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "Int32")
+                                {
+                                    var value = worksheet.Cells[i, j].Value?.ToString();
+                                    var setValue = default(Int32);
+
+                                    if (value?.Length <= 0)
+                                        Int32.TryParse(value, out setValue);
+
+                                    AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
+                                }
+                                else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "Decimal")
+                                {
+                                    var value = worksheet.Cells[i, j].Value?.ToString();
+                                    var setValue = default(Decimal);
+
+                                    if (value?.Length <= 0)
+                                        Decimal.TryParse(value, out setValue);
+
+                                    AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
+                                }
+                                else
+                                    AddPropertyValueToInstance(genericEntityInstance, worksheet.Cells[i, j].Value?.ToString(), propertyName);
+                            }
+
+                            //Add Audit fields non existant in excel column
+                            AddPropertyValueToInstance(genericEntityInstance, DateTime.Now, "CreatedOn");
+                            AddPropertyValueToInstance(genericEntityInstance, HttpAccessorService.GetLoggeInUser_FullName, "CreatedBy_FullName");
+                            AddPropertyValueToInstance(genericEntityInstance, HttpAccessorService.GetLoggeInUser_Id, "CreatedBy_Id");
 
                             _exportedInstances.Add(genericEntityInstance);
                         }
@@ -287,7 +203,132 @@ namespace Bussiness.Service
             return this;
         }
 
-        private async Task<int> GetIdForEntity(ExcelWorksheet worksheet, int row, int column)
+        public ExcelService<TEntity> ValidateExtractedData()
+        {
+            string uniqueError = "";
+            string requiredError = "";
+            switch (typeof(TEntity).Name)
+            {
+                case "Company":
+                    new CompanyExcelWorker(_baseDbContext)
+                      .ValidateUnique(_exportedInstances, out uniqueError)
+                      .ValidateRequired(_exportedInstances, out requiredError)
+                      .CompleteValidations();
+                    break;
+                case "Customer":
+                    new CustomerExcelWorker(_baseDbContext)
+                       .ValidateUnique(_exportedInstances, out uniqueError)
+                       .ValidateRequired(_exportedInstances, out requiredError)
+                       .CompleteValidations();
+                    break;
+                case "WorkPlace":
+                    new WorkPlaceExcelWorker(_baseDbContext)
+                        .ValidateUnique(_exportedInstances, out uniqueError)
+                        .ValidateRequired(_exportedInstances, out requiredError)
+                        .CompleteValidations();
+                    break;
+                case "Employee":
+                    new EmployeeExcelWorker(_baseDbContext)
+                        .ValidateUnique(_exportedInstances, out uniqueError)
+                        .ValidateRequired(_exportedInstances, out requiredError)
+                        .CompleteValidations();
+                    break;
+                case "Specialization":
+                    new SpecializationExcelWorker(_baseDbContext)
+                        .ValidateUnique(_exportedInstances, out uniqueError)
+                        .ValidateRequired(_exportedInstances, out requiredError)
+                        .CompleteValidations();
+                    break;
+                case "LeaveType":
+                    new LeaveTypeExcelWorker(_baseDbContext)
+                        .ValidateUnique(_exportedInstances, out uniqueError)
+                        .ValidateRequired(_exportedInstances, out requiredError)
+                        .CompleteValidations();
+                    break;
+                case "Contract":
+                    new ContractExcelWorker(_baseDbContext)
+                        .ValidateUnique(_exportedInstances, out uniqueError)
+                        .ValidateRequired(_exportedInstances, out requiredError)
+                        .CompleteValidations();
+                    break;
+                case "ContractType":
+                    new ContractTypeExcelWorker(_baseDbContext)
+                        .ValidateUnique(_exportedInstances, out uniqueError)
+                        .ValidateRequired(_exportedInstances, out requiredError)
+                        .CompleteValidations();
+                    break;
+                case "ContractMembership":
+                    new ContractMembershipExcelWorker(_baseDbContext)
+                        .ValidateUnique(_exportedInstances, out uniqueError)
+                        .ValidateRequired(_exportedInstances, out requiredError)
+                        .CompleteValidations();
+                    break;
+                default:
+                    AddError("error", "error");
+                    break;
+            }
+            if (uniqueError.Length > 0)
+                AddError("ValidationUnique", uniqueError);
+            if (requiredError.Length > 0)
+                AddError("ValidationRequired", requiredError);
+
+            return this;
+        }
+
+
+        private bool GetBoolValue(ExcelWorksheet worksheet, int row, int column)
+        {
+            var boolValue = false;
+            var excelCellValue = worksheet.Cells[row, column].Value?.ToString();
+            if (excelCellValue == "Ναί")
+                boolValue = true;
+            return boolValue;
+        }
+
+        private void GetIsActive(string colTitle, int colCount)
+        {
+            var colData = new List<string> { "Ναί", "Όχι" };
+            var dd = _worksheet.Cells[2, colCount, 50000, colCount].DataValidation.AddListDataValidation() as ExcelDataValidationList;
+            dd.AllowBlank = false;
+            if (colData.Count > 0)
+                foreach (var response in colData)
+                    dd.Formula.Values.Add(response);
+        }
+
+        private async Task GetLookUpValueAsync(string colTitle, int colCount)
+        {
+            var colData = new List<string>();
+
+            if (colTitle == "CompanyId")
+                colData = await _baseDataWork.Companies.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[Title]:" + x.Title);
+            else if (colTitle == "CustomerId")
+                colData = await _baseDataWork.Customers.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[IdentifyingName]:" + x.IdentifyingName);
+            else if (colTitle == "EmployeeId")
+                colData = await _baseDataWork.Employees.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[FullName]:" + x.FullName);
+            else if (colTitle == "SpecializationId")
+                colData = await _baseDataWork.Specializations.SelectAllAsync(x => "[Name]:" + x.Name);
+            else if (colTitle == "LeaveTypeId")
+                colData = await _baseDataWork.LeaveTypes.SelectAllAsync(x => "[Name]:" + x.Name);
+            else if (colTitle == "WorkPlaceId")
+                colData = await _baseDataWork.WorkPlaces.SelectAllAsync(x => "[Title]:" + x.Title + "_[CustomerVatNumber]:" + x.Customer.VatNumber);
+            else if (colTitle == "ContractId")
+                colData = await _baseDataWork.Contracts.SelectAllAsync(x => "[Title]:" + x.Title);
+            else if (colTitle == "ContractTypeId")
+                colData = await _baseDataWork.ContractTypes.SelectAllAsync(x => "[Name]:" + x.Name);
+            else if (colTitle == "ContractMembershipId")
+                colData = await _baseDataWork.ContractMemberships.SelectAllAsync(x => "[Name]:" + x.Name);
+
+            if (colData.Count == 0)
+                AddError("LookupEmpty", colTitle);
+
+            var excelDataValidationList = _worksheet.Cells[2, colCount, 50000, colCount].DataValidation.AddListDataValidation() as ExcelDataValidationList;
+            excelDataValidationList.AllowBlank = false;
+            if (colData.Count > 0)
+                foreach (var response in colData)
+                    excelDataValidationList.Formula.Values.Add(response);
+        }
+
+        private async Task<int> GetIdForExtractedEntity(ExcelWorksheet worksheet, int row, int column)
         {
             var id = 0;
             var excelColumnName = worksheet.Cells[1, column].Value.ToString();
@@ -369,79 +410,24 @@ namespace Bussiness.Service
                         .Id;
             }
 
-            if (id == 0)
-                AddError(entityName, "NullEntityIdFromDb");
+            //if (id == 0)
+            //AddError(entityName, "NullEntityIdFromDb");
 
             return id;
         }
 
-        private bool GetBoolValue(ExcelWorksheet worksheet, int row, int column)
-        {
-            var boolValue = false;
-            var excelCellValue = worksheet.Cells[row, column].Value?.ToString();
-            if (excelCellValue == "Ναί")
-                boolValue = true;
-            return boolValue;
-        }
-
-
-        private void GetIsActive(string colTitle, int colCount)
-        {
-            var colData = new List<string> { "Ναί", "Όχι" };
-            var dd = _worksheet.Cells[2, colCount, 50000, colCount].DataValidation.AddListDataValidation() as ExcelDataValidationList;
-            dd.AllowBlank = false;
-            if (colData.Count > 0)
-                foreach (var response in colData)
-                    dd.Formula.Values.Add(response);
-        }
-
-        private async Task GetLookUpAsync(string colTitle, int colCount)
-        {
-            var colData = await GetLookUpDataAsync(colTitle);
-            var dd = _worksheet.Cells[2, colCount, 50000, colCount].DataValidation.AddListDataValidation() as ExcelDataValidationList;
-            dd.AllowBlank = false;
-            if (colData.Count > 0)
-                foreach (var response in colData)
-                    dd.Formula.Values.Add(response);
-        }
-
-        private async Task<List<string>> GetLookUpDataAsync(string colTitle)
-        {
-            var response = new List<string>();
-            if (colTitle == "CompanyId")
-                response = await _baseDataWork.Companies.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[Title]:" + x.Title);
-            else if (colTitle == "CustomerId")
-                response = await _baseDataWork.Customers.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[IdentifyingName]:" + x.IdentifyingName);
-            else if (colTitle == "EmployeeId")
-                response = await _baseDataWork.Employees.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[FullName]:" + x.FullName);
-            else if (colTitle == "SpecializationId")
-                response = await _baseDataWork.Specializations.SelectAllAsync(x => "[Name]:" + x.Name);
-            else if (colTitle == "LeaveTypeId")
-                response = await _baseDataWork.LeaveTypes.SelectAllAsync(x => "[Name]:" + x.Name);
-            else if (colTitle == "WorkPlaceId")
-                response = await _baseDataWork.WorkPlaces.SelectAllAsync(x => "[Title]:" + x.Title + "_[CustomerVatNumber]:" + x.Customer.VatNumber);
-            else if (colTitle == "ContractId")
-                response = await _baseDataWork.Contracts.SelectAllAsync(x => "[Title]:" + x.Title);
-            else if (colTitle == "ContractTypeId")
-                response = await _baseDataWork.ContractTypes.SelectAllAsync(x => "[Name]:" + x.Name);
-            else if (colTitle == "ContractMembershipId")
-                response = await _baseDataWork.ContractMemberships.SelectAllAsync(x => "[Name]:" + x.Name);
-
-            if (response.Count == 0)
-                AddError(colTitle, "LookupEmpty");
-            return response;
-        }
-
-        private void AddError(string colName, string type)
+        private void AddError(string type, string colName)
         {
             var message = $"Βρέθηκε πρόβλημα στην κολώνα {colName}";
 
-            if (type == "Validation")
-                message += "  πρεπει να υπάρχει μοναδικότητα!";
+            if (type == "ValidationUnique")
+                message += " πρεπει να υπάρχει μοναδικότητα!";
+            if (type == "ValidationRequired")
+                message += " πρεπει να είναι συμπληρομένο!";
             if (type == "LookupEmpty")
-                message += "όπου δεν βρεθηκαν δεδομένα για την δημιουργεία λιστών!";
+                message += " όπου δεν βρεθηκαν δεδομένα για την δημιουργεία λιστών!";
             if (type == "NullEntityIdFromDb")
-                message += "όπου δεν βρεθηκαν οι συγγεκριμένες εγγραφές στην βάση!";
+                message += " όπου δεν βρεθηκαν οι συγγεκριμένες εγγραφές στην βάση!";
             if (type == "error")
                 message = "Error που δεν μπορεσε να διαχειριστεί!";
 

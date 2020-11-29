@@ -60,20 +60,10 @@ namespace DataAccess
         public async Task<int> SaveChangesAsync()
         {
             //AutoHistory will fill with user values on Edit and Delete
-            _httpContext = new HttpContextAccessor();
-            var firstNameValue = _httpContext.HttpContext.User
-                .Claims
-                .FirstOrDefault(x => x.Type == "FirstName")
-                .Value;
-
-            var lastNameValue = _httpContext.HttpContext.User
-                .Claims
-                .FirstOrDefault(x => x.Type == "LastName")
-                .Value;
-
             _dbcontext.EnsureAutoHistory(() => new AuditAutoHistory
             {
-                ModifiedBy = firstNameValue + lastNameValue,
+                ModifiedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                ModifiedBy_Id = HttpAccessorService.GetLoggeInUser_Id,
                 ModifiedOn = DateTime.Now
             });
             return await _dbcontext.SaveChangesAsync();

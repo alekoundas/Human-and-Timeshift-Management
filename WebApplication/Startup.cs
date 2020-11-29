@@ -38,7 +38,7 @@ namespace WebApplication
             services.AddDbContext<SecurityDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            //Seed Data
+            //Seed Base Data
             //var context = services.BuildServiceProvider()
             //           .GetService<BaseDbContext>();
             //InitializeBaseData.SeedData(context);

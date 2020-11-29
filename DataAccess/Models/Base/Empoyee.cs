@@ -17,6 +17,7 @@ namespace DataAccess.Models.Entity
         public string LastName { get; set; }
 
         [Display(Name = "ΑΦΜ")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string VatNumber { get; set; }
 
         [Display(Name = "Αριθμός Ταυτότητας")]

@@ -11,6 +11,8 @@ namespace DataAccess.Models.Audit
         [Display(Name = "Δημηουργήθηκε απο")]
         [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public string CreatedBy_Id { get; set; }
+
+        [Display(Name = "Δημηουργήθηκε απο")]
         public string CreatedBy_FullName { get; set; }
 
         [Display(Name = "Δημηουργήθηκε στις")]
