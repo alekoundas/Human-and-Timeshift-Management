@@ -50,7 +50,8 @@ namespace Bussiness.Service.ExcelServiceWorkers
                 var HireDate = (exportedInstance.GetType().GetProperty("HireDate"))
                    .GetValue(exportedInstance);
 
-                hasValidationError = hasValidationError = string.IsNullOrEmpty((string)FirstName) ||
+                hasValidationError = hasValidationError =
+                    string.IsNullOrEmpty((string)FirstName) ||
                     string.IsNullOrEmpty((string)LastName) ||
                     string.IsNullOrEmpty((string)VatNumber) ||
                     (DateTime)HireDate == default(DateTime);

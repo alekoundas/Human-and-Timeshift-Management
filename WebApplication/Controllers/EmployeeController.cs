@@ -103,6 +103,7 @@ namespace WebApplication.Controllers
                 .Include(x => x.Company)
                 .Include(x => x.Specialization)
                 .Include(y => y.Contacts)
+                .Include(y => y.Contract)
                 .FirstOrDefaultAsync(z => z.Id == id);
 
             if (employee == null)
@@ -174,18 +175,19 @@ namespace WebApplication.Controllers
         public async Task<ActionResult> DownloadExcelWithData()
         {
             var excelColumns = new List<string>(new string[] {
-                "FirstName",
-                "LastName",
-                "VatNumber",
-                "SocialSecurityNumber",
-                "ErpCode",
-                "Email",
-                "Address",
-                "IsActive",
-                "SpecializationId",
-                "ContractId",
-                "IsActive",
-                "CompanyId"
+                 "FirstName",
+                 "LastName",
+                 "VatNumber",
+                 "SocialSecurityNumber",
+                 "ErpCode",
+                 "Address",
+                 "HireDate",
+                 "ContractStartOn",
+                 "ContractEndOn",
+                 "IsActive",
+                 "SpecializationId",
+                 "ContractId",
+                 "CompanyId"
             });
 
 

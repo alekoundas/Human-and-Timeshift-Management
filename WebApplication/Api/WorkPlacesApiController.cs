@@ -225,15 +225,17 @@ namespace WebApplication.Api
             if (employee == null || workPlace == null)
                 return NotFound();
 
-            if (toggleState == "true" && _baseDataWork.EmployeeWorkPlaces
-                .Any(x => x.EmployeeId == employeeId && x.WorkPlaceId == workPlaceId))
-                return NotFound();
+            //if (toggleState == "true" && _baseDataWork.EmployeeWorkPlaces
+            //    .Any(x => x.EmployeeId == employeeId && x.WorkPlaceId == workPlaceId))
+            //    return NotFound();
 
             if (toggleState == "true")
                 _baseDataWork.EmployeeWorkPlaces.Add(new EmployeeWorkPlace()
                 {
                     EmployeeId = employeeId,
-                    WorkPlaceId = workPlaceId
+                    WorkPlaceId = workPlaceId,
+                    CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                    CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
                 });
 
             else
@@ -262,7 +264,7 @@ namespace WebApplication.Api
             _baseDataWork.Update(workPlace);
             await _baseDataWork.SaveChangesAsync();
 
-            //TempData["StatusMessage"] = "αμ μπλου ντα μπου ντι ντα μπουνται";
+
             return new { skata = "Polla Skata" };
         }
 

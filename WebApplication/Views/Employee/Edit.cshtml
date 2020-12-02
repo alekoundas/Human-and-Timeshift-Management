@@ -116,6 +116,19 @@
                     </div>
 
                     <div class="form-group">
+                        <label asp-for="ContractId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="Contract_Select2" asp-for="ContractId" style="width:50%">
+                                @if (Model.ContractId != null)
+                                {
+                    <option value="@Model.ContractId" selected="selected">@Model.Contract.Title</option>
+}
+                            </select>
+                            <span asp-validation-for="ContractId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label asp-for="CreatedBy_FullName" class="control-label"></label>
                         <div class="input-group">
                             <input asp-for="CreatedBy_FullName" class="form-control" readonly />
@@ -258,10 +271,24 @@
             }
         });
 
+        $('.Contract_Select2').select2({
+            allowClear: true,
+            ajax: {
+                url: '/api/contracts/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
         $(() => new DataTableService('#WorkPlacesDatatable')
             .ForApiController('workplaces')
             .AddColumn(true, true, "Title")
-            .AddColumn(true, true, "IdentifyingName")
+            .AddColumn(true, true, "CustomerName")
             .AddColumn(true, true, "IsInWorkPlace")
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'EmployeeEdit';

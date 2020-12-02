@@ -91,6 +91,13 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label asp-for="Contract" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Contract.Title" class="form-control" readonly disabled />
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -143,7 +150,7 @@
         $(() => new DataTableService('#WorkPlacesDatatable')
             .ForApiController('workplaces')
             .AddColumn(true, true, "Title")
-            .AddColumn(true, true, "IdentifyingName")
+            .AddColumn(true, true, "CustomerName")
             .AddColumn(true, true, "IsInWorkPlace")
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'EmployeeDetails';

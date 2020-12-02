@@ -103,6 +103,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label asp-for="ContractId" class="control-label"></label>
+                        <div class="input-group" style="width:100%">
+                            <select class="Contract_Select2" asp-for="ContractId" style="width:70%"></select>
+                            <span asp-validation-for="ContractId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label asp-for="Contacts" class="control-label"></label>
                         <div class="input-group" style="width:70%">
                             <div class="row">
@@ -157,6 +165,20 @@
             allowClear: true,
             ajax: {
                 url: '/api/companies/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
+        $('.Contract_Select2').select2({
+            allowClear: true,
+            ajax: {
+                url: '/api/contracts/select2',
                 data: function (params) {
                     var query = {
                         search: params.term,

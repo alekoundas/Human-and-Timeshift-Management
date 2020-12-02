@@ -43,7 +43,7 @@ namespace Bussiness.Service.ExcelServiceWorkers
                 var VatNumber = (exportedInstance.GetType().GetProperty("VatNumber"))
                     .GetValue(exportedInstance);
 
-                hasValidationError = (int)VatNumber == 0;
+                hasValidationError = string.IsNullOrEmpty((string)VatNumber);
             }
             if (hasValidationError)
                 error = "VatNumber";

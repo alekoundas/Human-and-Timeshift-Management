@@ -141,7 +141,14 @@ namespace WebApplication.Api
 
             if (predicate == "RealWorkHourCreate")
             {
-                filter = filter.And(x => x.Month == DateTime.Now.Month);
+                bool isLastDayOfMonth = (DateTime.Now.Day == DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
+                bool isFirstDayOfMonth = DateTime.Now.Day == 1;
+                if (isLastDayOfMonth)
+                    filter = filter.And(x => x.Month == DateTime.Now.Month || x.Month == DateTime.Now.Month + 1);
+                else if (isFirstDayOfMonth)
+                    filter = filter.And(x => x.Month == DateTime.Now.Month || x.Month == DateTime.Now.Month - 1);
+                else
+                    filter = filter.And(x => x.Month == DateTime.Now.Month);
             }
             else
             {

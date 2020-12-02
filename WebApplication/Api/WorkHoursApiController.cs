@@ -4,7 +4,6 @@ using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -222,7 +221,9 @@ namespace WebApplication.Api
                     TimeShiftId = workHour.TimeShiftId,
                     EmployeeId = workHour.EmployeeId,
                     IsDayOff = workHour.IsDayOff,
-                    Comments = workHour.Comments
+                    Comments = workHour.Comments,
+                    CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                    CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
                 });
             }
             _baseDataWork.WorkHours.AddRange(dataToSaveRange);
@@ -263,7 +264,9 @@ namespace WebApplication.Api
                         StartOn = workHour.NewStartOn,
                         EndOn = workHour.NewEndOn,
                         TimeShiftId = workHour.TimeShiftId,
-                        EmployeeId = workHour.EmployeeId
+                        EmployeeId = workHour.EmployeeId,
+                        CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                        CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
                     });
                 }
 
@@ -322,10 +325,5 @@ namespace WebApplication.Api
             return Ok(response);
         }
 
-
-        private bool WorkHourExists(int id)
-        {
-            return _context.WorkHours.Any(e => e.Id == id);
-        }
     }
 }

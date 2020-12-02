@@ -250,7 +250,9 @@ namespace WebApplication.Api
                         TimeShiftId = realWorkHour.TimeShiftId,
                         EmployeeId = realWorkHour.EmployeeId,
                         IsDayOff = realWorkHour.IsDayOff,
-                        Comments = realWorkHour.Comments
+                        Comments = realWorkHour.Comments,
+                        CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                        CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
                     });
                 else
                     realWorkHoursToSaveRange.Add(new RealWorkHour()
@@ -259,7 +261,9 @@ namespace WebApplication.Api
                         EndOn = realWorkHour.EndOn,
                         TimeShiftId = realWorkHour.TimeShiftId,
                         EmployeeId = realWorkHour.EmployeeId,
-                        Comments = realWorkHour.Comments
+                        Comments = realWorkHour.Comments,
+                        CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                        CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
                     });
             }
             _baseDataWork.WorkHours.AddRange(workHoursToSaveRange);
@@ -389,12 +393,6 @@ namespace WebApplication.Api
                 });
             }
             return Ok(response);
-        }
-
-
-        private bool RealWorkHourExists(int id)
-        {
-            return _context.RealWorkHours.Any(e => e.Id == id);
         }
     }
 }

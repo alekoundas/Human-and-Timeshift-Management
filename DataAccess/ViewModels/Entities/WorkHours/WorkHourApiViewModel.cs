@@ -1,11 +1,10 @@
-﻿using DataAccess.Models.Audit;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
 namespace DataAccess.ViewModels
 {
-    public class WorkHourApiViewModel : BaseEntity
+    public class WorkHourApiViewModel
     {
         [JsonProperty(PropertyName = "startOn")]
         public DateTime StartOn { get; set; }

@@ -205,7 +205,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             entities = entities.Select(X => new WorkPlace
             {
+                Id = X.Id,
                 CustomerId = X.CustomerId,
+                Customer = X.Customer,
                 Title = X.Title,
                 EmployeeWorkPlaces = X.EmployeeWorkPlaces.Select(y => new EmployeeWorkPlace
                 {
@@ -227,7 +229,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(_datatable.GenericId, result.Id);
 
-                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
+                dictionary.Add("CustomerName", result.Customer?.IdentifyingName);
 
                 if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == _datatable.GenericId))
                     dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -266,7 +268,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(_datatable.GenericId, result.Id);
 
-                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
+                dictionary.Add("CustomerName", result.Customer?.IdentifyingName);
 
                 if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == _datatable.GenericId))
                     dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -336,13 +338,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                var totalSeconds =  _baseDatawork.RealWorkHours
+                var totalSeconds = _baseDatawork.RealWorkHours
                        .GetEmployeeTotalSecondsFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
 
-                var totalSecondsDay =  _baseDatawork.RealWorkHours
+                var totalSecondsDay = _baseDatawork.RealWorkHours
                        .GetEmployeeTotalSecondsDayFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
 
-                var totalSecondsNight =  _baseDatawork.RealWorkHours
+                var totalSecondsNight = _baseDatawork.RealWorkHours
                         .GetEmployeeTotalSecondsNightFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
                 if (_datatable.ShowHoursInPercentage)
                 {

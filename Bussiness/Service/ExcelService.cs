@@ -124,80 +124,81 @@ namespace Bussiness.Service
                 using (ExcelPackage excelPackage = new ExcelPackage(stream))
                 {
 
-                    foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
-                        for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
+                    var worksheet = excelPackage.Workbook.Worksheets[0];
+                    //foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
+                    for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
+                    {
+                        genericEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
+
+                        //TODO:convert to arrow
+                        void AddPropertyValueToInstance<TValue>(TEntity instance, TValue value, string propertyName)
                         {
-                            genericEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
+                            instance.GetType().GetProperty(propertyName).SetValue(instance, value, null);
+                        }
 
-                            //TODO:convert to arrow
-                            void AddPropertyValueToInstance<TValue>(TEntity instance, TValue value, string propertyName)
+
+
+                        for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
+                        {
+
+                            var propertyName = worksheet.Cells[1, j].Value.ToString();
+
+                            if (worksheet.Cells[1, j].Value.ToString().EndsWith("Id"))//Filter relation
                             {
-                                instance.GetType().GetProperty(propertyName).SetValue(instance, value, null);
-                            }
-
-
-
-                            for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
-                            {
-
-                                var propertyName = worksheet.Cells[1, j].Value.ToString();
-
-                                if (worksheet.Cells[1, j].Value.ToString().EndsWith("Id"))//Filter relation
+                                if (await GetIdForExtractedEntity(worksheet, i, j) != 0)
                                 {
-                                    if (await GetIdForExtractedEntity(worksheet, i, j) != 0)
-                                    {
-                                        var propertyValue = await GetIdForExtractedEntity(worksheet, i, j);
-
-                                        AddPropertyValueToInstance(genericEntityInstance, propertyValue, propertyName);
-                                    }
-                                }
-                                else if (worksheet.Cells[1, j].Value.ToString().Contains("IsActive"))
-                                {
-                                    var propertyValue = GetBoolValue(worksheet, i, j);
+                                    var propertyValue = await GetIdForExtractedEntity(worksheet, i, j);
 
                                     AddPropertyValueToInstance(genericEntityInstance, propertyValue, propertyName);
                                 }
-                                else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "DateTime")
-                                {
-                                    var value = worksheet.Cells[i, j].Value?.ToString();
-                                    var setValue = default(DateTime);
-
-                                    if (value?.Length <= 0)
-                                        DateTime.TryParse(value, out setValue);
-
-                                    AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
-                                }
-                                else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "Int32")
-                                {
-                                    var value = worksheet.Cells[i, j].Value?.ToString();
-                                    var setValue = default(Int32);
-
-                                    if (value?.Length <= 0)
-                                        Int32.TryParse(value, out setValue);
-
-                                    AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
-                                }
-                                else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "Decimal")
-                                {
-                                    var value = worksheet.Cells[i, j].Value?.ToString();
-                                    var setValue = default(Decimal);
-
-                                    if (value?.Length <= 0)
-                                        Decimal.TryParse(value, out setValue);
-
-                                    AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
-                                }
-                                else
-                                    AddPropertyValueToInstance(genericEntityInstance, worksheet.Cells[i, j].Value?.ToString(), propertyName);
                             }
+                            else if (worksheet.Cells[1, j].Value.ToString().Contains("IsActive"))
+                            {
+                                var propertyValue = GetBoolValue(worksheet, i, j);
 
-                            //Add Audit fields non existant in excel column
-                            AddPropertyValueToInstance(genericEntityInstance, DateTime.Now, "CreatedOn");
-                            AddPropertyValueToInstance(genericEntityInstance, HttpAccessorService.GetLoggeInUser_FullName, "CreatedBy_FullName");
-                            AddPropertyValueToInstance(genericEntityInstance, HttpAccessorService.GetLoggeInUser_Id, "CreatedBy_Id");
+                                AddPropertyValueToInstance(genericEntityInstance, propertyValue, propertyName);
+                            }
+                            else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "DateTime")
+                            {
+                                var value = worksheet.Cells[i, j].Value?.ToString();
+                                var setValue = default(DateTime);
 
-                            _exportedInstances.Add(genericEntityInstance);
+                                if (value?.Length > 0)
+                                    DateTime.TryParse(value, out setValue);
+
+                                AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
+                            }
+                            else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "Int32")
+                            {
+                                var value = worksheet.Cells[i, j].Value?.ToString();
+                                var setValue = default(Int32);
+
+                                if (value?.Length > 0)
+                                    Int32.TryParse(value, out setValue);
+
+                                AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
+                            }
+                            else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "Decimal")
+                            {
+                                var value = worksheet.Cells[i, j].Value?.ToString();
+                                var setValue = default(Decimal);
+
+                                if (value?.Length > 0)
+                                    Decimal.TryParse(value, out setValue);
+
+                                AddPropertyValueToInstance(genericEntityInstance, setValue, propertyName);
+                            }
+                            else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "String")
+                                AddPropertyValueToInstance(genericEntityInstance, worksheet.Cells[i, j].Value?.ToString(), propertyName);
                         }
+
+                        //Add Audit fields non existant in excel column
+                        AddPropertyValueToInstance(genericEntityInstance, DateTime.Now, "CreatedOn");
+                        AddPropertyValueToInstance(genericEntityInstance, HttpAccessorService.GetLoggeInUser_FullName, "CreatedBy_FullName");
+                        AddPropertyValueToInstance(genericEntityInstance, HttpAccessorService.GetLoggeInUser_Id, "CreatedBy_Id");
+
+                        _exportedInstances.Add(genericEntityInstance);
+                    }
                 }
             }
             return this;
@@ -299,6 +300,19 @@ namespace Bussiness.Service
         {
             var colData = new List<string>();
 
+            var lookupSheet = this.ExcelPackage.Workbook.Worksheets.Add("Lookup_" + colTitle);
+
+            //lookupSheet.Cells["B1"].Value = "Here we have to add long text";
+            //lookupSheet.Cells["B2"].Value = "All list values combined have to have more then 255 chars";
+            //lookupSheet.Cells["B3"].Value = "more text 1 more text more text more text";
+            //lookupSheet.Cells["B4"].Value = "more text 2 more text more text more text";
+            //lookupSheet.Cells["B5"].Value = "more text 2 more text more text more textmore text 2 more text more text more textmore text 2 more text more text more textmore text 2 more text more text more textmore text 2 more text more text more textmore text 2 more text more text more textmore text 2 more text more text more textmore";
+
+            //var val = ws.DataValidations.AddListValidation("A2");
+            //val.Formula.ExcelFormula = "B$1:B$5";
+
+
+
             if (colTitle == "CompanyId")
                 colData = await _baseDataWork.Companies.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[Title]:" + x.Title);
             else if (colTitle == "CustomerId")
@@ -321,16 +335,20 @@ namespace Bussiness.Service
             if (colData.Count == 0)
                 AddError("LookupEmpty", colTitle);
 
+            for (int i = 0; i < colData.Count; i++)
+                lookupSheet.Cells[i + 1, 1].Value = colData[i];
+
+
             var excelDataValidationList = _worksheet.Cells[2, colCount, 50000, colCount].DataValidation.AddListDataValidation() as ExcelDataValidationList;
+            excelDataValidationList.Formula.ExcelFormula = "Lookup_" + colTitle + "!A1:A" + colData.Count;
             excelDataValidationList.AllowBlank = false;
-            if (colData.Count > 0)
-                foreach (var response in colData)
-                    excelDataValidationList.Formula.Values.Add(response);
+            excelDataValidationList.ShowErrorMessage = true;
+            excelDataValidationList.ShowInputMessage = true;
         }
 
         private async Task<int> GetIdForExtractedEntity(ExcelWorksheet worksheet, int row, int column)
         {
-            var id = 0;
+            int? id = 0;
             var excelColumnName = worksheet.Cells[1, column].Value.ToString();
             var entityName = excelColumnName.Remove(excelColumnName.Length - 2);
             var excelCellValue = worksheet.Cells[row, column].Value?.ToString();
@@ -340,7 +358,7 @@ namespace Bussiness.Service
                 var VatNumber = excelCellValue?.Split("_")[0]?.Split(":")[1];
                 if (VatNumber != null)
                     id = (await _baseDataWork.Companies
-                        .FirstAsync(x => x.VatNumber == VatNumber))
+                        .FirstAsync(x => x.VatNumber == VatNumber))?
                         .Id;
             }
             if (entityName == "Customer")
@@ -349,7 +367,7 @@ namespace Bussiness.Service
                 var identifyingName = excelCellValue?.Split("_")[1].Split(":")[1];
                 if (VatNumber != null && identifyingName != null)
                     id = (await _baseDataWork.Customers
-                    .FirstAsync(x => x.VatNumber == VatNumber && x.IdentifyingName == identifyingName))
+                    .FirstAsync(x => x.VatNumber == VatNumber && x.IdentifyingName == identifyingName))?
                     .Id;
             }
             if (entityName == "Employee")
@@ -357,7 +375,7 @@ namespace Bussiness.Service
                 var VatNumber = excelCellValue?.Split("_")[0]?.Split(":")[1];
                 if (VatNumber != null)
                     id = (await _baseDataWork.Employees
-                    .FirstAsync(x => x.VatNumber == VatNumber))
+                    .FirstAsync(x => x.VatNumber == VatNumber))?
                     .Id;
             }
             if (entityName == "Specialization")
@@ -365,7 +383,7 @@ namespace Bussiness.Service
                 var name = excelCellValue?.Split("_")[0]?.Split(":")[1];
                 if (name != null)
                     id = (await _baseDataWork.Specializations
-                        .FirstAsync(x => x.Name == name))
+                        .FirstAsync(x => x.Name == name))?
                         .Id;
             }
             if (entityName == "LeaveType")
@@ -373,7 +391,7 @@ namespace Bussiness.Service
                 var name = excelCellValue?.Split("_")[0]?.Split(":")[1];
                 if (name != null)
                     id = (await _baseDataWork.LeaveTypes
-                    .FirstAsync(x => x.Name == name))
+                    .FirstAsync(x => x.Name == name))?
                     .Id;
             }
             if (entityName == "WorkPlace")
@@ -382,7 +400,7 @@ namespace Bussiness.Service
                 var customerVatNumber = excelCellValue?.Split("_")[1]?.Split(":")[1];
                 if (title != null && customerVatNumber != null)
                     id = (await _baseDataWork.WorkPlaces
-                    .FirstAsync(x => x.Title == title && x.Customer.VatNumber == customerVatNumber))
+                    .FirstAsync(x => x.Title == title && x.Customer.VatNumber == customerVatNumber))?
                     .Id;
             }
             if (entityName == "Contract")
@@ -390,7 +408,7 @@ namespace Bussiness.Service
                 var title = excelCellValue?.Split("_")[0]?.Split(":")[1];
                 if (title != null)
                     id = (await _baseDataWork.Contracts
-                    .FirstAsync(x => x.Title == title))
+                    .FirstAsync(x => x.Title == title))?
                     .Id;
             }
             if (entityName == "ContractType")
@@ -398,7 +416,7 @@ namespace Bussiness.Service
                 var name = excelCellValue?.Split("_")[0]?.Split(":")[1];
                 if (name != null)
                     id = (await _baseDataWork.ContractTypes
-                    .FirstAsync(x => x.Name == name))
+                    .FirstAsync(x => x.Name == name))?
                     .Id;
             }
             if (entityName == "ContractMembership")
@@ -406,14 +424,17 @@ namespace Bussiness.Service
                 var name = excelCellValue?.Split("_")[0]?.Split(":")[1];
                 if (name != null)
                     id = (await _baseDataWork.ContractMemberships
-                        .FirstAsync(x => x.Name == name))
+                        .FirstAsync(x => x.Name == name))?
                         .Id;
             }
 
-            //if (id == 0)
-            //AddError(entityName, "NullEntityIdFromDb");
+            if (id == null)
+            {
+                AddError(entityName, "NullEntityIdFromDb");
+                return 0;
+            }
 
-            return id;
+            return (int)id;
         }
 
         private void AddError(string type, string colName)
@@ -427,7 +448,7 @@ namespace Bussiness.Service
             if (type == "LookupEmpty")
                 message += " όπου δεν βρεθηκαν δεδομένα για την δημιουργεία λιστών!";
             if (type == "NullEntityIdFromDb")
-                message += " όπου δεν βρεθηκαν οι συγγεκριμένες εγγραφές στην βάση!";
+                message += " όπου δεν βρεθηκαν δεδομενα των Lookup στην βάση!";
             if (type == "error")
                 message = "Error που δεν μπορεσε να διαχειριστεί!";
 

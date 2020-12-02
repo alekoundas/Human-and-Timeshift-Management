@@ -33,9 +33,26 @@
                     </div>
 
                     <div class="form-group">
+                        <label asp-for="DayOfDaysPerWeek" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="DayOfDaysPerWeek" class="form-control" value="0">
+                            <span asp-validation-for="DayOfDaysPerWeek" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="WorkingDaysPerWeek" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="WorkingDaysPerWeek" class="form-control" value="0">
+                            <span asp-validation-for="WorkingDaysPerWeek" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label asp-for="HoursPerWeek" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="HoursPerWeek" class="form-control"></input>
+                            <input asp-for="HoursPerWeek" class="form-control">
                             <span asp-validation-for="HoursPerWeek" class="text-danger"></span>
                         </div>
                     </div>
@@ -43,7 +60,7 @@
                     <div class="form-group">
                         <label asp-for="HoursPerDay" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="HoursPerDay" class="form-control"></input>
+                            <input asp-for="HoursPerDay" class="form-control">
                             <span asp-validation-for="HoursPerDay" class="text-danger"></span>
                         </div>
                     </div>
@@ -51,7 +68,7 @@
                     <div class="form-group">
                         <label asp-for="GrossSalaryPerHour" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="GrossSalaryPerHour" class="form-control"></input>
+                            <input asp-for="GrossSalaryPerHour" class="form-control">
                             <span asp-validation-for="GrossSalaryPerHour" class="text-danger"></span>
                         </div>
                     </div>
@@ -59,11 +76,10 @@
                     <div class="form-group">
                         <label asp-for="NetSalaryPerHour" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="NetSalaryPerHour" class="form-control"></input>
+                            <input asp-for="NetSalaryPerHour" class="form-control">
                             <span asp-validation-for="NetSalaryPerHour" class="text-danger"></span>
                         </div>
                     </div>
-
 
                     <div class="form-group">
                         <label asp-for="ContractMembershipId" class="control-label"></label>
