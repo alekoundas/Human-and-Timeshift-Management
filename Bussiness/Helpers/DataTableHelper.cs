@@ -108,7 +108,7 @@ namespace Bussiness.Helpers
                     "<input " +
                         "type='checkbox' " +
                         "aria-label='Checkbox for following text input'" +
-                        "class='PermitionCheckbox'" +
+                        "class='ToggleSliders'" +
                         "UserId='" + userId + "'" +
                         "RoleId='" + roleId + "'" +
                         (isChecked == true ? " checked " : "") +
@@ -141,33 +141,33 @@ namespace Bussiness.Helpers
 
         public string GetTimeShiftEditCellBodyWorkHours(List<WorkHour> workHours, List<Leave> leaves, int dayOfMonth, Datatable datatable, int employeeId)
         {
-            var strToReturn = "";
-
             var cellWorkHours = workHours.Where(x =>
                    x.TimeShiftId == datatable.GenericId &&
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day) &&
+                   //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
                    x.EmployeeId == employeeId)
                 .ToList();
 
             var cellLeaves = leaves.Where(x =>
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day) &&
+                   //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
                    x.EmployeeId == employeeId)
                 .ToList();
 
+            var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
+
             if (cellWorkHours.Any(x => x.IsDayOff))
                 strToReturn +=
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                    "<center><p><b>Ρεπό</b></p></center>" +
-                     "</div>";
-            else if (cellLeaves.Count() > 0)
-                return
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                    "<center><p><b>Άδεια</b></p></center>" +
-                     "</div>";
+                    "<center><p><b>Ρεπό</b></p></center>";
+
+            if (cellLeaves.Count() > 0)
+                return "<div style='width:110px; white-space: nowrap;'>" +
+                 "<center><p><b>Άδεια</b></p></center>" +
+                  "</div>";
             else
                 foreach (var cellWorkHour in cellWorkHours)
                 {
@@ -192,15 +192,22 @@ namespace Bussiness.Helpers
                                 59,
                                 0,
                                 0);
-                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
+
+                    if (!cellWorkHour.IsDayOff)
+                    {
+                        strToReturn +=
+                        "<div style='width:50px;display:block; float: left;'> " +
                         celStartOn.ToShortTimeString() +
-                  "</div>";
+                        "</div>";
 
-                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
+                        strToReturn +=
+                        "<div style='width:50px; display:block; float: right;'>" +
                         celEndOn.ToShortTimeString() +
-                     "</div></div>";
-
+                        "</div>";
+                    }
                 }
+
+            strToReturn += "</div>";
 
             _httpContext = new HttpContextAccessor();
             var currentUserRoles = _httpContext.HttpContext.User.Claims
@@ -210,7 +217,7 @@ namespace Bussiness.Helpers
             if (datatable.Predicate != "TimeShiftDetail")
             {
 
-                if (currentUserRoles.Contains("TimeShift_Create"))
+                if (currentUserRoles.Contains("TimeShift_Edit"))
                     if (true)
                         strToReturn += FaIconAdd(dayOfMonth, "", employeeId);
 
@@ -228,13 +235,13 @@ namespace Bussiness.Helpers
             List<WorkHour> workHours, List<Leave> leaves, int compareMonth, int compareYear,
             int compareDay, Datatable datatable, int employeeId)
         {
-            var strToReturn = "";
 
             var cellWorkHours = workHours.Where(x =>
                   x.TimeShiftId == datatable.GenericId &&
                   x.StartOn.Year == compareYear &&
                   x.StartOn.Month == compareMonth &&
-                  (x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
+                  (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day) &&
+                  //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
                   x.EmployeeId == employeeId)
                .ToList();
 
@@ -242,7 +249,8 @@ namespace Bussiness.Helpers
                x.TimeShiftId == datatable.GenericId &&
                x.StartOn.Year == compareYear &&
                x.StartOn.Month == compareMonth &&
-               (x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
+               (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day) &&
+               //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
                x.EmployeeId == employeeId)
             .ToList();
 
@@ -254,17 +262,16 @@ namespace Bussiness.Helpers
                    x.EmployeeId == employeeId)
                 .ToList();
 
+            var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
+
             if (cellWorkHours.Any(x => x.IsDayOff))
                 strToReturn +=
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                    "<center><p><b>Ρεπό</b></p></center>" +
-                     "</div>";
+                    "<center><p><b>Ρεπό</b></p></center>";
 
             if (cellLeaves.Count() > 0)
-                return
-                    "<div style='width:110px; white-space: nowrap;'>" +
-                        "<center><p><b>Άδεια</b></p></center>" +
-                     "</div>";
+                return "<div style='width:110px; white-space: nowrap;'>" +
+                 "<center><p><b>Άδεια</b></p></center>" +
+                  "</div>";
             else
             {
                 foreach (var cellWorkHour in cellRealWorkHours)
@@ -291,14 +298,18 @@ namespace Bussiness.Helpers
                                 0,
                                 0);
 
-                    strToReturn += "<div style='width:110px; white-space: nowrap;'><div style = 'width:50px;display:block;  float: left;' > " +
+                    strToReturn +=
+                        "<div style='width:50px;display:block; float: left;'> " +
                         celStartOn.ToShortTimeString() +
                         "</div>";
 
-                    strToReturn += " <div style = 'width:50px; display:block;  float: right; ' >" +
+                    strToReturn +=
+                        "<div style='width:50px; display:block; float: right;'>" +
                         celEndOn.ToShortTimeString() +
-                        "</div></div>";
+                        "</div>";
+
                 }
+                strToReturn += "</div>";
 
 
                 //var currentDate = new DateTime(compareYear, 1, 1);

@@ -4,6 +4,7 @@ using Bussiness.Service;
 using DataAccess;
 using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Identity;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -69,6 +70,36 @@ namespace WebApplication.Api.Security
             return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
+        // DELETE: api/specializations/id
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<DeleteViewModel>> Delete(string id)
+        {
+            var response = new DeleteViewModel();
+            var user = await _securityDatawork.ApplicationUsers
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+                return NotFound();
+
+            _securityDatawork.ApplicationUsers.Remove(user);
+            var status = await _securityDatawork.SaveChangesAsync();
+
+            if (status >= 1)
+                response.ResponseBody = "Ο χρήστης" +
+                    user.FirstName + " " +
+                    user.LastName +
+                    " διαγράφηκε με επιτυχία";
+            else
+                response.ResponseBody = "Ωχ! Ο χρήστης" +
+                    user.FirstName + " " +
+                    user.LastName +
+                    " ΔΕΝ διαγράφηκε!";
+
+
+            response.ResponseTitle = "Διαγραφή χρήστη";
+            response.Entity = user;
+            return response;
+        }
 
         protected IEnumerable<ExpandoObject> MapResults(IEnumerable<ApplicationUser> results, Datatable datatable)
         {

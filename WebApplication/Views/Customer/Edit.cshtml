@@ -86,7 +86,8 @@
                             <select class="Company_Select2" asp-for="CompanyId" style="width:70%">
                                 @if (Model.Company != null)
                                 {
-                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>}
+                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>
+}
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>
@@ -129,6 +130,15 @@
                 <h3 class="box-title">@ViewData["WorkPlaceDataTable"]</h3>
             </div>
             <hr />
+            <div style="width:100%; padding-left:5%;">
+                <div style="width:100%; float:left;">
+                    <div class="form-group">
+                        <label class="control-label">Εμφάνιση ΜΟΝΟ ενταγμένων πελατών</label>&nbsp
+                        <input type="checkbox" class="filterSlider" id="SliderFilter" checked>
+                    </div>
+                </div>
+            </div>
+            <hr />
             <div class="box-body table-responsive">
 
                 <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive stripe">
@@ -154,6 +164,11 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        $('.filterSlider').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι'
+        })
+
         $('.Company_Select2').select2({
             ajax: {
                 url: '/api/companies/select2',
@@ -166,9 +181,7 @@
                 }
             }
         });
-    </script>
 
-    <script>
         $(() => new DataTableService('#WorkPlacesDatatable')
             .ForApiController('workplaces')
             .AddColumn(true, true, "Title")
@@ -176,6 +189,7 @@
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'CustomerEdit';
                 data.genericId =@Model.Id;
+                data.filterByIncludedCustomer =GetSliderFilterValue();
                 return JSON.stringify(data);
             })
             .FnDrawCallback(()=>
@@ -184,7 +198,9 @@
                     off: 'Όχι'
                 }))
             .CompleteDataTable());
+    </script>
 
+    <script>
         $('#WorkPlacesDatatable').on('change', '.ToggleSliders', (element) => {
             var apiUrl = element.target.getAttribute('urlattr');
             $.ajax({
@@ -196,5 +212,11 @@
                 }
             });
         });
+
+        const GetSliderFilterValue = () =>
+            document.getElementById('SliderFilter').checked != true;
+
+        $('.filterSlider').change(e =>
+            $('#WorkPlacesDatatable').DataTable().ajax.reload());
     </script>
 }

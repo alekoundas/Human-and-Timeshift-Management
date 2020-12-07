@@ -22,14 +22,17 @@ namespace WebApplication.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly BaseDatawork _baseDataWork;
+        private readonly SecurityDataWork _securityDataWork;
 
         public UserController(SecurityDbContext dbContext,
             BaseDbContext BaseDbContext,
+            SecurityDbContext SecurityDbContext,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
         {
             _datawork = new SecurityDataWork(dbContext);
             _baseDataWork = new BaseDatawork(BaseDbContext);
+            _securityDataWork = new SecurityDataWork(SecurityDbContext);
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -164,14 +167,16 @@ namespace WebApplication.Controllers
                 return NotFound();
 
             var returnViewModel = ApplicationUserEdit.CreateFrom(user);
+
             returnViewModel.WorkPlaceRoles = new List<WorkPlaceRoleValues>();
+            returnViewModel.Tags = await _securityDataWork.ApplicationTags
+                .GetForUserId(user.Id);
+
             if (returnViewModel.IsEmployee)
                 returnViewModel.EmployeeOption = _baseDataWork.Employees
                     .Where(x => x.Id == returnViewModel.EmployeeId)
                     .Select(x => new StringBuilder(x.FullName + " - " + x.ErpCode).ToString())
                     .FirstOrDefault();
-
-
 
             var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
                 .GetWorkPlaceRolesByUserId(user.Id);

@@ -236,11 +236,11 @@
                 1,                                                     //day
                 0, 0, 0, 0).valueOf();                                 //time
 
+
             var maxTs = new Date(new Date(CelentimDate).getFullYear(),//year
                 new Date(CelentimDate).getMonth() + 1,                    //month
-                0,                                                    //day
-                23, 59, 59, 0).valueOf();                             //time
-
+                1,                                                    //day
+                12, 10, 59, 0).valueOf();
 
             var startTs = GetCalentimInputValue(workHourId)[0];
             var endTs = GetCalentimInputValue(workHourId)[1];
@@ -1988,6 +1988,10 @@
                                     .attr('cellcolor'))
                     }
                 })
+                .CreatedRow((row, data, dataIndex) => {
+                    if (!data.IsActive)
+                        $(row).css('background-color', '#AAAFB4');
+                })
                 //.InitComplete(() => {
                 //    [...document.getElementsByClassName('TableDays')]
                 //        .forEach(tableHead => {
@@ -2103,7 +2107,7 @@
                 '<div style="width:  100%;">' +
                 '<div style="width: 15%; float: left;">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;"><p> Δήλωση Ημ. ως ρεπό:</p></div>' +
-                '<div style="width: 20%; float: left;"><input  type="checkbox" id="DayOffSliderNum_' + workHourId + '" data-onstyle="success"></div>' +
+                '<div style="width: 20%; float: left;"><input  type="checkbox" id="DayOffSliderNum_' + workHourId + '" data-onstyle="success" disabled></div>' +
                 '</div >' +
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
@@ -2173,7 +2177,7 @@
                 '<div style="width:  100%;">' +
                 '<div style="width: 15%; float: left;  display: none;" id="IsDayOffNullSpaceNum_' + workHourId + '">&nbsp;</div >' +
                 '<div style="width: 20%; float: left;"><p> Δήλωση Ημ. ως ρεπό:</p></div>' +
-                '<div style="width: 20%; float: left;"><input disabled type="checkbox" id="DayOffSliderNum_' + workHourId + '" data-onstyle="success"></div>' +
+                '<div style="width: 20%; float: left;"><input  type="checkbox" id="DayOffSliderNum_' + workHourId + '" data-onstyle="success" disabled></div>' +
                 '</div >' +
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
@@ -2256,10 +2260,5 @@
                 '</div >' +
                 '</div >'
             );
-
-
-                                                                                                            //$(document).ready(AppendNewDataTableHTML());
-                                                                                                            //$(document).ready(InitDatatable());
-
     </script>
 }

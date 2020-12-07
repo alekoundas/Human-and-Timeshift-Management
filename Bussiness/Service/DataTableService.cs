@@ -69,6 +69,9 @@ namespace Bussiness.Service
                 case "WorkPlace":
                     _currentWorker = new WorkPlaceDataTableWorker(_datatable, _baseDatawork, _httpContext);
                     break;
+                case "RealWorkHour":
+                    _currentWorker = new RealWorkHourDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                    break;
                 default:
                     break;
             }

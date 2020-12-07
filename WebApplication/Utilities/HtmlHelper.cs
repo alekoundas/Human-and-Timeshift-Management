@@ -49,7 +49,7 @@ namespace WebApplication.Utilities
         public static IHtmlContent ButtonImport(this IHtmlHelper html, string controller)
         {
             var onClick = "onclick = \"$('#ImportModal').modal('show')\"";
-            if (IsOkToShow(controller + "_Create"))
+            if (IsOkToShow(controller + "_Import"))
                 return new HtmlString("<a " + onClick + " class='button'> <button class='btn btn-primary'>Import</button> </a>");
 
             return new HtmlString("");
@@ -58,7 +58,7 @@ namespace WebApplication.Utilities
         public static IHtmlContent ButtonExport(this IHtmlHelper html, string controller)
         {
             var onClick = "onclick = \"$('#ExportModal').modal('show')\"";
-            if (IsOkToShow(controller + "_View"))
+            if (IsOkToShow(controller + "_Export"))
                 return new HtmlString("<a " + onClick + " class='button'> <button class='btn btn-primary'>Export</button> </a>");
 
             return new HtmlString("");

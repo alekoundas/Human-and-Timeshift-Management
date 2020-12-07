@@ -1,5 +1,7 @@
 ﻿using Bussiness;
+using Bussiness.Service;
 using DataAccess;
+using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -24,6 +26,16 @@ namespace WebApplication.Api
             _context = BaseDbContext;
             _baseDataWork = new BaseDatawork(BaseDbContext);
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
+        }
+
+        // POST: api/RealWorkHours/Datatable
+        [HttpPost("Datatable")]
+        public async Task<ActionResult<RealWorkHour>> Datatable([FromBody] Datatable datatable)
+        {
+            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext)
+                .ConvertData<RealWorkHour>())
+                .CompleteResponse<RealWorkHour>();
+            return Ok(results);
         }
 
         // GET: api/realworkhours

@@ -89,6 +89,15 @@
                 <h3 class="box-title">@ViewData["EmployeeDataTable"]</h3>
             </div>
             <hr />
+            <div style="width:100%; padding-left:5%;">
+                <div style="width:100%; float:left;">
+                    <div class="form-group">
+                        <label class="control-label">Εμφάνιση ΜΟΝΟ ενταγμένων υπαλλήλων</label>&nbsp
+                        <input type="checkbox" class="filterSlider" id="SliderFilter" checked>
+                    </div>
+                </div>
+            </div>
+            <hr />
             <div class="box-body table-responsive">
 
                 <table id="WorkPlaceEmployeesDatatable" class="table table-bordered table-hover table-responsive stripe">
@@ -124,6 +133,25 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
+        $('.Customer_Select2').select2({
+            ajax: {
+                url: '/api/customers/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        });
+
+        $('.filterSlider').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι'
+        })
+
+
         $(() => new DataTableService('#WorkPlaceEmployeesDatatable')
             .ForApiController('employees')
             .AddColumn(true, true, "FirstName")
@@ -136,6 +164,7 @@
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'WorkPlaceEdit';
                 data.genericId =@Model.Id;
+                data.filterByIncludedEmployees = GetSliderFilterValue();
                 return JSON.stringify(data);
             })
             .FnDrawCallback(() =>
@@ -160,17 +189,11 @@
             });
         });
 
-        $('.Customer_Select2').select2({
-            ajax: {
-                url: '/api/customers/select2',
-                data: function (params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-                    return query;
-                }
-            }
-        });
+
+        const GetSliderFilterValue = () =>
+            document.getElementById('SliderFilter').checked != true;
+
+        $('.filterSlider').change(e =>
+            $('#WorkPlaceEmployeesDatatable').DataTable().ajax.reload());
     </script>
 }

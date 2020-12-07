@@ -120,7 +120,8 @@ namespace DataAccess.Repository.Base
             if (isDayOff)
                 filter = filter.And(x => startOn.Day == x.StartOn.Day);
             else
-                filter = filter.And(x => startOn.Day != x.StartOn.Day);
+                filter = filter.And(x => startOn.Day == x.StartOn.Day);
+            //filter = filter.And(x => startOn.Day != x.StartOn.Day);
 
             return Context.WorkHours
                     .Any(filter);

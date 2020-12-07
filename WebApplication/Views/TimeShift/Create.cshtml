@@ -1,8 +1,6 @@
 ﻿@model DataAccess.ViewModels.TimeShiftCreate
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 
@@ -35,8 +33,9 @@
 
                     <input asp-for="Year" hidden />
                     <span asp-validation-for="Year" class="text-danger"></span>
-                    <span asp-validation-for="Month" class="text-danger"></span>
+
                     <input asp-for="Month" hidden />
+                    <span asp-validation-for="Month" class="text-danger"></span>
 
                     <div class="form-group">
                         <label asp-for="WorkPlaceId" class="control-label"></label>
@@ -90,7 +89,7 @@
     <script>
         $('#MonthPicker').MonthPicker({
             Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
-            OnAfterChooseMonth: function () {
+            OnAfterChooseMonth: () => {
                 var month = $(this).val().split('/')[0];
                 var year = $(this).val().split('/')[1];
                 document.getElementById('Year').value = year

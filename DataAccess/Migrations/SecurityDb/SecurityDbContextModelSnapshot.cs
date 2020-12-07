@@ -220,8 +220,10 @@ namespace DataAccess.Migrations.SecurityDb
 
             modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserTag", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("ApplicationTagId")
                         .HasColumnType("int");
@@ -235,7 +237,7 @@ namespace DataAccess.Migrations.SecurityDb
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("ApplicationUserTag");
+                    b.ToTable("ApplicationUserTags");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserToken", b =>

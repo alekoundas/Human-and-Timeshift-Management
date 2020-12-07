@@ -4,9 +4,9 @@
 
 
 <div class="row">
-    <div class="col-md-3"> </div>
-    <div class="col-md-6">
-        <div class="box box-danger" style="margin-top:5%;">
+    <div class="col-md-1"> </div>
+    <div class="col-md-6" style="margin-top:5%;">
+        <div class="box box-danger">
 
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
@@ -84,29 +84,28 @@
                     @if (Model.IsEmployee)
                     {
 
-                <div class="form-group" id="EmployeeIdDiv">
-                    <label asp-for="EmployeeId" class="control-label"></label>
-                    <div class="input-group" style="width:100%">
-                        <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
-                            @if (Model.EmployeeId != null)
-                            {
-                <option value="@Model.EmployeeId" selected="selected">@Model.EmployeeOption</option>
-}
-                        </select>
-                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
-                    </div>
-                </div>}
-            else
-            {
-                <div class="form-group" id="EmployeeIdDiv" style="display:none;">
-                    <label asp-for="EmployeeId" class="control-label"></label>
-                    <div class="input-group" style="width:100%">
-                        <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
-                            }
-                        </select>
-                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
-                    </div>
-                </div>}
+        <div class="form-group" id="EmployeeIdDiv">
+            <label asp-for="EmployeeId" class="control-label"></label>
+            <div class="input-group" style="width:100%">
+                <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
+                    @if (Model.EmployeeId != null)
+                    {
+    <option value="@Model.EmployeeId" selected="selected">@Model.EmployeeOption</option>}
+                </select>
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+        </div>}
+    else
+    {
+<div class="form-group" id="EmployeeIdDiv" style="display:none;">
+    <label asp-for="EmployeeId" class="control-label"></label>
+    <div class="input-group" style="width:100%">
+        <select class="Employee_Select2" asp-for="EmployeeId" style="width:50%">
+            }
+        </select>
+        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+    </div>
+</div>}
 
                     <div class="form-group">
                         <label asp-for="CreatedBy_FullName" class="control-label"></label>
@@ -131,13 +130,72 @@
             </form>
         </div>
     </div>
-    <div class="col-md-3"> </div>
+    <div class="col-md-4" style="margin-top:5%;">
+
+        <div class="row">
+            <div class="box box-danger">
+                <div class="box-header">
+                    <h3 class="box-title">Επαναφορά κωδικού χρήστη</h3>
+                </div>
+                <hr />
+                <div class="box-body">
+                    <h4 class="box-body">Στο επόμενο login που θα κανει ο χρήστης θα του ζητηθεί να αλλάξει κωδικό</h4>
+                    <div style="display: flex; justify-content: center; align-items: center;">
+                        <button class="btn btn-warning" id="UserPasswordReset">Επαναφορά κωδικού</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*<div class="row">
+                <div class="box box-danger">
+                    <div class="box-header">
+                        <h3 class="box-title">Tags</h3>
+                    </div>
+                    <hr />
+                    <div class="box-body" id="BoxTag">
+                        <h4 class="box-body">Προσθήκη βοηθητικών tags στον χρήστη</h4>
+                        <div style="display: flex; justify-content: center; align-items: center;">
+                            <input class="Selectize" id="Selectize" style="width:100%" />
+                        </div>
+                        <div class="form-group pull-right">
+                            <button value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveTags">Αποθήκευση</button>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+
+        <div class="row">
+            <div class="box box-danger">
+                <div class="box-header">
+                    <h3 class="box-title">Φιλτράρισμα αποτελεσμάτων εφαρρμογής με βάση συγκεκριμένα πόστα</h3>
+                </div>
+                <hr />
+                <div class="box-body">
+                    <div style="width:100%;" id="BoxWorkPlace">
+                        <div style="width:100%; float:left;">
+                            Προσθήκη πόστου
+                            <button id="ButtonAddWorkPlace" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                        </div>
+
+                        <div style="width:100%; float:left;" id="DivToAppendSelect2"></div>
+                        <div class="form-group pull-right">
+                            <button value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveWorkPlaces">Αποθήκευση</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-1"> </div>
 </div>
 
 
 <div class="row">
     <div class="col-md-1"> </div>
-    <div class="col-md-5">
+    <div class="col-md-10">
         <div class="box box-danger" style="margin-top:5%;">
             <div class="box-header">
                 <h3 class="box-title">@ViewData["UserRolesTable"]</h3>
@@ -153,6 +211,8 @@
                             <th>Δημιουργία</th>
                             <th>Απενεργοποίηση</th>
                             <th>Διαγραφή</th>
+                            <th>Import</th>
+                            <th>Export</th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -163,6 +223,8 @@
                             <th>Δημιουργία</th>
                             <th>Απενεργοποίηση</th>
                             <th>Διαγραφή</th>
+                            <th>Import</th>
+                            <th>Export</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -170,53 +232,58 @@
         </div>
     </div>
     <div class="col-md-1"> </div>
-    <div class="col-md-4">
-        <div class="row">
-            <div class="box box-danger" style="margin-top:5%;">
-
-                <div class="box-header">
-                    <h3 class="box-title">Φιλτράρισμα αποτελεσμάτων εφαρρμογής με βάση συγκεκριμένα πόστα</h3>
-                </div>
-                <hr />
-                <div class="box-body">
-                    <div style="width:100%;" id="BoxWorkPlace">
-                        <div style="width:100%; float:left;">
-                            Προσθήκη πόστου
-                            <button id="ButtonAddWorkPlace" class="btn btn-success"><i class="fa fa-plus"></i></button>
-                        </div>
-
-                        <div style="width:100%; float:left;" id="DivToAppendSelect2"></div>
-
-                        <div class="form-group pull-right">
-                            <button @*style="display:none;"*@ value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveWorkPlaces">Αποθήκευση</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="box box-danger" style="margin-top:5%;">
-
-                <div class="box-header">
-                    <h3 class="box-title">Επαναφορά κωδικού χρήστη</h3>
-                </div>
-                <hr />
-                <div class="box-body">
-                    <h4 class="box-body">Στο επόμενο login που θα κανει ο χρήστης θα του ζητηθεί να αλλάξει κωδικό</h4>
-                    <div style="display: flex; justify-content: center; align-items: center;">
-                        <button class="btn btn-warning" id="UserPasswordReset">Επαναφορά κωδικού</button>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-    <div class="col-md-1"> </div>
-
 </div>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        var model = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        var selectizeInstance = $('#Selectize').selectize({
+            persist: false,
+            plugins: ['remove_button'],
+            maxItems: null,
+            delimiter: '_,_',
+            valueField: 'value',
+            labelField: 'value',
+            searchField: ['value'],
+            load:  (query, callback) =>{
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '/api/userrole/selectize',
+                    type: 'GET',
+                    dataType: 'jsonp',
+                    data: {
+                        query: query,
+                        pageLimit: 10,
+                        apikey: 'w82gs68n8m2gur98m6du5ugc' 
+                    },
+                    error: function () {
+                        callback();
+                    },
+                    success: function (res) {
+                        console.log(res);
+                        callback(res.movies);
+                    }
+                });
+            },
+            render: {
+                item: (item, escape) =>
+                    '<div>' +
+                    '<span class="value">' + escape(item.value) + '</span>' +
+                    '</div>'
+                ,
+                option: (item, escape) =>
+                    '<div>' +
+                    '<span class="value">' + escape(item.value) + '</span>' +
+                    '</div>'
+            },
+            create: (input) => ({
+                value: input
+            })
+        });
+        selectizeInstance[0].selectize.setValue('brian@thirdroute.com')
+    </script>
     <script>
         var Select2Count = 0;
         var WorkPlaceRoleIds = @Html.Raw(Json.Serialize(Model.WorkPlaceRoles))
@@ -381,8 +448,6 @@
             $('#WorkPlaceSelect2Num_' + num).append(GetSelect2Option(num));
             $('#WorkPlaceSelect2Num_' + num).val(GetDatabaseValueId(num));
             $('#WorkPlaceSelect2Num_' + num).select2();
-
-
         })
 
         //Save WorkPlaces
@@ -396,6 +461,19 @@
             }).done(response => RefreshWorkPlaceRoles(response));
         })
 
+        //Save Tags
+        $('#BoxTag').on('click', '#ButtonSaveTags', e => {
+            $.ajax({
+                type: "POST",
+                url: '/api/usertags/UpdateUserTags',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify({
+                    userId: document.getElementById('Id').value,
+                    values: [...document.getElementById('Selectize').value.split('_,_')]
+                })
+            })
+        })
 
         //Delete WorkPlace
         $('#BoxWorkPlace').on('click', '.Select2DeleteButton', e => {
@@ -404,8 +482,6 @@
                 document.getElementById('DivSelect2Num_' + num).remove()
             else
                 document.getElementById('DivSelect2Num_' + num).style.opacity = '0.5';
-
-
         });
 
         //Password Reset
@@ -463,103 +539,35 @@
                 }
             });
 
+        //DataTable
+        $(() => new DataTableService('#rolesDatatable')
+                .ForApiController('role')
+                .AddColumn(true, true, "GreekName")
+                .AddColumn(false, false, "View")
+                .AddColumn(false, false, "Edit")
+                .AddColumn(false, false, "Create")
+                .AddColumn(false, false, "Deactivate")
+                .AddColumn(false, false, "Delete")
+                .AddColumn(false, false, "Import")
+                .AddColumn(false, false, "Export")
+                .AjaxData((data, type, row, meta) => {
+                     data.Predicate='UserEdit'
+                     data.userId = '@Model.Id';
+                    return JSON.stringify(data);
+                })
+                .FnDrawCallback(() =>
+                    $('.ToggleSliders').bootstrapToggle({
+                        on: 'Ναί',
+                        off: 'Όχι'
+                    }))
+                .CompleteDataTable())
+
 
         jQuery(function () {
-            //console.log(WorkPlaceRoleIds);
             //Append existing workplaces
             [...WorkPlaceRoleIds].forEach(role => {
                 AppendExistingWorkPlaceRole(role);
                 WorkPlaceSelect2(Select2Count);
-            });
-
-
-             $('#rolesDatatable').DataTable({
-                 serverSide: true,
-                 responsive: true,
-                 processing: true,
-                 colReorder: true,
-                 lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150,"Όλα"]],
-                 iDisplayLength: 150,
-                dom: 'frtlp',
-                ajax: {
-                    url: '/api/role/datatable',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: (data, type, row, meta) => {
-                        data.userId = '@Model.Id';
-                        data.Predicate='UserEdit'
-                        return JSON.stringify(data);
-                    }
-                },
-                order: [[0, 'desc']],
-                columns: [
-                    {
-                        data: "GreekName",
-                        searchable: true,
-                        orderable: true,
-                        render: (a, b, data, d) => {
-                            if (data.GreekName != null)
-                                return data.GreekName ;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "View",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.View != null)
-                                return data.View;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Edit",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Edit != null)
-                                return data.Edit ;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Create",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Create != null)
-                                return data.Create;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Deactivate",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Deactivate!= null)
-                                return data.Deactivate;
-                            else
-                                return "";
-                        }
-                    },
-                    {
-                        data: "Delete",
-                        searchable: false,
-                        orderable: false,
-                        render: (a, b, data, d) => {
-                            if (data.Delete != null)
-                                return data.Delete;
-                            else
-                                return "";
-                        }
-                    }
-                ]
             });
         });
     </script>
@@ -568,7 +576,7 @@
     <script>
 
 
-        $('#rolesDatatable').on("change", ".PermitionCheckbox", (data) => {
+        $('#rolesDatatable').on("change", ".ToggleSliders", (data) => {
             var userId = data.target.attributes['userid'].nodeValue;
             var roleId = data.target.attributes['roleid'].nodeValue;
             var apiUrl = "/api/userrole/delete/" + userId + "/" + roleId;

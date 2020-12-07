@@ -57,73 +57,11 @@
                         data.Predicate = 'SpecializationIndex';
                         return JSON.stringify(data);
                     })
+                    .CreatedRow((row, data, dataIndex) => {
+                        if (!data.IsActive)
+                            $(row).css('background-color', '#AAAFB4');
+                    })
                     .CompleteDataTable();
             })
-        </script>
-        <script>
-//$('#SpecializationDatatable').DataTable({
-                                                                  //    serverSide: true,
-                                                                  //    responsive: true,
-                                                                  //    processing: true,
-                                                                  //    colReorder: false,
-                                                                  //    lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Όλα"]],
-                                                                  //    iDisplayLength: 150,
-                                                                  //    dom: 'Bfrtlp',
-                                                                  //    buttons: ['copy', 'excel', 'print'],
-                                                                  //    language: {
-                                                                  //        processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-                                                                  //    },
-                                                                  //    ajax: {
-                                                                  //        url: '/api/specializations/datatable',
-                                                                  //        type: 'POST',
-                                                                  //        contentType: "application/json",
-                                                                  //        data: (data, type, row, meta) => {
-                                                                  //            data.Predicate = 'SpecializationIndex';
-                                                                  //            return JSON.stringify(data);
-                                                                  //        }
-                                                                  //    },
-                                                                  //    order: [[0, 'desc']],
-                                                                  //    columns: [
-                                                                  //        {
-                                                                  //            data: "Name",
-                                                                  //            searchable: true,
-                                                                  //            orderable: true,
-                                                                  //            render: (a, b, data, d) => {
-                                                                  //                console.log(data);
-                                                                  //                if (data.Name != null)
-                                                                  //                    return data.Name;
-                                                                  //                else
-                                                                  //                    return "";
-                                                                  //            }
-                                                                  //        },
-                                                                  //        {
-                                                                  //            data: "Description",
-                                                                  //            searchable: false,
-                                                                  //            orderable: false,
-                                                                  //            render: (a, b, data, d) => {
-                                                                  //                if (data.Description != null)
-                                                                  //                    return data.Description;
-                                                                  //                else
-                                                                  //                    return "";
-                                                                  //            }
-                                                                  //        },
-                                                                  //        {
-                                                                  //            data: "Button",
-                                                                  //            searchable: false,
-                                                                  //            orderable: false,
-                                                                  //            render: (a, b, data, d) => {
-                                                                  //                if (data.Buttons != null)
-                                                                  //                    return data.Buttons;
-                                                                  //                else
-                                                                  //                    return "";
-                                                                  //            }
-                                                                  //        }
-                                                                  //    ],
-                                                                  //    createdRow: (row, data, dataIndex) => {
-                                                                  //        if (!data.IsActive) {
-                                                                  //            $(row).css('background-color', '#AAAFB4');
-                                                                  //        }
-                                                                  //    }
-                                                                  //});
         </script>
     }

@@ -25,7 +25,7 @@
                     <div class="form-group">
                         <label asp-for="WorkPlaceId" class="control-label"></label>
                         <div class="input-group" style="width:30%">
-                            <select class="WorkPlace_Select2" asp-for="WorkPlaceId" id="WorkPlaceId" style="width:30%"></select>
+                            <select class="WorkPlace_Select2" asp-for="WorkPlaceId" id="WorkPlaceId" style="width:100%"></select>
                             <span asp-validation-for="WorkPlaceId" class="text-danger"></span>
                         </div>
                     </div>
@@ -202,6 +202,11 @@
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
 
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
+
             if (minute + value < 60)
                 minute = minute + value;
             else {
@@ -223,6 +228,12 @@
             var currTime;
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
+
 
             if (Math.sign(minute - value) >= 0)//1 = Positive, -1 = Negative
                 minute = minute - value;
@@ -246,6 +257,10 @@
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
 
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
 
             hour = hour + value;
 
@@ -263,6 +278,11 @@
             var currTime;
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
 
             if (Math.sign(hour - value) >= 0)//1 = Positive, -1 = Negative
                 hour = hour - value;

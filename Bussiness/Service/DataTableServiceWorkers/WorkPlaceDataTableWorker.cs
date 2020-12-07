@@ -47,6 +47,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
         private Func<IQueryable<WorkPlace>, IOrderedQueryable<WorkPlace>> SetOrderBy()
         {
+            if (_columnName == "IdentifyingName")
+                return x => x.OrderBy(y => y.Customer.IdentifyingName + " " + _orderDirection.ToUpper());
             if (_columnName != "")
                 return x => x.OrderBy(_columnName + " " + _orderDirection.ToUpper());
             else
@@ -127,6 +129,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
             includes.Add(x => x.Include(y => y.Customer));
 
+            if (!_datatable.FilterByIncludedCustomer)
+                _filter = _filter.And(x => x.CustomerId == _datatable.GenericId);
+
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
@@ -161,6 +166,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
         {
             var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
             includes.Add(x => x.Include(y => y.Customer));
+
+            if (!_datatable.FilterByIncludedCustomer)
+                _filter = _filter.And(x => x.CustomerId == _datatable.GenericId);
 
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);

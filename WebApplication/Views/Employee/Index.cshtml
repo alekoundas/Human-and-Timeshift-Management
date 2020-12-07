@@ -67,6 +67,10 @@
                         data.Predicate = 'EmployeeIndex';
                         return JSON.stringify(data);
                     })
+                    .CreatedRow((row, data, dataIndex) => {
+                        if (!data.IsActive)
+                            $(row).css('background-color', '#AAAFB4');
+                    })
                     .CompleteDataTable();
             })
         </script>

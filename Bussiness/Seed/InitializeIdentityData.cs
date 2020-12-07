@@ -39,6 +39,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Employee_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Employee_Export").Wait();
 
                     //Contract
                     userManager.AddToRoleAsync(user, "Contract_View").Wait();
@@ -46,6 +48,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Contract_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Contract_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Contract_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Export").Wait();
 
                     //ContractType
                     userManager.AddToRoleAsync(user, "ContractType_View").Wait();
@@ -53,6 +57,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ContractType_Edit").Wait();
                     userManager.AddToRoleAsync(user, "ContractType_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "ContractType_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Import").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Export").Wait();
 
                     //ContractMembership
                     userManager.AddToRoleAsync(user, "ContractMembership_View").Wait();
@@ -60,6 +66,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ContractMembership_Edit").Wait();
                     userManager.AddToRoleAsync(user, "ContractMembership_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "ContractMembership_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Import").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Export").Wait();
 
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
@@ -67,6 +75,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
                     userManager.AddToRoleAsync(user, "User_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "User_Import").Wait();
+                    userManager.AddToRoleAsync(user, "User_Export").Wait();
 
                     //Specialization
                     userManager.AddToRoleAsync(user, "Specialization_View").Wait();
@@ -74,6 +84,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Specialization_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Export").Wait();
 
                     //Company
                     userManager.AddToRoleAsync(user, "Company_View").Wait();
@@ -81,13 +93,15 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Company_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Company_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Company_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Export").Wait();
 
                     //Customer
                     userManager.AddToRoleAsync(user, "Customer_View").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Create").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Edit").Wait();
-                    userManager.AddToRoleAsync(user, "Customer_Deactivate").Wait();
-                    userManager.AddToRoleAsync(user, "Customer_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Export").Wait();
 
                     //WorkPlace
                     userManager.AddToRoleAsync(user, "WorkPlace_View").Wait();
@@ -95,6 +109,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Import").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Export").Wait();
 
                     //TimeShift
                     userManager.AddToRoleAsync(user, "TimeShift_View").Wait();
@@ -102,6 +118,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "TimeShift_Edit").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Import").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Export").Wait();
 
                     //WorkPlaceHourRestriction
                     userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_View").Wait();
@@ -109,6 +127,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Edit").Wait();
                     //userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Import").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Export").Wait();
 
                     //Leave
                     userManager.AddToRoleAsync(user, "Leave_View").Wait();
@@ -116,6 +136,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Leave_Edit").Wait();
                     //userManager.AddToRoleAsync(user, "Leave_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Leave_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Leave_Export").Wait();
 
                     //LeaveType
                     userManager.AddToRoleAsync(user, "LeaveType_View").Wait();
@@ -123,6 +145,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "LeaveType_Edit").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Import").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Export").Wait();
 
                     //RealWorkhour
                     userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
@@ -130,6 +154,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "RealWorkHour_Edit").Wait();
                     //userManager.AddToRoleAsync(user, "RealWorkHour_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Import").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Export").Wait();
 
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
@@ -139,6 +165,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursSpecificDates_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionPresenceDaily_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                 }
             }
 
@@ -168,6 +195,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Employee_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Employee_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Employee_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Employee_Export").Wait();
 
                     //Contract
                     userManager.AddToRoleAsync(user, "Contract_View").Wait();
@@ -175,6 +204,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Contract_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Contract_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Contract_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Contract_Export").Wait();
 
                     //ContractType
                     userManager.AddToRoleAsync(user, "ContractType_View").Wait();
@@ -182,6 +213,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ContractType_Edit").Wait();
                     userManager.AddToRoleAsync(user, "ContractType_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "ContractType_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Import").Wait();
+                    userManager.AddToRoleAsync(user, "ContractType_Export").Wait();
 
                     //ContractMembership
                     userManager.AddToRoleAsync(user, "ContractMembership_View").Wait();
@@ -189,6 +222,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ContractMembership_Edit").Wait();
                     userManager.AddToRoleAsync(user, "ContractMembership_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "ContractMembership_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Import").Wait();
+                    userManager.AddToRoleAsync(user, "ContractMembership_Export").Wait();
 
                     //User
                     userManager.AddToRoleAsync(user, "User_View").Wait();
@@ -196,6 +231,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "User_Edit").Wait();
                     userManager.AddToRoleAsync(user, "User_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "User_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "User_Import").Wait();
+                    userManager.AddToRoleAsync(user, "User_Export").Wait();
 
                     //Specialization
                     userManager.AddToRoleAsync(user, "Specialization_View").Wait();
@@ -203,6 +240,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Specialization_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Specialization_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Specialization_Export").Wait();
 
                     //Company
                     userManager.AddToRoleAsync(user, "Company_View").Wait();
@@ -210,6 +249,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Company_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Company_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Company_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Company_Export").Wait();
 
                     //Customer
                     userManager.AddToRoleAsync(user, "Customer_View").Wait();
@@ -217,6 +258,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Customer_Edit").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Customer_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Customer_Export").Wait();
 
                     //WorkPlace
                     userManager.AddToRoleAsync(user, "WorkPlace_View").Wait();
@@ -224,6 +267,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "WorkPlace_Edit").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Import").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlace_Export").Wait();
 
                     //TimeShift
                     userManager.AddToRoleAsync(user, "TimeShift_View").Wait();
@@ -231,6 +276,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "TimeShift_Edit").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "TimeShift_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Import").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShift_Export").Wait();
 
                     //WorkPlaceHourRestriction
                     userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_View").Wait();
@@ -238,6 +285,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Edit").Wait();
                     //userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Import").Wait();
+                    userManager.AddToRoleAsync(user, "WorkPlaceHourRestriction_Export").Wait();
 
                     //Leave
                     userManager.AddToRoleAsync(user, "Leave_View").Wait();
@@ -245,6 +294,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "Leave_Edit").Wait();
                     //userManager.AddToRoleAsync(user, "Leave_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "Leave_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "Leave_Import").Wait();
+                    userManager.AddToRoleAsync(user, "Leave_Export").Wait();
 
                     //LeaveType
                     userManager.AddToRoleAsync(user, "LeaveType_View").Wait();
@@ -252,6 +303,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "LeaveType_Edit").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "LeaveType_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Import").Wait();
+                    userManager.AddToRoleAsync(user, "LeaveType_Export").Wait();
 
                     //RealWorkhour
                     userManager.AddToRoleAsync(user, "RealWorkHour_View").Wait();
@@ -259,6 +312,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "RealWorkHour_Edit").Wait();
                     //userManager.AddToRoleAsync(user, "RealWorkHour_Deactivate").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Import").Wait();
+                    userManager.AddToRoleAsync(user, "RealWorkHour_Export").Wait();
 
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
@@ -268,6 +323,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursSpecificDates_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionPresenceDaily_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                 }
             }
         }
@@ -280,6 +336,8 @@ namespace Business.Seed
             CreateRole(roleManager, "Employee", "Υπάλλήλου", "Edit");
             CreateRole(roleManager, "Employee", "Υπάλλήλου", "Deactivate");
             CreateRole(roleManager, "Employee", "Υπάλλήλου", "Delete");
+            CreateRole(roleManager, "Employee", "Υπάλλήλου", "Import");
+            CreateRole(roleManager, "Employee", "Υπάλλήλου", "Export");
 
             //Contract
             CreateRole(roleManager, "Contract", "Σύμβαση", "View");
@@ -287,6 +345,8 @@ namespace Business.Seed
             CreateRole(roleManager, "Contract", "Σύμβαση", "Edit");
             CreateRole(roleManager, "Contract", "Σύμβαση", "Deactivate");
             CreateRole(roleManager, "Contract", "Σύμβαση", "Delete");
+            CreateRole(roleManager, "Contract", "Σύμβαση", "Import");
+            CreateRole(roleManager, "Contract", "Σύμβαση", "Export");
 
             //ContractType
             CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "View");
@@ -294,6 +354,8 @@ namespace Business.Seed
             CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Edit");
             CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Deactivate");
             CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Delete");
+            CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Import");
+            CreateRole(roleManager, "ContractType", "ΤύποςΣύμβασης", "Export");
 
             //ContractMembership
             CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "View");
@@ -301,6 +363,8 @@ namespace Business.Seed
             CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Edit");
             CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Deactivate");
             CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Delete");
+            CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Import");
+            CreateRole(roleManager, "ContractMembership", "ΙδιότηταΣύμβασης", "Export");
 
             //User
             CreateRole(roleManager, "User", "Χρήστη", "View");
@@ -308,6 +372,8 @@ namespace Business.Seed
             CreateRole(roleManager, "User", "Χρήστη", "Edit");
             CreateRole(roleManager, "User", "Χρήστη", "Deactivate");
             CreateRole(roleManager, "User", "Χρήστη", "Delete");
+            CreateRole(roleManager, "User", "Χρήστη", "Import");
+            CreateRole(roleManager, "User", "Χρήστη", "Export");
 
             //Specialization
             CreateRole(roleManager, "Specialization", "Ειδικότητα", "View");
@@ -315,6 +381,8 @@ namespace Business.Seed
             CreateRole(roleManager, "Specialization", "Ειδικότητα", "Edit");
             CreateRole(roleManager, "Specialization", "Ειδικότητα", "Deactivate");
             CreateRole(roleManager, "Specialization", "Ειδικότητα", "Delete");
+            CreateRole(roleManager, "Specialization", "Ειδικότητα", "Import");
+            CreateRole(roleManager, "Specialization", "Ειδικότητα", "Export");
 
             //Company
             CreateRole(roleManager, "Company", "Εταιρία", "View");
@@ -322,6 +390,8 @@ namespace Business.Seed
             CreateRole(roleManager, "Company", "Εταιρία", "Edit");
             CreateRole(roleManager, "Company", "Εταιρία", "Deactivate");
             CreateRole(roleManager, "Company", "Εταιρία", "Delete");
+            CreateRole(roleManager, "Company", "Εταιρία", "Import");
+            CreateRole(roleManager, "Company", "Εταιρία", "Export");
 
             //Customer
             CreateRole(roleManager, "Customer", "Πελάτη", "View");
@@ -329,6 +399,8 @@ namespace Business.Seed
             CreateRole(roleManager, "Customer", "Πελάτη", "Edit");
             CreateRole(roleManager, "Customer", "Πελάτη", "Deactivate");
             CreateRole(roleManager, "Customer", "Πελάτη", "Delete");
+            CreateRole(roleManager, "Customer", "Πελάτη", "Import");
+            CreateRole(roleManager, "Customer", "Πελάτη", "Export");
 
             //WorkPlace
             CreateRole(roleManager, "WorkPlace", "Πόστο", "View");
@@ -336,6 +408,8 @@ namespace Business.Seed
             CreateRole(roleManager, "WorkPlace", "Πόστο", "Edit");
             CreateRole(roleManager, "WorkPlace", "Πόστο", "Deactivate");
             CreateRole(roleManager, "WorkPlace", "Πόστο", "Delete");
+            CreateRole(roleManager, "WorkPlace", "Πόστο", "Import");
+            CreateRole(roleManager, "WorkPlace", "Πόστο", "Export");
 
             //TimeShift
             CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "View");
@@ -343,6 +417,8 @@ namespace Business.Seed
             CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Edit");
             CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Deactivate");
             CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Delete");
+            CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Import");
+            CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Export");
 
             //Leave
             CreateRole(roleManager, "Leave", "Άδεια", "View");
@@ -350,6 +426,8 @@ namespace Business.Seed
             CreateRole(roleManager, "Leave", "Άδεια", "Edit");
             //CreateRole(roleManager, "Leave","Άδεια",  "Deactivate");
             CreateRole(roleManager, "Leave", "Άδεια", "Delete");
+            CreateRole(roleManager, "Leave", "Άδεια", "Import");
+            CreateRole(roleManager, "Leave", "Άδεια", "Export");
 
             //LeaveType
             CreateRole(roleManager, "LeaveType", "ΕίδοςΆδειας", "View");
@@ -357,6 +435,8 @@ namespace Business.Seed
             CreateRole(roleManager, "LeaveType", "ΕίδοςΆδειας", "Edit");
             CreateRole(roleManager, "LeaveType", "ΕίδοςΆδειας", "Deactivate");
             CreateRole(roleManager, "LeaveType", "ΕίδοςΆδειας", "Delete");
+            CreateRole(roleManager, "LeaveType", "ΕίδοςΆδειας", "Import");
+            CreateRole(roleManager, "LeaveType", "ΕίδοςΆδειας", "Export");
 
             //RealWorkhour
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "View");
@@ -364,6 +444,8 @@ namespace Business.Seed
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Edit");
             //CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Deactivate");
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Delete");
+            CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Import");
+            CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Export");
 
             //WorkPlaceHourRestriction
             CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "View");
@@ -371,6 +453,8 @@ namespace Business.Seed
             CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "Edit");
             //CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "Deactivate");
             CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "Delete");
+            CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "Import");
+            CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "Export");
 
             //Projection
             CreateRole(roleManager, "ProjectionDifference", "Προβολή_Διαφορές", "View");
@@ -380,6 +464,7 @@ namespace Business.Seed
             CreateRole(roleManager, "ProjectionRealWorkHoursSpecificDates", "Προβολή_ΕπιλεγμένεςΗμ", "View");
             CreateRole(roleManager, "ProjectionEmployeeRealHoursSum", "Προβολή_ώρεςΑναΕργαζ", "View");
             CreateRole(roleManager, "ProjectionPresenceDaily", "Προβολή_ΠαρουσίεςΗμ", "View");
+            CreateRole(roleManager, "ProjectionRealWorkHourRestrictions", "Προβολή_ΠαρουσίεςΗμ", "View");
 
         }
 
@@ -411,6 +496,10 @@ namespace Business.Seed
                     return "_Απενεργοποίηση";
                 case "Delete":
                     return "_Διαγραφή";
+                case "Import":
+                    return "_Import";
+                case "Export":
+                    return "_Export";
                 default:
                     return "";
             }

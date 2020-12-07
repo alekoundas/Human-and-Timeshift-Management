@@ -106,8 +106,7 @@
                             <th>ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
-}
+                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>}
                         </tr>
                     </thead>
                     <tfoot>
@@ -118,8 +117,7 @@
                             <th>ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
-}
+                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>}
                         </tr>
                     </tfoot>
                 </table>
@@ -297,7 +295,7 @@
                 0, 0, 0, 0).valueOf();
 
             var maxTs = new Date(DateConstants().Year, DateConstants().Month - 1,
-                DateConstants().DaysInMonth, 23, 59, 59, 0).valueOf();
+                DateConstants().DaysInMonth + 1, 12, 10, 59, 0).valueOf();
 
             var startTs = GetCalentimInputValue(workHourId)[0];
             var endTs = GetCalentimInputValue(workHourId)[1];

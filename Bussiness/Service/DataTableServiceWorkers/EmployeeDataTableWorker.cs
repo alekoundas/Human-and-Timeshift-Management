@@ -49,6 +49,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 return x => x.OrderBy(y => y.WorkHours.OrderBy(z => z.StartOn));
             else if (_columnName == "RealWorkHourDate")
                 return x => x.OrderBy(y => y.RealWorkHours.OrderBy(z => z.StartOn));
+            else if (_columnName == "WorkPlaceTitle")
+                return x => x.OrderBy(y => y.EmployeeWorkPlaces.OrderBy(z => z.WorkPlace.Title));
+
             else if (_columnName != "")
                 return x => x.OrderBy(_columnName + " " + _orderDirection.ToUpper());
             else
@@ -224,6 +227,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.Specialization));
             includes.Add(x => x.Include(y => y.Company));
 
+            if (!_datatable.FilterByIncludedEmployees)
+                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
+
             _filter = _filter.And(x => x.Company.Customers
                 .Any(y => y.WorkPlaces
                 .Any(z => z.Id == _datatable.GenericId)));
@@ -276,6 +282,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.Specialization));
             includes.Add(x => x.Include(y => y.Company));
+
+            if (!_datatable.FilterByIncludedEmployees)
+                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
 
             _filter = _filter.And(x => x.Company.Customers
                 .Any(y => y.WorkPlaces
@@ -552,7 +561,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
         public async Task<EmployeeDataTableWorker> ProjectionDifference()
         {
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
-
             var entities = await _baseDatawork.Employees
                 .ProjectionDifference(SetOrderBy(), _datatable, _filter, _pageSize, _pageIndex);
 
@@ -574,6 +582,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         {
                             expandoObj = expandoService.GetCopyFrom<Employee>(result);
                             dictionary = (IDictionary<string, object>)expandoObj;
+                            dictionary.Add("WorkPlaceTitle", realWorkHour.TimeShift.WorkPlace.Title);
                             dictionary.Add("RealWorkHourDate",
                                 dataTableHelper.GetProjectionDifferenceRealWorkHourLink(
                                     1,
@@ -590,6 +599,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         {
                             expandoObj = expandoService.GetCopyFrom<Employee>(result);
                             dictionary = (IDictionary<string, object>)expandoObj;
+                            dictionary.Add("WorkPlaceTitle", workHour.TimeShift.WorkPlace.Title);
                             dictionary.Add("WorkHourDate", dataTableHelper.
                                 GetProjectionDifferenceWorkHourLink(
                                 workHour.TimeShiftId,

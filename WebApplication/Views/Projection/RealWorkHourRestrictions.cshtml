@@ -1,0 +1,225 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
+
+            <hr />
+
+
+            <div class="box-body">
+                <div style="width:100%;">
+                    <div style="width:50%; float:left;">
+                        <div class="input-group" style="width:100%; margin-bottom:10px;">
+                            <div class="form-group">
+                                <label class="control-label">Πόστο</label>
+                                <select id="WorkPlace_Select2" style="width:70%"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width:50%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label"> Επιλογή μήνα και έτους</label>
+                            <div class="input-group" style="width:30%">
+                                <input type="text" id="MonthPicker" class="form-control" readonly />
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div style="width:100%; float:left;">
+                            <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
+                            <div class="input-group">
+                                <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+                <table id="RealWorkHourRestrictionsDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>ΑΦΜ</th>
+                            <th>Πόστο</th>
+                            <th>Βάρδια χρονογράμματος</th>
+                            <th>Βάρδια πραγματική</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Όνομα</th>
+                            <th>Επίθετο</th>
+                            <th>ΑΦΜ</th>
+                            <th>Πόστο</th>
+                            <th>Βάρδια Χρονογράμματος</th>
+                            <th>Βάρδια πραγματική</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/jQueryMonthPicker/MonthPicker.js"></script>
+
+    <script>
+        const GetSelectedWorkPlaceId = () =>
+            document.getElementById('WorkPlace_Select2').value;
+
+        const GetOffsetMinutesValue = () =>
+            document.getElementById('OffsetMinutes').value;
+
+        const GetMonthPickerValue = () =>
+            document.getElementById('MonthPicker').value;
+
+        const setHoursToMax = date => {
+            var newDate = new Date(date);
+            newDate.setHours(23, 59, 59);
+            return moment(newDate);
+        }
+    </script>
+    <script>
+        $('#WorkPlace_Select2').select2({
+            placeholder: "Επέλεξε πόστο",
+            allowClear: true,
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        }).on('change', () =>
+            $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload());
+
+
+        $('#MonthPicker').MonthPicker({
+            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button()
+        });
+
+        $('.filterOffsetMinutes').change(e =>
+            $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload());
+
+
+
+        var table = new DataTableService('#RealWorkHourRestrictionsDatatable')
+            .ForApiController('RealWorkHours')
+            .StartOrderFromCol(0)
+            .AddColumn(true, true, "EmployeeFirstName")
+            .AddColumn(true, true, "EmployeeLastName")
+            .AddColumn(true, true, "EmployeeVatNumber")
+            .AddColumn(true, true, "WorkPlaceTitle")
+            .AddColumn(false, false, "RealWorkHour_Start")
+            .AddColumn(false, false, "RealWorkHour_End")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'ProjectionRealWorkHourRestrictions';
+                if (GetSelectedWorkPlaceId() != '')
+                    data.filterByWorkPlace = GetSelectedWorkPlaceId();
+
+                if (GetMonthPickerValue() != '') {
+                    data.filterByMonth = GetMonthPickerValue().split('/')[0];
+                    data.filterByYear = GetMonthPickerValue().split('/')[1];
+                }
+
+                data.filterByOffsetMinutes = GetOffsetMinutesValue();
+                return JSON.stringify(data);
+            })
+            .CompleteDataTable();
+
+        // Add event listener for opening and closing details
+        $('#RealWorkHourRestrictionsDatatable tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                // Open this row
+                row.child(format(row.data())).show();
+                tr.addClass('shown');
+            }
+        });
+
+        const SetDetailsButtonOn = id => {
+            var detailButton = document.getElementById('DetailsButtonNum_' + id);
+            detailButton.classList.remove('btn-success');
+            detailButton.firstElementChild.classList.remove('fa-plus');
+
+            detailButton.classList.add('btn-danger');
+            detailButton.firstElementChild.classList.add('fa-minus');
+        }
+
+        const SetDetailsButtonOff = id => {
+            var detailButton = document.getElementById('DetailsButtonNum_' + id);
+            detailButton.classList.remove('btn-danger');
+            detailButton.firstElementChild.classList.remove('fa-minus');
+
+            detailButton.classList.add('btn-success');
+            detailButton.firstElementChild.classList.add('fa-plus');
+        }
+
+        function format(data) {
+            console.log(data);
+            var html = '<p>Συνολικά προβλήματα υπαλλήλου</p>' +
+                '<div style="width:100%">' +
+                '<div style="float:left; width:50% ">' +
+                '<table cellpadding = "5" cellspacing = "0" border = "0" style = "padding-left:50px;" > ';
+
+            data.WorkHours.forEach(workHour => html += GetWorkHourRows(workHour));
+            html += '</table>' +
+                '</div>' +
+                '<div style="float:left; width:50%">' +
+                '<table cellpadding = "5" cellspacing = "0" border = "0" style = "padding-left:50px;" > ';
+            data.RealWorkHours.forEach(realWorkHour => html += GetRealWorkHourRows(realWorkHour));
+
+            '</table>' +
+                '</div>' +
+                '</div>';
+            return html;
+        }
+
+        const GetWorkHourRows = dateObj => '<tr>' +
+            '<td>Χρονόγραμα:</td>' +
+            '<td>' + dateObj.startOn + '</td>' +
+            '<td>' + dateObj.endOn + '</td>' +
+            '</tr>';
+
+        const GetRealWorkHourRows = dateObj => '<tr>' +
+            '<td>Πραγματική:</td>' +
+            '<td>' + dateObj.startOn + '</td>' +
+            '<td>' + dateObj.endOn + '</td>' +
+            '</tr>';
+
+    </script>
+}

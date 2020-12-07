@@ -38,16 +38,15 @@
 
             <div class="pull-right">
                 <div class=" text-center">
-                    <b> @Html.LinkButton("User", "Profile/" + Context.User.FindFirstValue("UserID"), "Προφίλ")</b>
+                    @*<b> @Html.LinkButton("User", "Profile/" + Context.User.FindFirstValue("UserID"), "Προφίλ")</b>*@
                     <b> @Html.LinkButton("Account", "Logout", "Αποσύνδεση")</b>
                 </div>
             </div>
         </li>
     </ul>
-</li>
- }
-else
-{
+</li> }
+            else
+            {
 <li class="dropdown user user-menu">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-sign-in" aria-hidden="true"></i>
@@ -58,8 +57,7 @@ else
 
         </li>
     </ul>
-</li>
-}
+</li>}
         </ul>
     </div>
 </nav>

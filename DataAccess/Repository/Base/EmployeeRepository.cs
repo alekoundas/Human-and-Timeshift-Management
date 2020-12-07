@@ -47,8 +47,8 @@ namespace DataAccess.Repository.Base
 
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
 
-            includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(z => z.TimeShift));
-            includes.Add(x => x.Include(y => y.WorkHours).ThenInclude(z => z.TimeShift));
+            includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(z => z.TimeShift).ThenInclude(za => za.WorkPlace));
+            includes.Add(x => x.Include(y => y.WorkHours).ThenInclude(z => z.TimeShift).ThenInclude(za => za.WorkPlace));
             includes.Add(x => x.Include(y => y.Specialization));
 
             filter = filter.And(x =>

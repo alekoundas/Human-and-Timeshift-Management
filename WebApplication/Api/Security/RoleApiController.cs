@@ -84,6 +84,8 @@ namespace WebApplication.Api.Security
                     dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, userRoles, applicationRoles));
                     dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, userRoles, applicationRoles));
                     dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Import", dataTableHelper.GetButtonForRoles(result, "Import", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Export", dataTableHelper.GetButtonForRoles(result, "Export", datatable.UserId, userRoles, applicationRoles));
                     returnObjects.Add(expandoObj);
 
                 }
@@ -96,6 +98,8 @@ namespace WebApplication.Api.Security
                     dictionary.Add("Create", dataTableHelper.GetButtonForRoles(result, "Create", datatable.UserId, userRoles, applicationRoles));
                     dictionary.Add("Deactivate", dataTableHelper.GetButtonForRoles(result, "Deactivate", datatable.UserId, userRoles, applicationRoles));
                     dictionary.Add("Delete", dataTableHelper.GetButtonForRoles(result, "Delete", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Import", dataTableHelper.GetButtonForRoles(result, "Import", datatable.UserId, userRoles, applicationRoles));
+                    dictionary.Add("Export", dataTableHelper.GetButtonForRoles(result, "Export", datatable.UserId, userRoles, applicationRoles));
                     returnObjects.Add(expandoObj);
                 }
             }

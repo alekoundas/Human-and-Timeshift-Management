@@ -41,7 +41,7 @@
                         </div>
 
                         <div style="width:100%; float:left;">
-                            <label class="control-label">Αντιστάθμιση ωρας(λεπτά)</label>&nbsp
+                            <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
                             <div class="input-group">
                                 <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
                             </div>
@@ -72,6 +72,7 @@
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
                             <th>ΑΦΜ</th>
+                            <th>Πόστο</th>
                             <th>Βάρδια χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
                         </tr>
@@ -82,6 +83,7 @@
                             <th>Όνομα</th>
                             <th>Επίθετο</th>
                             <th>ΑΦΜ</th>
+                            <th>Πόστο</th>
                             <th>Βάρδια Χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
                         </tr>
@@ -182,7 +184,8 @@
             .AddColumn(false, false, "", (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>')
             .AddColumn(true, true, "FirstName")
             .AddColumn(true, true, "LastName")
-            .AddColumn(false, false, "VatNumber")
+            .AddColumn(true, true, "VatNumber")
+            .AddColumn(false, false, "WorkPlaceTitle")
             .AddColumn(false, false, "WorkHourDate")
             .AddColumn(false, false, "RealWorkHourDate")
             .AjaxData((data, type, row, meta) => {

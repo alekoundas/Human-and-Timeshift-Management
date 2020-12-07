@@ -42,6 +42,8 @@ namespace DataAccess.ViewModels
 
         public List<WorkPlaceRoleValues> WorkPlaceRoles { get; set; }
 
+        public List<ApplicationTag> Tags { get; set; }
+
 
         //Audit
         [Display(Name = "Δημηουργήθηκε απο")]
@@ -77,5 +79,6 @@ namespace DataAccess.ViewModels
         public string WorkPlaceId { get; set; }
         public string Name { get; set; }
     }
+
 
 }

@@ -14,13 +14,17 @@ namespace Bussiness
             _dbcontext = context;
 
             ApplicationRoles = new ApplicationRoleRepository(_dbcontext);
+            ApplicationTags = new ApplicationTagRepository(_dbcontext);
             ApplicationUsers = new ApplicationUserRepository(_dbcontext);
             ApplicationUserRoles = new ApplicationUserRoleRepository(_dbcontext);
+            ApplicationUserTags = new ApplicationUserTagRepository(_dbcontext);
         }
 
         public IApplicationRoleRepository ApplicationRoles { get; }
+        public IApplicationTagRepository ApplicationTags { get; }
         public IApplicationUserRepository ApplicationUsers { get; }
         public IApplicationUserRoleRepository ApplicationUserRoles { get; }
+        public IApplicationUserTagRepository ApplicationUserTags { get; }
 
         public async Task<int> SaveChangesAsync()
         {

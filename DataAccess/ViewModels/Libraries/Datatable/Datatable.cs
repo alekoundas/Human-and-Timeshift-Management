@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace DataAccess.Libraries.Datatable
 {
@@ -68,6 +67,7 @@ namespace DataAccess.Libraries.Datatable
 
         [JsonProperty(PropertyName = "filterByWorkHour")]
         public bool FilterByWorkHour { get; set; }
+
         [JsonProperty(PropertyName = "filterByRealWorkHour")]
         public bool FilterByRealWorkHour { get; set; }
 
@@ -88,5 +88,22 @@ namespace DataAccess.Libraries.Datatable
 
         [JsonProperty(PropertyName = "selectedMonth")]
         public int? SelectedMonth { get; set; }
+
+        //WorkPlace Edit
+        [JsonProperty(PropertyName = "filterByIncludedEmployees")]
+        public bool FilterByIncludedEmployees { get; set; }
+
+        //Customer Edit
+        [JsonProperty(PropertyName = "filterByIncludedCustomer")]
+        public bool FilterByIncludedCustomer { get; set; }
+
+        [JsonProperty(PropertyName = "filterByWorkPlace", Required = Required.Default)]
+        public int FilterByWorkPlace { get; set; }
+
+        [JsonProperty(PropertyName = "filterByMonth", Required = Required.Default)]
+        public int FilterByMonth { get; set; }
+
+        [JsonProperty(PropertyName = "filterByYear", Required = Required.Default)]
+        public int FilterByYear { get; set; }
     }
 }

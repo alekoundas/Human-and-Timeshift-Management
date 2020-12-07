@@ -29,7 +29,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "WorkPlaceHourRestriction_View")]
         public IActionResult Index()
         {
-            ViewData["Title"] = "Σύνολο περιορσμών μέγιστης εισαγωγής π.βαρδιών";
+            ViewData["Title"] = "Σύνολο περιορισμών μέγιστης εισαγωγής π.βαρδιών";
             return View();
         }
 
@@ -146,6 +146,13 @@ namespace WebApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            workPlaceHourRestriction.WorkPlace = await _baseDataWork.WorkPlaces
+                .FirstOrDefaultAsync(x => x.Id == workPlaceHourRestriction.WorkPlaceId);
+
+            ViewData["Title"] = "Επεξεργασία περιορισμού ";
+            ViewData["HourRestrictionDataTable"] = "Σύνολο περιορσμών μέγιστης εισαγωγής π.βαρδιών ανα μέρα";
+
             return View(workPlaceHourRestriction);
         }
 
