@@ -36,9 +36,8 @@ namespace DataAccess.ViewModels
                 {
                     Id = viewModel.Id,
                     Day = viewModel.Day,
-                    MaxTicks = new TimeSpan(int.Parse(viewModel.MaxTime.Split(':')[0]),
-                                           int.Parse(viewModel.MaxTime.Split(':')[1]),
-                                           0).TotalSeconds,
+                    MaxTicks = GetSeconds(viewModel.MaxTime.Split(':')[0],
+                                           viewModel.MaxTime.Split(':')[1]),
                     CreatedBy_FullName = viewModel.CreatedBy_FullName,
                     CreatedBy_Id = viewModel.CreatedBy_Id,
                     CreatedOn = viewModel.CreatedOn
@@ -65,15 +64,26 @@ namespace DataAccess.ViewModels
         private static string GetTime(double seconds)
         {
             var hours = (seconds / 3600).ToString();
-            var minutes = (seconds % 3600).ToString();
+            seconds %= 3600;
+            var minutes = (seconds / 60).ToString();
+
+            if (hours.Contains(","))
+                hours = hours.Split(',')[0];
 
             if (hours.Length == 1)
                 hours = "0" + hours;
+
             if (minutes.Length == 1)
                 minutes = "0" + minutes;
 
             return hours + ":" + minutes;
+        }
 
+        private static double GetSeconds(string hours, string minutes)
+        {
+            var totalSeconds = int.Parse(hours) * 3600;
+            totalSeconds += int.Parse(minutes) * 60;
+            return totalSeconds;
         }
     }
 }

@@ -89,6 +89,11 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             if (_datatable.FilterByMonth != 0 && _datatable.FilterByYear != 0 && _datatable.FilterByWorkPlace != 0)
             {
+                _filter = _filter.And(x => x.StartOn.Year == _datatable.FilterByYear);
+                _filter = _filter.And(x => x.StartOn.Month == _datatable.FilterByMonth);
+
+                var realWorkHours = await _baseDatawork.RealWorkHours.GetAllAsync(null, _filter, includes);
+
                 var hourRestrictions = await _baseDatawork.HourRestrictions
                     .Where(x =>
                         x.WorkPlaceHourRestriction.Month == _datatable.FilterByMonth &&
@@ -96,17 +101,41 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.WorkPlaceHourRestriction.WorkPlaceId == _datatable.FilterByWorkPlace)
                     .ToDynamicListAsync<HourRestriction>();
 
+
                 foreach (var hourRestriction in hourRestrictions)
                 {
 
-                    _filter = _filter.And(x => x.StartOn.Year == _datatable.FilterByYear);
-                    _filter = _filter.And(x => x.StartOn.Month == _datatable.FilterByMonth);
-                    _filter = _filter.And(x => x.StartOn.Day == hourRestriction.Day);
 
-                    var zzzz = await _baseDatawork.RealWorkHours
-                        .Where(_filter)
-                        .ToDynamicListAsync();
-                    //.GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
+                    var totalSecondsToday = realWorkHours
+                        .Where(x => x.StartOn.Day == hourRestriction.Day)
+                        .Select(x => Math.Abs((x.StartOn - x.EndOn).TotalSeconds))
+                        .Sum();
+                    var remainingSeconds = 0.0;
+
+                    var todayFilter = PredicateBuilder.New<RealWorkHour>();
+                    todayFilter = todayFilter.And(x => x.StartOn.Day == hourRestriction.Day);
+
+
+                    if (hourRestriction.MaxTicks != 0)
+                        if (totalSecondsToday >= hourRestriction.MaxTicks)
+                        {
+                            remainingSeconds = totalSecondsToday - hourRestriction.MaxTicks;
+                            do
+                            {
+                                //create filters to remove appended id from query
+
+                                var realWorkHour = realWorkHours
+                                    .Where(todayFilter)
+                                    .OrderByDescending(x => x.CreatedOn)
+                                    .FirstOrDefault();
+
+                                remainingSeconds = remainingSeconds - Math.Abs((realWorkHour.StartOn - realWorkHour.EndOn).TotalSeconds);
+                                entities.Add(realWorkHour);
+                                todayFilter = todayFilter.And(y => y.Id != realWorkHour.Id);
+
+                            } while (remainingSeconds > 0);
+
+                        }
                 }
             }
 

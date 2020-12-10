@@ -85,11 +85,9 @@
                 }
             }
         });
-    </script>
-    <script>
         $('#MonthPicker').MonthPicker({
             Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
-            OnAfterChooseMonth: () => {
+            OnAfterChooseMonth: function () {
                 var month = $(this).val().split('/')[0];
                 var year = $(this).val().split('/')[1];
                 document.getElementById('Year').value = year

@@ -31,12 +31,12 @@
                             </div>
                         </div>
 
-                        <div style="width:100%; float:left;">
+                        @*<div style="width:100%; float:left;">
                             <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
                             <div class="input-group">
                                 <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
                             </div>
-                        </div>
+                        </div>*@
 
                     </div>
                 </div>
@@ -122,8 +122,9 @@
 
 
         $('#MonthPicker').MonthPicker({
-            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button()
-        });
+            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
+            OnAfterChooseMonth: () => $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload()
+        })
 
         $('.filterOffsetMinutes').change(e =>
             $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload());
@@ -154,72 +155,6 @@
             })
             .CompleteDataTable();
 
-        // Add event listener for opening and closing details
-        $('#RealWorkHourRestrictionsDatatable tbody').on('click', 'td.details-control', function () {
-            var tr = $(this).closest('tr');
-            var row = table.row(tr);
-
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child.hide();
-                tr.removeClass('shown');
-            }
-            else {
-                // Open this row
-                row.child(format(row.data())).show();
-                tr.addClass('shown');
-            }
-        });
-
-        const SetDetailsButtonOn = id => {
-            var detailButton = document.getElementById('DetailsButtonNum_' + id);
-            detailButton.classList.remove('btn-success');
-            detailButton.firstElementChild.classList.remove('fa-plus');
-
-            detailButton.classList.add('btn-danger');
-            detailButton.firstElementChild.classList.add('fa-minus');
-        }
-
-        const SetDetailsButtonOff = id => {
-            var detailButton = document.getElementById('DetailsButtonNum_' + id);
-            detailButton.classList.remove('btn-danger');
-            detailButton.firstElementChild.classList.remove('fa-minus');
-
-            detailButton.classList.add('btn-success');
-            detailButton.firstElementChild.classList.add('fa-plus');
-        }
-
-        function format(data) {
-            console.log(data);
-            var html = '<p>Συνολικά προβλήματα υπαλλήλου</p>' +
-                '<div style="width:100%">' +
-                '<div style="float:left; width:50% ">' +
-                '<table cellpadding = "5" cellspacing = "0" border = "0" style = "padding-left:50px;" > ';
-
-            data.WorkHours.forEach(workHour => html += GetWorkHourRows(workHour));
-            html += '</table>' +
-                '</div>' +
-                '<div style="float:left; width:50%">' +
-                '<table cellpadding = "5" cellspacing = "0" border = "0" style = "padding-left:50px;" > ';
-            data.RealWorkHours.forEach(realWorkHour => html += GetRealWorkHourRows(realWorkHour));
-
-            '</table>' +
-                '</div>' +
-                '</div>';
-            return html;
-        }
-
-        const GetWorkHourRows = dateObj => '<tr>' +
-            '<td>Χρονόγραμα:</td>' +
-            '<td>' + dateObj.startOn + '</td>' +
-            '<td>' + dateObj.endOn + '</td>' +
-            '</tr>';
-
-        const GetRealWorkHourRows = dateObj => '<tr>' +
-            '<td>Πραγματική:</td>' +
-            '<td>' + dateObj.startOn + '</td>' +
-            '<td>' + dateObj.endOn + '</td>' +
-            '</tr>';
 
     </script>
 }

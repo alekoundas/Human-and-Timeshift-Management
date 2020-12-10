@@ -62,6 +62,16 @@
                         </div>
                     </div>
 
+                    @*@for (int i = 0; i < Model.HourRestrictions.Count; i++)
+                            {
+                        <div style="padding:5%">
+                            <div class="form-group">
+                                <label asp-for="CreatedOn" class="control-label"></label>
+                                <div class="input-group">
+                                    <input asp-for="CreatedOn" class="form-control" readonly />
+                                </div>
+                            </div>
+                        </div>}*@
 
                     <div id="DaysDiv"></div>
 
@@ -176,6 +186,21 @@
                 .filter(restriction => restriction.day == day)
                 .map(restriction => restriction.id)[0];
 
+        const GetCreatedByIdValueFromMVC = (day, hourRestrictions) =>
+            [...hourRestrictions]
+                .filter(restriction => restriction.day == day)
+                .map(restriction => restriction.createdBy_Id)[0];
+
+        const GetCreatedByFullNameValueFromMVC = (day, hourRestrictions) =>
+            [...hourRestrictions]
+                .filter(restriction => restriction.day == day)
+                .map(restriction => restriction.createdBy_FullName)[0];
+
+        const GetCreatedOnValueFromMVC = (day, hourRestrictions) =>
+            [...hourRestrictions]
+                .filter(restriction => restriction.day == day)
+                .map(restriction => restriction.createdOn)[0];
+
         const AppendMonthDaysHtml = (year, month, hourRestrictions) => {
 
             document.getElementById('DaysDiv')
@@ -204,8 +229,11 @@
                     '</div>' +
                     '<div class="input-group" style="margin-right:15px; width:30%; float: left;">' +
                     '<label class="control-label">' + currentDate.toLocaleString('el-GR', options) + '</label>' +
-                    '<input type="number" name="HourRestrictions[' + i + '].Id"  class="form-control" style="display:none;" value="' + GetIdValueFromMVC(day, hourRestrictions) + '" readonly />' +
-                    '<input type="number" name="HourRestrictions[' + i + '].Day"  class="form-control" style="display:none;" value="' + day + '" readonly />' +
+                    '<input type="number" name="HourRestrictions[' + i + '].Id" style="display:none;" value="' + GetIdValueFromMVC(day, hourRestrictions) + '" readonly />' +
+                    '<input type="number" name="HourRestrictions[' + i + '].Day" style="display:none;" value="' + day + '" readonly />' +
+                    '<input type="text" name="HourRestrictions[' + i + '].CreatedBy_Id" style="display:none;" value="' + GetCreatedByIdValueFromMVC(day, hourRestrictions) + '" readonly  />' +
+                    '<input type="text" name="HourRestrictions[' + i + '].CreatedBy_FullName"  style="display:none;" value="' + GetCreatedByFullNameValueFromMVC(day, hourRestrictions) + '" readonly  />' +
+                    '<input type="text" name="HourRestrictions[' + i + '].CreatedOn" style="display:none;" value="' + GetCreatedOnValueFromMVC(day, hourRestrictions) + '" readonly  />' +
                     '<input type="text" ' +
                     'data-val="true" ' +
                     'data-val-regex="Ο τύπος ώρας πρέπει να ειναι της μορφής ΗΗ:ΜΜ ή ΗΗΗ:ΜΜ" ' +
@@ -237,6 +265,11 @@
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
 
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
+
             if (minute + value < 60)
                 minute = minute + value;
             else {
@@ -258,6 +291,11 @@
             var currTime;
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
 
             if (Math.sign(minute - value) >= 0)//1 = Positive, -1 = Negative
                 minute = minute - value;
@@ -281,6 +319,10 @@
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
 
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
 
             hour = hour + value;
 
@@ -298,6 +340,11 @@
             var currTime;
             var hour = parseInt(GetInputMaxHourValue(num).split(':')[0]);
             var minute = parseInt(GetInputMaxHourValue(num).split(':')[1]);
+
+            if (isNaN(hour))
+                hour = 0;
+            if (isNaN(minute))
+                minute = 0;
 
             if (Math.sign(hour - value) >= 0)//1 = Positive, -1 = Negative
                 hour = hour - value;

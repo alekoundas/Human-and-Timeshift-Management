@@ -38,7 +38,11 @@ namespace DataAccess.Repository.Interface
 
 
         Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter);
-        Task<List<TEntity>> GetAllAsync();
+        Task<List<TEntity>> GetAllAsync(
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
+            Expression<Func<TEntity, bool>> filter = null,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
+
         int Count(Expression<Func<TEntity, bool>> predicate);
 
         TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate);

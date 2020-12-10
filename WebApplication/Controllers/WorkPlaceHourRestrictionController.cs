@@ -139,7 +139,7 @@ namespace WebApplication.Controllers
                     _context.Update(WorkPlaceHourRestrictionEdit
                         .CreateFrom(workPlaceHourRestriction));
 
-                    await _baseDataWork.SaveChangesAsync();
+                    var status = await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

@@ -35,9 +35,24 @@ namespace DataAccess.Repository
             return await qry.ToListAsync();
         }
 
-        public async Task<List<TEntity>> GetAllAsync()
+        public async Task<List<TEntity>> GetAllAsync(
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
+            Expression<Func<TEntity, bool>> filter = null,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
         {
-            return await _set.ToListAsync();
+            var qry = (IQueryable<TEntity>)_set;
+
+            if (includes != null)
+                foreach (var include in includes)
+                    qry = include(qry);
+
+            if (filter != null)
+                qry = qry.Where(filter);
+
+            if (orderingInfo != null)
+                qry = orderingInfo(qry);
+
+            return await qry.ToListAsync();
         }
 
         public async Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector)

@@ -113,7 +113,7 @@ namespace WebApplication.Controllers
                 if (result.Succeeded)
                     TempData["StatusMessage"] = "Ο χρήστης δημιουργήθηκε με επιτυχία. Κωδικός: TempPass_1 ";
                 else
-                    TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν δημιουργήθηκε.";
+                    TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν δημιουργήθηκε.'" + result.Errors.ElementAt(0).Description + "'";
                 return RedirectToAction(nameof(Index));
             }
             return View(viewModel);

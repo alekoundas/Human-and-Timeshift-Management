@@ -1,4 +1,4 @@
-using Business.Seed;
+﻿using Business.Seed;
 using DataAccess;
 using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Builder;
@@ -46,6 +46,7 @@ namespace WebApplication
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.ClaimsIdentity.UserIdClaimType = "UserID";
+                options.User.RequireUniqueEmail = true;
             })
                 .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddDefaultUI()
