@@ -149,7 +149,7 @@
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'ProjectionRealWorkHourRestrictions';
                 if (GetSelectedWorkPlaceId() != '')
-                    data.filterByWorkPlace = GetSelectedWorkPlaceId();
+                    data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
 
                 if (GetMonthPickerValue() != '') {
                     data.filterByMonth = GetMonthPickerValue().split('/')[0];

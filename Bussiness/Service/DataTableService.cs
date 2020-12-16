@@ -29,52 +29,68 @@ namespace Bussiness.Service
             _httpContext = httpContext;
         }
 
-        public async Task<DataTableService> ConvertData<TEntity>()
+        public async Task<DataTableService> ConvertData<TEntity>(string nonDbModelName = "")
         {
-            switch (typeof(TEntity).Name)
-            {
-                case "Company":
-                    _currentWorker = new CompanyDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "Contract":
-                    _currentWorker = new ContractDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "ContractType":
-                    _currentWorker = new ContractTypeDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "ContractMembership":
-                    _currentWorker = new ContractMembershipDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "Employee":
-                    _currentWorker = new EmployeeDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "Customer":
-                    _currentWorker = new CustomerDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "Leave":
-                    _currentWorker = new LeaveDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "LeaveType":
-                    _currentWorker = new LeaveTypeDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "Specialization":
-                    _currentWorker = new SpecializationDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "TimeShift":
-                    _currentWorker = new TimeShiftDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "WorkPlaceHourRestriction":
-                    _currentWorker = new WorkPlaceHourRestrictionDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "WorkPlace":
-                    _currentWorker = new WorkPlaceDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                case "RealWorkHour":
-                    _currentWorker = new RealWorkHourDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                    break;
-                default:
-                    break;
-            }
+            //if input is string it means that cant get model type from reflection
+            //so string is nessecery
+            if (nonDbModelName != "")
+
+            switch (nonDbModelName)
+                {
+                    case "Projection":
+                        _currentWorker = new ProjectionDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    default:
+                        break;
+                }
+            else
+                switch (typeof(TEntity).Name)
+                {
+                    case "Company":
+                        _currentWorker = new CompanyDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "Contract":
+                        _currentWorker = new ContractDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "ContractType":
+                        _currentWorker = new ContractTypeDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "ContractMembership":
+                        _currentWorker = new ContractMembershipDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "Employee":
+                        _currentWorker = new EmployeeDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "Customer":
+                        _currentWorker = new CustomerDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "Leave":
+                        _currentWorker = new LeaveDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "LeaveType":
+                        _currentWorker = new LeaveTypeDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "Specialization":
+                        _currentWorker = new SpecializationDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "TimeShift":
+                        _currentWorker = new TimeShiftDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "WorkPlaceHourRestriction":
+                        _currentWorker = new WorkPlaceHourRestrictionDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "WorkPlace":
+                        _currentWorker = new WorkPlaceDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "RealWorkHour":
+                        _currentWorker = new RealWorkHourDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    case "Projection":
+                        _currentWorker = new RealWorkHourDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        break;
+                    default:
+                        break;
+                }
 
             var task = (Task)_currentWorker.GetType()
             .GetMethod(_datatable.Predicate)?

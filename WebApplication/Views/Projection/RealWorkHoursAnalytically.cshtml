@@ -135,7 +135,7 @@
 
         var CreateDataTable = () =>
             new DataTableService('#EmployeesRealWorkHoursAnalytically')
-                .ForApiController('employees')
+                .ForApiController('projections')
                 .AddColumn(true, true, "LastName")
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
@@ -143,7 +143,7 @@
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionRealWorkHoursAnalytically';
                     if (GetSelectedWorkPlaceId() != '')
-                        data.genericId = GetSelectedWorkPlaceId();
+                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
                     data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
                     data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
                     return JSON.stringify(data);

@@ -1,5 +1,4 @@
-﻿using DataAccess;
-using DataAccess.Libraries.Datatable;
+﻿using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Identity;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bussiness.Helpers
 {
@@ -139,23 +137,23 @@ namespace Bussiness.Helpers
         private static string EditToggle(string toggleState, string link)
             => @"<input urlAttr='" + link + "' class='ToggleSliders' type='checkbox' data-onstyle='success' " + toggleState + ">";
 
-        public string GetTimeShiftEditCellBodyWorkHours(List<WorkHour> workHours, List<Leave> leaves, int dayOfMonth, Datatable datatable, int employeeId)
+        public string GetTimeShiftEditCellBodyWorkHours(int dayOfMonth, Datatable datatable, Employee employee)
         {
-            var cellWorkHours = workHours.Where(x =>
+            var cellWorkHours = employee.WorkHours.Where(x =>
                    x.TimeShiftId == datatable.GenericId &&
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day) &&
-                   //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
-                   x.EmployeeId == employeeId)
+                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day)) //&&
+                                                                               //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                                                                               //x.EmployeeId == employeeId)
                 .ToList();
 
-            var cellLeaves = leaves.Where(x =>
+            var cellLeaves = employee.Leaves.Where(x =>
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day) &&
-                   //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
-                   x.EmployeeId == employeeId)
+                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day)) //&&
+                                                                               //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
+                                                                               //x.EmployeeId == employeeId)
                 .ToList();
 
             var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
@@ -219,47 +217,46 @@ namespace Bussiness.Helpers
 
                 if (currentUserRoles.Contains("TimeShift_Edit"))
                     if (true)
-                        strToReturn += FaIconAdd(dayOfMonth, "", employeeId);
+                        strToReturn += FaIconAdd(dayOfMonth, "", employee.Id);
 
                 if (currentUserRoles.Contains("TimeShift_Edit"))
                     if (true)
                         if (cellWorkHours.Count() > 0)
-                            strToReturn += FaIconEdit(dayOfMonth, "green", employeeId, datatable.GenericId);
+                            strToReturn += FaIconEdit(dayOfMonth, "green", employee.Id, datatable.GenericId);
             }
 
             return strToReturn;
 
         }
 
-        public string GetTimeShiftEditCellBodyRealWorkHours(List<RealWorkHour> realWorkHours,
-            List<WorkHour> workHours, List<Leave> leaves, int compareMonth, int compareYear,
-            int compareDay, Datatable datatable, int employeeId)
+        public string GetTimeShiftEditCellBodyRealWorkHours(int compareMonth, int compareYear,
+            int compareDay, Datatable datatable, Employee employee)
         {
 
-            var cellWorkHours = workHours.Where(x =>
+            var cellWorkHours = employee.WorkHours.Where(x =>
                   x.TimeShiftId == datatable.GenericId &&
                   x.StartOn.Year == compareYear &&
                   x.StartOn.Month == compareMonth &&
-                  (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day) &&
-                  //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
-                  x.EmployeeId == employeeId)
+                  (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day)) //&&
+                                                                              //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
+                                                                              //x.EmployeeId == employeeId)
                .ToList();
 
-            var cellRealWorkHours = realWorkHours.Where(x =>
+            var cellRealWorkHours = employee.RealWorkHours.Where(x =>
                x.TimeShiftId == datatable.GenericId &&
                x.StartOn.Year == compareYear &&
                x.StartOn.Month == compareMonth &&
-               (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day) &&
-               //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
-               x.EmployeeId == employeeId)
+               (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day))//&&
+                                                                          //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
+                                                                          //x.EmployeeId == employeeId)
             .ToList();
 
 
-            var cellLeaves = leaves.Where(x =>
+            var cellLeaves = employee.Leaves.Where(x =>
                    x.StartOn.Year == compareYear &&
                    x.StartOn.Month == compareMonth &&
-                   (x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
-                   x.EmployeeId == employeeId)
+                   (x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day))//&&
+                                                                              //x.EmployeeId == employeeId)
                 .ToList();
 
             var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
@@ -330,12 +327,12 @@ namespace Bussiness.Helpers
                     {
 
                         if (currentUserRoles.Contains("RealWorkHour_Create"))
-                            strToReturn += FaIconAdd(compareDay, "", employeeId,
+                            strToReturn += FaIconAdd(compareDay, "", employee.Id,
                                 compareMonth, compareYear);
 
                         if (currentUserRoles.Contains("RealWorkHour_Edit"))
                             if (cellRealWorkHours.Count() > 0)
-                                strToReturn += FaIconEdit(compareDay, "green", employeeId,
+                                strToReturn += FaIconEdit(compareDay, "green", employee.Id,
                                        datatable.GenericId, compareMonth, compareYear);
                     }
                 }
@@ -343,14 +340,10 @@ namespace Bussiness.Helpers
             }
         }
 
-        public async Task<string> GetProjectionRealWorkHoursAnalyticallyCellBodyAsync(BaseDatawork baseDatawork, DateTime compareDate, Datatable datatable, int employeeId)
+        public string GetProjectionRealWorkHoursAnalyticallyCellBody(ICollection<RealWorkHour> realWorkHours)
         {
-            var cellRealWorkHours = await baseDatawork.RealWorkHours
-                .GetCurrentAssignedOnCell(compareDate, employeeId);
-
             var cellBody = "";
-
-            foreach (var realWorkHour in cellRealWorkHours)
+            foreach (var realWorkHour in realWorkHours)
             {
                 cellBody += "<p white-space: nowrap;'>" +
                     realWorkHour.StartOn.ToShortTimeString() +

@@ -179,7 +179,7 @@
         });
 
         var table = new DataTableService('#EmployeesWorkHourDifferenceDatatable')
-            .ForApiController('employees')
+            .ForApiController('projections')
             .StartOrderFromCol(1)
             .AddColumn(false, false, "", (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>')
             .AddColumn(true, true, "LastName")
@@ -191,7 +191,7 @@
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'ProjectionDifference';
                 if (GetSelectedWorkPlaceId() != '')
-                    data.genericId = GetSelectedWorkPlaceId();
+                    data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
                 data.StartOn = GetStartOn();
                 data.EndOn = GetEndOn();
                 data.filterByWorkHour = GetSliderWorkHourValue();

@@ -114,7 +114,7 @@
 
         $(() => {
             var dataTable = new DataTableService('#PresenceDailyDatatable')
-                .ForApiController('employees')
+                .ForApiController('projections')
                 .AddColumn(true, true, "LastName")
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
@@ -123,7 +123,7 @@
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionPresenceDaily';
                     if (GetSelectedWorkPlaceId() != '')
-                        data.genericId = GetSelectedWorkPlaceId();
+                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
                     return JSON.stringify(data);
                 })
                 .CompleteDataTable();

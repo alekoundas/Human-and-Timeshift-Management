@@ -78,10 +78,6 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     <script>
         const BuildSelect2Dto = (params) => ({
@@ -169,8 +165,6 @@
             locale: "el",
             onafterselect: () => {
                 DestroyDataTable();
-                DeleteDataTableHTML();
-                AppendNewDataTableHTML();
                 CreateDataTable();
             },
             onaftershow: () =>
@@ -185,7 +179,7 @@
 
         var CreateDataTable = () =>
             new DataTableService('#EmployeeRealHoursSumDatatable')
-                .ForApiController('workplaces')
+                .ForApiController('projections')
                 .AddColumn(true, true, "Title")
                 .AddColumn(false, false, "TotalHours")
                 .AddColumn(false, false, "TotalHoursDay")
@@ -200,9 +194,6 @@
                     return JSON.stringify(data);
                 })
                 .CompleteDataTable();
-
-        const DeleteDataTableHTML = () =>
-            document.getElementById('EmployeeRealHoursSumDatatable').remove();
 
         $(document).ready(CreateDataTable());
 

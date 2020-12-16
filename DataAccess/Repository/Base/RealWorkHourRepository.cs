@@ -229,8 +229,8 @@ namespace DataAccess.Repository.Base
 
         public double GetEmployeeTotalSecondsDayFromRange(int employeeId, DateTime startOn, DateTime endOn, int workplaceId = 0)
         {
-            var endOnNightTimeSpan = new TimeSpan(6, 0, 0);
-            var startOnNightTimeSpan = new TimeSpan(22, 0, 0);
+            //var endOnNightTimeSpan = new TimeSpan(6, 0, 0);
+            //var startOnNightTimeSpan = new TimeSpan(22, 0, 0);
 
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);

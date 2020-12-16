@@ -188,7 +188,7 @@
 
         var CreateDataTable = () =>
             new DataTableService('#EmployeesWorkHourConcentricDatatable')
-                .ForApiController('employees')
+                .ForApiController('projections')
                 .AddColumn(true, true, "LastName")
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
@@ -202,7 +202,7 @@
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionConcentric';
                     if (GetSelectedWorkPlaceId() != '')
-                        data.genericId = GetSelectedWorkPlaceId();
+                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
                     data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
                     data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
                     data.ShowHoursInPercentage = GetSliderHourChoiceValue();

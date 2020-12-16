@@ -147,7 +147,7 @@
         $(() => {
             AppendNewDataTableHTML();
             var table = new DataTableService('#TimeShiftSuggestionsDatatable')
-                .ForApiController('employees')
+                .ForApiController('projections')
                 .StartOrderFromCol(1)
                 .AddColumn(true, true, "LastName")
                 .AddColumn(true, true, "FirstName")

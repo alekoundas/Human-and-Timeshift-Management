@@ -72,11 +72,11 @@ namespace DataAccess.Repository.Base
                 as IQueryable<WorkHour>;
 
 
-            if (datatable.GenericId != 0)//workplaceId
+            if (datatable.FilterByWorkPlaceId != 0)//workplaceId
             {
-                workHours = workHours.Where(x => x.TimeShift.WorkPlaceId == datatable.GenericId);
-                realWorkHours = realWorkHours.Where(x => x.TimeShift.WorkPlaceId == datatable.GenericId);
-                filter = filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == datatable.GenericId));
+                workHours = workHours.Where(x => x.TimeShift.WorkPlaceId == datatable.FilterByWorkPlaceId);
+                realWorkHours = realWorkHours.Where(x => x.TimeShift.WorkPlaceId == datatable.FilterByWorkPlaceId);
+                filter = filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == datatable.FilterByWorkPlaceId));
             }
 
             var qry = (IQueryable<Employee>)Context.Employees;

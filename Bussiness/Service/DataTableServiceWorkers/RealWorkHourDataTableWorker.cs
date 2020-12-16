@@ -142,8 +142,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
             {
                 _filter = _filter.And(x => x.StartOn.Year == _datatable.FilterByYear);
                 _filter = _filter.And(x => x.StartOn.Month == _datatable.FilterByMonth);
-                if (_datatable.FilterByWorkPlace != 0)
-                    _filter = _filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlace);
+                if (_datatable.FilterByWorkPlaceId != 0)
+                    _filter = _filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
                 var realWorkHours = await _baseDatawork.RealWorkHours.GetAllAsync(null, _filter, includes);
 
@@ -153,8 +153,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var hourRestrictionFilter = PredicateBuilder.New<HourRestriction>();
                 hourRestrictionFilter = hourRestrictionFilter.And(x => x.WorkPlaceHourRestriction.Month == _datatable.FilterByMonth);
                 hourRestrictionFilter = hourRestrictionFilter.And(x => x.WorkPlaceHourRestriction.Year == _datatable.FilterByYear);
-                if (_datatable.FilterByWorkPlace != 0)
-                    hourRestrictionFilter = hourRestrictionFilter.And(x => x.WorkPlaceHourRestriction.WorkPlaceId == _datatable.FilterByWorkPlace);
+                if (_datatable.FilterByWorkPlaceId != 0)
+                    hourRestrictionFilter = hourRestrictionFilter.And(x => x.WorkPlaceHourRestriction.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
                 var hourRestrictions = new List<HourRestriction>();
                 hourRestrictions = await _baseDatawork.HourRestrictions
