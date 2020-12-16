@@ -302,6 +302,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
+            entities.ForEach(x => x.Customer.Company.Customers = null);
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<WorkPlace>();

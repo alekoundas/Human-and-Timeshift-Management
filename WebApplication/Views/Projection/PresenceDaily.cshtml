@@ -44,6 +44,7 @@
                             <th>Όνομα</th>
                             <th>Erp Code</th>
                             <th>ΑΦΜ</th>
+                            <th>Πόστο βάρδιας</th>
                             <th>Σήμερα</th>
                         </tr>
                     </thead>
@@ -53,6 +54,7 @@
                             <th>Όνομα</th>
                             <th>Erp Code</th>
                             <th>ΑΦΜ</th>
+                            <th>Πόστο βάρδιας</th>
                             <th>Σήμερα</th>
                         </tr>
                     </tfoot>
@@ -119,6 +121,7 @@
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumn(true, true, "VatNumber")
+                .AddColumn(true, true, "WorkPlace_RealWorkHour")
                 .AddColumn(true, true, "Today")
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionPresenceDaily';

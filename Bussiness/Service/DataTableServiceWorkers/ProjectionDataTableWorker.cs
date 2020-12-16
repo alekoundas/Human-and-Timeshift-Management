@@ -319,7 +319,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
         public async Task<ProjectionDataTableWorker> ProjectionPresenceDaily()
         {
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
-            includes.Add(x => x.Include(y => y.RealWorkHours));
+            includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
 
             //Get employees that have a realworkhour today
             _filter = _filter.And(x => x.RealWorkHours.Any(y => y.StartOn.Date == DateTime.Now.Date));
@@ -332,6 +332,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
+            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.Employee = null));
+            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.TimeShift.RealWorkHours = null));
+            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.TimeShift.WorkPlace.TimeShifts = null));
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -349,12 +352,17 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     .ToList();
 
                 var todayCell = "";
+                var workPlaceName = "";
                 foreach (var realWorkHour in result.RealWorkHours)
+                {
+                    workPlaceName = realWorkHour.TimeShift.WorkPlace.Title;
                     todayCell += "<p style='white-space:nowrap;'>" +
                         realWorkHour.StartOn.ToShortTimeString() +
                         " - " +
                         realWorkHour.EndOn.ToShortTimeString() +
                         "</p></br>";
+                }
+                dictionary.Add("WorkPlace_RealWorkHour", workPlaceName);
                 dictionary.Add("Today", todayCell);
 
                 returnObjects.Add(expandoObj);

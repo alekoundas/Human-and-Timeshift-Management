@@ -30,7 +30,6 @@ namespace WebApplication.Controllers
         public IActionResult Index()
         {
             ViewData["Title"] = "Σύνολο χρονοδιαγραμμάτων ανα πόστο ";
-
             return View();
         }
 
