@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DataAccess.Models.Entity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -24,6 +25,25 @@ namespace DataAccess.ViewModels
         [JsonProperty(PropertyName = "employeeIds", Required = Required.Default)]
         public List<int> EmployeeIds { get; set; }
 
-
+        public static List<Leave> CreateRangeFrom(LeaveCreate viewModel)
+        {
+            var results = new List<Leave>();
+            foreach (var employeeId in viewModel.EmployeeIds)
+            {
+                results.Add(new Leave()
+                {
+                    StartOn = viewModel.StartOn,
+                    EndOn = viewModel.EndOn,
+                    Description = viewModel.Description,
+                    ApprovedBy = viewModel.ApprovedBy,
+                    LeaveTypeId = viewModel.LeaveTypeId,
+                    EmployeeId = employeeId,
+                    CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                    CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id,
+                    CreatedOn = DateTime.Now
+                });
+            }
+            return results;
+        }
     }
 }

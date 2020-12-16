@@ -1952,8 +1952,8 @@
                 .ForApiController('employees')
                 .StartOrderFromCol(1)
                 .AddColumn(true, true, "ToggleSlider")
-                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumnsFromCount(GetDaysInMonth(), "Day_")
                 .AjaxData((data, type, row, meta) => {
@@ -1992,24 +1992,6 @@
                     if (!data.IsActive)
                         $(row).css('background-color', '#AAAFB4');
                 })
-                //.InitComplete(() => {
-                //    [...document.getElementsByClassName('TableDays')]
-                //        .forEach(tableHead => {
-                //            var options = { weekday: 'long', day: 'numeric' };
-                //            var day = tableHead.id.split('_')[1];
-
-                //            var currDate = new Date(GetColumnStartOn().setDate(day));
-
-                //            var dayToShow = currDate.toLocaleString('el-GR',
-                //                options);
-
-                //            document.getElementById('thDayNum_' + day)
-                //                .innerHTML = dayToShow;
-
-                //            document.getElementById('tbDayNum_' + day)
-                //                .innerHTML = dayToShow;
-                //        });
-                //})
                 .CompleteDataTable();
     </script>
 
@@ -2051,8 +2033,8 @@
                 '<thead>' +
                 '<tr>' +
                 '<th>Επιλογή</th>' +
-                '<th>Όνομα</th>' +
                 '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
                 '<th>Erp Code</th>' +
                 GetDaysColumns() +
                 '</tr>' +
@@ -2060,8 +2042,8 @@
                 '<tfoot>' +
                 '<tr>' +
                 '<th>Επιλογή</th>' +
-                '<th>Όνομα</th>' + '' +
                 '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' + '' +
                 '<th>Erp Code</th>' +
                 GetDaysColumns() +
                 '</tr>' +

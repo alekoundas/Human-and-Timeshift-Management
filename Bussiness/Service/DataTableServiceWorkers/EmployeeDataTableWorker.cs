@@ -505,58 +505,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             return this;
         }
 
-        public async Task<EmployeeDataTableWorker> RealWorkHourCurrentDay()
-        {
-            var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
-            includes.Add(x => x.Include(y => y.RealWorkHours));
 
-
-            var today = DateTime.Now;
-            _filter = _filter.And(x => x.RealWorkHours
-                .Any(y => y.StartOn.Date == today.Date));
-
-            var entities = await _baseDatawork.Employees
-                .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
-
-            entities = entities
-                .Select(x => new Employee
-                {
-                    Id = x.Id,
-                    FirstName = x.FirstName,
-                    LastName = x.LastName,
-                    RealWorkHours = x.RealWorkHours.Where(y => y.StartOn.Day == DateTime.Now.Day).ToList()
-                })
-                .ToList();
-
-            //Mapping
-            var expandoService = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<Employee>();
-            var returnObjects = new List<ExpandoObject>();
-
-            foreach (var result in entities)
-            {
-                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
-                var dictionary = (IDictionary<string, object>)expandoObj;
-
-                dictionary.Add("StartOn", String.Join<string>("</br>",
-                    result.RealWorkHours.Select(x => x.StartOn.ToString())));
-
-                dictionary.Add("EndOn", String.Join<string>("</br>",
-                    result.RealWorkHours.Select(x => x.EndOn.ToString())));
-
-                dictionary.Add("ToggleSlider", dataTableHelper
-                    .GetEmployeeCheckbox(_datatable, result.Id));
-
-                dictionary.Add("Buttons", dataTableHelper
-                    .GetCurrentDayButtons(result));
-
-                returnObjects.Add(expandoObj);
-            }
-            EntitiesMapped = returnObjects;
-            EntitiesTotal = await _baseDatawork.Employees.CountAllAsyncFiltered(_filter);
-
-            return this;
-        }
 
         public async Task<EmployeeDataTableWorker> ProjectionDifference()
         {
@@ -798,14 +747,18 @@ namespace Bussiness.Service.DataTableServiceWorkers
         public async Task<EmployeeDataTableWorker> ProjectionPresenceDaily()
         {
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
+            includes.Add(x => x.Include(y => y.RealWorkHours));
 
+            //Get employees that have a realworkhour today
+            _filter = _filter.And(x => x.RealWorkHours.Any(y => y.StartOn.Date == DateTime.Now.Date));
             if (_datatable.GenericId != 0)
                 _filter = _filter.And(x => x.EmployeeWorkPlaces
                     .Any(y => y.WorkPlaceId == _datatable.GenericId));
 
+
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
-            //Extra needed data
+
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -817,10 +770,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                var realWorkHours = await _baseDatawork.RealWorkHours
-                               .GetCurrentAssignedOnCell(DateTime.Now, result.Id);
+                //remove unessecery RealWorkHours
+                result.RealWorkHours = result.RealWorkHours
+                    .Where(x => x.StartOn.Date == DateTime.Now.Date)
+                    .ToList();
+
                 var todayCell = "";
-                foreach (var realWorkHour in realWorkHours)
+                foreach (var realWorkHour in result.RealWorkHours)
                     todayCell += "<p style='white-space:nowrap;'>" +
                         realWorkHour.StartOn.ToShortTimeString() +
                         " - " +
@@ -847,6 +803,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             var entities = await _baseDatawork.Employees
                .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
+
+            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.Employee = null));
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -893,6 +851,41 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     dictionary.Add("Day_" + i, dayCell);
 
                 }
+
+                returnObjects.Add(expandoObj);
+            }
+            EntitiesMapped = returnObjects;
+            EntitiesTotal = await _baseDatawork.Employees.CountAllAsyncFiltered(_filter);
+
+            return this;
+        }
+
+        public async Task<EmployeeDataTableWorker> ProjectionTimeShiftSuggestions()
+        {
+            var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
+            includes.Add(x => x.Include(y => y.RealWorkHours));
+
+            if (_datatable.FilterByWorkPlace != 0)
+                _filter = _filter.And(x => x.RealWorkHours
+                    .Any(y => y.TimeShiftId == _datatable.FilterByTimeShift));
+
+            var entities = await _baseDatawork.Employees
+               .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
+
+            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.Employee = null));
+
+            //Mapping
+            var expandoService = new ExpandoService();
+            var dataTableHelper = new DataTableHelper<Employee>();
+            var returnObjects = new List<ExpandoObject>();
+
+            foreach (var result in entities)
+            {
+                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
+                var dictionary = (IDictionary<string, object>)expandoObj;
+
+                dictionary.Add("Day_0", _datatable.StartOn);
+
 
                 returnObjects.Add(expandoObj);
             }

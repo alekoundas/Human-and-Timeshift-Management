@@ -136,8 +136,8 @@
         var CreateDataTable = () =>
             new DataTableService('#EmployeesRealWorkHoursAnalytically')
                 .ForApiController('employees')
-                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
                 .AjaxData((data, type, row, meta) => {
@@ -178,16 +178,16 @@
                 '<table id="EmployeesRealWorkHoursAnalytically" class="table table-bordered table-hover table-responsive stripe">' +
                 '<thead>' +
                 '<tr>' +
-                '<th>Όνομα</th>' +
                 '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
                 '<th>Erp Code</th>' +
                 GetDaysColumns() +
                 '</tr>' +
                 '</thead>' +
                 '<tfoot>' +
                 '<tr>' +
-                '<th>Όνομα</th>' +
                 '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
                 '<th>Erp Code</th>' +
                 GetDaysColumns() +
                 '</tr>' +

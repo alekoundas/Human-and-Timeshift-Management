@@ -32,11 +32,11 @@
                         </div>
 
                         @*<div style="width:100%; float:left;">
-                            <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
-                            <div class="input-group">
-                                <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
-                            </div>
-                        </div>*@
+                                <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
+                                <div class="input-group">
+                                    <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
+                                </div>
+                            </div>*@
 
                     </div>
                 </div>
@@ -65,6 +65,8 @@
                             <th>Πόστο</th>
                             <th>Βάρδια χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
+                            <th>Μέγιστη εισαγωγή</th>
+                            <th>Σύνολο ημέρας</th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -75,6 +77,8 @@
                             <th>Πόστο</th>
                             <th>Βάρδια Χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
+                            <th>Μέγιστη εισαγωγή</th>
+                            <th>Σύνολο ημέρας</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -91,8 +95,8 @@
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
-        const GetOffsetMinutesValue = () =>
-            document.getElementById('OffsetMinutes').value;
+        //const GetOffsetMinutesValue = () =>
+        //    document.getElementById('OffsetMinutes').value;
 
         const GetMonthPickerValue = () =>
             document.getElementById('MonthPicker').value;
@@ -140,6 +144,8 @@
             .AddColumn(true, true, "WorkPlaceTitle")
             .AddColumn(false, false, "RealWorkHour_Start")
             .AddColumn(false, false, "RealWorkHour_End")
+            .AddColumn(false, false, "WorkHourRestriction_Max")
+            .AddColumn(false, false, "WorkHourRestriction_Sum")
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'ProjectionRealWorkHourRestrictions';
                 if (GetSelectedWorkPlaceId() != '')
@@ -150,7 +156,7 @@
                     data.filterByYear = GetMonthPickerValue().split('/')[1];
                 }
 
-                data.filterByOffsetMinutes = GetOffsetMinutesValue();
+                //data.filterByOffsetMinutes = GetOffsetMinutesValue();
                 return JSON.stringify(data);
             })
             .CompleteDataTable();

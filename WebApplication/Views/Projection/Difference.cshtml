@@ -69,8 +69,8 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>ΑΦΜ</th>
                             <th>Πόστο</th>
                             <th>Βάρδια χρονογράμματος</th>
@@ -80,8 +80,8 @@
                     <tfoot>
                         <tr>
                             <th></th>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>ΑΦΜ</th>
                             <th>Πόστο</th>
                             <th>Βάρδια Χρονογράμματος</th>
@@ -182,8 +182,8 @@
             .ForApiController('employees')
             .StartOrderFromCol(1)
             .AddColumn(false, false, "", (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>')
-            .AddColumn(true, true, "FirstName")
             .AddColumn(true, true, "LastName")
+            .AddColumn(true, true, "FirstName")
             .AddColumn(true, true, "VatNumber")
             .AddColumn(false, false, "WorkPlaceTitle")
             .AddColumn(false, false, "WorkHourDate")

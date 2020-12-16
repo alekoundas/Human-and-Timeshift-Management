@@ -101,23 +101,25 @@
                     <thead>
                         <tr>
                             <th>Επιλογή</th>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>}
+                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
+}
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
                             <th>Επιλογή</th>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>}
+                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
+}
                         </tr>
                     </tfoot>
                 </table>
@@ -1905,8 +1907,8 @@
                 .ForApiController('employees')
                 .StartOrderFromCol(1)
                 .AddColumn(true, true, "ToggleSlider")
-                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumnsFromCount(DateConstants().DaysInMonth, "Day_")
                 .AjaxData((data, type, row, meta) => {

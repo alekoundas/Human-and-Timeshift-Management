@@ -88,8 +88,8 @@
                 <table id="WorkPlaceEmployeesDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -99,8 +99,8 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>ErpCode</th>
                             <th>ΑΦΜ</th>
                             <th>Ειδικότητα</th>
@@ -124,8 +124,8 @@
 
         $(() => new DataTableService('#WorkPlaceEmployeesDatatable')
             .ForApiController('employees')
-            .AddColumn(true, true, "FirstName")
             .AddColumn(true, true, "LastName")
+            .AddColumn(true, true, "FirstName")
             .AddColumn(true, true, "ErpCode")
             .AddColumn(true, true, "VatNumber")
             .AddColumn(true, true, "ScpecializationName")

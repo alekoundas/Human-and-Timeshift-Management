@@ -1,0 +1,220 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
+
+            <hr />
+
+            <div class="box-body">
+                <div style="width:100%;">
+                    <div style="width:50%; float:left;">
+                        <div class="input-group" style="width:100%; margin-bottom:10px;">
+                            <div class="form-group">
+                                <label class="control-label">Πόστο</label> @* TimeShift *@
+                                <select id="TimeShift_Select2" style="width:70%"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width:50%; float:left;">
+                        <div style="width:100%; float:left;">
+                            <label class="control-label">Χρονικό έυρος</label>
+                            <div class="input-group">
+                                <input id="SearchRangeInput" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div id="DataTableDiv"></div>
+        </div>
+    </div>
+</div>
+
+@*<div class="row">
+        <div class="col-md-12">
+            <div class="box box-danger" style="margin-top:5%;">
+                <div class="box-header">
+                    <h3 class="box-title">@ViewData["Title"]</h3>
+                </div>
+                <hr />
+                <div class="box-body table-responsive">
+                    <table id="TimeShiftSuggestionsDatatable" class="table table-bordered table-hover table-responsive stripe">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Επίθετο</th>
+                                <th>Όνομα</th>
+                                <th>ΑΦΜ</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Επίθετο</th>
+                                <th>Όνομα</th>
+                                <th>ΑΦΜ</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const GetSelectedTimeShiftId = () =>
+            document.getElementById('TimeShift_Select2').value;
+
+        const GetStartOn = () =>
+            new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+
+        const GetEndOn = () => {
+            var date = new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+            date.setHours(23, 59, 59, 59);
+            return new Date(date);
+        }
+
+        const setHoursToMax = date => {
+            var newDate = new Date(date);
+            newDate.setHours(23, 59, 59);
+            return moment(newDate);
+        }
+    </script>
+
+
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        $('#TimeShift_Select2').select2({
+            placeholder: "Επέλεξε πόστο",
+            allowClear: true,
+            ajax: {
+                url: '/api/timeshift/select2',
+                data: params => ({
+                    search: params.term,
+                    page: params.page || 1
+                })
+            }
+        }).on('change', () =>
+            $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
+
+        $('#SearchRangeInput').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showFooter: false,
+            startDate: Date.now(),
+            calendarCount: 1,
+            format: "DD/MM/YYYY",
+            dateSeparator: '/-/',
+            locale: "el",
+            onafterselect: () =>
+                $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload(),
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        });
+
+
+        $(() => {
+            AppendNewDataTableHTML();
+            var table = new DataTableService('#TimeShiftSuggestionsDatatable')
+                .ForApiController('employees')
+                .StartOrderFromCol(1)
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionTimeShiftSuggestions';
+                    if (GetSelectedTimeShiftId() != '')
+                        data.filterByTimeShift = GetSelectedTimeShiftId();
+                    data.StartOn = GetStartOn();
+                    data.EndOn = GetEndOn();
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
+        })
+
+    </script>
+
+
+    <script>
+        //Append HTMLTable
+        const AppendNewDataTableHTML = () =>
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive">' +
+                '<table id="TimeShiftSuggestionsDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
+                '<th>Erp Code</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
+                '<th>Erp Code</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
+                '');
+
+        const GetDaysDifferenceFromRange = () =>
+            Math.ceil(Math.abs(GetEndOn() - GetStartOn()) / (1000 * 60 * 60 * 24))
+
+        const GetDaysColumns = () => {
+            var thElements = '';
+            for (var i = 0; i < GetDaysDifferenceFromRange(); i++) {
+                var colDate = GetStartOn();
+                colDate.setDate(colDate.getDate() + i);
+                thElements = thElements + CreateThElement(colDate);
+            }
+            return thElements;
+        };
+
+        const CreateThElement = date =>
+            '<th style="white-space: nowrap;">' +
+            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
+            ' ' +
+            date.getDate() +
+            ' ' +
+            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
+            '</th>';
+
+
+    </script>
+}

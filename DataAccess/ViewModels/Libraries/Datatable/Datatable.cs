@@ -100,6 +100,9 @@ namespace DataAccess.Libraries.Datatable
         [JsonProperty(PropertyName = "filterByWorkPlace", Required = Required.Default)]
         public int FilterByWorkPlace { get; set; }
 
+        [JsonProperty(PropertyName = "filterByTimeShift", Required = Required.Default)]
+        public int FilterByTimeShift { get; set; }
+
         [JsonProperty(PropertyName = "filterByMonth", Required = Required.Default)]
         public int FilterByMonth { get; set; }
 

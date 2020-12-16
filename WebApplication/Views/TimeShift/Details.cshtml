@@ -92,8 +92,8 @@
                     <thead>
                         <tr>
                             <th>Επιλογή</th>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
@@ -104,8 +104,8 @@
                     <tfoot>
                         <tr>
                             <th data-searchable="false">Επιλογή</th>
-                            <th data-searchable="false">Όνομα</th>
                             <th data-searchable="false">Επίθετο</th>
+                            <th data-searchable="false">Όνομα</th>
                             <th data-searchable="false">ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
@@ -1582,8 +1582,8 @@
                 .ForApiController('employees')
                 .StartOrderFromCol(1)
                 .AddColumn(true, true, "ToggleSlider")
-                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumnsFromCount(DateConstants().DaysInMonth, "Day_")
                 .AjaxData((data, type, row, meta) => {
@@ -1617,7 +1617,7 @@
                             var day = tableHead.id.split('_')[1];
 
                             var currDate = new Date(Date.UTC(DateConstants().Year,
-                                DateConstants().Month - 1, day + 1, 0, 0, 0));
+                                DateConstants().Month - 1, parseInt(day) + 1, 0, 0, 0));
 
                             var dayToShow = currDate.toLocaleString('el-GR', options);
 

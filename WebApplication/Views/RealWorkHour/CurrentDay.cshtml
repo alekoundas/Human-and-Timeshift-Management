@@ -1,6 +1,4 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 
 <div class="row">
@@ -10,7 +8,7 @@
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title"></h3>
+                <h3 class="box-title">@ViewData["Title"]</h3>
             </div>
             <hr />
 
@@ -20,8 +18,9 @@
                     <thead>
                         <tr>
                             <th>Επιλογή</th>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>Πόστο</th>
                             <th>Έναρξη βάρδιας</th>
                             <th>Λήξη βάρδιας</th>
                             <th>Ενέργιες</th>
@@ -30,12 +29,13 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th data-searchable="false">Επιλογή</th>
-                            <th data-searchable="false">Όνομα</th>
-                            <th data-searchable="false">Επίθετο</th>
-                            <th data-searchable="false">Έναρξη βάρδιας</th>
-                            <th data-searchable="false">Λήξη βάρδιας</th>
-                            <th data-searchable="false">Ενέργιες</th>
+                            <th>Επιλογή</th>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>Πόστο</th>
+                            <th>Έναρξη βάρδιας</th>
+                            <th>Λήξη βάρδιας</th>
+                            <th>Ενέργιες</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -76,6 +76,8 @@
             console.log(e);
         })
     </script>
+
+
     <script>
         $('#EmployeesWorkhoursDatatable').on('click', '.faIconAdd', (element) => {
             var day = element.target.getAttribute('dayofmonth');
@@ -210,19 +212,20 @@
     <!--///////////////////////////////////////-->
     <script>
         $(() => new DataTableService('#EmployeesCurrentDayDatatable')
-            .ForApiController('employees')
+            .ForApiController('realworkhours')
             .StartOrderFromCol(1)
             .AddColumn(true, true, "ToggleSlider")
-            .AddColumn(true, true, "FirstName")
-            .AddColumn(true, true, "LastName")
-            .AddColumn(true, true, "StartOn")
-            .AddColumn(true, true, "EndOn")
+            .AddColumn(true, true, "EmployeeLastName")
+            .AddColumn(true, true, "EmployeeFirstName")
+            .AddColumn(true, true, "WorkPlaceTitle")
+            .AddColumn(true, true, "StartOn_string")
+            .AddColumn(true, true, "EndOn_string")
             .AddColumn(false, false, "Buttons")
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'RealWorkHourCurrentDay';
                 return JSON.stringify(data);
             })
-            .FnDrawCallback(()=>
+            .FnDrawCallback(() =>
                 $('.ToggleSliders').bootstrapToggle({
                     on: 'Ναί',
                     off: 'Όχι'

@@ -1,5 +1,6 @@
 ﻿using DataAccess;
 using DataAccess.Models.Entity;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -62,11 +63,11 @@ namespace WebApplication.Controllers
         // POST: Leave/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Leave leave)
+        public async Task<IActionResult> Create(LeaveCreate leave)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(leave);
+                _baseDataWork.Leaves.AddRange(LeaveCreate.CreateRangeFrom(leave));
 
                 var status = await _baseDataWork.SaveChangesAsync();
                 if (status > 0)
@@ -77,7 +78,7 @@ namespace WebApplication.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", leave.EmployeeId);
+            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", leave.EmployeeId);
             return View(leave);
         }
 

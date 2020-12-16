@@ -77,5 +77,12 @@ namespace WebApplication.Controllers
             return View();
         }
 
+        [Authorize(Roles = "ProjectionTimeShiftSuggestions_View")]
+        public IActionResult TimeShiftSuggestions()
+        {
+            ViewData["Title"] = "Υποδείξεις Χρονοδιαγράμματος";
+            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            return View();
+        }
     }
 }

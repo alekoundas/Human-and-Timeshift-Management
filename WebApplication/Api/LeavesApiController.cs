@@ -83,24 +83,24 @@ namespace WebApplication.Api
         }
 
         // POST: api/leaves/postleave
-        [HttpPost("postleave")]
-        public async Task<ActionResult<Leave>> PostLeave(LeaveCreate apiLeave)
-        {
-            if (apiLeave.EmployeeIds.Count() > 0)
-                apiLeave.EmployeeIds.ForEach(id => _baseDataWork.Leaves.Add(
-                    new Leave
-                    {
-                        StartOn = apiLeave.StartOn,
-                        EndOn = apiLeave.EndOn,
-                        ApprovedBy = apiLeave.ApprovedBy,
-                        Description = apiLeave.Description,
-                        EmployeeId = id,
-                        LeaveTypeId = apiLeave.LeaveTypeId
-                    }));
-            await _baseDataWork.SaveChangesAsync();
+        //[HttpPost("postleave")]
+        //public async Task<ActionResult<Leave>> PostLeave(LeaveCreate apiLeave)
+        //{
+        //    if (apiLeave.EmployeeIds.Count() > 0)
+        //        apiLeave.EmployeeIds.ForEach(id => _baseDataWork.Leaves.Add(
+        //            new Leave
+        //            {
+        //                StartOn = apiLeave.StartOn,
+        //                EndOn = apiLeave.EndOn,
+        //                ApprovedBy = apiLeave.ApprovedBy,
+        //                Description = apiLeave.Description,
+        //                EmployeeId = id,
+        //                LeaveTypeId = apiLeave.LeaveTypeId
+        //            }));
+        //    await _baseDataWork.SaveChangesAsync();
 
-            return Ok("Success my dudes");
-        }
+        //    return Ok("Success my dudes");
+        //}
 
         // DELETE: api/leaves/5
         [HttpDelete("{id}")]

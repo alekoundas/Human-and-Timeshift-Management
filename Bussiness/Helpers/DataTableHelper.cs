@@ -376,11 +376,11 @@ namespace Bussiness.Helpers
                 "employeeId=" + employeeId +
               ">";
 
-        public string GetCurrentDayButtons(Employee employee)
-           => CurrentDayFaIconEdit(employee.Id);
+        public string GetCurrentDayButtons(RealWorkHour realWorkHour)
+           => CurrentDayFaIconEdit(realWorkHour.Id);
 
-        private static string CurrentDayFaIconEdit(int employeeId)
-           => @"<i class='fa fa-pencil faIconEdit' employeeid='" + employeeId + "'></i>";
+        private static string CurrentDayFaIconEdit(int realWorkHourId)
+           => @"<i class='fa fa-pencil faIconEdit' employeeid='" + realWorkHourId + "'></i>";
 
 
         public string GetProjectionDifferenceWorkHourLink(int id, string value)

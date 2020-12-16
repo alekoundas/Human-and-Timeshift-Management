@@ -58,8 +58,8 @@
                     <table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive stripe">
                         <thead>
                             <tr>
-                                <th>Όνομα</th>
                                 <th>Επίθετο</th>
+                                <th>Όνομα</th>
                                 <th>Erp Code</th>
                                 <th>Σύνολο ώρες</th>
                                 <th>Σύνολο ώρες Μέρα</th>
@@ -72,8 +72,8 @@
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Όνομα</th>
                                 <th>Επίθετο</th>
+                                <th>Όνομα</th>
                                 <th>Erp Code</th>
                                 <th>Σύνολο ώρες</th>
                                 <th>Σύνολο ώρες Μέρα</th>
@@ -189,8 +189,8 @@
         var CreateDataTable = () =>
             new DataTableService('#EmployeesWorkHourConcentricDatatable')
                 .ForApiController('employees')
-                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumn(false, false, "TotalHours")
                 .AddColumn(false, false, "TotalHoursDay")

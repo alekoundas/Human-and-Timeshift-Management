@@ -170,8 +170,8 @@
         var CreateDataTable = () =>
             new DataTableService('#RealWorkHoursSpecificDatesDatatable')
                 .ForApiController('employees')
-                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumn(true, true, "VatNumber")
                 .AddColumnsFromCount(GetDaysToAppentNums().length, "Day_")
@@ -191,8 +191,8 @@
                 '<table id="RealWorkHoursSpecificDatesDatatable" class="table table-bordered table-hover table-responsive stripe">' +
                 '<thead>' +
                 '<tr>' +
-                '<th>Όνομα</th>' +
                 '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
                 '<th>Erp Code</th>' +
                 '<th>ΑΦΜ</th>' +
                 GetDaysColumns() +
@@ -200,8 +200,8 @@
                 '</thead>' +
                 '<tfoot>' +
                 '<tr>' +
-                '<th>Όνομα</th>' +
                 '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
                 '<th>Erp Code</th>' +
                 '<th>ΑΦΜ</th>' +
                 GetDaysColumns() +

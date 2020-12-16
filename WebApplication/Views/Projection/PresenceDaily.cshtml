@@ -40,8 +40,8 @@
                 <table id="PresenceDailyDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>Erp Code</th>
                             <th>ΑΦΜ</th>
                             <th>Σήμερα</th>
@@ -49,8 +49,8 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th>Όνομα</th>
                             <th>Επίθετο</th>
+                            <th>Όνομα</th>
                             <th>Erp Code</th>
                             <th>ΑΦΜ</th>
                             <th>Σήμερα</th>
@@ -115,8 +115,8 @@
         $(() => {
             var dataTable = new DataTableService('#PresenceDailyDatatable')
                 .ForApiController('employees')
-                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumn(true, true, "VatNumber")
                 .AddColumn(true, true, "Today")
