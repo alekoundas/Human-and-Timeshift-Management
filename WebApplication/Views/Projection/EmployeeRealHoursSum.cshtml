@@ -33,7 +33,7 @@
                 <div style="width:100%;">
                     <div style="width:100%; float:left;">
                         <div class="form-group">
-                            <label class="control-label">Τρόπος εμγάνισης χρόνου</label>&nbsp
+                            <label class="control-label">Τρόπος εμφάνισης χρόνου</label>&nbsp
                             <input type="checkbox" class="filterSlider" id="SliderHourChoice">
                         </div>
                     </div>
@@ -80,59 +80,59 @@
 
 @section Scripts {
     <script>
-        const BuildSelect2Dto = (params) => ({
-            search: params.term,
-            page: params.page || 1
-        });
+                   const BuildSelect2Dto = (params) => ({
+                search: params.term,
+                page: params.page || 1
+            });
 
-        const ConvertDateForApi = timeStamp =>
-            CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
+            const ConvertDateForApi = timeStamp =>
+                CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
 
-        CompleteTimeWithZerosForApiPost = date => {
-            var year = date.getFullYear();
-            var month = String((date.getMonth() + 1)).length == 1 ?
-                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
-            var day = String(date.getDate()).length == 1 ?
-                '0' + date.getDate() : date.getDate();
-            var hour = String(date.getHours()).length == 1 ?
-                '0' + date.getHours() : date.getHours();
-            var min = String(date.getMinutes()).length == 1 ?
-                '0' + date.getMinutes() : date.getMinutes();
+            CompleteTimeWithZerosForApiPost = date => {
+                var year = date.getFullYear();
+                var month = String((date.getMonth() + 1)).length == 1 ?
+                    '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+                var day = String(date.getDate()).length == 1 ?
+                    '0' + date.getDate() : date.getDate();
+                var hour = String(date.getHours()).length == 1 ?
+                    '0' + date.getHours() : date.getHours();
+                var min = String(date.getMinutes()).length == 1 ?
+                    '0' + date.getMinutes() : date.getMinutes();
 
-            return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
-        }
+                return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+            }
 
-        const GetSelectedEmployeeId = () =>
-            document.getElementById('Employee_Select2').value;
+            const GetSelectedEmployeeId = () =>
+                document.getElementById('Employee_Select2').value;
 
-        const GetSliderHourChoiceValue = () =>
-            document.getElementById('SliderHourChoice').checked != true;
+            const GetSliderHourChoiceValue = () =>
+                document.getElementById('SliderHourChoice').checked != true;
 
-        const GetStartOn = () =>
-            new Date(moment(document.getElementById('SearchRangeInput').value
-                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+            const GetStartOn = () =>
+                new Date(moment(document.getElementById('SearchRangeInput').value
+                    .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
 
-        const GetEndOn = () => {
-            var date = new Date(moment(document.getElementById('SearchRangeInput').value
-                .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
-            date.setHours(23, 59, 59, 59);
-            return new Date(date);
-        }
+            const GetEndOn = () => {
+                var date = new Date(moment(document.getElementById('SearchRangeInput').value
+                    .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+                date.setHours(23, 59, 59, 59);
+                return new Date(date);
+            }
 
-        const GetDaysDifferenceFromRange = () =>
-            Math.ceil(Math.abs(GetEndOn() - GetStartOn()) / (1000 * 60 * 60 * 24))
+            const GetDaysDifferenceFromRange = () =>
+                Math.ceil(Math.abs(GetEndOn() - GetStartOn()) / (1000 * 60 * 60 * 24))
 
-        const setHoursToMax = date => {
-            var newDate = new Date(date);
-            newDate.setHours(23, 59, 59);
-            return moment(newDate);
-        }
+            const setHoursToMax = date => {
+                var newDate = new Date(date);
+                newDate.setHours(23, 59, 59);
+                return moment(newDate);
+            }
     </script>
 
     <script>
         $('#SliderHourChoice').bootstrapToggle({
             on: 'HH:mm',
-            off: '%',
+            off: 'ώρες/8',
             onstyle: 'primary',
             offstyle: 'primary'
         });
@@ -192,6 +192,11 @@
                     data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
                     data.ShowHoursInPercentage = GetSliderHourChoiceValue();
                     return JSON.stringify(data);
+                })
+                .FooterCallback((row, data, start, end, display) => {
+                    row.children[1].innerHTML = "Σύνολο ώρες: " + data[0].TotalFooterHours;
+                    row.children[2].innerHTML = "Σύνολο ώρες μέρα: " + data[0].TotalFooterHoursDay;
+                    row.children[3].innerHTML = "Σύνολο ώρες νύχτα: " + data[0].TotalFooterHoursNight;
                 })
                 .CompleteDataTable();
 

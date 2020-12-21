@@ -148,6 +148,14 @@
                     data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
                     return JSON.stringify(data);
                 })
+                .FooterCallback((row, data, start, end, display) => {
+                    //for all columns except static ones
+                    for (var i = 0; i < row.children.length - 3; i++) {
+                        row.children[i + 3].innerHTML = "  Σύνολο: " + data[0]['Day_' + i + '_FooterTotal'];
+                        console.log(data[i]['Day_' + i + '_FooterTotal']);
+
+                    }
+                })
                 .CompleteDataTable();
 
         const GetDaysColumns = () => {

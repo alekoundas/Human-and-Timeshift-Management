@@ -183,6 +183,12 @@
                     data.specificDates = GetCalentimValuesForApi()
                     return JSON.stringify(data);
                 })
+                .FooterCallback((row, data, start, end, display) => {
+                    //for all columns except static ones
+                    for (var i = 0; i < row.children.length - 4; i++) {
+                        row.children[i + 4].innerHTML = "  Σύνολο: " + data[0]['Day_' + i + '_FooterTotal'];
+                    }
+                })
                 .CompleteDataTable();
 
         const AppendNewDataTableHTML = () =>

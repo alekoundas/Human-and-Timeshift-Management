@@ -34,7 +34,7 @@
                 <div style="width:100%;">
                     <div style="width:100%; float:left;">
                         <div class="form-group">
-                            <label class="control-label">Τρόπος εμγάνισης χρόνου</label>&nbsp
+                            <label class="control-label">Τρόπος εμφάνισης χρόνου</label>&nbsp
                             <input type="checkbox" class="filterSlider" id="SliderHourChoice">
                         </div>
                     </div>
@@ -133,7 +133,7 @@
     <script>
         $('#SliderHourChoice').bootstrapToggle({
             on: 'HH:mm',
-            off: '%',
+            off: 'ώρες/8',
             onstyle: 'primary',
             offstyle: 'primary'
         });
@@ -195,6 +195,14 @@
                     data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
                     data.ShowHoursInPercentage = GetSliderHourChoiceValue();
                     return JSON.stringify(data);
+                })
+                .FooterCallback((row, data, start, end, display) => {
+                    //for all columns except static ones
+                    for (var i = 0; i < row.children.length - 3; i++) {
+                        row.children[i + 3].innerHTML = "  Σύνολο: " + data[0]['Day_' + i + '_FooterTotal'];
+                        console.log(data[i]['Day_' + i + '_FooterTotal']);
+
+                    }
                 })
                 .CompleteDataTable();
 

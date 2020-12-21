@@ -122,12 +122,15 @@
                 .AddColumn(true, true, "ErpCode")
                 .AddColumn(true, true, "VatNumber")
                 .AddColumn(true, true, "WorkPlace_RealWorkHour")
-                .AddColumn(true, true, "Today")
+                .AddColumn(false, false, "Today")
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionPresenceDaily';
                     if (GetSelectedWorkPlaceId() != '')
                         data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
                     return JSON.stringify(data);
+                })
+                .FooterCallback((row, data, start, end, display) => {
+                    row.children[5].innerHTML = "Σήμερα σύνολο: " + data[0].Today_FooterTotal;
                 })
                 .CompleteDataTable();
         })

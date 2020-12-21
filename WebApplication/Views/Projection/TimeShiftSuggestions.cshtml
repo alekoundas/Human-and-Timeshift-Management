@@ -105,6 +105,12 @@
             newDate.setHours(23, 59, 59);
             return moment(newDate);
         }
+
+        const DestroyDataTable = () => $('#TimeShiftSuggestionsDatatable')
+            .DataTable().destroy();
+
+        const DeleteDataTableHTML = () =>
+            document.getElementById('TimeShiftSuggestionsDatatable').remove();
     </script>
 
 
@@ -112,56 +118,61 @@
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
-        $('#TimeShift_Select2').select2({
-            placeholder: "Επέλεξε πόστο",
-            allowClear: true,
-            ajax: {
-                url: '/api/timeshift/select2',
-                data: params => ({
-                    search: params.term,
-                    page: params.page || 1
-                })
-            }
-        }).on('change', () =>
-            $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
-
-        $('#SearchRangeInput').calentim({
-            showTimePickers: false,
-            startOnMonday: true,
-            showFooter: false,
-            startDate: Date.now(),
-            calendarCount: 1,
-            format: "DD/MM/YYYY",
-            dateSeparator: '/-/',
-            locale: "el",
-            onafterselect: () =>
-                $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload(),
-            onaftershow: () =>
-                //Fix Calentim width
-                [...document.getElementsByClassName('calentim-input')]
-                    .forEach((calentim) =>
-                        calentim.setAttribute('style', 'width: 400px;'))
-        });
-
-
         $(() => {
+            $('#TimeShift_Select2').select2({
+                placeholder: "Επέλεξε πόστο",
+                allowClear: true,
+                ajax: {
+                    url: '/api/timeshift/select2',
+                    data: params => ({
+                        search: params.term,
+                        page: params.page || 1
+                    })
+                }
+            }).on('change', () =>
+                $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
+
+            $('#SearchRangeInput').calentim({
+                showTimePickers: false,
+                startOnMonday: true,
+                showFooter: false,
+                startDate: Date.now(),
+                calendarCount: 1,
+                format: "DD/MM/YYYY",
+                dateSeparator: '/-/',
+                locale: "el",
+                onafterselect: () => {
+                    DestroyDataTable();
+                    DeleteDataTableHTML();
+                    AppendNewDataTableHTML();
+                    CreateDataTable();
+                },
+                onaftershow: () =>
+                    //Fix Calentim width
+                    [...document.getElementsByClassName('calentim-input')]
+                        .forEach((calentim) =>
+                            calentim.setAttribute('style', 'width: 400px;'))
+            });
+
+
             AppendNewDataTableHTML();
-            var table = new DataTableService('#TimeShiftSuggestionsDatatable')
-                .ForApiController('projections')
-                .StartOrderFromCol(1)
-                .AddColumn(true, true, "LastName")
-                .AddColumn(true, true, "FirstName")
-                .AddColumn(true, true, "ErpCode")
-                .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
-                .AjaxData((data, type, row, meta) => {
-                    data.predicate = 'ProjectionTimeShiftSuggestions';
-                    if (GetSelectedTimeShiftId() != '')
-                        data.filterByTimeShift = GetSelectedTimeShiftId();
-                    data.StartOn = GetStartOn();
-                    data.EndOn = GetEndOn();
-                    return JSON.stringify(data);
-                })
-                .CompleteDataTable();
+            var CreateDataTable = () =>
+                new DataTableService('#TimeShiftSuggestionsDatatable')
+                    .ForApiController('projections')
+                    .StartOrderFromCol(1)
+                    .AddColumn(true, true, "LastName")
+                    .AddColumn(true, true, "FirstName")
+                    .AddColumn(true, true, "ErpCode")
+                    .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
+                    .AjaxData((data, type, row, meta) => {
+                        data.predicate = 'ProjectionTimeShiftSuggestions';
+                        if (GetSelectedTimeShiftId() != '')
+                            data.filterByTimeShift = GetSelectedTimeShiftId();
+                        data.StartOn = GetStartOn();
+                        data.EndOn = GetEndOn();
+                        return JSON.stringify(data);
+                    })
+                    .CompleteDataTable();
         })
 
     </script>

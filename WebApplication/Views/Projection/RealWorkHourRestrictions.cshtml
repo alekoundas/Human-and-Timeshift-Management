@@ -95,9 +95,6 @@
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
-        //const GetOffsetMinutesValue = () =>
-        //    document.getElementById('OffsetMinutes').value;
-
         const GetMonthPickerValue = () =>
             document.getElementById('MonthPicker').value;
 
@@ -106,7 +103,11 @@
             newDate.setHours(23, 59, 59);
             return moment(newDate);
         }
+
+        $('.filterOffsetMinutes').change(e =>
+            $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload());
     </script>
+
     <script>
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
@@ -124,16 +125,10 @@
         }).on('change', () =>
             $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload());
 
-
         $('#MonthPicker').MonthPicker({
             Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
             OnAfterChooseMonth: () => $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload()
         })
-
-        $('.filterOffsetMinutes').change(e =>
-            $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload());
-
-
 
         var table = new DataTableService('#RealWorkHourRestrictionsDatatable')
             .ForApiController('RealWorkHours')
@@ -155,12 +150,8 @@
                     data.filterByMonth = GetMonthPickerValue().split('/')[0];
                     data.filterByYear = GetMonthPickerValue().split('/')[1];
                 }
-
-                //data.filterByOffsetMinutes = GetOffsetMinutesValue();
                 return JSON.stringify(data);
             })
             .CompleteDataTable();
-
-
     </script>
 }

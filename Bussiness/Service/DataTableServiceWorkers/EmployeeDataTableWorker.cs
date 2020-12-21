@@ -403,19 +403,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
             entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.Employee = null));
             entities.ForEach(x => x.Leaves.ToList().ForEach(y => y.Employee = null));
 
-            //Extra needed data
-
-            //var workHours = await _baseDatawork.WorkHours.Where(x =>
-            //         x.TimeShiftId == _datatable.GenericId &&
-            //         x.StartOn.Year == _datatable.TimeShiftYear &&
-            //         x.StartOn.Month == _datatable.TimeShiftMonth)
-            //     .ToDynamicListAsync<WorkHour>();
-
-            //var leaves = await _baseDatawork.Leaves.Where(x =>
-            //       x.StartOn.Year == _datatable.TimeShiftYear &&
-            //       x.StartOn.Month == _datatable.TimeShiftMonth)
-            //   .ToDynamicListAsync<Leave>();
-
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Employee>();
@@ -479,23 +466,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 compareMonth = (int)_datatable.SelectedMonth;
                 compareYear = (int)_datatable.SelectedYear;
             }
-
-            //var workHours = await _baseDatawork.WorkHours.Where(x =>
-            //         x.TimeShiftId == _datatable.GenericId &&
-            //         x.StartOn.Year == compareYear &&
-            //         x.StartOn.Month == compareMonth)
-            //    .ToDynamicListAsync<WorkHour>();
-
-            //var leaves = await _baseDatawork.Leaves.Where(x =>
-            //         x.StartOn.Year == compareYear &&
-            //         x.StartOn.Month == compareMonth)
-            //    .ToDynamicListAsync<Leave>();
-
-            //var realWorkHours = await _baseDatawork.RealWorkHours.Where(x =>
-            //        x.StartOn.Year == compareYear &&
-            //        x.TimeShiftId == _datatable.GenericId &&
-            //        x.StartOn.Month == compareMonth)
-            //    .ToDynamicListAsync<RealWorkHour>();
 
             //Mapping
             var expandoService = new ExpandoService();

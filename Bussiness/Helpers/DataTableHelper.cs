@@ -340,7 +340,23 @@ namespace Bussiness.Helpers
             }
         }
 
-        public string GetProjectionRealWorkHoursAnalyticallyCellBody(ICollection<RealWorkHour> realWorkHours)
+        public string GetProjectionRealWorkHoursAnalyticallyCellBody(
+            ICollection<RealWorkHour> realWorkHours)
+        {
+            var cellBody = "";
+            foreach (var realWorkHour in realWorkHours)
+            {
+                cellBody += "<p white-space: nowrap;'>" +
+                    realWorkHour.StartOn.ToShortTimeString() +
+                    " - " +
+                    realWorkHour.EndOn.ToShortTimeString() +
+                    "</p></br>";
+            }
+
+            return cellBody;
+        }
+        public string GetProjectionTimeShiftSuggestionCellBody(
+            ICollection<RealWorkHour> realWorkHours, List<string> errors)
         {
             var cellBody = "";
             foreach (var realWorkHour in realWorkHours)

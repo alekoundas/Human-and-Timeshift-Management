@@ -1,4 +1,5 @@
-﻿class DataTableService {
+﻿class DataTableServiceCore {
+
     constructor(selector) {
         this._dataTable;
         this._url = '/api/specializations/datatable';
@@ -119,38 +120,51 @@
         return this;
     }
 
-    CompleteDataTable = () => {
-        return $(this._selector).DataTable({
-            serverSide: true,
-            responsive: true,
-            processing: true,
-            colReorder: true,
-            lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
-            iDisplayLength: 150,
-            dom: 'Bfrtlp',
-            buttons: [/*'copy', 'csv', */'excel', /*'pdf',*/ 'print'],
-            language: {
-                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
-            },
-            ajax: {
-                url: this._url,
-                type: 'POST',
-                contentType: "application/json",
-                data: this._ajaxData
-            },
-            order: [[this._startOrderFrom, 'desc']],
-            columns: this._columns,
-            columnDefs: [{
-                targets: '_all',
-                render: (data, type, row) => data
-            }],
-            fnDrawCallback: this._fnDrawCallback,
-            createdRow: this._createdRow,
-            rowCallback: this._rowCallback,
-            initComplete: this._initComplete,
-            footerCallback: this._footerCallback
-        });
-    }
+    CompleteDataTable = () => $(this._selector).DataTable({
+        serverSide: true,
+        responsive: true,
+        processing: true,
+        colReorder: true,
+        lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
+        iDisplayLength: 150,
+        //dom: 'frtlp',
+        dom: 'Bfrtlp',
+        buttons: [/*'copy', 'csv', */'excel', /*'pdf',*/ 'print'],
+        //buttons: [
+        //    {
+        //        extend: 'excelHtml5',
+        //        text: 'Excel',
+        //        exportOptions: { orthogonal: 'ExcelExport' }
+        //    }
+        //],
+        language: {
+            processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> '
+        },
+        ajax: {
+            url: this._url,
+            type: 'POST',
+            contentType: "application/json",
+            data: this._ajaxData
+        },
+        order: [[this._startOrderFrom, 'desc']],
+        columns: this._columns,
+        columnDefs: [{
+            targets: '_all',
+            render: (data, type, row) => {
+                if (type == 'ExcelExport') {
+                    console.log(data);
+                    return data;
+                }
+                else
+                    return data;
+            }
+        }],
+        fnDrawCallback: this._fnDrawCallback,
+        createdRow: this._createdRow,
+        rowCallback: this._rowCallback,
+        initComplete: this._initComplete,
+        footerCallback: this._footerCallback
+    });
 
 
 

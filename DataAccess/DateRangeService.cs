@@ -32,6 +32,17 @@ namespace DataAccess.Service
         private bool IsSunday(DateTime date) => date.DayOfWeek == DayOfWeek.Sunday;
 
 
+        public DateRangeService ConvertToTotalWork()
+        {
+            this._Seconds = 0;
+            var currentStartDate = this.StartTime;
+            var currentEndDate = this.EndTime;
+
+            this._Seconds += currentEndDate.Subtract(currentStartDate).TotalSeconds;
+
+            return this;
+        }
+
         public DateRangeService ConvertToDayWork()
         {
             this._Seconds = 0;
