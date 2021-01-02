@@ -64,17 +64,17 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        $('.Customer_Select2').select2({
+        var customerSelect2 = $('.Customer_Select2').select2({
             ajax: {
+                type: "POST",
                 url: '/api/customers/select2',
-                data: function (params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-                    return query;
-                }
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: (params) => JSON.stringify({
+                    search: params.search,
+                    page: params.page || 1
+                })
             }
-        });
+        })
     </script>
 }

@@ -2,6 +2,15 @@
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
+<style>
+    .disabled-select {
+        background-color: #d5d5d5;
+        opacity: 0.5;
+        border-radius: 3px;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+</style>
 
 <div class="row">
     <div class="col-md-3"> </div>
@@ -44,8 +53,8 @@
 
                     <div class="form-group">
                         <label asp-for="CustomerId" class="control-label"></label>
-                        <div class="input-group">
-                            <select class="Customer_Select2" asp-for="CustomerId" style="width:70%" readonly></select>
+                        <div class="input-group disabled-select" style="width:70%">
+                            <select class="Customer_Select2" asp-for="CustomerId" style="width:100%"></select>
                         </div>
                     </div>
 
@@ -133,7 +142,8 @@
     <script>
 
         var predefinedCustomerId = @Model.CustomerId;
-        var customerSelect2 =  $('.Customer_Select2').select2({
+        var customerSelect2 = $('.Customer_Select2').select2({
+            readonly:true,
             ajax: {
                 type: "POST",
                 url: '/api/customers/select2',
