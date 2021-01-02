@@ -206,24 +206,20 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.Customer));
             includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
 
+            if (!_datatable.FilterByIncludedWorkPlaces)
+                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
+
             _filter = _filter.And(x => x.Customer.Company != null);
 
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
-            entities = entities.Select(X => new WorkPlace
-            {
-                Id = X.Id,
-                CustomerId = X.CustomerId,
-                Customer = X.Customer,
-                Title = X.Title,
-                EmployeeWorkPlaces = X.EmployeeWorkPlaces.Select(y => new EmployeeWorkPlace
-                {
-                    Id = y.Id,
-                    WorkPlaceId = y.WorkPlaceId,
-                    EmployeeId = y.EmployeeId
-                }).ToList()
-            }).ToList();
+            entities.ForEach(x => x.Customer.WorkPlaces = null);
+            entities.ForEach(x => x.Customer.Company = null);
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.EmployeeWorkPlaces = null));
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.Company = null));
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.RealWorkHours = null));
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.WorkHours = null));
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -259,11 +255,20 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.Customer));
             includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
 
+            if (!_datatable.FilterByIncludedWorkPlaces)
+                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
+
             _filter = _filter.And(x => x.Customer.Company != null);
 
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
+            entities.ForEach(x => x.Customer.WorkPlaces = null);
+            entities.ForEach(x => x.Customer.Company = null);
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.EmployeeWorkPlaces = null));
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.Company = null));
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.RealWorkHours = null));
+            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.WorkHours = null));
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<WorkPlace>();

@@ -90,7 +90,7 @@ namespace DataAccess.Repository
             if (orderingInfo != null)
                 qry = orderingInfo(qry);
 
-            if (pageSize != -1)
+            if (pageSize != -1 && pageSize != 0)
                 qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return await qry.ToListAsync();

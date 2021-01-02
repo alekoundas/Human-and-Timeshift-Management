@@ -95,8 +95,7 @@
                             <select class="Specialization_Select2" asp-for="SpecializationId" style="width:50%">
                                 @if (Model.Specialization != null)
                                 {
-                    <option value="@Model.SpecializationId" selected="selected">@Model.Specialization.Name</option>
-}
+                    <option value="@Model.SpecializationId" selected="selected">@Model.Specialization.Name</option>}
                             </select>
                             <span asp-validation-for="SpecializationId" class="text-danger"></span>
                         </div>
@@ -108,8 +107,7 @@
                             <select class="Company_Select2" asp-for="CompanyId" style="width:50%">
                                 @if (Model.CompanyId != null)
                                 {
-                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>
-}
+                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>}
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>
@@ -121,8 +119,7 @@
                             <select class="Contract_Select2" asp-for="ContractId" style="width:50%">
                                 @if (Model.ContractId != null)
                                 {
-                    <option value="@Model.ContractId" selected="selected">@Model.Contract.Title</option>
-}
+                    <option value="@Model.ContractId" selected="selected">@Model.Contract.Title</option>}
                             </select>
                             <span asp-validation-for="ContractId" class="text-danger"></span>
                         </div>
@@ -212,6 +209,14 @@
                 <h3 class="box-title">@ViewData["WorkPlaceDataTable"]</h3>
             </div>
             <hr />
+            <div style="width:100%; padding-left:5%;">
+                <div style="width:100%; float:left;">
+                    <div class="form-group">
+                        <label class="control-label">Εμφάνιση ΜΟΝΟ ενταγμένων πόστων</label>&nbsp
+                        <input type="checkbox" class="filterSlider" id="SliderFilter" checked>
+                    </div>
+                </div>
+            </div>
             <div class="box-body table-responsive">
 
                 <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive stripe">
@@ -285,6 +290,13 @@
             }
         });
 
+        $('.filterSlider').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι'
+        })
+        $('.filterSlider').change(e =>
+            $('#WorkPlacesDatatable').DataTable().ajax.reload());
+
         $(() => new DataTableService('#WorkPlacesDatatable')
             .ForApiController('workplaces')
             .AddColumn(true, true, "Title")
@@ -292,6 +304,7 @@
             .AddColumn(true, true, "IsInWorkPlace")
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'EmployeeEdit';
+                data.filterByIncludedWorkPlaces = GetSliderFilterValue();
                 data.genericId =@Model.Id;
                 return JSON.stringify(data);
             })
@@ -325,6 +338,9 @@
     </script>
 
     <script>
+        const GetSliderFilterValue = () =>
+            document.getElementById('SliderFilter').checked != true;
+
         $('#WorkPlacesDatatable').on('change', '.ToggleSliders', (element) => {
             var apiUrl = element.target.getAttribute('urlattr');
             $.ajax({

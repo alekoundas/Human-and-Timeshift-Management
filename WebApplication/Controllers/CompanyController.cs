@@ -94,13 +94,13 @@ namespace WebApplication.Controllers
 
             ViewData["Title"] = "Επεξεργασία εταιρίας ";
             ViewData["EmployeeDataTable"] = "Σύνολο  υπαλλήλων";
-            return View(company);
+            return View(CompanyEdit.CreateFrom(company));
         }
 
         // POST: Companies/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Company company)
+        public async Task<IActionResult> Edit(int id, CompanyEdit company)
         {
             if (id != company.Id)
                 return NotFound();
@@ -109,7 +109,7 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(company);
+                    _context.Update(CompanyEdit.CreateFrom(company));
                     await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

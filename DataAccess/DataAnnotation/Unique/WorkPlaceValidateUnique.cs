@@ -21,6 +21,16 @@ namespace DataAccess.DataAnnotation.Unique
             var baseDbContext = (BaseDbContext)validationContext.GetService(typeof(BaseDbContext));
             var baseDataWork = new BaseDatawork(baseDbContext);
             var filter = PredicateBuilder.New<WorkPlace>();
+            var idProperty = validationContext.ObjectType.GetProperty("Id");
+
+            //Edit
+            if (idProperty != null)
+            {
+                var idValue = (int)idProperty
+                    .GetValue(validationContext.ObjectInstance);
+
+                filter = filter.And(x => x.Id != idValue);
+            }
 
             var customerIdProperty = validationContext.ObjectType.GetProperty("CustomerId");
             var titleProperty = validationContext.ObjectType.GetProperty("Title");

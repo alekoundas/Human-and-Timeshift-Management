@@ -18,8 +18,10 @@ namespace DataAccess.ViewModels
         [Display(Name = "Πελάτης")]
         [WorkPlaceValidateUnique("CustomerId")]
         public int? CustomerId { get; set; }
+        public Customer Customer { get; set; }
 
 
+        public bool IsActive { get; set; } = true;
 
         public static WorkPlace CreateFrom(WorkPlaceCreate viewModel)
         {

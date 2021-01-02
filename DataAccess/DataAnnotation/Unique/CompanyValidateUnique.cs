@@ -9,8 +9,27 @@ namespace DataAccess.DataAnnotation.Unique
         {
             var baseDbContext = (BaseDbContext)validationContext.GetService(typeof(BaseDbContext));
             var baseDataWork = new BaseDatawork(baseDbContext);
-            if (baseDataWork.Companies.Any(x => x.VatNumber == value.ToString().Trim()))
-                return new ValidationResult("Το ΑΦΜ πρέπει να είναι μοναδικό");
+
+            var idProperty = validationContext.ObjectType.GetProperty("Id");
+            //Create
+            if (idProperty == null)
+            {
+                if (baseDataWork.Companies.Any(x => x.VatNumber == value.ToString().Trim()))
+                    return new ValidationResult("Το ΑΦΜ πρέπει να είναι μοναδικό");
+            }
+            //Edit
+            else
+            {
+                var idValue = (int)idProperty
+                    .GetValue(validationContext.ObjectInstance);
+
+                var isUnique = !baseDataWork.Companies.Any(x =>
+                    x.VatNumber == value.ToString().Trim() &&
+                    x.Id != idValue);
+
+                if (!isUnique)
+                    return new ValidationResult("Το ΑΦΜ πρέπει να είναι μοναδικό");
+            }
 
             return ValidationResult.Success;
         }

@@ -116,6 +116,14 @@
                 <h3 class="box-title">@ViewData["WorkPlaceDataTable"]</h3>
             </div>
             <hr />
+            <div style="width:100%; padding-left:5%;">
+                <div style="width:100%; float:left;">
+                    <div class="form-group">
+                        <label class="control-label">Εμφάνιση ΜΟΝΟ ενταγμένων πόστων</label>&nbsp
+                        <input type="checkbox" class="filterSlider" id="SliderFilter" checked>
+                    </div>
+                </div>
+            </div>
             <div class="box-body table-responsive">
 
                 <table id="WorkPlacesDatatable" class="table table-bordered table-hover table-responsive stripe">
@@ -147,6 +155,15 @@
     <script src="~/js/Custom/Contacts.js"></script>
 
     <script>
+        const GetSliderFilterValue = () =>
+            document.getElementById('SliderFilter').checked != true;
+        $('.filterSlider').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι'
+        })
+        $('.filterSlider').change(e =>
+            $('#WorkPlacesDatatable').DataTable().ajax.reload());
+
         $(() => new DataTableService('#WorkPlacesDatatable')
             .ForApiController('workplaces')
             .AddColumn(true, true, "Title")
@@ -154,6 +171,7 @@
             .AddColumn(true, true, "IsInWorkPlace")
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'EmployeeDetails';
+                data.filterByIncludedWorkPlaces = GetSliderFilterValue();
                 data.genericId =@Model.Id;
                 return JSON.stringify(data);
             })

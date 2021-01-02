@@ -2,27 +2,31 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.ViewModels
 {
     public class LeaveCreate
     {
-        [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
+        [Display(Name = "Έναρξη")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public DateTime StartOn { get; set; }
 
-        [JsonProperty(PropertyName = "endOn", Required = Required.Default)]
+        [Display(Name = "Λήξη")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public DateTime EndOn { get; set; }
 
-        [JsonProperty(PropertyName = "description")]
+        [Display(Name = "Περιγραφή")]
         public string Description { get; set; }
 
-        [JsonProperty(PropertyName = "approvedBy")]
+        [Display(Name = "Εγκρίθηκε απο")]
         public string ApprovedBy { get; set; }
 
-        [JsonProperty(PropertyName = "leaveTypeId", Required = Required.Default)]
+        [Display(Name = "Τύπος άδειας")]
+        [Required(ErrorMessage = "Το παιδίο είναι υποχρεωτικό")]
         public int LeaveTypeId { get; set; }
 
-        [JsonProperty(PropertyName = "employeeIds", Required = Required.Default)]
+        [Display(Name = "Υπάλληλοι")]
         public List<int> EmployeeIds { get; set; }
 
         public static List<Leave> CreateRangeFrom(LeaveCreate viewModel)

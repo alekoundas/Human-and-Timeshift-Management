@@ -97,6 +97,10 @@ namespace DataAccess.Libraries.Datatable
         [JsonProperty(PropertyName = "filterByIncludedCustomer")]
         public bool FilterByIncludedCustomer { get; set; }
 
+        //Employee Edit
+        [JsonProperty(PropertyName = "filterByIncludedWorkPlaces")]
+        public bool FilterByIncludedWorkPlaces { get; set; }
+
         [JsonProperty(PropertyName = "filterByWorkPlaceId", Required = Required.Default)]
         public int FilterByWorkPlaceId { get; set; }
 

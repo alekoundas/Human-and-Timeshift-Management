@@ -97,14 +97,14 @@ namespace WebApplication.Controllers
 
             ViewData["Title"] = "Επεξεργασία πόστου";
             ViewData["EmployeeDataTable"] = "Σύνολο υπαλλήλων";
-            return View(workPlace);
+            return View(WorkPlaceEdit.CreateFrom(workPlace));
         }
 
         // POST: WorkPlace/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "WorkPlace_Edit")]
-        public async Task<IActionResult> Edit(int id, WorkPlace workPlace)
+        public async Task<IActionResult> Edit(int id, WorkPlaceEdit workPlace)
         {
             if (id != workPlace.Id)
                 return NotFound();
@@ -113,7 +113,7 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(workPlace);
+                    _context.Update(WorkPlaceEdit.CreateFrom(workPlace));
                     await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -156,7 +156,7 @@ namespace WebApplication.Controllers
                 "Title",
                 "Description",
                 "IsActive",
-                "CustomerId" 
+                "CustomerId"
             });
 
             var excelPackage = (await (new ExcelService<WorkPlace>(_context)

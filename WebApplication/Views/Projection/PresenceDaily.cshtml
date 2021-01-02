@@ -130,7 +130,7 @@
                     return JSON.stringify(data);
                 })
                 .FooterCallback((row, data, start, end, display) => {
-                    row.children[5].innerHTML = "Σήμερα σύνολο: " + data[0].Today_FooterTotal;
+                    row.children[5].innerHTML = "Σήμερα σύνολο: " + data[0]?.Today_FooterTotal;
                 })
                 .CompleteDataTable();
         })

@@ -1,15 +1,24 @@
 ﻿using DataAccess.DataAnnotation.Unique;
 using DataAccess.Models.Entity;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.ViewModels
 {
     public class CompanyCreate
     {
         [CompanyValidateUnique]
+        [Display(Name = "ΑΦΜ")]
         public string VatNumber { get; set; }
+
+        [Display(Name = "Περιγραφή")]
         public string Description { get; set; }
+
+        [Display(Name = "Τίτλος")]
         public string Title { get; set; }
+
+
+        public bool IsActive { get; set; } = true;
 
 
 
@@ -26,5 +35,6 @@ namespace DataAccess.ViewModels
                 CreatedOn = DateTime.Now
             };
         }
+
     }
 }

@@ -208,6 +208,15 @@
                     data.ShowHoursInPercentage = GetSliderHourChoiceValue();
                     return JSON.stringify(data);
                 })
+                .FooterCallback((row, data, start, end, display) => {
+                    row.children[3].innerHTML = "Σύνολο ώρες: " + data[0]?.TotalFooterHours;
+                    row.children[4].innerHTML = "Σύνολο ώρες Μέρα: " + data[0]?.TotalFooterHoursDay;
+                    row.children[5].innerHTML = "Σύνολο ώρες Νύχτα: " + data[0]?.TotalFooterHoursNight;
+                    row.children[6].innerHTML = "Σύνολο ώρες Σάββατο Μέρα: " + data[0]?.TotalFooterSaturdayDay;
+                    row.children[7].innerHTML = "Σύνολο ώρες Σάββατο Νύχτα: " + data[0]?.TotalFooterSaturdayNight;
+                    row.children[8].innerHTML = "Σύνολο ώρες Κυριακή Μέρα: " + data[0]?.TotalFooterSundayDay;
+                    row.children[9].innerHTML = "Σύνολο ώρες Κυριακή Νύχτα: " + data[0]?.TotalFooterSundayNight;
+                })
                 .CompleteDataTable();
 
         $(document).ready(CreateDataTable());

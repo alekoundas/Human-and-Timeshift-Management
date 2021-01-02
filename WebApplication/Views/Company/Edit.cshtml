@@ -1,4 +1,4 @@
-﻿@model DataAccess.Models.Entity.Company
+﻿@model DataAccess.ViewModels.CompanyEdit
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
@@ -35,7 +35,7 @@
                     <div class="form-group">
                         <label asp-for="VatNumber" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="VatNumber" class="form-control" readonly />
+                            <input asp-for="VatNumber" class="form-control" />
                             <span asp-validation-for="VatNumber" class="text-danger"></span>
                         </div>
                     </div>

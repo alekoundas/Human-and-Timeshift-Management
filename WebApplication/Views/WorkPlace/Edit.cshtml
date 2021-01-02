@@ -1,4 +1,4 @@
-﻿@model DataAccess.Models.Entity.WorkPlace
+﻿@model DataAccess.ViewModels.WorkPlaceEdit
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
@@ -42,14 +42,12 @@
                         </div>
                     </div>
 
-                    @if (Model.Customer != null)
-                    {
-        <div class="form-group">
-            <label asp-for="CustomerId" class="control-label"></label>
-            <div class="input-group">
-                <input asp-for="Customer.IdentifyingName" class="form-control" readonly />
-            </div>
-        </div>}
+                    <div class="form-group">
+                        <label asp-for="CustomerId" class="control-label"></label>
+                        <div class="input-group">
+                            <select class="Customer_Select2" asp-for="CustomerId" style="width:70%" readonly></select>
+                        </div>
+                    </div>
 
                     <div class="form-group">
                         <label asp-for="CreatedBy_FullName" class="control-label"></label>
@@ -133,18 +131,44 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        $('.Customer_Select2').select2({
+
+        var predefinedCustomerId = @Model.CustomerId;
+        var customerSelect2 =  $('.Customer_Select2').select2({
             ajax: {
+                type: "POST",
                 url: '/api/customers/select2',
-                data: function (params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-                    return query;
-                }
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: (params) => JSON.stringify({
+                    search: params.search,
+                    page: params.page || 1
+                })
             }
+        })
+
+        var option = $('<option selected>Loading...</option>').val(predefinedCustomerId);
+        customerSelect2.append(option).trigger('change');
+
+        $.ajax({
+            type: "POST",
+            url: '/api/customers/select2',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data:  JSON.stringify({
+                    page: 1,
+                    fromEntityId: predefinedCustomerId
+            })
+        }).then(function (data) {
+            customerSelect2.remove(option);
+            var option2 = $('<option selected>'+data.results[0].text+'</option>').val(predefinedCustomerId);
+            customerSelect2.append(option2).trigger('change');
+
         });
+
+
+
+
+
 
         $('.filterSlider').bootstrapToggle({
             on: 'Ναί',
