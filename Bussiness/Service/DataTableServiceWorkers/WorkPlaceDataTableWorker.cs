@@ -307,7 +307,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
-            entities.ForEach(x => x.Customer.Company.Customers = null);
+            //entities.ForEach(x => x.Customer.Company.Customers = null);
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<WorkPlace>();
@@ -330,55 +330,5 @@ namespace Bussiness.Service.DataTableServiceWorkers
         }
 
 
-        //public async Task<WorkPlaceDataTableWorker> ProjectionEmployeeRealHoursSum()
-        //{
-        //    var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
-        //    includes.Add(x => x.Include(y => y.Customer).ThenInclude(z => z.Company));
-
-
-        //    if (_datatable.GenericId != 0)
-        //        _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.EmployeeId == _datatable.GenericId));
-
-        //    var entities = await _baseDatawork.WorkPlaces
-        //        .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
-
-        //    //Mapping
-        //    var expandoService = new ExpandoService();
-        //    var dataTableHelper = new DataTableHelper<WorkPlace>();
-        //    var returnObjects = new List<ExpandoObject>();
-
-        //    foreach (var result in entities)
-        //    {
-        //        var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
-        //        var dictionary = (IDictionary<string, object>)expandoObj;
-
-        //        var totalSeconds = _baseDatawork.RealWorkHours
-        //               .GetEmployeeTotalSecondsFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
-
-        //        var totalSecondsDay = _baseDatawork.RealWorkHours
-        //               .GetEmployeeTotalSecondsDayFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
-
-        //        var totalSecondsNight = _baseDatawork.RealWorkHours
-        //                .GetEmployeeTotalSecondsNightFromRange(_datatable.GenericId, _datatable.StartOn, _datatable.EndOn, result.Id);
-        //        if (_datatable.ShowHoursInPercentage)
-        //        {
-        //            dictionary.Add("TotalHours", totalSeconds / 60 / 60);
-        //            dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 60);
-        //            dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 60);
-        //        }
-        //        else
-        //        {
-        //            dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
-        //            dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
-        //            dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
-        //        }
-
-        //        returnObjects.Add(expandoObj);
-        //    }
-        //    EntitiesMapped = returnObjects;
-        //    EntitiesTotal = await _baseDatawork.WorkPlaces.CountAllAsyncFiltered(_filter);
-
-        //    return this;
-        //}
     }
 }

@@ -199,6 +199,7 @@
                 .AddColumn(false, false, "TotalHoursSaturdayNight")
                 .AddColumn(false, false, "TotalHoursSundayDay")
                 .AddColumn(false, false, "TotalHoursSundayNight")
+                .FixedLeftColums(2)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionConcentric';
                     if (GetSelectedWorkPlaceId() != '')

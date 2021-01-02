@@ -1689,6 +1689,8 @@
                     DeleteDataTableHTML();
                     AppendNewDataTableHTML();
                     InitDatatable();
+                    //Hide annoying line on static cols
+                    document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
                 });
         });
 
@@ -1701,6 +1703,8 @@
                 DeleteDataTableHTML();
                 AppendNewDataTableHTML();
                 InitDatatable();
+                //Hide annoying line on static cols
+                document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
                 //document.getElementById('MonthFilter').value = month + '/' + year;
                 //$('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
             }
@@ -1956,6 +1960,7 @@
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumnsFromCount(GetDaysInMonth(), "Day_")
+                .FixedLeftColums(3)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'RealWorkHourIndex';
                     if (GetTimeShiftFilterValue() == undefined || GetTimeShiftFilterValue() == '')
@@ -1993,6 +1998,7 @@
                         $(row).css('background-color', '#AAAFB4');
                 })
                 .CompleteDataTable();
+
     </script>
 
     <!--    Html Append -->

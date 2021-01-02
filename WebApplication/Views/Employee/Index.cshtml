@@ -63,6 +63,7 @@
                     .AddColumn(true, true, "SpecializationName")
                     .AddColumn(true, true, "CompanyTitle")
                     .AddColumn(false, false, "Buttons")
+                    .FixedLeftColums(2)
                     .AjaxData((data, type, row, meta) => {
                         data.Predicate = 'EmployeeIndex';
                         return JSON.stringify(data);
@@ -72,6 +73,8 @@
                             $(row).css('background-color', '#AAAFB4');
                     })
                     .CompleteDataTable();
+                //Hide annoying line on static cols
+                document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
             })
         </script>
     }

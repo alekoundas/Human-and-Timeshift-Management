@@ -1,7 +1,17 @@
 ﻿@model IEnumerable<DataAccess.Models.Entity.ContractMembership>
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+<style>
+    /* Ensure that the demo table scrolls */
+    th, td {
+        white-space: nowrap;
+    }
 
+    div.dataTables_wrapper {
+        width: 800px;
+        margin: 0 auto;
+    }
+</style>
 <div class="row">
     <div class="col-md-2"> </div>
     <div class="col-md-8">
@@ -18,7 +28,7 @@
             <hr />
             <div class="box-body table-responsive">
 
-                <table id="ContractMembershipsDatatable" class="table table-bordered table-hover table-responsive stripe">
+                <table id="ContractMembershipsDatatable" class="table table-bordered table-hover table-responsive stripe row-border order-column">
                     <thead>
                         <tr>
                             <th>Τίτλος</th>
@@ -71,6 +81,7 @@
                     .AddColumn(true, true, "GrossSalaryPerHour")
                     .AddColumn(true, true, "NetSalaryPerHour")
                     .AddColumn(false, false, "Buttons")
+                    .FixedLeftColums(1)
                     .AjaxData((data, type, row, meta) => {
                         data.Predicate = 'ContractIndex';
                         return JSON.stringify(data);
@@ -80,6 +91,8 @@
                             $(row).css('background-color', '#AAAFB4');
                     })
                     .CompleteDataTable();
+                //Hide annoying line on static cols
+                document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
             })
         </script>
     }

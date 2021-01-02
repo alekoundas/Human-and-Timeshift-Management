@@ -129,6 +129,7 @@
             .AddColumn(true, true, "ScpecializationName")
             .AddColumn(true, true, "CompanyTitle")
             .AddColumn(true, true, "IsInCompany")
+            .FixedLeftColums(2)
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'CompanyEdit';
                 data.genericId =@Model.Id;
@@ -140,6 +141,8 @@
                     off: 'Όχι'
                 }))
             .CompleteDataTable());
+        //Hide annoying line on static cols
+        document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
     </script>
 
 

@@ -167,6 +167,7 @@
                             calentim.setAttribute('style', 'width: 400px;'))
             });
 
+
         var CreateDataTable = () =>
             new DataTableService('#RealWorkHoursSpecificDatesDatatable')
                 .ForApiController('projections')
@@ -175,6 +176,7 @@
                 .AddColumn(true, true, "ErpCode")
                 .AddColumn(true, true, "VatNumber")
                 .AddColumnsFromCount(GetDaysToAppentNums().length, "Day_")
+                .FixedLeftColums(2)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionRealWorkHoursSpecificDates';
                     if (GetSelectedWorkPlaceId() != '')

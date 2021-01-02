@@ -221,6 +221,7 @@
             .AddColumn(true, true, "StartOn_string")
             .AddColumn(true, true, "EndOn_string")
             .AddColumn(false, false, "Buttons")
+            .FixedLeftColums(2)
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'RealWorkHourCurrentDay';
                 return JSON.stringify(data);
@@ -231,5 +232,7 @@
                     off: 'Όχι'
                 }))
             .CompleteDataTable());
+        //Hide annoying line on static cols
+        document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
     </script>
 }

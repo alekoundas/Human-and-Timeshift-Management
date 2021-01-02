@@ -97,8 +97,7 @@
                             <th>ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>
-}
+                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>}
                         </tr>
                     </thead>
                     <tfoot>
@@ -109,8 +108,7 @@
                             <th data-searchable="false">ErpCode</th>
                             @for (int i = 0; i < Model.DaysInMonth; i++)
                             {
-                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>
-}
+                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>}
                         </tr>
                     </tfoot>
                 </table>
@@ -1586,6 +1584,7 @@
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumnsFromCount(DateConstants().DaysInMonth, "Day_")
+                .FixedLeftColums(3)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'TimeShiftEdit';
                     data.genericId = DateConstants().TimeShiftId;
@@ -1629,6 +1628,8 @@
                         });
                 })
                 .CompleteDataTable();
+        //Hide annoying line on static cols
+        document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
     </script>
 
     <!--    Html Append -->

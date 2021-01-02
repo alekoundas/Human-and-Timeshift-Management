@@ -67,11 +67,14 @@
                 .AddColumn(true, true, "ApprovedBy")
                 .AddColumn(true, true, "LeaveTypeName")
                 .AddColumn(false, false, "Buttons")
+                .FixedLeftColums(1)
                 .AjaxData((data, type, row, meta) => {
                     data.Predicate = 'LeaveIndex';
                     return JSON.stringify(data);
                 })
                 .CompleteDataTable();
+            //Hide annoying line on static cols
+            document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
         })
     </script>
 }

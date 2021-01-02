@@ -11,6 +11,8 @@
         this._createdRow;
         this._initComplete;
         this._footerCallback;
+        this._fixedLeftColums = 0;
+        this._fixedRightColums = 0;
     }
 
     Destroy = () =>
@@ -79,6 +81,17 @@
         return this;
     }
 
+
+    FixedLeftColums(leftColumns) {
+        this._fixedLeftColums = leftColumns;
+        return this;
+    };
+
+    FixedRightColums(rightColumns) {
+        this._fixedRightColums = rightColumns;
+        return this;
+    };
+
     // (oSettings) => {}
     FnDrawCallback(expression) {
         this._fnDrawCallback = expression;
@@ -124,7 +137,13 @@
             serverSide: true,
             responsive: true,
             processing: true,
+            autoWidth: false,
             colReorder: true,
+            scrollX: true,
+            fixedColumns: {
+                leftColumns: this._fixedLeftColums,
+                rightColumns: this._fixedRightColums
+            },
             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
             iDisplayLength: 150,
             dom: 'Bfrtlp',
@@ -150,6 +169,9 @@
             initComplete: this._initComplete,
             footerCallback: this._footerCallback
         });
+
+        //Hide annoying line on static cols
+        //document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
     }
 
 
@@ -157,38 +179,39 @@
 
 
     //https://datatables.net/forums/discussion/51536/hide-empty-columns-in-responsive-datatables
-    HideEmptyColumnss = (selector) => {
-        var emptyColumnsIndexes = []; // store index of empty columns here
-        // check each column separately for empty cells
-        $(selector).find('th').each(function (i) {
-            // get all cells for current column
-            var cells = $(this).parents('table').find('tr td:nth-child(' + (i + 1) + ')');
-            var emptyCells = 0;
+    //HideEmptyColumnss = (selector) => {
+    //    var emptyColumnsIndexes = []; // store index of empty columns here
+    //    // check each column separately for empty cells
+    //    $(selector).find('th').each(function (i) {
+    //        // get all cells for current column
+    //        var cells = $(this).parents('table').find('tr td:nth-child(' + (i + 1) + ')');
+    //        var emptyCells = 0;
 
-            cells.each(function (cell) {
-                // increase emptyCells if current cell is empty, trim string to remove possible spaces in cell
-                if ($(this).html().trim() === '') {
-                    emptyCells++;
-                }
-            });
+    //        cells.each(function (cell) {
+    //            // increase emptyCells if current cell is empty, trim string to remove possible spaces in cell
+    //            if ($(this).html().trim() === '') {
+    //                emptyCells++;
+    //            }
+    //        });
 
-            // if all cells are empty push current column to emptyColumns
-            if (emptyCells === $(cells).length) {
-                emptyColumnsIndexes.push($(this).index());
-            }
-        });
+    //        // if all cells are empty push current column to emptyColumns
+    //        if (emptyCells === $(cells).length) {
+    //            emptyColumnsIndexes.push($(this).index());
+    //        }
+    //    });
 
-        // only make changes if there are columns to hide
-        if (emptyColumnsIndexes.length > 0) {
-            /* add class never to all empty columns
-                never is a special class of the Responsive extension:
-                Columns with class never will never be visible, regardless of the browser width, and the data will not be shown in a child row
-            */
-            $((selector).DataTable().columns(emptyColumnsIndexes).header()).addClass('never');
-            // Recalculate the column breakpoints based on the class information of the column header cells, class never will now be available to Responsive extension
-            $(selector).DataTable().columns.adjust().responsive.rebuild();
-            // immediatly call recalc to have Responsive extension updae the display for the cahnge in classes
-            $(selector).DataTable().columns.adjust().responsive.recalc();
-        }
-    }
+    //    // only make changes if there are columns to hide
+    //    if (emptyColumnsIndexes.length > 0) {
+    //        /* add class never to all empty columns
+    //            never is a special class of the Responsive extension:
+    //            Columns with class never will never be visible, regardless of the browser width, and the data will not be shown in a child row
+    //        */
+    //        $((selector).DataTable().columns(emptyColumnsIndexes).header()).addClass('never');
+    //        // Recalculate the column breakpoints based on the class information of the column header cells, class never will now be available to Responsive extension
+    //        $(selector).DataTable().columns.adjust().responsive.rebuild();
+    //        // immediatly call recalc to have Responsive extension updae the display for the cahnge in classes
+    //        $(selector).DataTable().columns.adjust().responsive.recalc();
+    //    }
+    //}
+    //}
 }

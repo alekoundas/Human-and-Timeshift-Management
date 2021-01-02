@@ -188,6 +188,7 @@
             .AddColumn(false, false, "WorkPlaceTitle")
             .AddColumn(false, false, "WorkHourDate")
             .AddColumn(false, false, "RealWorkHourDate")
+            .FixedLeftColums(2)
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'ProjectionDifference';
                 if (GetSelectedWorkPlaceId() != '')

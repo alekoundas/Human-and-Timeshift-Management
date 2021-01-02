@@ -52,6 +52,7 @@
                     .AddColumn(true, true, "Title")
                     .AddColumn(true, true, "VatNumber")
                     .AddColumn(false, false, "Buttons")
+                    .FixedLeftColums(1)
                     .AjaxData((data, type, row, meta) => {
                         data.Predicate = 'CompanyIndex';
                         return JSON.stringify(data);
@@ -61,6 +62,8 @@
                             $(row).css('background-color', '#AAAFB4');
                     })
                     .CompleteDataTable();
+                //Hide annoying line on static cols
+                document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
             })
         </script>
     }

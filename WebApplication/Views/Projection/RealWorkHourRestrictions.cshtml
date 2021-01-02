@@ -141,6 +141,7 @@
             .AddColumn(false, false, "RealWorkHour_End")
             .AddColumn(false, false, "WorkHourRestriction_Max")
             .AddColumn(false, false, "WorkHourRestriction_Sum")
+            .FixedLeftColums(2)
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'ProjectionRealWorkHourRestrictions';
                 if (GetSelectedWorkPlaceId() != '')
@@ -153,5 +154,6 @@
                 return JSON.stringify(data);
             })
             .CompleteDataTable();
+
     </script>
 }

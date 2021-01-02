@@ -123,6 +123,7 @@
                 .AddColumn(true, true, "VatNumber")
                 .AddColumn(true, true, "WorkPlace_RealWorkHour")
                 .AddColumn(false, false, "Today")
+                .FixedLeftColums(2)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionPresenceDaily';
                     if (GetSelectedWorkPlaceId() != '')

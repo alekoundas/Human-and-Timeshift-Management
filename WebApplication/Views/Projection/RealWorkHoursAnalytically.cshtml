@@ -140,6 +140,7 @@
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
                 .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
+                .FixedLeftColums(2)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionRealWorkHoursAnalytically';
                     if (GetSelectedWorkPlaceId() != '')

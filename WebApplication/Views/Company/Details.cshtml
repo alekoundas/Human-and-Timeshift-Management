@@ -44,14 +44,14 @@
                 <div class="form-group">
                     <label asp-for="CreatedBy_FullName" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="CreatedBy_FullName" class="form-control" readonly disabled/>
+                        <input asp-for="CreatedBy_FullName" class="form-control" readonly disabled />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="CreatedOn" class="control-label"></label>
                     <div class="input-group">
-                        <input asp-for="CreatedOn" class="form-control" readonly disabled/>
+                        <input asp-for="CreatedOn" class="form-control" readonly disabled />
                     </div>
                 </div>
 
@@ -115,6 +115,7 @@
             .AddColumn(true, true, "ScpecializationName")
             .AddColumn(true, true, "CompanyTitle")
             .AddColumn(true, true, "IsInCompany")
+            .FixedLeftColums(2)
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'CompanyDetail';
                 data.genericId =@Model.Id;
@@ -126,5 +127,7 @@
                     off: 'Όχι'
                 }))
             .CompleteDataTable());
+        //Hide annoying line on static cols
+        document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
     </script>
 }
