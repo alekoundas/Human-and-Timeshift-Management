@@ -349,28 +349,20 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.Employee = null));
             entities.ForEach(x => x.Leaves.ToList().ForEach(y => y.Employee = null));
-            //Extra needed data
-
-            //var workHours = await _baseDatawork.WorkHours.Where(x =>
-            //         x.TimeShiftId == _datatable.GenericId &&
-            //         x.StartOn.Year == _datatable.TimeShiftYear &&
-            //         x.StartOn.Month == _datatable.TimeShiftMonth)
-            //     .ToDynamicListAsync<WorkHour>();
-
-            //var leaves = await _baseDatawork.Leaves.Where(x =>
-            //       x.StartOn.Year == _datatable.TimeShiftYear &&
-            //       x.StartOn.Month == _datatable.TimeShiftMonth)
-            //   .ToDynamicListAsync<Leave>();
 
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Employee>();
             var returnObjects = new List<ExpandoObject>();
+            var autoIncrementNumber = 0;
 
             foreach (var result in entities)
             {
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
+
+                if (_datatable.MakePrintable)
+                    dictionary.Add("AutoIncrementNumber", ++autoIncrementNumber);
 
                 for (int i = 0; i < DateTime.DaysInMonth(_datatable.TimeShiftYear, _datatable.TimeShiftMonth); i++)
                     dictionary.Add("Day_" + i, dataTableHelper
@@ -407,11 +399,15 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Employee>();
             var returnObjects = new List<ExpandoObject>();
-
+            var autoIncrementNumber = 0;
             foreach (var result in entities)
             {
                 var expandoObj = expandoService.GetCopyFrom<Employee>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
+
+
+                if (_datatable.MakePrintable)
+                    dictionary.Add("AutoIncrementNumber", ++autoIncrementNumber);
 
                 for (int i = 0; i < DateTime.DaysInMonth(_datatable.TimeShiftYear, _datatable.TimeShiftMonth); i++)
                     dictionary.Add("Day_" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
@@ -443,11 +439,44 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
-            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.Employee = null));
-            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.TimeShift = null));
-            entities.ForEach(x => x.Leaves.ToList().ForEach(y => y.Employee = null));
-            entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.Employee = null));
-            entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.TimeShift = null));
+            //if (_datatable.GenericId != 0)
+            //    entities.ForEach(x => x.RealWorkHours = x.RealWorkHours.Where(y => y.TimeShiftId == _datatable.GenericId).ToList());
+
+
+            entities = entities.Select(x => new Employee
+            {
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                ErpCode = x.ErpCode,
+                IsActive = x.IsActive,
+                RealWorkHours = x.RealWorkHours.Select(y => new RealWorkHour
+                {
+                    Comments = y.Comments,
+                    StartOn = y.StartOn,
+                    EndOn = y.EndOn,
+                    TimeShiftId = y.TimeShiftId
+                }).ToList(),
+                WorkHours = x.WorkHours.Select(y => new WorkHour
+                {
+                    Comments = y.Comments,
+                    StartOn = y.StartOn,
+                    EndOn = y.EndOn,
+                    IsDayOff = y.IsDayOff,
+                    TimeShiftId = y.TimeShiftId
+                }).ToList(),
+                Leaves = x.Leaves.Select(y => new Leave
+                {
+                    StartOn = y.StartOn,
+                    EndOn = y.EndOn
+                }).ToList(),
+            }).ToList();
+
+
+            //entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.TimeShift = null));
+            //entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.Employee = null));
+            //entities.ForEach(x => x.Leaves.ToList().ForEach(y => y.Employee = null));
+            //entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.TimeShift = null));
+            //entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.Employee = null));
 
             //Extra needed data
             var timeshifts = await _baseDatawork.TimeShifts

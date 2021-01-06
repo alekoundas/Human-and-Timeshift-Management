@@ -95,6 +95,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             //break loop reference
             entities.ForEach(x => x.RealWorkHours.ToList().ForEach(x => x.TimeShift.RealWorkHours = null));
+            entities.ForEach(x => x.RealWorkHours.ToList().ForEach(x => x.Employee = null));
 
             //Mapping
             var expandoService = new ExpandoService();

@@ -91,36 +91,27 @@
 
         <div class="box box-danger" style="margin-top:5%;">
 
-            <div class="box-header">
-                <h3 class="box-title">@ViewData["EmployeeDataTable"]</h3>
+            <div class="box-header" style="width:50%;">
+                <h3 class="box-title">@ViewData["WorkPlaceDataTable"]</h3>
+                <div style="padding-top:5%">
+                    <h4> Προεραιτικά φίλτρα </h4>
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Τρόπος εμφάνισης χρόνου</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderShowHoursIn24h" checked>
+                        </div>
+                    </div>
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Μετατροπή σε εκτυπώσιμη μορφή </label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderMakePrintable">
+                        </div>
+                    </div>
+                </div>
             </div>
             <hr />
             <div class="box-body table-responsive">
-
-                <table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive stripe">
-                    <thead>
-                        <tr>
-                            <th>Επιλογή</th>
-                            <th>Επίθετο</th>
-                            <th>Όνομα</th>
-                            <th>ErpCode</th>
-                            @for (int i = 0; i < Model.DaysInMonth; i++)
-                            {
-                <th style="white-space: nowrap;" id="thDayNum_@i" class="TableDays"></th>}
-                        </tr>
-                    </thead>
-                    <tfoot>
-                        <tr>
-                            <th>Επιλογή</th>
-                            <th>Επίθετο</th>
-                            <th>Όνομα</th>
-                            <th>ErpCode</th>
-                            @for (int i = 0; i < Model.DaysInMonth; i++)
-                            {
-                <th style="white-space: nowrap;" id="tbDayNum_@i" class="TableDays" data-searchable="false"></th>}
-                        </tr>
-                    </tfoot>
-                </table>
+                <div id="DataTableDiv"></div>
             </div>
         </div>
     </div>
@@ -202,6 +193,7 @@
       });
 
     $(document).ready(function () {
+        AppendNewDataTableHTML();
         Datatable();
     });
     </script>
@@ -605,6 +597,12 @@
             }).done(response => ajaxResponse = response);
             return ajaxResponse;
         }
+
+        const GetSliderShowHoursIn24hValue = () =>
+            document.getElementById('SliderShowHoursIn24h').checked == true;
+
+        const GetSliderMakePrintableValue = () =>
+            document.getElementById('SliderMakePrintable').checked == true;
 
         const GetWorkHoursDateInputValuesPerDay = workHourId => {
             var response = [];
@@ -1267,7 +1265,7 @@
     <!--///////////////////////////////////////-->
     <!--    Modal 'Edit'  Functionality   -->
     <script>
-        $('#EmployeesWorkhoursDatatable').on('click', '.faIconEdit', (element) => {
+        $(document).on('click', '.faIconEdit', (element) => {
             var day = element.target.getAttribute('dayofmonth');
             var month = document.getElementById('Month').value;
             var year = document.getElementById('Year').value;
@@ -1491,7 +1489,7 @@
 
     <!--    Modal 'Add'  Functionality   -->
     <script>
-        $('#EmployeesWorkhoursDatatable').on('click', '.faIconAdd', (element) => {
+        $(document).on('click', '.faIconAdd', (element) => {
             var day = element.target.getAttribute('dayofmonth');
             var month = document.getElementById('Month').value;
             var year = document.getElementById('Year').value;
@@ -1645,7 +1643,7 @@
     <!--    Datatable Hover    -->
     <script>
         //Make Datatable cell set/unset backround grey and show/hide <i>
-        $('#EmployeesWorkhoursDatatable')
+        $(document)
             .on('mouseenter', '.DataTableHoverCell', (elem) =>
                 elem.target.querySelectorAll('i')
                     .forEach(element => element.classList.remove("hidden")))
@@ -1654,14 +1652,14 @@
                     .forEach(element => element.classList.add("hidden")));
 
         //Cursor change - mouse over <i> Edit
-        $('#EmployeesWorkhoursDatatable')
+        $(document)
             .on('mouseenter', '.faIconEdit', (elem) =>
                 elem.target.setAttribute("style", "cursor:pointer"))
             .on('mouseleave', '.faIconEdit', (elem) =>
                 elem.target.setAttribute("style", "cursor:"))
 
         //Cursor change - mouse over <i> Add
-        $('#EmployeesWorkhoursDatatable')
+        $(document)
             .on('mouseenter', '.faIconAdd', (elem) =>
                 elem.target.setAttribute("style", "cursor:pointer"))
             .on('mouseleave', '.faIconAdd', (elem) =>
@@ -1674,6 +1672,25 @@
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
+
+        //Filter Time BootstrapToggle
+        $('#SliderShowHoursIn24h').bootstrapToggle({
+            on: '24h',
+            off: '12h'
+        }).on('change', () =>
+            $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload());;
+
+        //Filter MakePrintable BootstrapToggle
+        $('#SliderMakePrintable').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι'
+        }).on('change', () => {
+            $('#EmployeesWorkhoursDatatable').DataTable().destroy();
+            document.getElementById('DataTableDiv').innerHTML = '';
+            AppendNewDataTableHTML();
+            Datatable(true);
+        });
+
         //Workplaces Select2
         $('.WorkPlace_Select2').select2({
             ajax: {
@@ -1900,21 +1917,38 @@
         };
 
         //Datatable
-        var Datatable = () =>
-            new DataTableService('#EmployeesWorkhoursDatatable')
-                .ForApiController('employees')
-                .StartOrderFromCol(1)
-                .AddColumn(true, true, "ToggleSlider")
+        var Datatable = (makePrintable) => {
+
+            var tableService = new DataTableService('#EmployeesWorkhoursDatatable')
+                .ForApiController('employees');
+
+            if (GetSliderMakePrintableValue())
+                tableService
+                    .AddColumn(true, true, "AutoIncrementNumber")
+                    .StartOrderFromCol(1);
+            else
+                tableService
+                    .StartOrderFromCol(0);
+
+            //.AddColumn(true, true, "ToggleSlider")
+            tableService
                 .AddColumn(true, true, "LastName")
-                .AddColumn(true, true, "FirstName")
-                .AddColumn(true, true, "ErpCode")
+                .AddColumn(true, true, "FirstName");
+
+            if (!GetSliderMakePrintableValue())
+                tableService
+                    .AddColumn(true, true, "ErpCode");
+
+            tableService
                 .AddColumnsFromCount(DateConstants().DaysInMonth, "Day_")
-                .FixedLeftColums(3)
+                .FixedLeftColums(2)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'TimeShiftEdit';
                     data.genericId = DateConstants().TimeShiftId;
                     data.timeShiftYear = DateConstants().Year;
                     data.timeShiftMonth = DateConstants().Month;
+                    data.makePrintable = GetSliderMakePrintableValue();
+                    data.showHoursIn24h = GetSliderShowHoursIn24hValue();
                     return JSON.stringify(data);
                 })
                 .FnDrawCallback(() => {
@@ -1925,40 +1959,70 @@
                 })
                 .RowCallback((row, data, displayNum, displayIndex, dataIndex) => {
                     for (var i = 1; i <= DateConstants().DaysInMonth; i++) {
-                        row.querySelectorAll('td')[i + 3]
+                        row.querySelectorAll('td')[i + 2]
                             .setAttribute("class", "DataTableHoverCell")
 
-                        row.querySelectorAll('td')[i + 3]
+                        row.querySelectorAll('td')[i + 2]
                             .setAttribute('style', 'background-color:' +
                                 $(data["Day" + i])
                                     .attr('cellcolor'))
                     }
                 })
-                .InitComplete(() => {
-                    [...document.getElementsByClassName('TableDays')]
-                        .forEach(tableHead => {
-                            var options = { weekday: 'long', day: 'numeric' };
-                            var day = tableHead.id.split('_')[1];
-
-                            var currDate = new Date(Date.UTC(DateConstants().Year,
-                                DateConstants().Month - 1, parseInt(day) + 1, 0, 0, 0));
-
-                            var dayToShow = currDate.toLocaleString('el-GR', options);
-
-                            document.getElementById('thDayNum_' + day)
-                                .innerHTML = dayToShow;
-
-                            document.getElementById('tbDayNum_' + day)
-                                .innerHTML = dayToShow;
-                        });
-                })
                 .CompleteDataTable();
-        //Hide annoying line on static cols
-        document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
+        }
     </script>
 
     <!--    Html Append -->
     <script>
+        const GetDaysColumns = () => {
+            var thElements = '';
+            for (var i = 0; i < DateConstants().DaysInMonth; i++) {
+                var colDate = new Date(Date.UTC(DateConstants().Year, DateConstants().Month - 1, 1, 0, 0, 0));;
+                colDate.setDate(colDate.getDate() + i);
+                thElements += CreateThElement(colDate, i);
+            }
+            return thElements;
+        };
+        const CreateThElement = (date, i) => {
+            if (GetSliderMakePrintableValue())
+                return '<th style="white-space: nowrap;" class="TableDays" id="thDayNum_' + i + '">' +
+                    date.toLocaleString('el-GR', { weekday: 'long', day: 'numeric' })[0] +
+                    date.toLocaleString('el-GR', { weekday: 'long', day: 'numeric' })[1] +
+                    " " + ++i +
+                    '</th>';
+            else
+                return '<th style="white-space: nowrap;" class="TableDays" id="thDayNum_' + i + '">' +
+                    date.toLocaleString('el-GR', { weekday: 'long', day: 'numeric' }) +
+                    '</th>';
+        }
+
+        AppendNewDataTableHTML = () =>
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive">' +
+                '<table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                (GetSliderMakePrintableValue() ? '<th>A/A</th>' : "") +
+                //'<th>Επιλογή</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
+                (GetSliderMakePrintableValue() ? '' : '<th>Erp Code</th>') +
+                GetDaysColumns() +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                (GetSliderMakePrintableValue() ? '<th>A/A</th>' : "") +
+                //'<th>Επιλογή</th>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' + '' +
+                (GetSliderMakePrintableValue() ? '' : '<th>Erp Code</th>') +
+                GetDaysColumns() +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
+                '');
         AppendNewWorkHourToAddModal = (workHourId) =>
             document.getElementById('AddWorkHour_ModalBody').insertAdjacentHTML('beforeend',
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + workHourId + '" id="WorkHourDivNum_' + workHourId + '">' +

@@ -54,8 +54,16 @@ namespace DataAccess.Libraries.Datatable
 
         [JsonPropertyName("timeShiftYear")]
         public int TimeShiftYear { get; set; }
+
         [JsonPropertyName("timeShiftMonth")]
         public int TimeShiftMonth { get; set; }
+
+        [JsonPropertyName("makePrintable")]
+        public bool MakePrintable { get; set; }
+
+        [JsonPropertyName("showHoursIn24h")]
+        public bool ShowHoursIn24h { get; set; }
+
 
         //Difference
 

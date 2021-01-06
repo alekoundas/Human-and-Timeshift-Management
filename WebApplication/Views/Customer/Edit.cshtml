@@ -21,6 +21,7 @@
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="IsActive" />
                 <input type="hidden" asp-for="CreatedBy_Id" />
+                <input type="hidden" asp-for="CreatedBy_FullName" />
 
                 <div class="box-body">
 
@@ -86,8 +87,7 @@
                             <select class="Company_Select2" asp-for="CompanyId" style="width:70%">
                                 @if (Model.Company != null)
                                 {
-                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>
-}
+                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>}
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>

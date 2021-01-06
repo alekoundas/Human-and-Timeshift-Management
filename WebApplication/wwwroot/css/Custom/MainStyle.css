@@ -9,3 +9,8 @@
     font-size: 12px;
     line-height: 1.42857;
 }
+
+/* DataTable fixedxolumns bug always showws annoying overflow*/
+.DTFC_LeftBodyLiner {
+    overflow-y: hidden !important;
+}

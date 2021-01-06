@@ -143,29 +143,33 @@ namespace Bussiness.Helpers
                    x.TimeShiftId == datatable.GenericId &&
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day)) //&&
-                                                                               //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
-                                                                               //x.EmployeeId == employeeId)
+                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day))
                 .ToList();
 
             var cellLeaves = employee.Leaves.Where(x =>
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day)) //&&
-                                                                               //(x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day) &&
-                                                                               //x.EmployeeId == employeeId)
+                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day))
                 .ToList();
 
-            var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
+            var strToReturn = "<div style='width:120px; white-space: nowrap;'>";
 
             if (cellWorkHours.Any(x => x.IsDayOff))
-                strToReturn +=
-                    "<center><p><b>Ρεπό</b></p></center>";
+                if (datatable.MakePrintable)
+                    strToReturn += "<center><p><b>Ρ</b></p></center>";
+                else
+                    strToReturn += "<center><p><b>Ρεπό</b></p></center>";
 
             if (cellLeaves.Count() > 0)
-                return "<div style='width:110px; white-space: nowrap;'>" +
-                 "<center><p><b>Άδεια</b></p></center>" +
-                  "</div>";
+                if (datatable.MakePrintable)
+                    return "<div style='width:110px; white-space: nowrap;'>" +
+                        "<center><p><b>ΚΑ</b></p></center>" +
+                        "</div>";
+                else
+                    return "<div style='width:110px; white-space: nowrap;'>" +
+                        "<center><p><b>Άδεια</b></p></center>" +
+                        "</div>";
+
             else
                 foreach (var cellWorkHour in cellWorkHours)
                 {
@@ -191,17 +195,62 @@ namespace Bussiness.Helpers
                                 0,
                                 0);
 
+                    //build cell html for current date 
                     if (!cellWorkHour.IsDayOff)
                     {
-                        strToReturn +=
-                        "<div style='width:50px;display:block; float: left;'> " +
-                        celStartOn.ToShortTimeString() +
-                        "</div>";
+                        //start on
+                        if (datatable.ShowHoursIn24h)
+                            if (datatable.MakePrintable)
+                            {
+                                strToReturn += "<div style='width:18px;display:block; float: left;'> ";
+                                strToReturn += celStartOn.ToString("HH");
+                            }
+                            else
+                            {
+                                strToReturn += "<div style='width:38px;display:block; float: left;'> ";
+                                strToReturn += celStartOn.ToString("HH:mm");
+                            }
+                        else
+                        {
+                            strToReturn += "<div style='width:50px;display:block; float: left;'> ";
+                            strToReturn += celStartOn.ToShortTimeString();
+                        }
 
-                        strToReturn +=
-                        "<div style='width:50px; display:block; float: right;'>" +
-                        celEndOn.ToShortTimeString() +
-                        "</div>";
+                        // "-" or "--"
+                        strToReturn += "</div>";
+                        if (datatable.MakePrintable)
+                        {
+                            strToReturn += "<div style='width:12px;display:block; float: left;'> ";
+                            strToReturn += "--";
+                        }
+                        else
+                        {
+                            strToReturn += "<div style='width:8px;display:block; float: left;'> ";
+                            strToReturn += "-";
+                        }
+                        strToReturn += "</div>";
+
+                        //End on
+                        if (datatable.ShowHoursIn24h)
+                        {
+                            strToReturn += "<div style='width:38px; display:block; float: left;'>";
+                            if (datatable.MakePrintable)
+                                strToReturn += celEndOn.ToString("HH");
+                            else
+                                strToReturn += celEndOn.ToString("HH:mm");
+                        }
+                        else
+                        {
+                            strToReturn += "<div style='width:50px; display:block; float: left;'>";
+                            strToReturn += celEndOn.ToShortTimeString();
+                        }
+
+                        strToReturn += "</div>";
+
+                        //strToReturn +=
+                        //"<div style='width:50px; display:block; float: right;'>" +
+                        //celEndOn.ToShortTimeString() +
+                        //"</div>";
                     }
                 }
 

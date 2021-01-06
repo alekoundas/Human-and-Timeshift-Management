@@ -1955,7 +1955,7 @@
             new DataTableService('#EmployeesWorkhoursDatatable')
                 .ForApiController('employees')
                 .StartOrderFromCol(1)
-                .AddColumn(true, true, "ToggleSlider")
+                //.AddColumn(true, true, "ToggleSlider")
                 .AddColumn(true, true, "LastName")
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
@@ -1984,10 +1984,10 @@
                 })
                 .RowCallback((row, data, displayNum, displayIndex, dataIndex) => {
                     for (var i = 1; i <= GetDaysInMonth(); i++) {
-                        row.querySelectorAll('td')[i + 3]
+                        row.querySelectorAll('td')[i + 2]
                             .setAttribute("class", "DataTableHoverCell")
 
-                        row.querySelectorAll('td')[i + 3]
+                        row.querySelectorAll('td')[i + 2]
                             .setAttribute('style', 'background-color:' +
                                 $(data["Day" + i])
                                     .attr('cellcolor'))
@@ -2038,7 +2038,7 @@
                 '<table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive stripe">' +
                 '<thead>' +
                 '<tr>' +
-                '<th>Επιλογή</th>' +
+                //'<th>Επιλογή</th>' +
                 '<th>Επίθετο</th>' +
                 '<th>Όνομα</th>' +
                 '<th>Erp Code</th>' +
@@ -2047,7 +2047,7 @@
                 '</thead>' +
                 '<tfoot>' +
                 '<tr>' +
-                '<th>Επιλογή</th>' +
+                //'<th>Επιλογή</th>' +
                 '<th>Επίθετο</th>' +
                 '<th>Όνομα</th>' + '' +
                 '<th>Erp Code</th>' +
