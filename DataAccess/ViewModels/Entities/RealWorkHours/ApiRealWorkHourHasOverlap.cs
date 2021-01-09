@@ -1,11 +1,10 @@
-﻿using DataAccess.Models.Audit;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
 namespace DataAccess.ViewModels
 {
-    public class ApiRealWorkHourHasOverlap : BaseEntity
+    public class ApiRealWorkHourHasOverlap
     {
         [JsonProperty(PropertyName = "startOn", Required = Required.Default)]
         public DateTime StartOn { get; set; }

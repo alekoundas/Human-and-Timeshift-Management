@@ -167,6 +167,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
                 }
             }
 
@@ -326,6 +327,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
                 }
             }
         }
@@ -459,15 +461,16 @@ namespace Business.Seed
             CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "Export");
 
             //Projection
-            CreateRole(roleManager, "ProjectionDifference",                  "Προβολή_Διαφορές", "View");
-            CreateRole(roleManager, "ProjectionConcentric",                  "Προβολή_Συγκεντρωτικό", "View");
-            CreateRole(roleManager, "ProjectionRealWorkHoursAnalytically",   "Προβολή_Π.ΒάρδιεςΑναλ", "View");
-            CreateRole(roleManager, "ProjectionRealWorkHoursAnalyticallySum","Προβολή_Π.ΒάρδιεςΑναλΩρες", "View");
-            CreateRole(roleManager, "ProjectionRealWorkHoursSpecificDates",  "Προβολή_ΕπιλεγμένεςΗμ", "View");
-            CreateRole(roleManager, "ProjectionEmployeeRealHoursSum",        "Προβολή_ώρεςΑναΕργαζ", "View");
-            CreateRole(roleManager, "ProjectionPresenceDaily",               "Προβολή_ΠαρουσίεςΗμ", "View");
-            CreateRole(roleManager, "ProjectionRealWorkHourRestrictions",    "Προβολή_ΠαρουσίεςΗμ", "View");
-            CreateRole(roleManager, "ProjectionTimeShiftSuggestions",        "Προβολή_ΥποδείξειςΧρονοδιαγράμματος", "View");
+            CreateRole(roleManager, "ProjectionDifference", "Προβολή_Διαφορές", "View");
+            CreateRole(roleManager, "ProjectionConcentric", "Προβολή_Συγκεντρωτικό", "View");
+            CreateRole(roleManager, "ProjectionRealWorkHoursAnalytically", "Προβολή_Π.ΒάρδιεςΑναλ", "View");
+            CreateRole(roleManager, "ProjectionRealWorkHoursAnalyticallySum", "Προβολή_Π.ΒάρδιεςΑναλΩρες", "View");
+            CreateRole(roleManager, "ProjectionRealWorkHoursSpecificDates", "Προβολή_ΕπιλεγμένεςΗμ", "View");
+            CreateRole(roleManager, "ProjectionEmployeeRealHoursSum", "Προβολή_ώρεςΑναΕργαζ", "View");
+            CreateRole(roleManager, "ProjectionPresenceDaily", "Προβολή_ΠαρουσίεςΗμ", "View");
+            CreateRole(roleManager, "ProjectionRealWorkHourRestrictions", "Προβολή_ΠαρουσίεςΗμ", "View");
+            CreateRole(roleManager, "ProjectionTimeShiftSuggestions", "Προβολή_ΥποδείξειςΧρονοδιαγράμματος", "View");
+            CreateRole(roleManager, "ProjectionHoursWithComments", "Προβολή_ΒάρδιεςΜεΣχόλια", "View");
 
         }
 

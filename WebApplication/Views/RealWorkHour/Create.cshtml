@@ -123,12 +123,10 @@
     <!--///             Handlers            ///-->
     <!--///////////////////////////////////////-->
     <script>
-        const HandleSubmitButton = () => {
+        const HandleSubmitButton = () =>
             [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
                 .filter(span => span.style.display == '').length > 0 ?
                 HideSaveButton() : ShowSaveButton();
-
-        }
 
         const HandleTimeRangeSpan = (response) => {
             if (response != undefined) {
@@ -191,12 +189,14 @@
                     }
         };
 
+        /**/
     </script>
 
     <!--///////////////////////////////////////-->
     <!--///             Validation          ///-->
     <!--///////////////////////////////////////-->
     <script>
+        /**/
         const ValidateEmployeesWithRangeToRealWorkhour = () => {
             var startOn = document.getElementById('StartOn').value;
             var endOn = document.getElementById('EndOn').value;
@@ -219,7 +219,6 @@
             var startOn = document.getElementById('StartOn').value;
             var endOn = document.getElementById('EndOn').value;
             var employeeIds = GetAlreadyAppendedEmployeeIds();
-
             $.ajax({
                 type: "POST",
                 url: '/api/workhours/employeebelongstoworkhour',
@@ -341,7 +340,7 @@
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
-
+        $(AppendDateRangeToDateInputs(TimeConverter(Date.now().valueOf()), TimeConverter(Date.now().valueOf()), false));
 
         var OnGoingTimeChanges = 0;
         $("#TimeRange").calentim({

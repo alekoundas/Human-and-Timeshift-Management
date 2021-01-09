@@ -124,35 +124,64 @@ namespace WebApplication.Api
         }
 
 
-        // GET: api/workplaces/select2
+        // POST: api/workplaces/select2
         [HttpPost("select2")]
-        public async Task<ActionResult<WorkPlace>> Select2([FromBody] Select2Get select2)
+        public async Task<ActionResult<WorkPlace>> Select2([FromBody] Select2 select2)
         {
             var workPlaces = new List<WorkPlace>();
             var select2Helper = new Select2Helper();
-            var total = await _baseDataWork.WorkPlaces.CountAllAsync();
-            var hasMore = (select2.Page * 10) < total;
             var filter = PredicateBuilder.New<WorkPlace>();
-            filter = filter.And(GetUserRoleFiltersAsync());
-
-            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
+            filter = filter.And(x => true);
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Customer>(HttpContext);
 
             if (!canShowDeactivated)
                 filter = filter.And(x => x.IsActive == true);
 
-            if (string.IsNullOrWhiteSpace(select2.Search))
-                workPlaces = (List<WorkPlace>)await _baseDataWork
-                     .WorkPlaces
-                     .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+            if (select2.FromEntityId != 0)
+                filter = filter.And(x => x.Id == select2.FromEntityId);
 
+            if (!string.IsNullOrWhiteSpace(select2.Search))
+                filter = filter.And(x => x.Title.Contains(select2.Search));
 
-            filter = filter.And(x => x.Title.Contains(select2.Search));
-            workPlaces = await _baseDataWork
-                .WorkPlaces
+            workPlaces = await _baseDataWork.WorkPlaces
                 .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+
+            var total = await _baseDataWork.WorkPlaces.CountAllAsyncFiltered(filter);
+            var hasMore = (select2.Page * 10) < total;
 
             return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
         }
+
+
+        // GET: api/workplaces/select2
+        //[HttpPost("select2")]
+        //public async Task<ActionResult<WorkPlace>> Select2([FromBody] Select2Get select2)
+        //{
+        //    var workPlaces = new List<WorkPlace>();
+        //    var select2Helper = new Select2Helper();
+        //    var total = await _baseDataWork.WorkPlaces.CountAllAsync();
+        //    var hasMore = (select2.Page * 10) < total;
+        //    var filter = PredicateBuilder.New<WorkPlace>();
+        //    filter = filter.And(GetUserRoleFiltersAsync());
+
+        //    var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
+
+        //    if (!canShowDeactivated)
+        //        filter = filter.And(x => x.IsActive == true);
+
+        //    if (string.IsNullOrWhiteSpace(select2.Search))
+        //        workPlaces = (List<WorkPlace>)await _baseDataWork
+        //             .WorkPlaces
+        //             .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+
+
+        //    filter = filter.And(x => x.Title.Contains(select2.Search));
+        //    workPlaces = await _baseDataWork
+        //        .WorkPlaces
+        //        .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+
+        //    return Ok(select2Helper.CreateWorkplacesResponse(workPlaces, hasMore));
+        //}
 
         // GET: api/workplaces/select2
         [HttpGet("select2")]

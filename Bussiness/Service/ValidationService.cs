@@ -56,7 +56,7 @@ namespace Bussiness.Service
                 if (skata.Count > 0)
                 {
 
-                    var zzz = "";
+                    //var zzz = "";
                 }
 
             }

@@ -34,8 +34,8 @@
                             <input id="SearchRangeInput" class="form-control" />
                         </div>
                         <div class="form-group" style=" padding-top:5%;">
-                            <label class="control-label">Τρόπος εμφάνισης χρόνου</label>&nbsp
-                            <input type="checkbox" class="filterSlider" id="SliderHourChoice">
+                            <label class="control-label">Φιλτράρισμα ανα</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderHourTypeChoice">
                         </div>
 
                     </div>
@@ -58,21 +58,27 @@
             </div>
             <hr />
             <div class="box-body table-responsive">
-                <table id="EmployeeRealHoursSumDatatable" class="table table-bordered table-hover table-responsive stripe">
+                <table id="EmployeeHoursWithCommentsDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>Erp Code</th>
+                            <th>Βάρδια</th>
+                            <th>Τύπος</th>
                             <th>Πόστο</th>
-                            <th>Σύνολο ώρες</th>
-                            <th>Σύνολο ώρες μέρα</th>
-                            <th>Σύνολο ώρες νύχτα</th>
+                            <th>Σχόλιο</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>Erp Code</th>
+                            <th>Βάρδια</th>
+                            <th>Τύπος</th>
                             <th>Πόστο</th>
-                            <th>Σύνολο ώρες</th>
-                            <th>Σύνολο ώρες μέρα</th>
-                            <th>Σύνολο ώρες νύχτα</th>
+                            <th>Σχόλιο</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -111,8 +117,8 @@
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
-        const GetSliderHourChoiceValue = () =>
-            document.getElementById('SliderHourChoice').checked != true;
+        const GetSliderHourTypeChoiceValue = () =>
+            document.getElementById('SliderHourTypeChoice').checked != true;
 
         const GetStartOn = () =>
             new Date(moment(document.getElementById('SearchRangeInput').value
@@ -136,15 +142,15 @@
     </script>
 
     <script>
-        $('#SliderHourChoice').bootstrapToggle({
-            on: 'HH:mm',
-            off: 'ώρες/8',
+        $('#SliderHourTypeChoice').bootstrapToggle({
+            on: 'Χρονοδιαγράμματος',
+            off: 'Πραγματικές',
             onstyle: 'primary',
             offstyle: 'primary'
         });
 
         $('.filterSlider').change(e =>
-            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+            $('#EmployeeHoursWithCommentsDatatable').DataTable().ajax.reload());
 
         $('#Employee_Select2').select2({
             placeholder: "Επέλεξε υπάλληλο",
@@ -157,7 +163,7 @@
                 data: (params) => JSON.stringify(BuildSelect2Dto(params))
             }
         }).on('change', () =>
-            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+            $('#EmployeeHoursWithCommentsDatatable').DataTable().ajax.reload());
 
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
@@ -170,7 +176,7 @@
                 data: (params) => JSON.stringify(BuildSelect2Dto(params))
             }
         }).on('change', () =>
-            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+            $('#EmployeeHoursWithCommentsDatatable').DataTable().ajax.reload());
 
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
@@ -193,18 +199,21 @@
                         calentim.setAttribute('style', 'width: 400px;'))
         });
 
-        var DestroyDataTable = () => $('#EmployeeRealHoursSumDatatable')
+        var DestroyDataTable = () => $('#EmployeeHoursWithCommentsDatatable')
             .DataTable().destroy();
 
         var CreateDataTable = () =>
-            new DataTableService('#EmployeeRealHoursSumDatatable')
+            new DataTableService('#EmployeeHoursWithCommentsDatatable')
                 .ForApiController('projections')
-                .AddColumn(true, true, "Title")
-                .AddColumn(false, false, "TotalHours")
-                .AddColumn(false, false, "TotalHoursDay")
-                .AddColumn(false, false, "TotalHoursNight")
+                .AddColumn(true, true, "LastName")
+                .AddColumn(false, false, "FirstName")
+                .AddColumn(false, false, "ErpCode")
+                .AddColumn(false, false, "Hour")
+                .AddColumn(false, false, "Hour_Type")
+                .AddColumn(false, false, "WorkPlace_Title")
+                .AddColumn(false, false, "Comment")
                 .AjaxData((data, type, row, meta) => {
-                    data.predicate = 'ProjectionEmployeeRealHoursSum';
+                    data.predicate = 'ProjectionHoursWithComments';
 
                     if (GetSelectedEmployeeId() != '')
                         data.filterByEmployeeId = GetSelectedEmployeeId();
@@ -214,13 +223,8 @@
 
                     data.StartOn = ConvertDateForApi(GetStartOn().valueOf());
                     data.EndOn = ConvertDateForApi(GetEndOn().valueOf());
-                    data.ShowHoursInPercentage = GetSliderHourChoiceValue();
+                    data.filterByRealWorkHour = GetSliderHourTypeChoiceValue();
                     return JSON.stringify(data);
-                })
-                .FooterCallback((row, data, start, end, display) => {
-                    row.children[1].innerHTML = "Σύνολο ώρες: " + data[0].TotalFooterHours;
-                    row.children[2].innerHTML = "Σύνολο ώρες μέρα: " + data[0].TotalFooterHoursDay;
-                    row.children[3].innerHTML = "Σύνολο ώρες νύχτα: " + data[0].TotalFooterHoursNight;
                 })
                 .CompleteDataTable();
 

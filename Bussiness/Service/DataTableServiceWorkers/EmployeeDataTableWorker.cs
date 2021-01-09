@@ -445,6 +445,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             entities = entities.Select(x => new Employee
             {
+                Id = x.Id,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 ErpCode = x.ErpCode,

@@ -109,16 +109,18 @@ namespace DataAccess.Libraries.Datatable
         [JsonProperty(PropertyName = "filterByIncludedWorkPlaces")]
         public bool FilterByIncludedWorkPlaces { get; set; }
 
-        [JsonProperty(PropertyName = "filterByWorkPlaceId", Required = Required.Default)]
+        [JsonProperty(PropertyName = "filterByWorkPlaceId")]
         public int FilterByWorkPlaceId { get; set; }
+        [JsonProperty(PropertyName = "filterByEmployeeId")]
+        public int FilterByEmployeeId { get; set; }
 
-        [JsonProperty(PropertyName = "filterByTimeShift", Required = Required.Default)]
+        [JsonProperty(PropertyName = "filterByTimeShift")]
         public int FilterByTimeShift { get; set; }
 
-        [JsonProperty(PropertyName = "filterByMonth", Required = Required.Default)]
+        [JsonProperty(PropertyName = "filterByMonth")]
         public int FilterByMonth { get; set; }
 
-        [JsonProperty(PropertyName = "filterByYear", Required = Required.Default)]
+        [JsonProperty(PropertyName = "filterByYear")]
         public int FilterByYear { get; set; }
 
     }

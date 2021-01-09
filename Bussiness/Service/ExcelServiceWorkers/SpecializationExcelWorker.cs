@@ -43,7 +43,7 @@ namespace Bussiness.Service.ExcelServiceWorkers
                 var Name = (exportedInstance.GetType().GetProperty("Name"))
                     .GetValue(exportedInstance);
 
-                hasValidationError = Name == "";
+                hasValidationError = (string)Name == "";
             }
             if (hasValidationError)
                 error = "Name";

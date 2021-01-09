@@ -49,7 +49,7 @@ namespace Bussiness.Service.ExcelServiceWorkers
                 var customerId = (int?)(exportedInstance.GetType().GetProperty("CustomerId"))
                     .GetValue(exportedInstance);
 
-                if (title == "" || customerId == 0)
+                if ((string)title == "" || customerId == 0)
                     hasValidationError = true;
             }
             if (hasValidationError)

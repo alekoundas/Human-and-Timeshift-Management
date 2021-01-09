@@ -84,5 +84,13 @@ namespace WebApplication.Controllers
             ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
             return View();
         }
+
+        [Authorize(Roles = "ProjectionHoursWithComments_View")]
+        public IActionResult HoursWithComments()
+        {
+            ViewData["Title"] = "Βάρδιες με σχόλια";
+            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            return View();
+        }
     }
 }

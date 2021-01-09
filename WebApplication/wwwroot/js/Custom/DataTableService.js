@@ -170,8 +170,6 @@
             footerCallback: this._footerCallback
         });
 
-        //Hide annoying line on static cols
-        //document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
     }
 
 

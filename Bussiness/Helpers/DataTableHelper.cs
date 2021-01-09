@@ -344,15 +344,54 @@ namespace Bussiness.Helpers
                                 0,
                                 0);
 
-                    strToReturn +=
-                        "<div style='width:50px;display:block; float: left;'> " +
-                        celStartOn.ToShortTimeString() +
-                        "</div>";
+                    //build cell html for current date 
+                    //start on
+                    if (datatable.ShowHoursIn24h)
+                    {
+                        strToReturn += "<div style='width:38px;display:block; float: left;'> ";
+                        strToReturn += celStartOn.ToString("HH:mm");
+                    }
+                    else
+                    {
+                        strToReturn += "<div style='width:50px;display:block; float: left;'> ";
+                        strToReturn += celStartOn.ToShortTimeString();
+                    }
 
-                    strToReturn +=
-                        "<div style='width:50px; display:block; float: right;'>" +
-                        celEndOn.ToShortTimeString() +
-                        "</div>";
+                    // "-" or "--"
+                    strToReturn += "</div>";
+                    strToReturn += "<div style='width:8px;display:block; float: left;'> ";
+                    strToReturn += "-";
+                    strToReturn += "</div>";
+
+                    //End on
+                    if (datatable.ShowHoursIn24h)
+                    {
+                        strToReturn += "<div style='width:38px; display:block; float: left;'>";
+                        strToReturn += celEndOn.ToString("HH:mm");
+                    }
+                    else
+                    {
+                        strToReturn += "<div style='width:50px; display:block; float: left;'>";
+                        strToReturn += celEndOn.ToShortTimeString();
+                    }
+
+                    strToReturn += "</div>";
+
+
+
+
+
+
+
+                    //strToReturn +=
+                    //    "<div style='width:50px;display:block; float: left;'> " +
+                    //    celStartOn.ToShortTimeString() +
+                    //    "</div>";
+
+                    //strToReturn +=
+                    //    "<div style='width:50px; display:block; float: left;'>" +
+                    //    celEndOn.ToShortTimeString() +
+                    //    "</div>";
 
                 }
                 strToReturn += "</div>";

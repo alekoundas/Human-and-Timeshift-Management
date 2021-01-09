@@ -53,6 +53,18 @@
 <div class="row">
     <div class="col-md-12">
         <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header" style="width:50%;">
+                <h3 class="box-title">@ViewData["WorkPlaceDataTable"]</h3>
+                <div style="padding-top:5%">
+                    <h4> Προεραιτικά φίλτρα </h4>
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Τρόπος εμφάνισης χρόνου</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderShowHoursIn24h" checked>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
             </div>
@@ -125,9 +137,10 @@
         var CelentimDate = "";
 
 
-        $(document).ready(function () {
-            Datatable();
-        });
+        //$(document).ready(() => {
+        //    AppendNewDataTableHTML();
+        //    InitDatatable();
+        //});
     </script>
 
 
@@ -530,20 +543,23 @@
     <script>
 
         //Datatable Filters
-        GetMonthFilterValue = () =>
+        const GetMonthFilterValue = () =>
             document.getElementById('MonthFilter').value;
 
-        GetMonthFilterValueMonth = () =>
+        const GetMonthFilterValueMonth = () =>
             document.getElementById('MonthFilter').value.split('/')[0];
 
-        GetMonthFilterValueYear = () =>
+        const GetMonthFilterValueYear = () =>
             document.getElementById('MonthFilter').value.split('/')[1];
 
-        GetWorkPlaceFilterValue = () =>
+        const GetWorkPlaceFilterValue = () =>
             $('#WorkPlace_Select2').find(':selected').val()
 
-        GetTimeShiftFilterValue = () =>
+        const GetTimeShiftFilterValue = () =>
             $('#TimeShift_Select2').find(':selected').val()
+
+        const GetSliderShowHoursIn24hValue = () =>
+            document.getElementById('SliderShowHoursIn24h').checked == true;
 
         const AjaxPost = async (url, data) => {
             var ajaxResponse;
@@ -1634,6 +1650,12 @@
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
+        //Filter Time BootstrapToggle
+        $('#SliderShowHoursIn24h').bootstrapToggle({
+            on: '24h',
+            off: '12h'
+        }).on('change', () =>
+            $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload());
 
         //Workplaces Filter
         $('#WorkPlace_Select2').select2({
@@ -1689,8 +1711,6 @@
                     DeleteDataTableHTML();
                     AppendNewDataTableHTML();
                     InitDatatable();
-                    //Hide annoying line on static cols
-                    document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
                 });
         });
 
@@ -1704,7 +1724,6 @@
                 AppendNewDataTableHTML();
                 InitDatatable();
                 //Hide annoying line on static cols
-                document.getElementsByClassName('DTFC_LeftBodyLiner')[0].style.overflowY = 'hidden';
                 //document.getElementById('MonthFilter').value = month + '/' + year;
                 //$('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
             }
@@ -1974,6 +1993,8 @@
                         }
                     else
                         data.genericId = GetTimeShiftFilterValue();
+
+                    data.showHoursIn24h = GetSliderShowHoursIn24hValue();
                     return JSON.stringify(data);
                 })
                 .FnDrawCallback(() => {
