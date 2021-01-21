@@ -168,6 +168,9 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
+
+                    //Administration
+                    userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
                 }
             }
 
@@ -328,6 +331,9 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
+
+                    //Administration
+                    userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
                 }
             }
         }
@@ -471,6 +477,8 @@ namespace Business.Seed
             CreateRole(roleManager, "ProjectionRealWorkHourRestrictions", "Προβολή_ΠαρουσίεςΗμ", "View");
             CreateRole(roleManager, "ProjectionTimeShiftSuggestions", "Προβολή_ΥποδείξειςΧρονοδιαγράμματος", "View");
             CreateRole(roleManager, "ProjectionHoursWithComments", "Προβολή_ΒάρδιεςΜεΣχόλια", "View");
+            //Administration
+            CreateRole(roleManager, "AdministrationBatchTimeshiftCreate", "Μαζική_δημ_χρονοδιαγραμμάτών", "View");
 
         }
 

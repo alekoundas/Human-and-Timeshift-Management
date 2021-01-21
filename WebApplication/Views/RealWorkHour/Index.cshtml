@@ -32,13 +32,14 @@
                             </div>
                         </div>
                     </div>
-                    <div style="width:50%; float:left;">
-                        <label class="control-label">Μήνας</label>
-                        <div class="input-group">
-                            <input id="MonthFilter" class="form-control" />
-                        </div>
+                    @*<div style="width:50%; float:left;">
+                            <label class="control-label">Μήνας</label>
+                            <div class="input-group">
+                                <input id="MonthFilter" class="form-control" />
+                            </div>
 
-                    </div>
+                        </div>*@
+                    <input id="MonthFilter" class="form-control" style="display:none;" />
                 </div>
 
 
@@ -1714,21 +1715,21 @@
                 });
         });
 
-        //Month Filter
-        $('#MonthFilter').MonthPicker({
-            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
-            OnAfterChooseMonth: () => {
-                $('#TimeShift_Select2').val([]).trigger('change');
-                DestroyDataTable();
-                DeleteDataTableHTML();
-                AppendNewDataTableHTML();
-                InitDatatable();
-                //Hide annoying line on static cols
-                //document.getElementById('MonthFilter').value = month + '/' + year;
-                //$('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
-            }
+        ////Month Filter
+        //$('#MonthFilter').MonthPicker({
+        //    Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
+        //    OnAfterChooseMonth: () => {
+        //        $('#TimeShift_Select2').val([]).trigger('change');
+        //        DestroyDataTable();
+        //        DeleteDataTableHTML();
+        //        AppendNewDataTableHTML();
+        //        InitDatatable();
+        //        //Hide annoying line on static cols
+        //        //document.getElementById('MonthFilter').value = month + '/' + year;
+        //        //$('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
+        //    }
 
-        });
+        //});
 
 
         //DayOff BootstrapToggle
@@ -1898,7 +1899,7 @@
                 format: "DD/MM/YYYY HH:mm",
                 hourFormat: 24,
                 calendarCount: 1,
-                minuteSteps: 15,
+                minuteSteps: 1,
                 showHeader: false,
                 showButtons: true,
                 locale: "el",
@@ -2005,13 +2006,13 @@
                 })
                 .RowCallback((row, data, displayNum, displayIndex, dataIndex) => {
                     for (var i = 1; i <= GetDaysInMonth(); i++) {
-                        row.querySelectorAll('td')[i + 2]
-                            .setAttribute("class", "DataTableHoverCell")
+                        var element = row.querySelectorAll('td')[i + 2];
+                        if (element) {
 
-                        row.querySelectorAll('td')[i + 2]
-                            .setAttribute('style', 'background-color:' +
-                                $(data["Day" + i])
-                                    .attr('cellcolor'))
+                            element.setAttribute("class", "DataTableHoverCell")
+                            element.setAttribute('style', 'background-color:' + $(data["Day" + i])
+                                .attr('cellcolor'))
+                        }
                     }
                 })
                 .CreatedRow((row, data, dataIndex) => {

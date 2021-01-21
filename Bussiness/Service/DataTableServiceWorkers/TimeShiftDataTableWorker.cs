@@ -85,9 +85,12 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<TimeShift>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
+                dictionary.Add("Title", result.Title);
+                dictionary.Add("Month", result.Month);
+                dictionary.Add("Year", result.Year);
                 dictionary.Add("Buttons", dataTableHelper
                     .GetButtons("TimeShift", "TimeShifts", result.Id.ToString()));
 

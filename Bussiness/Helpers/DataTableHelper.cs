@@ -310,9 +310,9 @@ namespace Bussiness.Helpers
 
             var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
 
-            if (cellWorkHours.Any(x => x.IsDayOff))
-                strToReturn +=
-                    "<center><p><b>Ρεπό</b></p></center>";
+            //if (cellWorkHours.Any(x => x.IsDayOff))
+            //    strToReturn +=
+            //        "<center><p><b>Ρεπό</b></p></center>";
 
             if (cellLeaves.Count() > 0)
                 return "<div style='width:110px; white-space: nowrap;'>" +
@@ -411,7 +411,8 @@ namespace Bussiness.Helpers
 
                 if (datatable.GenericId != 0)
                 {
-                    if (!cellWorkHours.Any(x => x.IsDayOff))
+                    //if (!cellWorkHours.Any(x => x.IsDayOff))
+                    if (true)
                     {
 
                         if (currentUserRoles.Contains("RealWorkHour_Create"))
@@ -471,6 +472,15 @@ namespace Bussiness.Helpers
                 "type='checkbox'" +
                 "data-onstyle='success'" +
                 "employeeId=" + employeeId +
+              ">";
+
+        public string GetCheckbox(int entityId, bool state)
+            => @"<input " +
+                "class='ToggleSliders'" +
+                "type='checkbox'" +
+                "data-onstyle='success'" +
+                "entityId='" + entityId + "'" +
+                (state ? "checked" : "") +
               ">";
 
         public string GetCurrentDayButtons(RealWorkHour realWorkHour)

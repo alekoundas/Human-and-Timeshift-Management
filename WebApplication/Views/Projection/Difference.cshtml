@@ -40,12 +40,13 @@
                             </div>
                         </div>
 
-                        <div style="width:100%; float:left;">
-                            <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
-                            <div class="input-group">
-                                <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
-                            </div>
-                        </div>
+                        @*<div style="width:100%; float:left;">
+                                <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
+                                <div class="input-group">
+                                    <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
+                                </div>
+                            </div>*@
+                        <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes" style="display:none;">
 
                     </div>
                 </div>
@@ -98,6 +99,26 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        const ConvertDateForApi = timeStamp =>
+            CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
+
+        CompleteTimeWithZerosForApiPost = date => {
+            var year = date.getFullYear();
+            var month = String((date.getMonth() + 1)).length == 1 ?
+                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+            var day = String(date.getDate()).length == 1 ?
+                '0' + date.getDate() : date.getDate();
+            var hour = String(date.getHours()).length == 1 ?
+                '0' + date.getHours() : date.getHours();
+            var min = String(date.getMinutes()).length == 1 ?
+                '0' + date.getMinutes() : date.getMinutes();
+
+            return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+        }
+
+
+
+
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
@@ -110,17 +131,13 @@
         const GetOffsetMinutesValue = () =>
             document.getElementById('OffsetMinutes').value;
 
-        const GetStartOn = () =>
-            moment(document.getElementById('SearchRangeInput').value
-                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm');
+        const GetStartOn = () => ConvertDateForApi(moment(document.getElementById('SearchRangeInput').value
+            .split('/-/')[0], 'DD/MM/YYYY').valueOf());
 
-        const GetEndOn = () => {
+        const GetEndOn = () =>
+            ConvertDateForApi(new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[0], 'DD/MM/YYYY').valueOf()).setHours(23, 59, 59).valueOf());
 
-            var date = new Date(moment(document.getElementById('SearchRangeInput').value
-                .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
-            date.setHours(23, 59, 59, 59);
-            return date
-        }
 
         const setHoursToMax = date => {
             var newDate = new Date(date);

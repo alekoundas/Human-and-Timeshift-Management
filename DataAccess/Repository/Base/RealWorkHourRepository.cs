@@ -118,9 +118,9 @@ namespace DataAccess.Repository.Base
             filter = filter.And(x => x.Employee.Id == employeeId);
             filter = filter.And(x => x.IsDayOff);
             if (isDayOff)
-                filter = filter.And(x => startOn.Day == x.StartOn.Day);
+                filter = filter.And(x => startOn.Date == x.StartOn.Date);
             else
-                filter = filter.And(x => startOn.Day == x.StartOn.Day);
+                filter = filter.And(x => startOn.Date == x.StartOn.Date);
             //filter = filter.And(x => startOn.Day != x.StartOn.Day);
 
             return Context.WorkHours

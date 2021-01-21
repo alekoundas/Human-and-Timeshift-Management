@@ -89,6 +89,9 @@ namespace DataAccess.Repository.Base
                 qry = orderingInfo(qry);
 
             qry = qry.Where(filter);
+
+            //var skata = qry.ToList();
+
             var DbF = Microsoft.EntityFrameworkCore.EF.Functions;
             qry = qry.Select(x => new Employee
             {

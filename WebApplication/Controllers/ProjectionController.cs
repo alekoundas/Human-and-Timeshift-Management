@@ -5,14 +5,6 @@ namespace WebApplication.Controllers
 {
     public class ProjectionController : MasterController
     {
-        //private readonly BaseDbContext _context;
-        //private BaseDatawork _baseDataWork;
-        //public ProjectionController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
-        //{
-        //    _context = BaseDbContext;
-        //    _baseDataWork = new BaseDatawork(BaseDbContext);
-        //}
-
         [Authorize(Roles = "ProjectionDifference_View")]
         public IActionResult Difference()
         {

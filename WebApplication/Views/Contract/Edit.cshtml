@@ -21,6 +21,8 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="CreatedBy_Id" />
                 <input type="hidden" asp-for="IsActive" />
+                <input type="hidden" asp-for="CreatedBy_FullName" />
+                <input type="hidden" asp-for="CreatedOn" />
 
                 <div class="box-body">
 
@@ -87,7 +89,8 @@
                             <select class="ContractMembership_Select2" asp-for="ContractMembershipId" style="width:50%">
                                 @if (Model.ContractMembership != null)
                                 {
-                    <option value="@Model.ContractMembershipId" selected="selected">@Model.ContractMembership.Name</option>}
+                    <option value="@Model.ContractMembershipId" selected="selected">@Model.ContractMembership.Name</option>
+}
                             </select>
                             <span asp-validation-for="ContractMembershipId" class="text-danger"></span>
                         </div>
@@ -99,7 +102,8 @@
                             <select class="ContractType_Select2" asp-for="ContractTypeId" style="width:50%">
                                 @if (Model.ContractType != null)
                                 {
-                    <option value="@Model.ContractTypeId" selected="selected">@Model.ContractType.Name</option>}
+                    <option value="@Model.ContractTypeId" selected="selected">@Model.ContractType.Name</option>
+}
                             </select>
                             <span asp-validation-for="ContractTypeId" class="text-danger"></span>
                         </div>
@@ -111,20 +115,6 @@
                         <div class="input-group">
                             <textarea asp-for="Description" class="form-control"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="CreatedBy_FullName" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="CreatedBy_FullName" class="form-control" readonly />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="CreatedOn" class="control-label"></label>
-                        <div class="input-group">
-                            <input asp-for="CreatedOn" class="form-control" readonly />
                         </div>
                     </div>
 

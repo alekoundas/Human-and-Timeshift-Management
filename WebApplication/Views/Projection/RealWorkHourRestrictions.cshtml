@@ -59,9 +59,6 @@
                 <table id="RealWorkHourRestrictionsDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
-                            <th>Όνομα</th>
-                            <th>Επίθετο</th>
-                            <th>ΑΦΜ</th>
                             <th>Πόστο</th>
                             <th>Βάρδια χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
@@ -71,9 +68,6 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th>Όνομα</th>
-                            <th>Επίθετο</th>
-                            <th>ΑΦΜ</th>
                             <th>Πόστο</th>
                             <th>Βάρδια Χρονογράμματος</th>
                             <th>Βάρδια πραγματική</th>
@@ -131,11 +125,8 @@
         })
 
         var table = new DataTableService('#RealWorkHourRestrictionsDatatable')
-            .ForApiController('RealWorkHours')
+            .ForApiController('projections')
             .StartOrderFromCol(0)
-            .AddColumn(true, true, "EmployeeFirstName")
-            .AddColumn(true, true, "EmployeeLastName")
-            .AddColumn(true, true, "EmployeeVatNumber")
             .AddColumn(true, true, "WorkPlaceTitle")
             .AddColumn(false, false, "RealWorkHour_Start")
             .AddColumn(false, false, "RealWorkHour_End")

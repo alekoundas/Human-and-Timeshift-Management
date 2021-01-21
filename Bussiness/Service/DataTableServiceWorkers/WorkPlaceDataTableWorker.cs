@@ -207,19 +207,12 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
 
             if (!_datatable.FilterByIncludedWorkPlaces)
-                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
+                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.EmployeeId == _datatable.GenericId));
 
             _filter = _filter.And(x => x.Customer.Company != null);
 
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
-
-            entities.ForEach(x => x.Customer.WorkPlaces = null);
-            entities.ForEach(x => x.Customer.Company = null);
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.EmployeeWorkPlaces = null));
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.Company = null));
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.RealWorkHours = null));
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.WorkHours = null));
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -228,11 +221,12 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(_datatable.GenericId, result.Id);
 
+                dictionary.Add("Title", result.Title);
                 dictionary.Add("CustomerName", result.Customer?.IdentifyingName);
 
                 if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == _datatable.GenericId))
@@ -256,19 +250,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.EmployeeWorkPlaces).ThenInclude(z => z.Employee));
 
             if (!_datatable.FilterByIncludedWorkPlaces)
-                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
+                _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.EmployeeId == _datatable.GenericId));
 
             _filter = _filter.And(x => x.Customer.Company != null);
 
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
-            entities.ForEach(x => x.Customer.WorkPlaces = null);
-            entities.ForEach(x => x.Customer.Company = null);
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.EmployeeWorkPlaces = null));
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.Company = null));
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.RealWorkHours = null));
-            entities.ForEach(x => x.EmployeeWorkPlaces.ToList().ForEach(y => y.Employee.WorkHours = null));
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<WorkPlace>();
@@ -276,11 +264,12 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(_datatable.GenericId, result.Id);
 
+                dictionary.Add("Title", result.Title);
                 dictionary.Add("CustomerName", result.Customer?.IdentifyingName);
 
                 if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == _datatable.GenericId))
@@ -307,6 +296,43 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var entities = await _baseDatawork.WorkPlaces
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
+            //Mapping
+            var expandoService = new ExpandoService();
+            var dataTableHelper = new DataTableHelper<WorkPlace>();
+            var returnObjects = new List<ExpandoObject>();
+
+            foreach (var result in entities)
+            {
+                var expandoObj = new ExpandoObject();
+                var dictionary = (IDictionary<string, object>)expandoObj;
+
+                dictionary.Add("Id", result.Id);
+                dictionary.Add("Title", result.Title);
+                dictionary.Add("CompanyTitle", result.Customer?.Company?.Title);
+                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
+
+                returnObjects.Add(expandoObj);
+            }
+            EntitiesMapped = returnObjects;
+            EntitiesTotal = await _baseDatawork.WorkPlaces.CountAllAsyncFiltered(_filter);
+
+            return this;
+        }
+
+        public async Task<WorkPlaceDataTableWorker> AdministrationBatchTimeshiftCreate()
+        {
+            var entities = new List<WorkPlace>();
+            var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
+            includes.Add(x => x.Include(y => y.Customer).ThenInclude(z => z.Company));
+            if (_datatable.FilterByMonth != 0 && _datatable.FilterByYear != 0)
+            {
+                _filter = _filter.And(x => !x.TimeShifts.Any(y =>
+                        y.Month == _datatable.FilterByMonth && y.Year == _datatable.FilterByYear));
+
+                entities = await _baseDatawork.WorkPlaces
+                    .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
+            }
+
             //entities.ForEach(x => x.Customer.Company.Customers = null);
             //Mapping
             var expandoService = new ExpandoService();
@@ -315,11 +341,12 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<WorkPlace>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                dictionary.Add("CompanyTitle", result.Customer?.Company?.Title);
-                dictionary.Add("IdentifyingName", result.Customer?.IdentifyingName);
+                dictionary.Add("Id", result.Id);
+                dictionary.Add("Title", result.Title);
+                dictionary.Add("Checkbox", dataTableHelper.GetCheckbox(result.Id, true));
 
                 returnObjects.Add(expandoObj);
             }

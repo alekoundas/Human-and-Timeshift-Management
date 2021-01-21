@@ -107,9 +107,14 @@ namespace Bussiness.Service.DataTableServiceWorkers
             foreach (var result in entities)
             {
 
-                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
+                dictionary.Add("LastName", result.LastName);
+                dictionary.Add("FirstName", result.FirstName);
+                dictionary.Add("ErpCode", result.ErpCode);
+                dictionary.Add("VatNumber", result.VatNumber);
+                dictionary.Add("IsActive", result.IsActive);
                 dictionary.Add("SpecializationName", result.Specialization?.Name);
 
                 if (result.Company != null)
@@ -347,8 +352,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
-            entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.Employee = null));
-            entities.ForEach(x => x.Leaves.ToList().ForEach(y => y.Employee = null));
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -358,8 +361,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
+
+                dictionary.Add("FirstName", result.FirstName);
+                dictionary.Add("LastName", result.LastName);
+                dictionary.Add("ErpCode", result.ErpCode);
+                dictionary.Add("IsActive", result.IsActive);
 
                 if (_datatable.MakePrintable)
                     dictionary.Add("AutoIncrementNumber", ++autoIncrementNumber);
@@ -392,9 +400,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
-            entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.Employee = null));
-            entities.ForEach(x => x.Leaves.ToList().ForEach(y => y.Employee = null));
-
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Employee>();
@@ -402,9 +407,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var autoIncrementNumber = 0;
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
+                dictionary.Add("FirstName", result.FirstName);
+                dictionary.Add("LastName", result.LastName);
+                dictionary.Add("ErpCode", result.ErpCode);
+                dictionary.Add("IsActive", result.IsActive);
 
                 if (_datatable.MakePrintable)
                     dictionary.Add("AutoIncrementNumber", ++autoIncrementNumber);
@@ -442,43 +451,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
             //if (_datatable.GenericId != 0)
             //    entities.ForEach(x => x.RealWorkHours = x.RealWorkHours.Where(y => y.TimeShiftId == _datatable.GenericId).ToList());
 
-
-            entities = entities.Select(x => new Employee
-            {
-                Id = x.Id,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                ErpCode = x.ErpCode,
-                IsActive = x.IsActive,
-                RealWorkHours = x.RealWorkHours.Select(y => new RealWorkHour
-                {
-                    Comments = y.Comments,
-                    StartOn = y.StartOn,
-                    EndOn = y.EndOn,
-                    TimeShiftId = y.TimeShiftId
-                }).ToList(),
-                WorkHours = x.WorkHours.Select(y => new WorkHour
-                {
-                    Comments = y.Comments,
-                    StartOn = y.StartOn,
-                    EndOn = y.EndOn,
-                    IsDayOff = y.IsDayOff,
-                    TimeShiftId = y.TimeShiftId
-                }).ToList(),
-                Leaves = x.Leaves.Select(y => new Leave
-                {
-                    StartOn = y.StartOn,
-                    EndOn = y.EndOn
-                }).ToList(),
-            }).ToList();
-
-
-            //entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.TimeShift = null));
-            //entities.ForEach(x => x.RealWorkHours.ToList().ForEach(y => y.Employee = null));
-            //entities.ForEach(x => x.Leaves.ToList().ForEach(y => y.Employee = null));
-            //entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.TimeShift = null));
-            //entities.ForEach(x => x.WorkHours.ToList().ForEach(y => y.Employee = null));
-
             //Extra needed data
             var timeshifts = await _baseDatawork.TimeShifts
                 .Where(x => x.Id == _datatable.GenericId)
@@ -504,10 +476,16 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
+                var daysinmonth = DateTime.DaysInMonth(compareYear, compareMonth);
 
-                for (int i = 0; i < DateTime.DaysInMonth(compareYear, compareMonth); i++)
+                dictionary.Add("FirstName", result.FirstName);
+                dictionary.Add("LastName", result.LastName);
+                dictionary.Add("ErpCode", result.ErpCode);
+                dictionary.Add("IsActive", result.IsActive);
+
+                for (int i = 0; i <= DateTime.DaysInMonth(compareYear, compareMonth); i++)
                     dictionary.Add("Day_" + i,
                          dataTableHelper.GetTimeShiftEditCellBodyRealWorkHours(
                              compareMonth, compareYear, i + 1, _datatable, result));

@@ -1,0 +1,201 @@
+﻿@model DataAccess.ViewModels.TimeShiftBatchCreate
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
+
+            <hr />
+
+            <div class="form-group">
+                <label class="control-label"> Επιλογή μήνα και έτους</label>
+                <div class="input-group" style="width:30%">
+                    <input type="text" id="MonthPicker" class="form-control" readonly />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Form"]</h3>
+            </div>
+
+            <hr />
+            <div style="padding:3%; text-align:center;">
+
+                <p>Προσθήκη επιλεγμένων πόστων απο τον πίνακα</p>
+                <button class="btn btn-primary " id="AppendWorkPlaces">Προσθήκη</button>
+            </div>
+
+            <hr />
+
+            <form asp-controller="Administration" asp-action="BatchTimeshiftCreate" method="post">
+                <div style="padding:3%; text-align:center;">
+                    <input type="hidden" asp-for="Year" />
+                    <input type="hidden" asp-for="Month" />
+
+                    <div id="AppendHTMLDiv"></div>
+                    <div id="AppendDataDiv"></div>
+
+                </div>
+
+                <hr />
+
+                <div class="form-group pull-right">
+                    <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                </div>
+            </form>
+
+
+
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div id="DataTableDiv">
+                <div class="box-body table-responsive">
+                    <table id="AdministrationBatchTimeshiftCreateDatatable" class="table table-bordered table-hover table-responsive stripe">
+                        <thead>
+                            <tr>
+                                <th>Πόστο</th>
+                                <th>Επιλογή</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Πόστο</th>
+                                <th>Επιλογή</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/jQueryMonthPicker/MonthPicker.js"></script>
+
+    <script>
+
+const GetMonthValue = () =>
+        document.getElementById('MonthPicker').value.split('/')[0];
+
+    const GetMonthValueLocalized = () => {
+        var objDate = new Date();
+        objDate.setDate(1);
+        objDate.setMonth(GetMonthValue() - 1);
+
+        return objDate.toLocaleString("el-gr", { month: "long" });
+    }
+
+    const GetYearValue = () =>
+        document.getElementById('MonthPicker').value.split('/')[1];
+
+    const GetDataTableData = (id) =>
+        $('#AdministrationBatchTimeshiftCreateDatatable').DataTable().rows().data()
+            .filter(data => data.Id == id)[0];
+
+    const GetSliderCheckedWorkPlaceIds = () =>
+        [...document.getElementsByClassName('ToggleSliders')]
+            .filter(slider => slider.checked)
+            .map(slider => slider.getAttribute('entityId'));
+
+    //set new name again on every input
+    const FixHTMLArrayIndex = () => {
+        var count = 0;
+        [...document.getElementsByClassName('WorkPlaceInputs')]
+            .forEach(input => input.localName = 'WorkPlaceIds[' + count++ + ']')
+    }
+
+    //Append WorkPlaces to div
+    $(document).on('click', '#AppendWorkPlaces', (e) => {
+        document.getElementById('AppendHTMLDiv').innerHTML = '';
+        var count = 0;
+        [...GetSliderCheckedWorkPlaceIds()].forEach((workPlaceId) =>
+            AppendHTMLToDiv(count++, workPlaceId))
+    });
+
+    //Delete WorkPlace
+    $(document).on('click', '.WorkPlaceDeleteButton', (e) => {
+        console.log(e.target);
+        var num = e.target.getAttribute('num')
+        document.getElementById('WorkPlaceRowNum_' + num).remove();
+        FixHTMLArrayIndex();
+    });
+    </script>
+
+    <script>
+        $('#MonthPicker').MonthPicker({
+            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
+            OnAfterChooseMonth: () => {
+                document.getElementById('Year').value = GetYearValue();
+                document.getElementById('Month').value = GetMonthValue();
+                $('#AdministrationBatchTimeshiftCreateDatatable').DataTable().ajax.reload();
+            }
+        });
+
+        $(() => new DataTableService('#AdministrationBatchTimeshiftCreateDatatable')
+            .ForApiController('workplaces')
+            .AddColumn(true, true, "Title")
+            .AddColumn(false, false, "Checkbox")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'AdministrationBatchTimeshiftCreate';
+                data.filterByMonth = 0;
+                data.filterByYear = 0;
+                if (GetMonthValue() != '') {
+                    data.filterByMonth = GetMonthValue();
+                    data.filterByYear = GetYearValue();
+                }
+                return JSON.stringify(data);
+            })
+            .FnDrawCallback(() => {
+                $('.ToggleSliders').bootstrapToggle({
+                    on: 'Ναί',
+                    off: 'Όχι'
+                })
+            })
+            .CompleteDataTable());
+    </script>
+
+    <script>
+        var AppendHTMLToDiv = (currNum, workPlaceId) =>
+            document.getElementById('AppendHTMLDiv').insertAdjacentHTML('beforeend',
+                '<div style="padding-left:40px;" class="row" id="WorkPlaceRowNum_' + currNum + '">' +
+                '<div style="width: 100%;">' +
+                '<div style="width: 60%; float: left;">' +
+                '<p>' + GetYearValue() + GetMonthValueLocalized() + ':  ' + GetDataTableData(workPlaceId).Title + '</p>' +
+                '<input class="WorkPlaceInputs" name="WorkPlaceIds[' + currNum + ']" value="' + workPlaceId + '"style="display:none;"/>' +
+                '</div >' +
+                '<div style="width: 5%; float: left;">&nbsp;</div >' +
+                '<div style="width: 20%; float: left;">' +
+                //'<button type="button" class= "btn btn-danger WorkPlaceDeleteButton" Num=' + currNum + '" > <i class="fa fa-trash"></i></button >' +
+                '</div >' +
+                '</div >' +
+                '</div >'
+            );
+    </script>
+}
