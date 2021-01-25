@@ -1,18 +1,14 @@
-﻿using Bussiness.Helpers;
-using DataAccess;
+﻿using DataAccess;
 using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 
 namespace Bussiness.Service.DataTableServiceWorkers
@@ -87,49 +83,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             return filter;
         }
 
-        public async Task<RealWorkHourDataTableWorker> RealWorkHourCurrentDay()
-        {
-            var includes = new List<Func<IQueryable<RealWorkHour>, IIncludableQueryable<RealWorkHour, object>>>();
-            includes.Add(x => x.Include(y => y.Employee));
-            includes.Add(x => x.Include(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
 
-
-            //Get todays realWorkHours
-            _filter = _filter.And(x => x.StartOn.Date == DateTime.Now.Date);
-
-            var entities = await _baseDatawork.RealWorkHours
-                .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
-
-
-            //Mapping
-            var expandoService = new ExpandoService();
-            var dataTableHelper = new DataTableHelper<RealWorkHour>();
-            var returnObjects = new List<ExpandoObject>();
-
-            foreach (var result in entities)
-            {
-                var expandoObj = expandoService.GetCopyFrom<RealWorkHour>(result);
-                var dictionary = (IDictionary<string, object>)expandoObj;
-
-                dictionary.Add("ToggleSlider", dataTableHelper
-                    .GetEmployeeCheckbox(_datatable, result.Id));
-
-                dictionary.Add("EmployeeFirstName", result.Employee.FirstName);
-                dictionary.Add("EmployeeLastName", result.Employee.LastName);
-                dictionary.Add("WorkPlaceTitle", result.TimeShift.WorkPlace.Title);
-                dictionary.Add("StartOn_string", result.StartOn.ToString("dd-mm-yyyy hh:mm"));
-                dictionary.Add("EndOn_string", result.EndOn.ToString("dd-mm-yyyy hh:mm"));
-
-                dictionary.Add("Buttons", dataTableHelper
-                    .GetCurrentDayButtons(result));
-
-                returnObjects.Add(expandoObj);
-            }
-            EntitiesMapped = returnObjects;
-            EntitiesTotal = await _baseDatawork.RealWorkHours.CountAllAsyncFiltered(_filter);
-
-            return this;
-        }
 
         //public async Task<RealWorkHourDataTableWorker> ProjectionRealWorkHourRestrictions()
         //{

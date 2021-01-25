@@ -80,7 +80,6 @@
     <ul class="treeview-menu">
         @Html.LinkButton("RealWorkHour", "Index", "Π.βάρδιες", "RealWorkHour_View")
         @Html.LinkButton("RealWorkHour", "Create", "Προσθήκη π.βάρδιας", "RealWorkHour_Create")
-        @Html.LinkButton("RealWorkHour", "CurrentDay", "Δηλωμένες π.βάρδιες ημέρας", "RealWorkHour_View")
     </ul>
 </li>}
 
@@ -138,20 +137,6 @@
     </ul>
 </li>}
 
-            <!-- DayOff-->
-            @if (Html.HasAnyChildButton("DayOff"))
-            {
-<li class="treeview ">
-    <a href="#">
-        <i class="fa fa-users "></i> <span>Ρεπό</span>
-        <span class="pull-right-container">
-            <i class="fa fa-angle-left pull-right"></i>
-        </span>
-    </a>
-    <ul class="treeview-menu">
-        @Html.LinkButton("TODO", "Index", "TODO")
-    </ul>
-</li>}
 
 
             <!-- Projections -->
@@ -166,13 +151,13 @@
                 @Html.LinkButton("Projection", "Concentric", "Συγκεντρωτικό", "ProjectionConcentric_View")
             </li>
             <li class="treeview-menu">
+                @Html.LinkButton("Projection", "ConcentricSpecificDates", "Συγκεντρωτικό Επιλ. Ημ.", "ProjectionConcentricSpecificDates_View")
+            </li>
+            <li class="treeview-menu">
                 @Html.LinkButton("Projection", "PresenceDaily", "Παρουσίες ημέρας", "ProjectionPresenceDaily_View")
             </li>
             <li class="treeview-menu">
                 @Html.LinkButton("Projection", "EmployeeRealHoursSum", "Ώρες ανα εργαζόμενο", "ProjectionEmployeeRealHoursSum_View")
-            </li>
-            <li class="treeview-menu">
-                @Html.LinkButton("Projection", "RealWorkHoursSpecificDates", "Επιλεγμένες ημερομηνίες", "ProjectionRealWorkHoursSpecificDates_View")
             </li>
             <li class="treeview-menu">
                 @Html.LinkButton("Projection", "TimeShiftSuggestions", "Υποδείξεις Χρονοδιαγράμματος", "ProjectionRealWorkHourRestrictions_View")
@@ -181,13 +166,19 @@
                 @Html.LinkButton("Projection", "HoursWithComments", "(Π)Βάρδιες με σχόλια", "ProjectionHoursWithComments_View")
             </li>
             <li class="treeview-menu">
+                @Html.LinkButton("Projection", "CurrentDay", "Π.βάρδιες ημέρας", "ProjectionCurrentDay_View")
+            </li>
+            <li class="treeview-menu">
+                @Html.LinkButton("Projection", "RealWorkHoursSpecificDates", "Π.Βάρδιες Επιλ. Ημ.", "ProjectionRealWorkHoursSpecificDates_View")
+            </li>
+            <li class="treeview-menu">
                 @Html.LinkButton("Projection", "RealWorkHoursAnalytically", "Π.Βάρδιες αναλυτικά", "ProjectionRealWorkHoursAnalytically_View")
             </li>
             <li class="treeview-menu">
                 @Html.LinkButton("Projection", "RealWorkHoursAnalyticallySum", "Π.Βάρδιες αναλυτικά σε ώρες", "ProjectionRealWorkHoursAnalyticallySum_View")
             </li>
             <li class="treeview-menu">
-                @Html.LinkButton("Projection", "RealWorkHourRestrictions", "Π.Βάρδιες - Έλεγχος υπέρβασης", "ProjectionRealWorkHourRestrictions_View")
+                @Html.LinkButton("Projection", "RealWorkHourRestrictions", "Π.Βάρδιες έλεγχος υπέρβασης", "ProjectionRealWorkHourRestrictions_View")
             </li>
 
 
@@ -287,26 +278,21 @@
 </li>}
 
             <!-- Administration -->
-            @*@if (Html.HasAnyChildButton("Administration"))*@
+            @if (Html.HasAnyChildButton("Administration"))
+            {
 
-            <li class="treeview ">
-                <a href="#">
-                    <i class="fa fa-building-o"></i> <span>Διαχειριση</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    @Html.LinkButton("Administration", "BatchTimeshiftCreate", "Μαζική δημ. χρονοδιαγράμματος", "AdministrationBatchTimeshiftCreate_View")
-                </ul>
-            </li>
-
-
-
-
-
-
-            @* Register *@
+<li class="treeview ">
+    <a href="#">
+        <i class="fa fa-building-o"></i> <span>Διαχειριση</span>
+        <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+        </span>
+    </a>
+    <ul class="treeview-menu">
+        @Html.LinkButton("Administration", "BatchTimeshiftCreate", "Μαζική δημ. χρονοδιαγράμματος", "AdministrationBatchTimeshiftCreate_View")
+    </ul>
+</li>
+ } @* Register *@
             <!-- Register -->
             @*<li class="treeview ">
                     <a href="#">

@@ -160,6 +160,8 @@ namespace Business.Seed
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionConcentric_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionCurrentDay_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionConcentricSpecificDates_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalytically_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalyticallySum_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursSpecificDates_View").Wait();
@@ -323,6 +325,8 @@ namespace Business.Seed
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionConcentric_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionCurrentDay_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionConcentricSpecificDates_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalytically_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursAnalyticallySum_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHoursSpecificDates_View").Wait();
@@ -468,7 +472,9 @@ namespace Business.Seed
 
             //Projection
             CreateRole(roleManager, "ProjectionDifference", "Προβολή_Διαφορές", "View");
+            CreateRole(roleManager, "ProjectionCurrentDay", "Προβολή_ΠαρουσίεςΗμέρας", "View");
             CreateRole(roleManager, "ProjectionConcentric", "Προβολή_Συγκεντρωτικό", "View");
+            CreateRole(roleManager, "ProjectionConcentricSpecificDates", "Προβολή_ΣυγκεντρωτικόΕπιλΗμ", "View");
             CreateRole(roleManager, "ProjectionRealWorkHoursAnalytically", "Προβολή_Π.ΒάρδιεςΑναλ", "View");
             CreateRole(roleManager, "ProjectionRealWorkHoursAnalyticallySum", "Προβολή_Π.ΒάρδιεςΑναλΩρες", "View");
             CreateRole(roleManager, "ProjectionRealWorkHoursSpecificDates", "Προβολή_ΕπιλεγμένεςΗμ", "View");

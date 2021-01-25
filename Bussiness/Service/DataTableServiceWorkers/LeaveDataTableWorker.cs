@@ -88,10 +88,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<Leave>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                 dictionary.Add("EmployeeFullName", result.Employee.FullName);
+                dictionary.Add("StartOn", result.StartOn);
+                dictionary.Add("EndOn", result.EndOn);
+                dictionary.Add("ApprovedBy", result.ApprovedBy);
                 dictionary.Add("LeaveTypeName", result.LeaveType.Name);
                 dictionary.Add("Buttons", dataTableHelper
                     .GetButtons("Leave", "Leaves", result.Id.ToString()));

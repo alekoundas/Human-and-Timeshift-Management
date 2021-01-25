@@ -13,10 +13,26 @@ namespace WebApplication.Controllers
             return View();
         }
 
+        [Authorize(Roles = "ProjectionCurrentDay_View")]
+        public IActionResult CurrentDay()
+        {
+            ViewData["Title"] = "Σύνολο πραγματικών βαρδιών ημέρας";
+            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            return View();
+        }
+
         [Authorize(Roles = "ProjectionConcentric_View")]
         public IActionResult Concentric()
         {
             ViewData["Title"] = "Συνγκεντρωτικό";
+            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            return View();
+        }
+
+        [Authorize(Roles = "ProjectionConcentricSpecificDates_View")]
+        public IActionResult ConcentricSpecificDates()
+        {
+            ViewData["Title"] = "Συνγκεντρωτικό με επιλεγμένες ημερομηνίες";
             ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
             return View();
         }

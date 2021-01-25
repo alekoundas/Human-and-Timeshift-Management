@@ -1,0 +1,308 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
+
+            <hr />
+
+
+            <div class="box-body">
+                <div style="width:100%;">
+                    <div style="width:50%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Πόστο</label>
+                            <div class="input-group" style="width:100%">
+                                <select id="WorkPlace_Select2" style="width:70%"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div style="width:50%; float:left;">
+                        <div style="width:80%; float:left;">
+                            <label class="control-label">Χρονικό έυρος</label>
+                        </div>
+                        <div style="width:20%; float:left;">
+                            <button type="button" id="AppendCalentim" class="btn btn-success"><i class="fa fa-plus"></i></button>
+                        </div>
+                        <div style="width:100%; float:left;">
+                            <div id="CalentimDiv"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width:100%;">
+                    <div style="width:100%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Τρόπος εμφάνισης χρόνου</label>&nbsp
+                            <input type="checkbox" class="filterSlider" id="SliderHourChoice">
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div id="DataTableDiv">
+                <div class="box-body table-responsive">
+                    <table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive stripe">
+                        <thead>
+                            <tr>
+                                <th>Επίθετο</th>
+                                <th>Όνομα</th>
+                                <th>Erp Code</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Επίθετο</th>
+                                <th>Όνομα</th>
+                                <th>Erp Code</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+
+        const ConvertDateForApi = timeStamp =>
+            CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
+
+        CompleteTimeWithZerosForApiPost = date => {
+            var year = date.getFullYear();
+            var month = String((date.getMonth() + 1)).length == 1 ?
+                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+            var day = String(date.getDate()).length == 1 ?
+                '0' + date.getDate() : date.getDate();
+            var hour = String(date.getHours()).length == 1 ?
+                '0' + date.getHours() : date.getHours();
+            var min = String(date.getMinutes()).length == 1 ?
+                '0' + date.getMinutes() : date.getMinutes();
+
+            return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+        }
+
+        const GetDaysToAppentNums = () =>
+            [...document.getElementsByClassName('CalentimInputs')]
+                .filter(input => input.value != '')
+                .map(input => input.id.split('_')[1]);
+        const GetCalentimValuesForApi = () =>
+            GetDaysToAppentNums().map(num => ConvertDateForApi(GetSelectedDate(num).valueOf()));
+
+        const GetSelectedWorkPlaceId = () =>
+            document.getElementById('WorkPlace_Select2').value;
+
+        const GetSliderHourChoiceValue = () =>
+            document.getElementById('SliderHourChoice').checked != true;
+
+        const GetStartOn = () =>
+            new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+
+        const GetEndOn = () => {
+            var date = new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+            date.setHours(23, 59, 59, 59);
+            return new Date(date);
+        }
+
+        const GetDaysDifferenceFromRange = () =>
+            Math.ceil(Math.abs(GetEndOn() - GetStartOn()) / (1000 * 60 * 60 * 24))
+
+        const setHoursToMax = date => {
+            var newDate = new Date(date);
+            newDate.setHours(23, 59, 59);
+            return moment(newDate);
+        }
+
+        var Count = 0;
+        $('#AppendCalentim').on('click', (e) => {
+            Count++;
+            AppendNewCalentimHTML(Count);
+            InitiateCalentim(Count);
+        });
+
+        $(document).on('click', '.DeleteCalentimButton', (e) =>
+            document.getElementById('CalnentimDivNum_' + e.target.id.split('_')[1])
+                .remove())
+    </script>
+
+    <script>
+        $('#SliderHourChoice').bootstrapToggle({
+            on: 'HH:mm',
+            off: 'ώρες/8',
+            onstyle: 'primary',
+            offstyle: 'primary'
+        });
+
+        $('.filterSlider').change(e =>
+            $('#EmployeesWorkHourConcentricDatatable').DataTable().ajax.reload());
+
+        $('#WorkPlace_Select2').select2({
+            placeholder: "Επέλεξε πόστο",
+            allowClear: true,
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        }).on('change', () =>
+            $('#EmployeesWorkHourConcentricDatatable').DataTable().ajax.reload());
+
+
+        const InitiateCalentim = num =>
+            $('#CalnentimNum_' + num).calentim({
+                showTimePickers: false,
+                startOnMonday: true,
+                showFooter: false,
+                singleDate: true,
+                calendarCount: 1,
+                //startDate:  Date.now(),
+                //endDate:  Date.now(),
+                format: "DD/MM/YYYY",
+                dateSeparator: '/-/',
+                locale: "el",
+                onafterselect: () => {
+                    DestroyDataTable();
+                    DeleteDataTableHTML();
+                    AppendNewDataTableHTML();
+                    CreateDataTable();
+                },
+                onaftershow: () =>
+                    //Fix Calentim width
+                    [...document.getElementsByClassName('calentim-input')]
+                        .forEach((calentim) =>
+                            calentim.setAttribute('style', 'width: 400px;'))
+            });
+
+        var CreateDataTable = () =>
+            new DataTableService('#EmployeesWorkHourConcentricDatatable')
+                .ForApiController('projections')
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "ErpCode")
+                //.AddColumn(false, false, "TotalHours")
+                //.AddColumn(false, false, "TotalHoursDay")
+                //.AddColumn(false, false, "TotalHoursNight")
+                //.AddColumn(false, false, "TotalHoursSaturdayDay")
+                //.AddColumn(false, false, "TotalHoursSaturdayNight")
+                //.AddColumn(false, false, "TotalHoursSundayDay")
+                //.AddColumn(false, false, "TotalHoursSundayNight")
+                .AddColumnsFromCount(GetDaysToAppentNums().length,
+                    "TotalHours_",
+                    "TotalHoursDay_",
+                    "TotalHoursNight_",
+                    "TotalHoursSaturdayDay_",
+                    "TotalHoursSaturdayNight_",
+                    "TotalHoursSundayDay_",
+                    "TotalHoursSundayNight_")
+
+                .FixedLeftColums(2)
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionConcentricSpecificDates';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+                    data.specificDates = GetCalentimValuesForApi()
+                    data.ShowHoursInPercentage = GetSliderHourChoiceValue();
+                    return JSON.stringify(data);
+                })
+                .FooterCallback((row, data, start, end, display) => {
+                    //row.children[3].innerHTML = "Σύνολο ώρες: " + data[0]?.TotalFooterHours;
+                    //row.children[4].innerHTML = "Σύνολο ώρες Μέρα: " + data[0]?.TotalFooterHoursDay;
+                    //row.children[5].innerHTML = "Σύνολο ώρες Νύχτα: " + data[0]?.TotalFooterHoursNight;
+                    //row.children[6].innerHTML = "Σύνολο ώρες Σάββατο Μέρα: " + data[0]?.TotalFooterSaturdayDay;
+                    //row.children[7].innerHTML = "Σύνολο ώρες Σάββατο Νύχτα: " + data[0]?.TotalFooterSaturdayNight;
+                    //row.children[8].innerHTML = "Σύνολο ώρες Κυριακή Μέρα: " + data[0]?.TotalFooterSundayDay;
+                    //row.children[9].innerHTML = "Σύνολο ώρες Κυριακή Νύχτα: " + data[0]?.TotalFooterSundayNight;
+                })
+                .CompleteDataTable();
+
+        $(document).ready(CreateDataTable());
+
+    </script>
+    <script>
+        const GetDaysColumns = () =>
+            GetDaysToAppentNums().map(num => CreateThElement(GetSelectedDate(num))).join();
+
+        const CreateThElement = (date) =>
+            '<th style="white-space: nowrap;">' +
+            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
+            ' ' +
+            date.getDate() +
+            ' ' +
+            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
+            '</th>';
+
+        const DeleteDataTableHTML = () =>
+            document.getElementById('DatatableDiv').remove();
+
+        var DestroyDataTable = () => $('#RealWorkHoursSpecificDatesDatatable')
+            .DataTable().destroy();
+
+        const AppendNewDataTableHTML = () =>
+            document.getElementById('AppendHere_Datatable').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive" id="DatatableDiv">' +
+                '<table id="RealWorkHoursSpecificDatesDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
+                '<th>Erp Code</th>' +
+                '<th>ΑΦΜ</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
+                '<th>Erp Code</th>' +
+                '<th>ΑΦΜ</th>' +
+                GetDaysColumns() +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
+                '');
+        const AppendNewCalentimHTML = num =>
+            document.getElementById('CalentimDiv').insertAdjacentHTML('beforeend', '' +
+                '<div  id="CalnentimDivNum_' + num + '">' +
+                '<div style="width:70%;float:left">' +
+                '<div class="input-group">' +
+                '<input  id="CalnentimNum_' + num + '" class="form-control CalentimInputs" />' +
+                '</div>' +
+                '</div>' +
+                '<div style="width:30%; float:left">' +
+                '<button type="button"  id="DeleteCalentimButtonNum_' + num + '" class="btn btn-danger DeleteCalentimButton"><i class="fa fa-trash DeleteCalentimButton" id="DeleteCalentimINum_' + num + '"></i></button>' +
+                '</div>' +
+                '</div>' +
+                '');
+    </script>
+
+}

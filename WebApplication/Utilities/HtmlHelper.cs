@@ -13,8 +13,8 @@ namespace WebApplication.Utilities
         public static IHtmlContent LinkButton(this IHtmlHelper html, string controller, string action, string buttonName, string permition = "")
         {
             var link = "href=/" + controller + "/" + action;
-            if (IsOkToShow(permition))
-                return new HtmlString("<li class=''><a " + link + " ><i class='fa fa-circle-o'></i> " + buttonName + " </a></li>");
+            if (IsOkToShow(permition) || controller == "Account")
+                return new HtmlString("<li class='user-body'><a " + link + " ><i class='fa fa-circle-o'></i> " + buttonName + " </a></li>");
 
             return new HtmlString("");
         }
@@ -66,6 +66,9 @@ namespace WebApplication.Utilities
 
         public static bool HasAnyChildButton(this IHtmlHelper html, string controller)
         {
+            if (controller == "Administration")
+                return IsOkToShowForNonEntity(controller + "_View");
+
             if (IsOkToShow(controller + "_View") || IsOkToShow(controller + "_Create"))
                 return true;
 
@@ -80,7 +83,17 @@ namespace WebApplication.Utilities
                 return httpContext.HttpContext.User.Claims.Any(x =>
                 x.Value.Split("_")[0] == permition.Split("_")[0] &&
                 x.Value.Split("_")[1] == permition.Split("_")[1]);
-            return true;
+            return false;
+        }
+        private static bool IsOkToShowForNonEntity(string permition)
+        {
+            var controller = permition.Split('_')[0];
+            httpContext = new HttpContextAccessor();
+
+            if (!String.IsNullOrEmpty(controller))
+                return httpContext.HttpContext.User.Claims
+                    .Any(x => x.Value.Contains(controller));
+            return false;
         }
 
     }

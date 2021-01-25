@@ -84,16 +84,14 @@ namespace DataAccess
             DateTime startOn, DateTime endOn, int employeeId)
         {
             var response = new List<ApiLeavesHasOverlapResponse>();
-            Expression<Func<Leave, bool>> leaveFilter = x =>
-                  ((x.StartOn <= startOn && startOn <= x.EndOn) ||
-                      (x.StartOn <= endOn && endOn <= x.EndOn) ||
-                      (startOn < x.StartOn && x.EndOn < endOn));
+            Expression<Func<Leave, bool>> leaveFilter =
+                x => x.EndOn.Date >= startOn.Date && x.StartOn.Date <= endOn.Date;
 
-            Expression<Func<WorkHour, bool>> WorkHourFilter = x =>
-                ((x.StartOn <= startOn && startOn <= x.EndOn) ||
-                (x.StartOn <= endOn && endOn <= x.EndOn) ||
-                (startOn < x.StartOn && x.EndOn < endOn));
+            Expression<Func<WorkHour, bool>> WorkHourFilter =
+                x => x.EndOn.Date >= startOn.Date && x.StartOn.Date <= endOn.Date;
 
+            Expression<Func<RealWorkHour, bool>> realWorkHourFilter =
+                x => x.EndOn.Date >= startOn.Date && x.StartOn.Date <= endOn.Date;
 
             await _dbcontext.WorkHours.Include(x => x.Employee)
                 .Where(WorkHourFilter)
@@ -107,6 +105,19 @@ namespace DataAccess
                         TypeOf = y.IsDayOff ? "DayOff" : "WorkHour"
                     })
                 );
+
+            await _dbcontext.RealWorkHours.Include(x => x.Employee)
+            .Where(realWorkHourFilter)
+            .Where(x => x.Employee.Id == employeeId)?
+            .ForEachAsync(y =>
+                response.Add(new ApiLeavesHasOverlapResponse
+                {
+                    Id = y.Id,
+                    EmployeeId = y.Employee.Id,
+                    GivenEmployeeId = employeeId,
+                    TypeOf = "RealWorkHour"
+                })
+            );
 
             await _dbcontext.Leaves.Include(x => x.Employee)
                 .Where(leaveFilter)

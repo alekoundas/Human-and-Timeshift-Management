@@ -123,5 +123,21 @@ namespace DataAccess.Libraries.Datatable
         [JsonProperty(PropertyName = "filterByYear")]
         public int FilterByYear { get; set; }
 
+        //TimeshifSuggestion
+        [JsonProperty(PropertyName = "filterByValidateOvertime")]
+        public bool FilterByValidateOvertime { get; set; }
+
+        [JsonProperty(PropertyName = "filterByValidateDayOfDaysPerWeek")]
+        public bool FilterByValidateDayOfDaysPerWeek { get; set; }
+
+        [JsonProperty(PropertyName = "filterByValidateWorkDaysPerWeek")]
+        public bool FilterByValidateWorkDaysPerWeek { get; set; }
+
+        [JsonProperty(PropertyName = "filterByValidateHoursPerWeek")]
+        public bool FilterByValidateHoursPerWeek { get; set; }
+
+        [JsonProperty(PropertyName = "filterByValidateWorkingHoursPerDay")]
+        public bool FilterByValidateWorkingHoursPerDay { get; set; }
+
     }
 }

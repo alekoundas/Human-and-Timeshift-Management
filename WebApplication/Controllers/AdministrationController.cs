@@ -2,7 +2,6 @@
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
@@ -46,7 +45,10 @@ namespace WebApplication.Controllers
                     TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
 
             }
-            return RedirectToAction(nameof(Index));
+            ViewData["Title"] = "Μαζική δημιουργια χρονοδιαγραμμάτών";
+            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Form"] = "Χρονοδιαγράμματα προς μαζική εισαγωγή";
+            return View();
         }
     }
 }

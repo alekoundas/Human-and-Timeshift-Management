@@ -110,7 +110,7 @@
             startOn: ConvertDateForApi(SetMinTime(GetInputValue('StartOn'))),
             endOn: ConvertDateForApi(SetMaxTime(GetInputValue('EndOn'))),
             description: GetDescription(),
-            employeeIds: employeeId == "" ?
+            employeeIds: employeeId == undefined ?
                 GetAlreadyAppendedEmployeeIds() : [employeeId]
         });
 
@@ -203,14 +203,13 @@
         const TranslateTypeToGreek = dbType => {
             switch (dbType) {
                 case 'DayOff':
-                    return 'ρεπό'
-                    break;
+                    return 'ρεπό';
                 case 'Leave':
-                    return 'άδεια'
-                    break;
+                    return 'άδεια';
                 case 'WorkHour':
-                    return 'βάρδια'
-                    break;
+                    return 'βάρδια';
+                case 'RealWorkHour':
+                    return 'πραγματική βάρδια';
 
             }
         };
@@ -386,7 +385,7 @@
                 '</div>' +
                 '<div style="width: 5%; float: left;">&nbsp;</div>' +
                 '<div style="width: 10%; float: left;">' +
-                '<button type = "button"  class="btn btn-danger DeleteEmployeeSelect2" id="DeleteEmployeeSelect2Num_' + Count + '"> <i class="fa fa-user DeleteEmployeeSelect2" id="DeleteEmployeeSelect2Num_' + Count + '"></i></button >' +
+                //'<button type = "button"  class="btn btn-danger DeleteEmployeeSelect2" id="DeleteEmployeeSelect2Num_' + Count + '"> <i class="fa fa-user DeleteEmployeeSelect2" id="DeleteEmployeeSelect2Num_' + Count + '"></i></button >' +
                 '</div >' +
                 '</div >' +
                 '</div>'
@@ -403,17 +402,17 @@
         });
 
 
-                            //Save Leaves
-                            //$('#SaveLeaves').on('click', (e) => {
-                            //    $.ajax({
-                            //        type: "POST",
-                            //        url: '/api/leaves/postleave',
-                            //        contentType: "application/json; charset=utf-8",
-                            //        dataType: "json",
-                            //        data: JSON.stringify(BuildSaveToDbDto())
-                            //    });
-                            //    window.location.href = 'index';
-                            //});
+                                                //Save Leaves
+                                                //$('#SaveLeaves').on('click', (e) => {
+                                                //    $.ajax({
+                                                //        type: "POST",
+                                                //        url: '/api/leaves/postleave',
+                                                //        contentType: "application/json; charset=utf-8",
+                                                //        dataType: "json",
+                                                //        data: JSON.stringify(BuildSaveToDbDto())
+                                                //    });
+                                                //    window.location.href = 'index';
+                                                //});
 
 
     </script>

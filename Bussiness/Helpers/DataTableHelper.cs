@@ -139,6 +139,11 @@ namespace Bussiness.Helpers
 
         public string GetTimeShiftEditCellBodyWorkHours(int dayOfMonth, Datatable datatable, Employee employee)
         {
+            var currentDate = new DateTime(
+                datatable.TimeShiftYear,
+                datatable.TimeShiftMonth,
+                dayOfMonth);
+
             var cellWorkHours = employee.WorkHours.Where(x =>
                    x.TimeShiftId == datatable.GenericId &&
                    x.StartOn.Year == datatable.TimeShiftYear &&
@@ -149,7 +154,7 @@ namespace Bussiness.Helpers
             var cellLeaves = employee.Leaves.Where(x =>
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day))
+                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day))
                 .ToList();
 
             var strToReturn = "<div style='width:120px; white-space: nowrap;'>";
@@ -445,19 +450,13 @@ namespace Bussiness.Helpers
             return cellBody;
         }
         public string GetProjectionTimeShiftSuggestionCellBody(
-            ICollection<RealWorkHour> realWorkHours, List<string> errors)
+            WorkHour workHour)
         {
-            var cellBody = "";
-            foreach (var realWorkHour in realWorkHours)
-            {
-                cellBody += "<p white-space: nowrap;'>" +
-                    realWorkHour.StartOn.ToShortTimeString() +
-                    " - " +
-                    realWorkHour.EndOn.ToShortTimeString() +
-                    "</p></br>";
-            }
-
-            return cellBody;
+            return "<p white-space: nowrap;'>" +
+                workHour.StartOn.ToString() +
+                " - " +
+                workHour.EndOn.ToString() +
+                "</p></br>";
         }
 
         private static string FaIconEdit(int dayOfMonth, string color, int employeeid, int timeshiftid, int month = 0, int year = 0)
@@ -487,7 +486,7 @@ namespace Bussiness.Helpers
            => CurrentDayFaIconEdit(realWorkHour.Id);
 
         private static string CurrentDayFaIconEdit(int realWorkHourId)
-           => @"<i class='fa fa-pencil faIconEdit' employeeid='" + realWorkHourId + "'></i>";
+           => @"<i class='fa fa-pencil faIconEdit' realworkhourid='" + realWorkHourId + "'></i>";
 
 
         public string GetProjectionDifferenceWorkHourLink(int id, string value)

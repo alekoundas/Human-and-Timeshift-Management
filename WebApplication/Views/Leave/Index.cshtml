@@ -47,8 +47,8 @@
 </div>
 @section Scripts {
     <script>
-        $(() => {
-            var dataTable = new DataTableService('#LeaveDatatable')
+        $(() =>
+            new DataTableService('#LeaveDatatable')
                 .ForApiController('leaves')
                 .StartOrderFromCol(1)
                 .AddColumn(true, true, "EmployeeFullName")
@@ -72,7 +72,7 @@
                     data.Predicate = 'LeaveIndex';
                     return JSON.stringify(data);
                 })
-                .CompleteDataTable();
-        })
+                .CompleteDataTable()
+        )
     </script>
 }

@@ -163,7 +163,7 @@ namespace WebApplication.Api
             }
             else
             {
-                filter = filter.And(x => x.Title.Contains(search));
+                filter = filter.And(x => x.Title.Contains(search) || x.WorkPlace.Title.Contains(search));
                 timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
                    .GetPaggingWithFilter(null, filter, includes, 10, page);
             }

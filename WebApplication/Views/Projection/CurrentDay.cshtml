@@ -1,0 +1,321 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+
+            <div class="box-body table-responsive">
+
+                <table id="EmployeesCurrentDayDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>Πόστο</th>
+                            <th>Έναρξη βάρδιας</th>
+                            <th>Λήξη βάρδιας</th>
+                            <th>Ενέργιες</th>
+
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>Πόστο</th>
+                            <th>Έναρξη βάρδιας</th>
+                            <th>Λήξη βάρδιας</th>
+                            <th>Ενέργιες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+
+<div class="modal fade in" id="RealWorkHour_Modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Επεξεργασία βάρδιας χρήστη</h4>
+            </div>
+            <div class="modal-body" style="width:100%;">
+
+                <div style="width:10%; float:left;">
+                    <input id="CalentimInput" style="display:none" />
+                    <input id="RealWorkHourId" style="display:none" />
+                    <input id="StartOn" style="display:none" />
+                    <input id="EndOn" style="display:none" />
+                    <button class="btn btn-primary" id="CalentimButton"><i class="fa fa-calendar"></i></button>
+                </div>
+                <div style="width:90%; float:left;">
+
+                    <div>
+                        <div style="width:50%; float:left;">
+                            <div class="form-group">
+                                <label class="control-label">Υπάρων έναρξη</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="DatabaseStartOn" readonly />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Νέα έναρξη</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="NewStartOn" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="width:50%; float:left;">
+                            <div class="form-group">
+                                <label class="control-label">Υπάρων λήξη</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="DatabaseEndOn" readonly />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Νέα λήξη</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="NewEndOn" readonly />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Σχόλια</label>
+                        <div class="input-group">
+                            <textarea id="Comments"></textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Κλείσιμο</button>
+                <div class="form-group pull-right">
+                    <input type="button" value="Αποθήκευση" id="SubmitButton" class="btn btn-primary " />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <!--    Modal Functionality   -->
+    <script>
+        var EmployeeId = 0;
+        var TimeShiftId = 0;
+
+        $(document).on('click', '.faIconEdit', (element) => {
+            var realWorkHourId = element.target.getAttribute('realworkhourid');
+            document.getElementById('RealWorkHourId').value = realWorkHourId;
+            $.ajax({
+                type: "GET",
+                async: true,
+                url: "/api/realworkhours/" + realWorkHourId,
+            }).done(response => {
+                document.getElementById('DatabaseStartOn').value = response.startOn;
+                document.getElementById('DatabaseEndOn').value = response.endOn;
+                document.getElementById('Comments').value = response.comments;
+            });
+
+            $('#RealWorkHour_Modal').modal('show');
+        });
+
+        //Save edited RealWorkHour
+        $(document).on('click', '#SubmitButton', (element) => {
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+            $.ajax({
+                type: "POST",
+                url: '/api/realworkhours/editEmployeeRealWorkhour',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildRealWorkHourEditDto(startOn, endOn))
+            })
+            $('#RealWorkHour_Modal').modal('hide')
+            $('#EmployeesCurrentDayDatatable').DataTable().ajax.reload();
+
+        });
+    </script>
+
+    <!-- Dtos-->
+    <script>
+        const TimeConverter = (ticks, hasLaterDate) => {
+            var date = new Date(+ticks);
+            var year = date.getFullYear();
+            var month = String((date.getMonth() + 1)).length == 1 ?
+                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+            var day = String(date.getDate()).length == 1 ?
+                '0' + date.getDate() : date.getDate();
+            var hour = String(date.getHours()).length == 1 ?
+                '0' + date.getHours() : date.getHours();
+            var min = String(date.getMinutes()).length == 1 ?
+                '0' + date.getMinutes() : date.getMinutes();
+            if (hasLaterDate)
+                var day = String(date.getDate() + 1).length == 1 ?
+                    '0' + (date.getDate() + 1) : date.getDate() + 1;
+
+            var time = year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+            return time;
+        }
+
+        const BuildValidateWorkHourDto = (startDate, endDate) => ({
+            employeeIds: [EmployeeId],
+            startOn: TimeConverter(startDate),
+            endOn: TimeConverter(endDate),
+            timeShiftId: TimeShiftId
+        });
+        const BuildValidateHasOvertimeDto = (startDate, endDate) => ([{
+            startOn: TimeConverter(startDate),
+            endOn: TimeConverter(endDate),
+            employeeIds: [EmployeeId],
+            timeShiftId: TimeShiftId
+        }]);
+        const BuildRealWorkHourEditDto = (startDate, endDate) => ({
+            startOn: TimeConverter(startDate),
+            endOn: TimeConverter(endDate),
+            realWorkHourId: document.getElementById('RealWorkHourId').value,
+            comments: document.getElementById('Comments').value
+
+        });
+    </script>
+
+    <!--///////////////////////////////////////-->
+    <!--///             Validation          ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        const ValidateEmployeeWithRangeToRealWorkhour = (employeeId, timeShiftId) => {
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+
+            $.ajax({
+                type: "POST",
+                url: '/api/realworkhours/hasoverlap',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildValidateWorkHourDto(startOn, endOn))
+            }).done((data) => { console.log(data) });
+        };
+
+        const ValidateEmployeeWithRestrictionMaxHours = () => {
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+            var employeeIds = GetAlreadyAppendedEmployeeIds();
+
+            $.ajax({
+                type: "POST",
+                url: '/api/WorkPlaceHourRestrictions/ValidateHoursToWorkPlaceHourRestriction',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildValidateWorkHourDto(startOn, endOn, employeeIds))
+            }).done((data) => {
+            });
+        };
+
+        const ValidateEmployeesWithRestrictionHasOvertime = () => {
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+            var employeeIds = GetAlreadyAppendedEmployeeIds();
+
+            $.ajax({
+                type: "POST",
+                url: '/api/realworkhours/HasOvertime',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildValidateHasOvertimeDto(startOn, endOn, employeeIds))
+            }).done((data) => {
+
+                data.filter(response => !response.isSuccessful)
+                    .forEach(response => HandleEmployeeSelect2Span(({
+                        errorType: 'warning',
+                        errorValue: response.value,
+                        employeeId: response.employeeId
+                    })));
+
+                HandleSubmitButton();
+            });
+        };
+    </script>
+
+    <!--///////////////////////////////////////-->
+    <!--///             Libraries           ///-->
+    <!--///////////////////////////////////////-->
+    <script>
+        $('#CalentimButton').calentim({
+            showTimePickers: true,
+            startOnMonday: true,
+            showFooter: true,
+            showButtons: true,
+            calendarCount: 1,
+            startDate: Date.now(),
+            endDate: Date.now(),
+            hourFormat: 24,
+            format: "DD/MM/YYYY HH:mm",
+            dateSeparator: '/-/',
+            target: $("#CalentimInput"),
+            locale: "el",
+            onafterselect: () => {
+                var dateRange = document.getElementById('CalentimInput').value;
+                var startOn = dateRange.split('/-/')[0];
+                var endOn = dateRange.split('/-/')[1];
+
+                document.getElementById('NewEndOn').value = endOn;
+                document.getElementById('NewStartOn').value = startOn;
+
+                startOn = moment(startOn, 'DD/MM/YYYY HH:mm').valueOf()
+                endOn = moment(endOn, 'DD/MM/YYYY HH:mm').valueOf()
+
+                document.getElementById('EndOn').value = endOn;
+
+                document.getElementById('StartOn').value = startOn;
+                //HandleTimeRangeSpan(data);
+                //ValidateEmployeeWithRangeToRealWorkhour();
+                //ValidateEmployeesWithRestrictionMaxHours();
+                //ValidateEmployeesWithRestrictionHasOvertime();
+            },
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        });
+        $(() => new DataTableService('#EmployeesCurrentDayDatatable')
+            .ForApiController('projections')
+            .AddColumn(true, true, "EmployeeLastName")
+            .AddColumn(true, true, "EmployeeFirstName")
+            .AddColumn(true, true, "WorkPlaceTitle")
+            .AddColumn(true, true, "StartOn_string")
+            .AddColumn(true, true, "EndOn_string")
+            .AddColumn(false, false, "Buttons")
+            .FixedLeftColums(2)
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'ProjectionCurrentDay';
+                return JSON.stringify(data);
+            })
+            .CompleteDataTable());
+    </script>
+}

@@ -89,6 +89,7 @@ namespace DataAccess.Repository.Base
             filter = filter.And(x => !(workHour.StartOn.Day != x.StartOn.Day && x.IsDayOff == true));
             filter = filter.And(filterOr);
 
+            //var asdfasdf = Context.WorkHours.Where(filter);
             return Context.WorkHours.Any(filter);
         }
 

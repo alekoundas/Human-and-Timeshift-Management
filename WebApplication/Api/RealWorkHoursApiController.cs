@@ -108,7 +108,7 @@ namespace WebApplication.Api
 
 
 
-        // POST: api/workhours/getforcell
+        // POST: api/realworkhours/getforcell
         [HttpPost("getForEditCell")]
         public async Task<ActionResult<RealWorkHour>> GetForEditCell([FromBody] GetForEditCellWorkHoursApiViewModel realworkHour)
         {
@@ -134,7 +134,7 @@ namespace WebApplication.Api
             return Ok(response);
         }
 
-        // POST: api/workhours/deletebatch
+        // POST: api/realworkhours/deletebatch
         [HttpPost("deletebatch")]
         public async Task<ActionResult<RealWorkHour>> DeleteBatch([FromBody] WorkHourApiViewModel workHourViewModel)
         {
@@ -156,7 +156,7 @@ namespace WebApplication.Api
 
             return Ok(new { Value = "Its  me Mario" });
         }
-        // POST: api/workhours/deleteEmployeeWorkhours
+        // POST: api/realworkhours/deleteEmployeeWorkhours
         [HttpPost("deleteEmployeeWorkhours")]
         public async Task<ActionResult<RealWorkHour>> DeleteEmployeeWorkhours([FromBody] List<WorkHourDelete> workHours)
         {
@@ -176,7 +176,29 @@ namespace WebApplication.Api
 
             return Ok("success my dudes");
         }
-        // POST: api/workhours/editEmployeeWorkhours
+
+        // POST: api/realworkhours/editEmployeeRealWorkhour
+        [HttpPost("editEmployeeRealWorkhour")]
+        public async Task<ActionResult<WorkHour>> EditEmployeeRealWorkhour([FromBody] RealWorkHourEdit realWorkHour)
+        {
+            var workHourToModify = await _baseDataWork.RealWorkHours
+                .FirstOrDefaultAsync(x => x.Id == realWorkHour.RealworkHourId);
+
+            //if workhour exists for employee, edit it
+            if (workHourToModify != null)
+            {
+                workHourToModify.StartOn = realWorkHour.StartOn;
+                workHourToModify.EndOn = realWorkHour.EndOn;
+                workHourToModify.Comments = realWorkHour.Comments;
+
+                _baseDataWork.Update(workHourToModify);
+                await _baseDataWork.SaveChangesAsync();
+            }
+
+            return Ok();
+        }
+
+        // POST: api/realworkhours/editEmployeeWorkhours
         [HttpPost("editEmployeeWorkhours")]
         public async Task<ActionResult<WorkHour>> EditEmployeeWorkhours([FromBody] List<WorkHourEdit> workHours)
         {
@@ -243,7 +265,9 @@ namespace WebApplication.Api
 
             return Ok(realWorkHoursToSaveRange);
         }
-        // POST: api/workhours/addEmployeeWorkhours
+
+
+        // POST: api/realworkhours/addEmployeeWorkhours
         [HttpPost("addEmployeeWorkhours")]
         public async Task<ActionResult<WorkHour>> AddEmployeeWorkhours([FromBody] List<WorkHourApiCreate> workHours)
         {
@@ -329,7 +353,7 @@ namespace WebApplication.Api
             return Ok(dataToReturn);
         }
 
-        // POST: api/workhours/hasoverlap
+        // POST: api/realworkhours/hasoverlap
         [HttpPost("HasOverlapRange")]
         public ActionResult<WorkHour> HasOverlapRange([FromBody] List<ApiRealWorkHoursHasOverlapRange> workHours)
         {
@@ -378,7 +402,7 @@ namespace WebApplication.Api
             return Ok(response);
         }
 
-        // POST: api/workhours/hasovertime
+        // POST: api/realworkhours/hasovertime
         [HttpPost("HasOvertime")]
         public ActionResult<WorkHour> HasOvertime([FromBody] List<ApiRealWorkHoursHasOvertimeRange> workHours)
         {

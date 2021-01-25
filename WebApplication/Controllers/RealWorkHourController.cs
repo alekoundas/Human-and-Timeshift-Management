@@ -160,15 +160,6 @@ namespace WebApplication.Controllers
             return View(realWorkHour);
         }
 
-
-        // POST: RealWorkHours/CurrentDay
-        [HttpGet, ActionName("CurrentDay")]
-        public IActionResult CurrentDay()
-        {
-            ViewData["Title"] = "Σύνολο πραγματικών βαρδιών ημέρας";
-            return View();
-        }
-
         private bool RealWorkHourExists(int id)
         {
             return _context.RealWorkHours.Any(e => e.Id == id);

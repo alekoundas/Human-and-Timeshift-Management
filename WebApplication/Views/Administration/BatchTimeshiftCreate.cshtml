@@ -139,9 +139,8 @@ const GetMonthValue = () =>
             AppendHTMLToDiv(count++, workPlaceId))
     });
 
-    //Delete WorkPlace
+    //Delete WorkPlace TODO
     $(document).on('click', '.WorkPlaceDeleteButton', (e) => {
-        console.log(e.target);
         var num = e.target.getAttribute('num')
         document.getElementById('WorkPlaceRowNum_' + num).remove();
         FixHTMLArrayIndex();

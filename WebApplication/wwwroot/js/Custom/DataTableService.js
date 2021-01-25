@@ -66,13 +66,16 @@
         return this;
     }
 
-    AddColumnsFromCount(count, columnName) {
+    AddColumnsFromCount(count, ...columnNames) {
         for (var i = 0; i < count; i++)
-            this._columns.push({
-                data: columnName + i,
-                searchable: false,
-                orderable: false
-            });
+            for (var j = 0; j < columnNames.length; j++) {
+
+                this._columns.push({
+                    data: columnNames[j] + i,
+                    searchable: false,
+                    orderable: false
+                });
+            }
         return this;
     }
 

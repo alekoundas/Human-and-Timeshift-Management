@@ -15,9 +15,9 @@
                 <div style="width:100%;">
                     <div style="width:50%; float:left;">
                         <div class="input-group" style="width:100%; margin-bottom:10px;">
+                            <label class="control-label">Πόστο</label> @* TimeShift *@
                             <div class="form-group">
-                                <label class="control-label">Πόστο</label> @* TimeShift *@
-                                <select id="TimeShift_Select2" style="width:70%"></select>
+                                <select id="WorkPlace_Select2" style="width:70%"></select>
                             </div>
                         </div>
                     </div>
@@ -30,7 +30,46 @@
                         </div>
                     </div>
                 </div>
-
+                <div style="width:60%; float:left;">
+                    <div style="width:100%; float:left;">
+                        <div style="width:70%; float:left;">
+                            <label class="control-label">Έλεγχος υπερορίας</label>
+                        </div>
+                        <div style="width:30%; float:left;">
+                            <input type="checkbox" class="filterSlider" id="SliderValidateOvertime" checked>
+                        </div>
+                    </div>
+                    <div style="width:70%; float:left;">
+                        <label class="control-label">Έλεγχος ρεπό/εβδομάδα</label>
+                    </div>
+                    <div style="width:30%; float:left;">
+                        <input type="checkbox" class="filterSlider" id="SliderValidateDayOfDaysPerWeek" checked>
+                    </div>
+                    <div style="width:100%; float:left;">
+                        <div style="width:70%; float:left;">
+                            <label class="control-label">Έλεγχος εργ.ημέρες/εβδομάδα</label>
+                        </div>
+                        <div style="width:30%; float:left;">
+                            <input type="checkbox" class="filterSlider" id="SliderValidateWorkDaysPerWeek" checked>
+                        </div>
+                    </div>
+                    <div style="width:100%; float:left;">
+                        <div style="width:70%; float:left;">
+                            <label class="control-label">Έλεγχος ώρες/εβδομάδα</label>
+                        </div>
+                        <div style="width:30%; float:left;">
+                            <input type="checkbox" class="filterSlider" id="SliderValidateHoursPerWeek" checked>
+                        </div>
+                    </div>
+                    <div style="width:100%; float:left;">
+                        <div style="width:70%; float:left;">
+                            <label class="control-label">Έλεγχος ώρες/ημέρα</label>
+                        </div>
+                        <div style="width:30%; float:left;">
+                            <input type="checkbox" class="filterSlider" id="SliderWorkingHoursPerDay" checked>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -39,18 +78,6 @@
 
 
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="box box-danger" style="margin-top:5%;">
-            <div class="box-header">
-                <h3 class="box-title">@ViewData["Title"]</h3>
-            </div>
-            <hr />
-            <div id="DataTableDiv"></div>
-        </div>
-    </div>
-</div>
-
 @*<div class="row">
         <div class="col-md-12">
             <div class="box box-danger" style="margin-top:5%;">
@@ -58,36 +85,66 @@
                     <h3 class="box-title">@ViewData["Title"]</h3>
                 </div>
                 <hr />
-                <div class="box-body table-responsive">
-                    <table id="TimeShiftSuggestionsDatatable" class="table table-bordered table-hover table-responsive stripe">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Επίθετο</th>
-                                <th>Όνομα</th>
-                                <th>ΑΦΜ</th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th></th>
-                                <th>Επίθετο</th>
-                                <th>Όνομα</th>
-                                <th>ΑΦΜ</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                <div id="DataTableDiv"></div>
             </div>
         </div>
     </div>*@
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+                <table id="TimeShiftSuggestionsDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>ΑΦΜ</th>
+                            <th>Βάρδια</th>
+                            <th>Πρόβλημα</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>ΑΦΜ</th>
+                            <th>Βάρδια</th>
+                            <th>Πρόβλημα</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        const GetSelectedTimeShiftId = () =>
-            document.getElementById('TimeShift_Select2').value;
+
+        const GetSelectedWorkPlaceId = () =>
+            document.getElementById('WorkPlace_Select2').value;
+
+        const GetSliderValidateOvertimeValue = () =>
+            document.getElementById('SliderValidateOvertime').checked == true;
+
+        const GetSliderSliderValidateDayOfDaysPerWeekValue = () =>
+            document.getElementById('SliderValidateDayOfDaysPerWeek').checked == true;
+
+        const GetSliderValidateWorkDaysPerWeekValue = () =>
+            document.getElementById('SliderValidateWorkDaysPerWeek').checked == true;
+
+        const GetSliderValidateHoursPerWeekValue = () =>
+            document.getElementById('SliderValidateHoursPerWeek').checked == true;
+
+        const GetSliderWorkingHoursPerDayValue = () =>
+            document.getElementById('SliderWorkingHoursPerDay').checked == true;
 
         const GetStartOn = () =>
             new Date(moment(document.getElementById('SearchRangeInput').value
@@ -118,19 +175,27 @@
     <!--///             Libraries           ///-->
     <!--///////////////////////////////////////-->
     <script>
+        $('.filterSlider').bootstrapToggle({
+            on: '',
+            off: ''
+        });
+
+        $('.filterSlider').change(e =>
+            $('#TimeShiftSuggestionsDatatable').DataTable().ajax.reload());
+
         $(() => {
-            $('#TimeShift_Select2').select2({
+            $('#WorkPlace_Select2').select2({
                 placeholder: "Επέλεξε πόστο",
                 allowClear: true,
                 ajax: {
-                    url: '/api/timeshifts/select2',
+                    url: '/api/workplaces/select2',
                     data: params => ({
                         search: params.term,
                         page: params.page || 1
                     })
                 }
             }).on('change', () =>
-                $('#EmployeesWorkHourDifferenceDatatable').DataTable().ajax.reload());
+                $('#TimeShiftSuggestionsDatatable').DataTable().ajax.reload());
 
             $('#SearchRangeInput').calentim({
                 showTimePickers: false,
@@ -142,10 +207,7 @@
                 dateSeparator: '/-/',
                 locale: "el",
                 onafterselect: () => {
-                    DestroyDataTable();
-                    DeleteDataTableHTML();
-                    AppendNewDataTableHTML();
-                    CreateDataTable();
+                    $('#TimeShiftSuggestionsDatatable').DataTable().ajax.reload();
                 },
                 onaftershow: () =>
                     //Fix Calentim width
@@ -155,25 +217,32 @@
             });
 
 
-            AppendNewDataTableHTML();
-            var CreateDataTable = () =>
-                new DataTableService('#TimeShiftSuggestionsDatatable')
-                    .ForApiController('projections')
-                    .StartOrderFromCol(1)
-                    .AddColumn(true, true, "LastName")
-                    .AddColumn(true, true, "FirstName")
-                    .AddColumn(true, true, "ErpCode")
-                    .AddColumnsFromDateRange(GetStartOn(), GetEndOn(), "Day_")
-                    .FixedLeftColums(2)
-                    .AjaxData((data, type, row, meta) => {
-                        data.predicate = 'ProjectionTimeShiftSuggestions';
-                        if (GetSelectedTimeShiftId() != '')
-                            data.filterByTimeShift = GetSelectedTimeShiftId();
+            //AppendNewDataTableHTML();
+            $(new DataTableService('#TimeShiftSuggestionsDatatable')
+                .ForApiController('projections')
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumn(true, true, "WorkHour")
+                .AddColumn(true, true, "Error")
+                .FixedLeftColums(2)
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionTimeShiftSuggestions';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+                    data.filterByValidateOvertime = GetSliderValidateOvertimeValue();
+                    data.filterByValidateDayOfDaysPerWeek = GetSliderSliderValidateDayOfDaysPerWeekValue();
+                    data.filterByValidateWorkDaysPerWeek = GetSliderValidateWorkDaysPerWeekValue();
+                    data.filterByValidateHoursPerWeek = GetSliderValidateHoursPerWeekValue();
+                    data.filterByValidateWorkingHoursPerDay = GetSliderWorkingHoursPerDayValue();
+                    if (GetStartOn() != "Invalid Date") {
+
                         data.StartOn = GetStartOn();
                         data.EndOn = GetEndOn();
-                        return JSON.stringify(data);
-                    })
-                    .CompleteDataTable();
+                    }
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable());
         })
 
     </script>

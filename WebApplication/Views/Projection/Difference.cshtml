@@ -41,7 +41,7 @@
                         </div>
 
                         @*<div style="width:100%; float:left;">
-                                <label class="control-label">Αντιστάθμιση ώρας(λεπτά)</label>&nbsp
+                                <label class="control-label">Χρονική ανοχή(λεπτά)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control filterOffsetMinutes" id="OffsetMinutes">
                                 </div>
@@ -69,7 +69,7 @@
                 <table id="EmployeesWorkHourDifferenceDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
                         <tr>
-                            <th></th>
+                            @*<th></th>*@
                             <th>Επίθετο</th>
                             <th>Όνομα</th>
                             <th>ΑΦΜ</th>
@@ -80,7 +80,7 @@
                     </thead>
                     <tfoot>
                         <tr>
-                            <th></th>
+                            @*<th></th>*@
                             <th>Επίθετο</th>
                             <th>Όνομα</th>
                             <th>ΑΦΜ</th>
@@ -136,7 +136,7 @@
 
         const GetEndOn = () =>
             ConvertDateForApi(new Date(moment(document.getElementById('SearchRangeInput').value
-                .split('/-/')[0], 'DD/MM/YYYY').valueOf()).setHours(23, 59, 59).valueOf());
+                .split('/-/')[1], 'DD/MM/YYYY').valueOf()).setHours(23, 59, 59).valueOf());
 
 
         const setHoursToMax = date => {
@@ -197,8 +197,8 @@
 
         var table = new DataTableService('#EmployeesWorkHourDifferenceDatatable')
             .ForApiController('projections')
-            .StartOrderFromCol(1)
-            .AddColumn(false, false, "", (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>')
+            //.StartOrderFromCol(1)
+            //.AddColumn(false, false, "", (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>')
             .AddColumn(true, true, "LastName")
             .AddColumn(true, true, "FirstName")
             .AddColumn(true, true, "VatNumber")
@@ -216,6 +216,10 @@
                 data.filterByRealWorkHour = GetSliderRealWorkHourValue();
                 data.filterByOffsetMinutes = GetOffsetMinutesValue();
                 return JSON.stringify(data);
+            })
+            .FooterCallback((row, data, start, end, display) => {
+                row.children[4].innerHTML = "Σύνολο ώρες: " + [...data].filter(x => x.TotalFooterWorkHours)[0]?.TotalFooterWorkHours
+                row.children[5].innerHTML = "Σύνολο ώρες: " + [...data].filter(x => x.TotalFooterRealWorkHours)[0]?.TotalFooterRealWorkHours[0]
             })
             .CompleteDataTable();
 
