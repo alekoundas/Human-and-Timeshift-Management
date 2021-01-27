@@ -58,26 +58,7 @@
                 <h3 class="box-title">@ViewData["Title"]</h3>
             </div>
             <hr />
-            <div id="DataTableDiv">
-                <div class="box-body table-responsive">
-                    <table id="EmployeesWorkHourConcentricDatatable" class="table table-bordered table-hover table-responsive stripe">
-                        <thead>
-                            <tr>
-                                <th>Επίθετο</th>
-                                <th>Όνομα</th>
-                                <th>Erp Code</th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Επίθετο</th>
-                                <th>Όνομα</th>
-                                <th>Erp Code</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
+            <div id="AppendHere_Datatable"></div>
         </div>
     </div>
 </div>
@@ -157,7 +138,7 @@
         });
 
         $('.filterSlider').change(e =>
-            $('#EmployeesWorkHourConcentricDatatable').DataTable().ajax.reload());
+            $('#ConcetricSpecificDatesDatatable').DataTable().ajax.reload());
 
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
@@ -173,7 +154,7 @@
                 }
             }
         }).on('change', () =>
-            $('#EmployeesWorkHourConcentricDatatable').DataTable().ajax.reload());
+            $('#ConcetricSpecificDatesDatatable').DataTable().ajax.reload());
 
 
         const InitiateCalentim = num =>
@@ -202,18 +183,12 @@
             });
 
         var CreateDataTable = () =>
-            new DataTableService('#EmployeesWorkHourConcentricDatatable')
+            new DataTableService('#ConcetricSpecificDatesDatatable')
                 .ForApiController('projections')
                 .AddColumn(true, true, "LastName")
                 .AddColumn(true, true, "FirstName")
                 .AddColumn(true, true, "ErpCode")
-                //.AddColumn(false, false, "TotalHours")
-                //.AddColumn(false, false, "TotalHoursDay")
-                //.AddColumn(false, false, "TotalHoursNight")
-                //.AddColumn(false, false, "TotalHoursSaturdayDay")
-                //.AddColumn(false, false, "TotalHoursSaturdayNight")
-                //.AddColumn(false, false, "TotalHoursSundayDay")
-                //.AddColumn(false, false, "TotalHoursSundayNight")
+                .AddColumn(true, true, "VatNumber")
                 .AddColumnsFromCount(GetDaysToAppentNums().length,
                     "TotalHours_",
                     "TotalHoursDay_",
@@ -243,32 +218,46 @@
                 })
                 .CompleteDataTable();
 
-        $(document).ready(CreateDataTable());
+
 
     </script>
     <script>
-        const GetDaysColumns = () =>
-            GetDaysToAppentNums().map(num => CreateThElement(GetSelectedDate(num))).join();
 
-        const CreateThElement = (date) =>
+        const CreateThElement = (date, displayText) =>
             '<th style="white-space: nowrap;">' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
-            ' ' +
             date.getDate() +
             ' ' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
+            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
+            ' ' +
+            //moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
+            //' ' +
+            displayText +
             '</th>';
+
+        const GetSelectedDate = (num) =>
+            new Date(moment(document.getElementById('CalnentimNum_' + num).value
+                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+
+        const GetDaysColumns = () =>
+            GetDaysToAppentNums().map(num =>
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Μέρα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Σάββατο Μέρα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Σάββατο Νύχτα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Κυριακή Μέρα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Κυριακή Νύχτα")
+            ).join();
 
         const DeleteDataTableHTML = () =>
             document.getElementById('DatatableDiv').remove();
 
-        var DestroyDataTable = () => $('#RealWorkHoursSpecificDatesDatatable')
+        const DestroyDataTable = () => $('#RealWorkHoursSpecificDatesDatatable')
             .DataTable().destroy();
 
         const AppendNewDataTableHTML = () =>
             document.getElementById('AppendHere_Datatable').insertAdjacentHTML('beforeend', '' +
                 '<div class="box-body table-responsive" id="DatatableDiv">' +
-                '<table id="RealWorkHoursSpecificDatesDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<table id="ConcetricSpecificDatesDatatable" class="table table-bordered table-hover table-responsive stripe">' +
                 '<thead>' +
                 '<tr>' +
                 '<th>Επίθετο</th>' +
@@ -303,6 +292,11 @@
                 '</div>' +
                 '</div>' +
                 '');
+
+
+
+        $(document).ready(AppendNewDataTableHTML());
+        $(document).ready(CreateDataTable());
     </script>
 
 }

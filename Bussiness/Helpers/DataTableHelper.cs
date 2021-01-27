@@ -144,17 +144,40 @@ namespace Bussiness.Helpers
                 datatable.TimeShiftMonth,
                 dayOfMonth);
 
-            var cellWorkHours = employee.WorkHours.Where(x =>
+            var cellWorkHours = new List<WorkHour>();
+            if (dayOfMonth == 1)
+                cellWorkHours = employee.WorkHours.Where(x =>
+                (
+                   x.TimeShiftId == datatable.GenericId &&
+                   x.StartOn.Year == datatable.TimeShiftYear &&
+                   x.StartOn.Month == datatable.TimeShiftMonth - 1 &&
+                   x.StartOn.Day == DateTime.DaysInMonth(datatable.TimeShiftYear, datatable.TimeShiftMonth - 1)
+                   ) ||
+                (
                    x.TimeShiftId == datatable.GenericId &&
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day == dayOfMonth || dayOfMonth == x.EndOn.Day))
+                   x.StartOn.Day == datatable.TimeShiftMonth))
                 .ToList();
+
+            else
+                cellWorkHours = employee.WorkHours.Where(x =>
+                           x.TimeShiftId == datatable.GenericId &&
+                           x.StartOn.Year == datatable.TimeShiftYear &&
+                           x.StartOn.Month == datatable.TimeShiftMonth &&
+                           x.StartOn.Day == dayOfMonth)
+                        .ToList();
+            //var cellWorkHours = employee.WorkHours.Where(x =>
+            //       x.TimeShiftId == datatable.GenericId &&
+            //       x.StartOn.Year == datatable.TimeShiftYear &&
+            //       x.StartOn.Month == datatable.TimeShiftMonth &&
+            //       x.StartOn.Day == dayOfMonth)
+            //    .ToList();
 
             var cellLeaves = employee.Leaves.Where(x =>
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   (x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day))
+                   x.StartOn.Day <= dayOfMonth)
                 .ToList();
 
             var strToReturn = "<div style='width:120px; white-space: nowrap;'>";
@@ -287,23 +310,37 @@ namespace Bussiness.Helpers
             int compareDay, Datatable datatable, Employee employee)
         {
 
-            var cellWorkHours = employee.WorkHours.Where(x =>
+            var cellWorkHours = new List<WorkHour>();
+            cellWorkHours = employee.WorkHours.Where(x =>
                   x.TimeShiftId == datatable.GenericId &&
                   x.StartOn.Year == compareYear &&
                   x.StartOn.Month == compareMonth &&
-                  (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day)) //&&
-                                                                              //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
-                                                                              //x.EmployeeId == employeeId)
+                  x.StartOn.Day == compareDay)
                .ToList();
 
-            var cellRealWorkHours = employee.RealWorkHours.Where(x =>
-               x.TimeShiftId == datatable.GenericId &&
-               x.StartOn.Year == compareYear &&
-               x.StartOn.Month == compareMonth &&
-               (x.StartOn.Day == compareDay || compareDay == x.EndOn.Day))//&&
-                                                                          //(x.StartOn.Day <= compareDay && compareDay <= x.EndOn.Day) &&
-                                                                          //x.EmployeeId == employeeId)
-            .ToList();
+            var cellRealWorkHours = new List<RealWorkHour>();
+            if (compareDay == 1)
+                cellRealWorkHours = employee.RealWorkHours.Where(x =>
+                (
+                   x.TimeShiftId == datatable.GenericId &&
+                   x.StartOn.Year == compareYear &&
+                   x.StartOn.Month == compareMonth - 1 &&
+                   x.StartOn.Day == DateTime.DaysInMonth(compareYear, compareMonth - 1)
+                   ) ||
+                (
+                   x.TimeShiftId == datatable.GenericId &&
+                   x.StartOn.Year == compareYear &&
+                   x.StartOn.Month == compareMonth &&
+                   x.StartOn.Day == compareMonth))
+                .ToList();
+
+            else
+                cellRealWorkHours = employee.RealWorkHours.Where(x =>
+                           x.TimeShiftId == datatable.GenericId &&
+                           x.StartOn.Year == compareYear &&
+                           x.StartOn.Month == compareMonth &&
+                           x.StartOn.Day == compareDay)
+                        .ToList();
 
 
             var cellLeaves = employee.Leaves.Where(x =>
@@ -381,23 +418,6 @@ namespace Bussiness.Helpers
                     }
 
                     strToReturn += "</div>";
-
-
-
-
-
-
-
-                    //strToReturn +=
-                    //    "<div style='width:50px;display:block; float: left;'> " +
-                    //    celStartOn.ToShortTimeString() +
-                    //    "</div>";
-
-                    //strToReturn +=
-                    //    "<div style='width:50px; display:block; float: left;'>" +
-                    //    celEndOn.ToShortTimeString() +
-                    //    "</div>";
-
                 }
                 strToReturn += "</div>";
 

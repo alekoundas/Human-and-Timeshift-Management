@@ -249,17 +249,20 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(result.Id, _datatable.GenericId);
 
-                if (result.Company != null)
-                {
-                    result.Company.Employees = null;
-                    dictionary.Add("CompanyTitle", result.Company.Title);
-                }
+
+                dictionary.Add("Id", result.Id);
+                dictionary.Add("FirstName", result.FirstName);
+                dictionary.Add("LastName", result.LastName);
+                dictionary.Add("ErpCode", result.ErpCode);
+                dictionary.Add("VatNumber", result.VatNumber);
+                dictionary.Add("IsActive", result.IsActive);
+                dictionary.Add("CompanyTitle", result?.Company.Title);
 
                 if (_baseDatawork.EmployeeWorkPlaces
                     .Any(x => x.EmployeeId == result.Id &&
@@ -272,7 +275,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
                         "Employee", apiUrl, ""));
 
-                dictionary.Add("SpecializationName", result.Specialization?.Name);
+                dictionary.Add("SpecializationName", result?.Specialization?.Name);
 
                 returnObjects.Add(expandoObj);
             }
@@ -305,17 +308,20 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             foreach (var result in entities)
             {
-                var expandoObj = expandoService.GetCopyFrom<Employee>(result);
+                var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
 
                 var apiUrl = UrlHelper.EmployeeWorkPlace(result.Id, _datatable.GenericId);
 
-                if (result.Company != null)
-                {
-                    result.Company.Employees = null;
-                    dictionary.Add("CompanyTitle", result.Company.Title);
-                }
+
+                dictionary.Add("Id", result.Id);
+                dictionary.Add("FirstName", result.FirstName);
+                dictionary.Add("LastName", result.LastName);
+                dictionary.Add("ErpCode", result.ErpCode);
+                dictionary.Add("VatNumber", result.VatNumber);
+                dictionary.Add("IsActive", result.IsActive);
+                dictionary.Add("CompanyTitle", result?.Company.Title);
 
                 if (_baseDatawork.EmployeeWorkPlaces
                     .Any(x => x.EmployeeId == result.Id &&
