@@ -1931,7 +1931,7 @@
                 .FixedLeftColums(2)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'TimeShiftEdit';
-                    data.genericId = DateConstants().TimeShiftId;
+                    data.filterByTimeShiftId = DateConstants().TimeShiftId;
                     data.timeShiftYear = DateConstants().Year;
                     data.timeShiftMonth = DateConstants().Month;
                     data.makePrintable = GetSliderMakePrintableValue();

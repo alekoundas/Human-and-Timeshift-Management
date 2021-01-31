@@ -148,13 +148,13 @@ namespace Bussiness.Helpers
             if (dayOfMonth == 1)
                 cellWorkHours = employee.WorkHours.Where(x =>
                 (
-                   x.TimeShiftId == datatable.GenericId &&
+                   x.TimeShiftId == datatable.FilterByTimeShiftId &&
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth - 1 &&
                    x.StartOn.Day == DateTime.DaysInMonth(datatable.TimeShiftYear, datatable.TimeShiftMonth - 1)
                    ) ||
                 (
-                   x.TimeShiftId == datatable.GenericId &&
+                   x.TimeShiftId == datatable.FilterByTimeShiftId &&
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
                    x.StartOn.Day == datatable.TimeShiftMonth))
@@ -162,7 +162,7 @@ namespace Bussiness.Helpers
 
             else
                 cellWorkHours = employee.WorkHours.Where(x =>
-                           x.TimeShiftId == datatable.GenericId &&
+                           x.TimeShiftId == datatable.FilterByTimeShiftId &&
                            x.StartOn.Year == datatable.TimeShiftYear &&
                            x.StartOn.Month == datatable.TimeShiftMonth &&
                            x.StartOn.Day == dayOfMonth)
@@ -310,14 +310,6 @@ namespace Bussiness.Helpers
             int compareDay, Datatable datatable, Employee employee)
         {
 
-            var cellWorkHours = new List<WorkHour>();
-            cellWorkHours = employee.WorkHours.Where(x =>
-                  x.TimeShiftId == datatable.GenericId &&
-                  x.StartOn.Year == compareYear &&
-                  x.StartOn.Month == compareMonth &&
-                  x.StartOn.Day == compareDay)
-               .ToList();
-
             var cellRealWorkHours = new List<RealWorkHour>();
             if (compareDay == 1)
                 cellRealWorkHours = employee.RealWorkHours.Where(x =>
@@ -351,10 +343,6 @@ namespace Bussiness.Helpers
                 .ToList();
 
             var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
-
-            //if (cellWorkHours.Any(x => x.IsDayOff))
-            //    strToReturn +=
-            //        "<center><p><b>Ρεπό</b></p></center>";
 
             if (cellLeaves.Count() > 0)
                 return "<div style='width:110px; white-space: nowrap;'>" +
@@ -436,7 +424,6 @@ namespace Bussiness.Helpers
 
                 if (datatable.GenericId != 0)
                 {
-                    //if (!cellWorkHours.Any(x => x.IsDayOff))
                     if (true)
                     {
 

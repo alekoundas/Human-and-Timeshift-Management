@@ -20,46 +20,10 @@ namespace DataAccess.Repository
             _set = Context.Set<TEntity>();
         }
 
-        public async Task<List<TEntity>> GetWithPagging(
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-            int pageSize = 10,
-            int pageIndex = 1)
-        {
-
-            if (orderingInfo == null)
-                return await _set.Take(pageSize).ToListAsync();
-
-            var qry = (IQueryable<TEntity>)orderingInfo(_set);
-            qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return await qry.ToListAsync();
-        }
-
-        public async Task<List<TEntity>> GetAllAsync(
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo = null,
-            Expression<Func<TEntity, bool>> filter = null,
-            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
-        {
-            var qry = (IQueryable<TEntity>)_set;
-
-            if (includes != null)
-                foreach (var include in includes)
-                    qry = include(qry);
-
-            if (filter != null)
-                qry = qry.Where(filter);
-
-            if (orderingInfo != null)
-                qry = orderingInfo(qry);
-
-            return await qry.ToListAsync();
-        }
-
         public async Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector)
         {
             return (List<TResult>)await _set.Select(selector).ToListAsync();
         }
-
 
         public async Task<int> CountAllAsync()
         {
@@ -95,23 +59,20 @@ namespace DataAccess.Repository
 
             return await qry.ToListAsync();
         }
-        public async Task<List<TEntity>> GetPaggingWithFilter<TSource>(
-           Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-           List<string> selectFields,
-           Expression<Func<TEntity, bool>> filter,
-           List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
-           int pageSize = 10,
-           int pageIndex = 1)
-        {
 
+        public IQueryable<TEntity> GetPaggingWithFilterQueryable(
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+            Expression<Func<TEntity, bool>> filter,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+            int pageSize = 10,
+            int pageIndex = 1)
+        {
             var qry = (IQueryable<TEntity>)_set;
+            //qry = qry.AsExpandable();
 
             if (includes != null)
                 foreach (var include in includes)
                     qry = include(qry);
-
-            //if (selectFields != null)
-            //    qry = qry.Select(x=> SelectObject(selectFields,x));
 
             if (filter != null)
                 qry = qry.Where(filter);
@@ -119,20 +80,16 @@ namespace DataAccess.Repository
             if (orderingInfo != null)
                 qry = orderingInfo(qry);
 
-            if (pageSize != -1)
+            if (pageSize != -1 && pageSize != 0)
                 qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
-            return await qry.ToListAsync();
+            return qry;
         }
+
 
         public int Count(Expression<Func<TEntity, bool>> predicate)
         {
             return _set.Count(predicate);
-        }
-
-        public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
-        {
-            return _set.SingleOrDefault(predicate);
         }
 
         public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
@@ -188,7 +145,6 @@ namespace DataAccess.Repository
                     qry = include(qry);
 
             return await qry.FirstOrDefaultAsync(filter);
-
         }
 
         public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter)
@@ -200,8 +156,5 @@ namespace DataAccess.Repository
         {
             return _set.Where(expression);
         }
-
-
-
     }
 }

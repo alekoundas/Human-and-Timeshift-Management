@@ -1042,53 +1042,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
             return this;
         }
 
-        //public async Task<ProjectionDataTableWorker> ProjectionTimeShiftSuggestions()
-        //{
-        //    var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
-        //    includes.Add(x => x.Include(y => y.RealWorkHours));
-
-        //    if (_datatable.FilterByWorkPlaceId != 0)
-        //        _filter = _filter.And(x => x.RealWorkHours
-        //            .Any(y => y.TimeShiftId == _datatable.FilterByTimeShift));
-
-
-
-        //    var entities = await _baseDatawork.Employees
-        //       .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
-
-
-        //    //Mapping
-        //    var expandoService = new ExpandoService();
-        //    var dataTableHelper = new DataTableHelper<Employee>();
-        //    var returnObjects = new List<ExpandoObject>();
-
-        //    foreach (var result in entities)
-        //    {
-        //        var expandoObj = new ExpandoObject();
-        //        var dictionary = (IDictionary<string, object>)expandoObj;
-        //        var errors = new List<string>();
-
-        //        dictionary.Add("FirstName", result.FirstName);
-        //        dictionary.Add("LastName", result.LastName);
-        //        dictionary.Add("ErpCode", result.ErpCode);
-
-        //        for (int i = 0; i <= (_datatable.EndOn.Date - _datatable.StartOn.Date).TotalDays; i++)
-        //        {
-        //            var realWorkHoursToday = result.RealWorkHours
-        //                .Where(x => x.StartOn.Date == _datatable.StartOn.AddDays(i).Date)
-        //                .ToList();
-
-        //            dictionary.Add("Day_" + i, dataTableHelper
-        //                .GetProjectionTimeShiftSuggestionCellBody(realWorkHoursToday, errors));
-        //        }
-
-        //        returnObjects.Add(expandoObj);
-        //    }
-        //    EntitiesMapped = returnObjects;
-        //    EntitiesTotal = await _baseDatawork.Employees.CountAllAsyncFiltered(_filter);
-
-        //    return this;
-        //}
         public async Task<ProjectionDataTableWorker> ProjectionTimeShiftSuggestions()
         {
             var sum = 0.0;
@@ -1434,7 +1387,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
             if (_datatable.FilterByWorkPlaceId != 0)
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
-            var realWorkHours = await _baseDatawork.RealWorkHours.GetAllAsync(null, filter, includes);
+            //var realWorkHours = await _baseDatawork.RealWorkHours.GetAllAsync(null, filter, includes);
+            var realWorkHours = await _baseDatawork.RealWorkHours.GetPaggingWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes);
 
 
             var hourRestrictionFilter = PredicateBuilder.New<HourRestriction>();

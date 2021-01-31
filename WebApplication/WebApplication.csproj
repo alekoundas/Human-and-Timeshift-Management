@@ -34,6 +34,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\css\LoadingIo\ldLoader\" />
     <Folder Include="wwwroot\css\Selectize\" />
+    <Folder Include="wwwroot\js\Custom\Dtos\Validation\" />
     <Folder Include="wwwroot\js\jQueryMonthPicker\" />
     <Folder Include="wwwroot\ExcelTemplates\" />
     <Folder Include="wwwroot\js\Selectize\" />

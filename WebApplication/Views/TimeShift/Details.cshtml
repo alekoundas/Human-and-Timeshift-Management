@@ -443,24 +443,24 @@
 
         var BuildEditWorkHourToDbDto = (startTd, endTs, newStartTs,
             newEndTs, employeeId, workHourId) =>
-            ({
-                startOn: ConvertDateForApi(startTd),
-                endOn: ConvertDateForApi(endTs),
-                newStartOn: ConvertDateForApi(newStartTs),
-                newEndOn: ConvertDateForApi(newEndTs),
-                timeShiftId: DateConstants().TimeShiftId,
-                employeeId: employeeId,
-                isDayOff: IsDayOff(workHourId),
-                comments: GetCommentValue(workHourId)
-            });
+        ({
+            startOn: ConvertDateForApi(startTd),
+            endOn: ConvertDateForApi(endTs),
+            newStartOn: ConvertDateForApi(newStartTs),
+            newEndOn: ConvertDateForApi(newEndTs),
+            timeShiftId: DateConstants().TimeShiftId,
+            employeeId: employeeId,
+            isDayOff: IsDayOff(workHourId),
+            comments: GetCommentValue(workHourId)
+        });
 
         var BuildDeleteWorkHourToDbDto = (startTs, endTs, employeeId) =>
-            ({
-                startOn: ConvertDateForApi(startTs),
-                endOn: ConvertDateForApi(endTs),
-                timeShiftId: DateConstants().TimeShiftId,
-                employeeId: employeeId
-            });
+        ({
+            startOn: ConvertDateForApi(startTs),
+            endOn: ConvertDateForApi(endTs),
+            timeShiftId: DateConstants().TimeShiftId,
+            employeeId: employeeId
+        });
 
         const BuildCellWorkHourDto = (day, employeeIds) => ({
             timeShiftId: DateConstants().TimeShiftId,
@@ -1602,7 +1602,7 @@
                 .FixedLeftColums(2)
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'TimeShiftEdit';
-                    data.genericId = DateConstants().TimeShiftId;
+                    data.filterByTimeShiftId = DateConstants().TimeShiftId;
                     data.timeShiftYear = DateConstants().Year;
                     data.timeShiftMonth = DateConstants().Month;
                     data.makePrintable = GetSliderMakePrintableValue();

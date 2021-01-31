@@ -190,7 +190,6 @@ namespace WebApplication.Controllers
         public async Task<ActionResult> DownloadExcelWithData()
         {
             var errors = new List<string>();
-            var workPlaceHourRestrictions = await _baseDataWork.WorkPlaceHourRestrictions.GetAllAsync();
             var excelColumns = new List<string>(new string[] {
               "Month",
                 "Year",

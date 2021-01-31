@@ -111,11 +111,15 @@ namespace DataAccess.Libraries.Datatable
 
         [JsonProperty(PropertyName = "filterByWorkPlaceId")]
         public int FilterByWorkPlaceId { get; set; }
+
         [JsonProperty(PropertyName = "filterByEmployeeId")]
         public int FilterByEmployeeId { get; set; }
 
         [JsonProperty(PropertyName = "filterByTimeShift")]
         public int FilterByTimeShift { get; set; }
+
+        [JsonProperty(PropertyName = "filterByTimeShiftId")]
+        public int FilterByTimeShiftId { get; set; }
 
         [JsonProperty(PropertyName = "filterByMonth")]
         public int FilterByMonth { get; set; }

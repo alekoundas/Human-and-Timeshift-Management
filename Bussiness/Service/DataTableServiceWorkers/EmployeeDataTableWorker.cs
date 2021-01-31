@@ -37,6 +37,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             //Filters for everyone
             _filter = _filter.And(GetSearchFilter());
+            _filter = _filter.And(GetDataTableFilter());
 
             var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Employee>(_httpContext);
             if (!canShowDeactivated)
@@ -82,6 +83,21 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     if (column.Data == "CompanyTitle")
                         filter = filter.Or(x => x.Company.Title.Contains(_datatable.Search.Value));
                 }
+            }
+            else
+                filter = filter.And(x => true);
+            return filter;
+        }
+
+        private Expression<Func<Employee, bool>> GetDataTableFilter()
+        {
+            var filter = PredicateBuilder.New<Employee>();
+            if (_datatable.FilterByTimeShiftId != 0)
+            {
+                filter = filter.And(x => x.EmployeeWorkPlaces
+                 .Any(y => y.WorkPlace.TimeShifts
+                     .Any(z => z.Id == _datatable.FilterByTimeShiftId)) ||
+                     x.WorkHours.Any(y => y.TimeShiftId == _datatable.FilterByTimeShiftId));
             }
             else
                 filter = filter.And(x => true);
@@ -231,6 +247,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.Specialization));
             includes.Add(x => x.Include(y => y.Company));
+            includes.Add(x => x.Include(y => y.EmployeeWorkPlaces));
 
             if (!_datatable.FilterByIncludedEmployees)
                 _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
@@ -264,8 +281,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 dictionary.Add("IsActive", result.IsActive);
                 dictionary.Add("CompanyTitle", result?.Company.Title);
 
-                if (_baseDatawork.EmployeeWorkPlaces
-                    .Any(x => x.EmployeeId == result.Id &&
+                if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == result.Id &&
                     x.WorkPlaceId == _datatable.GenericId))
                 {
                     dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -323,8 +339,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 dictionary.Add("IsActive", result.IsActive);
                 dictionary.Add("CompanyTitle", result?.Company.Title);
 
-                if (_baseDatawork.EmployeeWorkPlaces
-                    .Any(x => x.EmployeeId == result.Id &&
+
+                if (result.EmployeeWorkPlaces.Any(x => x.EmployeeId == result.Id &&
                     x.WorkPlaceId == _datatable.GenericId))
                 {
                     dictionary.Add("IsInWorkPlace", dataTableHelper.GetToggle(
@@ -350,14 +366,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.WorkHours));
             includes.Add(x => x.Include(y => y.Leaves));
 
-            _filter = _filter.And(x => x.EmployeeWorkPlaces
-                .Any(y => y.WorkPlace.TimeShifts
-                    .Any(z => z.Id == _datatable.GenericId)) ||
-                    x.WorkHours.Any(y => y.TimeShiftId == _datatable.GenericId));
-
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
-
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -398,11 +408,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.WorkHours));
             includes.Add(x => x.Include(y => y.Leaves));
 
-            _filter = _filter.And(x => x.EmployeeWorkPlaces
-                .Any(y => y.WorkPlace.TimeShifts
-                    .Any(z => z.Id == _datatable.GenericId)) ||
-                    x.WorkHours.Any(y => y.TimeShiftId == _datatable.GenericId));
-
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
 
@@ -438,13 +443,59 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             return this;
         }
+        //  public async Task<EmployeeDataTableWorker> TimeShiftEdit()
+        //{
+        //    var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
+        //    includes.Add(x => x.Include(y => y.WorkHours));
+        //    includes.Add(x => x.Include(y => y.Leaves));
+
+        //    _filter = _filter.And(x => x.EmployeeWorkPlaces
+        //        .Any(y => y.WorkPlace.TimeShifts
+        //            .Any(z => z.Id == _datatable.GenericId)) ||
+        //            x.WorkHours.Any(y => y.TimeShiftId == _datatable.GenericId));
+
+        //    var entities = await _baseDatawork.Employees
+        //        .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
+
+        //    //Mapping
+        //    var expandoService = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<Employee>();
+        //    var returnObjects = new List<ExpandoObject>();
+        //    var autoIncrementNumber = 0;
+        //    foreach (var result in entities)
+        //    {
+        //        var expandoObj = new ExpandoObject();
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //        dictionary.Add("FirstName", result.FirstName);
+        //        dictionary.Add("LastName", result.LastName);
+        //        dictionary.Add("ErpCode", result.ErpCode);
+        //        dictionary.Add("IsActive", result.IsActive);
+
+        //        if (_datatable.MakePrintable)
+        //            dictionary.Add("AutoIncrementNumber", ++autoIncrementNumber);
+
+        //        for (int i = 0; i < DateTime.DaysInMonth(_datatable.TimeShiftYear, _datatable.TimeShiftMonth); i++)
+        //            dictionary.Add("Day_" + i, dataTableHelper.GetTimeShiftEditCellBodyWorkHours
+        //                (i + 1, _datatable, result));
+
+        //        dictionary.Add("ToggleSlider", dataTableHelper
+        //            .GetEmployeeCheckbox(_datatable, result.Id));
+
+        //        returnObjects.Add(expandoObj);
+        //    }
+        //    EntitiesMapped = returnObjects;
+        //    EntitiesTotal = await _baseDatawork.Employees.CountAllAsyncFiltered(_filter);
+
+        //    return this;
+        //}
 
         public async Task<EmployeeDataTableWorker> RealWorkHourIndex()
         {
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.RealWorkHours));
             includes.Add(x => x.Include(y => y.Leaves));
-            includes.Add(x => x.Include(y => y.WorkHours));
+            //includes.Add(x => x.Include(y => y.WorkHours));
 
             if (_datatable.GenericId != 0)
                 _filter = _filter.And(x => (x.EmployeeWorkPlaces

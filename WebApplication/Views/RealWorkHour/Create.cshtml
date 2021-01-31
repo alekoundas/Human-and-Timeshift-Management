@@ -19,8 +19,8 @@
 
             <form asp-controller="RealWorkHour" asp-action="Create" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="StartOn" id="StartOn" class="TimePicker form-control" style="display:none;" />
-                <input asp-for="EndOn" id="EndOn" class="TimePicker form-control" style="display:none;" />
+                <input asp-for="StartOn" id="StartOn" class="TimePicker form-control" />
+                <input asp-for="EndOn" id="EndOn" class="TimePicker form-control" />
                 <div class="box-body">
 
                     <div class="row">
@@ -281,7 +281,7 @@
     <!--///////////////////////////////////////-->
 
     <script>
-        const TimeConverter = (ticks, hasLaterDate) => {
+        const TimeConverter = (ticks) => {
             var date = new Date(ticks);
             var year = date.getFullYear();
             var month = String((date.getMonth() + 1)).length == 1 ?
@@ -292,9 +292,6 @@
                 '0' + date.getHours() : date.getHours();
             var min = String(date.getMinutes()).length == 1 ?
                 '0' + date.getMinutes() : date.getMinutes();
-            if (hasLaterDate)
-                var day = String(date.getDate() + 1).length == 1 ?
-                    '0' + (date.getDate() + 1) : date.getDate() + 1;
 
             var time = year + '-' + month + '-' + day + 'T' + hour + ':' + min;
             return time;
@@ -331,8 +328,12 @@
                 HandleEmployeeSelect2Span(response));
 
         const AppendDateRangeToDateInputs = (startDate, endDate, hasLaterDate) => {
+            if (hasLaterDate)
+                endDate = new Date(endDate)
+                    .setDate(new Date(endDate).getDate() + 1)
+                    .valueOf();
             document.getElementById('StartOn').value = TimeConverter(startDate);
-            document.getElementById('EndOn').value = TimeConverter(endDate, hasLaterDate);
+            document.getElementById('EndOn').value = TimeConverter(endDate);
         };
     </script>
 
