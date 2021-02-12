@@ -437,7 +437,6 @@
             endOn: ConvertDateForApi(endTs),
             timeShiftId: DateConstants().TimeShiftId,
             employeeId: employeeId,
-            isDayOff: IsDayOff(workHourId),
             comments: GetCommentValue(workHourId)
         });
 
@@ -450,7 +449,6 @@
             newEndOn: ConvertDateForApi(newEndTs),
             timeShiftId: DateConstants().TimeShiftId,
             employeeId: employeeId,
-            isDayOff: IsDayOff(workHourId),
             comments: GetCommentValue(workHourId)
         });
 
@@ -550,25 +548,8 @@
             return response;
         };
 
-        const SetDayOffSliderState = (workHourId, state) => {
-            var slider = document.getElementById('DayOffSliderNum_' + workHourId)
-            if (slider.disabled == true) {
-                slider.disabled = false;
-
-                $('#DayOffSliderNum_' + workHourId)
-                    .bootstrapToggle(state == 'true' || state == true ? 'on' : 'off');
-
-                slider.disabled = true;
-            }
-            else
-                $('#DayOffSliderNum_' + workHourId)
-                    .bootstrapToggle(state == true ? 'on' : 'off');
-        }
-
         const UndoValues = workHourId => {
             SetCommentValue(workHourId, GetCommentDatabaseValue(workHourId));
-            SetIsDayOffValue(workHourId, GetIsDayOffDatabaseValue(workHourId));
-            SetDayOffSliderState(workHourId, GetIsDayOffDatabaseValue(workHourId))
         };
 
         const SplitDateRangeInDates = dateInput => {
@@ -661,8 +642,6 @@
 
             SetCommentDatabaseValue(workHourId, workHour.comments);
             SetCommentValue(workHourId, workHour.comments);
-            SetIsDayOffDatabaseValue(workHourId, IsDayOff(workHourId));
-            SetDayOffSliderState(workHourId, workHour.isDayOff);
         }
 
 
@@ -763,22 +742,6 @@
             document.getElementById('CalentimInputDatabaseNum_' + workHourId)
                 .value.split('/-/');
 
-        //IsDayOff
-        const IsDayOff = workHourId =>
-            document.getElementById('DayOffSliderNum_' + workHourId)
-                .checked == true;
-
-        const SetIsDayOffValue = (workHourId, value) =>
-            document.getElementById('DayOffSliderNum_' + workHourId)
-                .value = value;
-
-        const GetIsDayOffDatabaseValue = workHourId =>
-            document.getElementById('DatabaseDayOffSliderNum_' + workHourId)
-                .value;
-
-        const SetIsDayOffDatabaseValue = (workHourId, value) =>
-            document.getElementById('DatabaseDayOffSliderNum_' + workHourId)
-                .value = value;
 
         //Comments
         const GetCommentValue = workHourId =>
@@ -975,10 +938,6 @@
                 startTs = dateRange[0];
                 endTs = dateRange[1];
             }
-            if (IsDayOff(workHourId)) {
-                startTs = SetTimeStampTimeToMin(startTs);
-                endTs = SetTimeStampTimeToMax(endTs)
-            }
 
             SetCalentimInputValue(workHourId, startTs, endTs);
         }
@@ -1002,8 +961,6 @@
                 GetWorkHourSelect2Ids(workHourId).forEach(select2Id =>
                     document.getElementById('EmployeeRowNum_' + select2Id).style.opacity = '1');
                 document.getElementById('CommentsNum_' + workHourId).disabled = false;
-                document.getElementById('DayOffSliderNum_' + workHourId).disabled = false;
-                document.getElementById('IsDayOffNullSpaceNum_' + workHourId).style.display = '';
                 document.getElementById('CommentsNullSpaceNum_' + workHourId).style.display = '';
                 document.getElementById('TextareaNullSpaceNum_' + workHourId).style.display = '';
             }
@@ -1017,8 +974,6 @@
                 [...document.getElementsByClassName('EmployeeSelect2DeleteButtonNum_' + workHourId)].forEach(empDelButton => empDelButton.style.display = 'none');
                 [...document.getElementsByClassName('EmployeeSelect2WorkHourNum_' + workHourId)].forEach(select2 => select2.disabled = true);
                 document.getElementById('CommentsNum_' + workHourId).disabled = true;
-                document.getElementById('DayOffSliderNum_' + workHourId).disabled = true;
-                document.getElementById('IsDayOffNullSpaceNum_' + workHourId).style.display = 'none';
                 document.getElementById('CommentsNullSpaceNum_' + workHourId).style.display = 'none';
                 document.getElementById('TextareaNullSpaceNum_' + workHourId).style.display = 'none';
 
@@ -1066,9 +1021,7 @@
                     HandleShowWorkHourRangeToModal(WorkHourId);
                     SetCalentimInputDatabaseValue(WorkHourId, startTs, endTs)
                     //set new BootstrapToggle instance
-                    DayOffSlider(WorkHourId);
 
-                    SetDayOffSliderState(WorkHourId, workHour.isDayOff)
                     SetValuesToEditWorkHour(workHour, WorkHourId);
                     workHour.employeeIds.forEach(employeeId =>
                         $.get("/api/employees/getSelect2Option/" + employeeId,
@@ -1211,7 +1164,6 @@
 
 
                 SetCommentDatabaseValue(workHourId, GetCommentValue(workHourId));
-                SetIsDayOffDatabaseValue(workHourId, IsDayOff(workHourId));
                 HandleShowWorkHourRangeToModal(workHourId);
             }
             else {
@@ -1260,7 +1212,6 @@
             WorkHourId++;
             AppendNewWorkHourToAddModal(WorkHourId);  //Append html to add modal
             Calentim(CelentimDate, WorkHourId);       //set new Calentim instance
-            DayOffSlider(WorkHourId);                 //set new BootstrapToggle instance
 
             var num = WorkHourId;
             if (prependEmployeeIds.length > 0)
@@ -1434,41 +1385,6 @@
                 }
             }
         });
-
-        //DayOff BootstrapToggle
-        const DayOffSlider = workHourId =>
-            $('#DayOffSliderNum_' + workHourId).bootstrapToggle({
-                on: 'Ναί',
-                off: 'Όχι'
-            }).on('change', (e) => {
-                if (e.target.checked == true && !ValidateNullInputs(workHourId)) {
-
-                    var startTs = SetTimeStampTimeToMin(
-                        GetCalentimInputValue(workHourId)[0]);
-
-                    var endTs = SetTimeStampTimeToMax(
-                        GetCalentimInputValue(workHourId)[1]);
-
-                    SetCalentimInputValue(workHourId, startTs, endTs);
-                    HandleShowWorkHourRangeToModal(workHourId);
-
-                    if (IsEdit()) {
-                        var startDbTs = SetTimeStampTimeToMin(
-                            GetCalentimInputDatabaseValue(workHourId)[0]);
-
-                        var endDbTs = SetTimeStampTimeToMax(
-                            GetCalentimInputDatabaseValue(workHourId)[1]);
-
-                        SetCalentimInputDatabaseValue(workHourId, startDbTs, endDbTs);
-                        HandleShowWorkHourRangeToModal(workHourId, true);
-                    }
-
-                    ValidateAppendedWorkHoursTimeRange(workHourId);
-                    ValidateExistingErrorsOnWorkHours();
-                    ValidateWorkHourDateOutOfRange(workHourId);
-                    ValidateEmployeesWithRangeToWorkhour(workHourId);
-                }
-            })
 
         //Employees Select2
         const EmployeeSelect2 = (workHourId, num) => {
@@ -1715,11 +1631,6 @@
                 '</div>' +
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
-                '<div style="width:  100%;">' +
-                '<div style="width: 15%; float: left;">&nbsp;</div >' +
-                '<div style="width: 20%; float: left;"><p> Δήλωση Ημ. ως ρεπό:</p></div>' +
-                '<div style="width: 20%; float: left;"><input  type="checkbox" id="DayOffSliderNum_' + workHourId + '" data-onstyle="success"></div>' +
-                '</div >' +
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
                 '<div style="width:  100%;">' +
@@ -1749,7 +1660,6 @@
                 '<div style="padding-top:10px;" class= "row ElementToDeleteOnClose WorkHourDiv AppendEmployeeNum_' + workHourId + '" id="WorkHourDivNum_' + workHourId + '">' +
                 '<label style="padding-left:10px;" class="control-label"> Επεξεργασία βάρδιας κελιού για εργαζόμενο/ους:</label>' +
                 '<div style="padding-left:40px;" class="row">' +
-                '<input style="display:none;" id="DatabaseDayOffSliderNum_' + workHourId + '" />' +
                 '<input style="display:none;" id="DatabaseCommentsNum_' + workHourId + '" />' +
                 '<input style="display:none;" id="CalentimInputNum_' + workHourId + '" class="calentimInput" />' +
                 '<input style="display:none;" id="CalentimInputDatabaseNum_' + workHourId + '"  />' +
@@ -1785,11 +1695,6 @@
                 '</div>' +
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
-                '<div style="width:  100%;">' +
-                '<div style="width: 15%; float: left;  display: none;" id="IsDayOffNullSpaceNum_' + workHourId + '">&nbsp;</div >' +
-                '<div style="width: 20%; float: left;"><p> Δήλωση Ημ. ως ρεπό:</p></div>' +
-                '<div style="width: 20%; float: left;"><input disabled type="checkbox" id="DayOffSliderNum_' + workHourId + '" data-onstyle="success"></div>' +
-                '</div >' +
                 '</div >' +
                 '<div style="padding-left:40px;" class="row">' +
                 '<div style="width: 100%; ">' +

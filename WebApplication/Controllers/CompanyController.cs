@@ -31,7 +31,6 @@ namespace WebApplication.Controllers
         }
 
         // GET: Companies/Details/5
-
         [Authorize(Roles = "Company_View")]
         public async Task<IActionResult> Details(int? id)
         {

@@ -19,8 +19,10 @@
 
             <form asp-controller="RealWorkHour" asp-action="Create" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="StartOn" id="StartOn" class="TimePicker form-control" />
-                <input asp-for="EndOn" id="EndOn" class="TimePicker form-control" />
+                @*<input asp-for="StartOn" id="StartOn" class="TimePicker form-control" />*@
+                @*<input asp-for="EndOn" id="EndOn" class="TimePicker form-control" />*@
+                <input asp-for="StartOn" id="StartOn" class="TimePicker form-control" style="display:none;" />
+                <input asp-for="EndOn" id="EndOn" class="TimePicker form-control" style="display:none;" />
                 <div class="box-body">
 
                     <div class="row">

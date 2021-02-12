@@ -152,8 +152,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(z => z.TimeShift));
 
             _filter = _filter.And(x => x.RealWorkHours.Any(y =>
-                 y.EndOn >= _datatable.StartOn && y.StartOn <= _datatable.EndOn));
-            //_datatable.StartOn.Date <= y.StartOn.Date && y.EndOn.Date <= _datatable.EndOn.Date));
+            _datatable.StartOn <= y.StartOn && y.StartOn <= _datatable.EndOn));
 
             if (_datatable.FilterByWorkPlaceId != 0)
                 _filter = _filter.And(x => x.RealWorkHours.Any(y =>
@@ -169,7 +168,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var returnObjects = new List<ExpandoObject>();
             var filterRealWorkHours = PredicateBuilder.New<RealWorkHour>();
 
-            filterRealWorkHours = filterRealWorkHours.And(x => _datatable.StartOn.Date <= x.StartOn.Date && x.EndOn.Date <= _datatable.EndOn.Date);
+            filterRealWorkHours = filterRealWorkHours.And(x => _datatable.StartOn <= x.StartOn && x.StartOn <= _datatable.EndOn);
+
             if (_datatable.FilterByWorkPlaceId != 0)
                 filterRealWorkHours = filterRealWorkHours.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
@@ -242,7 +242,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         .And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
                 filterRealWorkHours = filterRealWorkHours.And(x =>
-                    _datatable.StartOn.Date <= x.StartOn.Date && x.EndOn.Date <= _datatable.EndOn.Date);
+                               _datatable.StartOn <= x.StartOn && x.StartOn <= _datatable.EndOn);
+
 
 
                 var totalSeconds = resultRealWorkHours
@@ -520,7 +521,6 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includesWorkHour.Add(x => x.Include(y => y.TimeShift.WorkPlace));
 
             var filterWorkHour = PredicateBuilder.New<WorkHour>();
-            filterWorkHour = filterWorkHour.And(x => x.IsDayOff == false);
             //filterWorkHour = filterWorkHour.And(x => x.EndOn >= _datatable.StartOn && x.StartOn <= _datatable.EndOn);
             filterWorkHour = filterWorkHour.And(x => (_datatable.StartOn <= x.StartOn && x.EndOn <= _datatable.EndOn) || (_datatable.StartOn <= x.StartOn && _datatable.EndOn <= x.EndOn));
             filterWorkHour = filterWorkHour.And(x => !x.Employee.RealWorkHours.Any(y => x.StartOn <= y.StartOn && y.EndOn <= x.EndOn));
@@ -543,9 +543,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             var filterRealWorkHour = PredicateBuilder.New<RealWorkHour>();
             filterRealWorkHour = filterRealWorkHour.And(x => (_datatable.StartOn <= x.StartOn && x.EndOn <= _datatable.EndOn) || (_datatable.StartOn <= x.StartOn && _datatable.EndOn <= x.EndOn));
-            //filterRealWorkHour = filterRealWorkHour.And(x => x.EndOn >= _datatable.StartOn && x.StartOn <= _datatable.EndOn);
             filterRealWorkHour = filterRealWorkHour.And(x => !x.Employee.WorkHours.Any(y => y.StartOn <= x.StartOn && x.EndOn <= y.EndOn));
-            //filterRealWorkHour = filterRealWorkHour.And(x => !x.Employee.WorkHours.Any(y => Math.Abs(DbF.DateDiffMinute(x.StartOn, y.StartOn)) <= _datatable.FilterByOffsetMinutes));
 
             if (_datatable.FilterByWorkPlaceId != 0)
                 filterRealWorkHour = filterRealWorkHour.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
@@ -1068,9 +1066,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
             if (_datatable.FilterByValidateOvertime)
             {
                 filter = PredicateBuilder.New<WorkHour>();
-                filter = filter.And(x => x.IsDayOff == false);
                 filter = filter.And(x => x.Employee.WorkHours
-                     .Where(y => y.Id != x.Id && y.IsDayOff == false)
+                     .Where(y => y.Id != x.Id)
                      .Any(y => (x.StartOn - y.EndOn).TotalHours < 11));
                 var overTimeEntities = entities.Where(filter).ToList();
                 foreach (var result in overTimeEntities)
@@ -1093,7 +1090,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             if (_datatable.FilterByValidateDayOfDaysPerWeek)
             {
                 filter = PredicateBuilder.New<WorkHour>();
-                filter = filter.And(x => x.IsDayOff == true);
+                filter = filter.And(x => true);
 
                 var dayOfDaysPerWeekEntities = entities.Where(filter)
                     .GroupBy(x => new
@@ -1133,7 +1130,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             if (_datatable.FilterByValidateWorkDaysPerWeek)
             {
                 filter = PredicateBuilder.New<WorkHour>();
-                filter = filter.And(x => x.IsDayOff == false);
+                filter = filter.And(x => true);
 
                 var workingDaysPerWeekEntities = entities.Where(filter)
                     .GroupBy(x => new
@@ -1173,7 +1170,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             if (_datatable.FilterByValidateHoursPerWeek)
             {
                 filter = PredicateBuilder.New<WorkHour>();
-                filter = filter.And(x => x.IsDayOff == false);
+                filter = filter.And(x => true);
                 var hoursPerWeekEntities = entities.Where(filter)
                     .GroupBy(x => new
                     {
@@ -1220,7 +1217,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             if (_datatable.FilterByValidateWorkingHoursPerDay)
             {
                 filter = PredicateBuilder.New<WorkHour>();
-                filter = filter.And(x => x.IsDayOff == false);
+                filter = filter.And(x => true);
                 var hoursPerDayEntities = entities.Where(filter)
                     .GroupBy(x => new
                     {
@@ -1368,11 +1365,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
         public async Task<ProjectionDataTableWorker> ProjectionRealWorkHourRestrictions()
         {
-            var entities = new List<RealWorkHour>();
             var filter = PredicateBuilder.New<RealWorkHour>();
             var includes = new List<Func<IQueryable<RealWorkHour>, IIncludableQueryable<RealWorkHour, object>>>();
             includes.Add(x => x.Include(y => y.Employee));
-            includes.Add(x => x.Include(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
+            includes.Add(x => x.Include(y => y.TimeShift)
+                .ThenInclude(y => y.WorkPlace)
+                .ThenInclude(y => y.WorkPlaceHourRestrictions)
+                .ThenInclude(y => y.HourRestrictions));
 
             if (_datatable.FilterByMonth != 0)
             {
@@ -1384,80 +1383,46 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 filter = filter.And(x => x.StartOn.Year == DateTime.Now.Year);
                 filter = filter.And(x => x.StartOn.Month == DateTime.Now.Month);
             }
+
             if (_datatable.FilterByWorkPlaceId != 0)
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
-            //var realWorkHours = await _baseDatawork.RealWorkHours.GetAllAsync(null, filter, includes);
-            var realWorkHours = await _baseDatawork.RealWorkHours.GetPaggingWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes);
-
-
-            var hourRestrictionFilter = PredicateBuilder.New<HourRestriction>();
-            hourRestrictionFilter = hourRestrictionFilter.And(x => x.WorkPlaceHourRestriction.Month == _datatable.FilterByMonth);
-            hourRestrictionFilter = hourRestrictionFilter.And(x => x.WorkPlaceHourRestriction.Year == _datatable.FilterByYear);
-            if (_datatable.FilterByWorkPlaceId != 0)
-                hourRestrictionFilter = hourRestrictionFilter.And(x => x.WorkPlaceHourRestriction.WorkPlaceId == _datatable.FilterByWorkPlaceId);
-
-            var hourRestrictions = new List<HourRestriction>();
-            hourRestrictions = await _baseDatawork.HourRestrictions
-                .Where(hourRestrictionFilter)
-                .ToDynamicListAsync<HourRestriction>();
-
-            foreach (var hourRestriction in hourRestrictions)
-            {
-                var totalSecondsToday = realWorkHours
-                    .Where(x => x.StartOn.Day == hourRestriction.Day)
-                    .Select(x => Math.Abs((x.StartOn - x.EndOn).TotalSeconds))
-                    .Sum();
-
-                var remainingSeconds = 0.0;
-
-                var todayFilter = PredicateBuilder.New<RealWorkHour>();
-                todayFilter = todayFilter.And(x => x.StartOn.Day == hourRestriction.Day);
-
-                if (hourRestriction.MaxTicks != 0)
-                    if (totalSecondsToday >= hourRestriction.MaxTicks)
-                    {
-                        remainingSeconds = totalSecondsToday - hourRestriction.MaxTicks;
-                        do
-                        {
-                            //create filters to remove appended id from query
-
-                            var realWorkHour = realWorkHours
-                                .Where(todayFilter)
-                                .OrderByDescending(x => x.CreatedOn)
-                                .FirstOrDefault();
-
-                            remainingSeconds = remainingSeconds - Math.Abs((realWorkHour.StartOn - realWorkHour.EndOn).TotalSeconds);
-                            entities.Add(realWorkHour);
-                            todayFilter = todayFilter.And(y => y.Id != realWorkHour.Id);
-
-                        } while (remainingSeconds > 0);
-                    }
-            }
+            var entities = (await _baseDatawork.RealWorkHours
+                .GetPaggingWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes))
+                .GroupBy(x => new
+                {
+                    x.StartOn.Date,
+                    x.TimeShift.WorkPlace
+                })
+                .Select(x => new
+                {
+                    x.Key.Date,
+                    x.Key.WorkPlace,
+                    MaxPermitedHours = x.Key.WorkPlace.WorkPlaceHourRestrictions
+                        .FirstOrDefault(y => y.Month == x.Key.Date.Month && y.Year == x.Key.Date.Year)
+                        .HourRestrictions.FirstOrDefault(y => y.Day == x.Key.Date.Day)
+                        .MaxTicks,
+                    RealWorkHours = x.ToList()
+                })
+                .ToList();
 
             //Mapping
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<Company>();
             var returnObjects = new List<ExpandoObject>();
 
-            foreach (var result in entities)
-            {
-                var expandoObj = new ExpandoObject();
-                var dictionary = (IDictionary<string, object>)expandoObj;
+            //foreach (var result in entities)
+            //{
+            var expandoObj = new ExpandoObject();
+            var dictionary = (IDictionary<string, object>)expandoObj;
 
-                var totalSecondsToday = realWorkHours
-                    .Where(x => x.StartOn.Day == result.StartOn.Day)
-                    .Select(x => Math.Abs((x.StartOn - x.EndOn).TotalSeconds))
-                    .Sum();
 
-                dictionary.Add("WorkPlaceTitle", result.TimeShift.WorkPlace.Title);
-                dictionary.Add("RealWorkHour_Start", result.StartOn);
-                dictionary.Add("RealWorkHour_End", result.EndOn);
-                dictionary.Add("WorkHourRestriction_Max", GetTime(hourRestrictions.First(x => x.Day == result.StartOn.Day).MaxTicks));
-                dictionary.Add("WorkHourRestriction_Sum", GetTime(totalSecondsToday));
+            //dictionary.Add("WorkPlaceTitle", result.WorkPlace.Title);
+            dictionary.Add("WorkPlaceTitle", "");
+            dictionary.Add("Errors", "");
 
-                returnObjects.Add(expandoObj);
-            }
+            returnObjects.Add(expandoObj);
+            //}
             EntitiesMapped = returnObjects;
             EntitiesTotal = await _baseDatawork.RealWorkHours.CountAllAsyncFiltered(filter);
 

@@ -102,7 +102,7 @@ namespace DataAccess
                         Id = y.Id,
                         EmployeeId = y.Employee.Id,
                         GivenEmployeeId = employeeId,
-                        TypeOf = y.IsDayOff ? "DayOff" : "WorkHour"
+                        TypeOf = "WorkHour"
                     })
                 );
 

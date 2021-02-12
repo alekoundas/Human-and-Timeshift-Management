@@ -12,9 +12,6 @@ namespace DataAccess.ViewModels
         [JsonProperty(PropertyName = "endOn")]
         public DateTime EndOn { get; set; }
 
-        [JsonProperty(PropertyName = "isDayOff")]
-        public bool IsDayOff { get; set; }
-
         [JsonProperty(PropertyName = "comments")]
         public string Comments { get; set; }
 

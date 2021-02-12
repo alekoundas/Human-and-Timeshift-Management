@@ -21,9 +21,6 @@ namespace DataAccess.ViewModels
         [JsonProperty(PropertyName = "isEdit")]
         public bool IsEdit { get; set; }
 
-        [JsonProperty(PropertyName = "isDayOff")]
-        public bool IsDayOff { get; set; }
-
 
         [JsonProperty(PropertyName = "timeShiftId")]
         public int TimeShiftId { get; set; }

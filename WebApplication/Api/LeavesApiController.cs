@@ -39,7 +39,6 @@ namespace WebApplication.Api
         {
             StartOn = x.StartOn,
             EndOn = x.EndOn,
-            IsDayOff = x.IsDayOff,
             EmployeeId = x.EmployeeId,
             Comments = x.Comments,
             TimeShiftId = x.TimeShiftId

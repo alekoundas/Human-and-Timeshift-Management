@@ -213,50 +213,26 @@ namespace WebApplication.Api
                         x.EmployeeId == realWorkHour.EmployeeId
                  );
 
-
-                if (realWorkHour.IsDayOff)
+                //if workhour exists for employee, edit it
+                if (workHourToModify != null)
                 {
+                    workHourToModify.StartOn = realWorkHour.NewStartOn;
+                    workHourToModify.EndOn = realWorkHour.NewEndOn;
+                    workHourToModify.Comments = realWorkHour.Comments;
 
-                    //if workhour exists for employee, delete it and create workHour
-                    if (workHourToModify != null)
-                    {
-                        workHourToModify.Comments = realWorkHour.Comments;
-                        _baseDataWork.RealWorkHours.Remove(workHourToModify);
-
-                    }
-                    _baseDataWork.WorkHours.Add(new WorkHour
-                    {
-                        StartOn = realWorkHour.StartOn,
-                        EndOn = realWorkHour.EndOn,
-                        Comments = realWorkHour.Comments,
-                        TimeShiftId = realWorkHour.TimeShiftId,
-                        EmployeeId = realWorkHour.EmployeeId
-                    });
-
+                    _baseDataWork.Update(workHourToModify);
                 }
+                //if workhour does NOT exists for employee, create it
                 else
                 {
-                    //if workhour exists for employee, edit it
-                    if (workHourToModify != null)
+                    realWorkHoursToSaveRange.Add(new RealWorkHour()
                     {
-                        workHourToModify.StartOn = realWorkHour.NewStartOn;
-                        workHourToModify.EndOn = realWorkHour.NewEndOn;
-                        workHourToModify.Comments = realWorkHour.Comments;
-
-                        _baseDataWork.Update(workHourToModify);
-                    }
-                    //if workhour does NOT exists for employee, create it
-                    else
-                    {
-                        realWorkHoursToSaveRange.Add(new RealWorkHour()
-                        {
-                            StartOn = realWorkHour.NewStartOn,
-                            EndOn = realWorkHour.NewEndOn,
-                            TimeShiftId = realWorkHour.TimeShiftId,
-                            EmployeeId = realWorkHour.EmployeeId,
-                            Comments = realWorkHour.Comments
-                        });
-                    }
+                        StartOn = realWorkHour.NewStartOn,
+                        EndOn = realWorkHour.NewEndOn,
+                        TimeShiftId = realWorkHour.TimeShiftId,
+                        EmployeeId = realWorkHour.EmployeeId,
+                        Comments = realWorkHour.Comments
+                    });
                 }
             }
 
@@ -276,31 +252,16 @@ namespace WebApplication.Api
 
             foreach (var realWorkHour in workHours)
             {
-                //if (_baseDataWork.WorkHours.IsDateOverlaping(workHour))
-                //    return NotFound();
-                if (realWorkHour.IsDayOff)
-                    workHoursToSaveRange.Add(new WorkHour()
-                    {
-                        StartOn = realWorkHour.StartOn,
-                        EndOn = realWorkHour.EndOn,
-                        TimeShiftId = realWorkHour.TimeShiftId,
-                        EmployeeId = realWorkHour.EmployeeId,
-                        IsDayOff = realWorkHour.IsDayOff,
-                        Comments = realWorkHour.Comments,
-                        CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
-                        CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
-                    });
-                else
-                    realWorkHoursToSaveRange.Add(new RealWorkHour()
-                    {
-                        StartOn = realWorkHour.StartOn,
-                        EndOn = realWorkHour.EndOn,
-                        TimeShiftId = realWorkHour.TimeShiftId,
-                        EmployeeId = realWorkHour.EmployeeId,
-                        Comments = realWorkHour.Comments,
-                        CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
-                        CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
-                    });
+                realWorkHoursToSaveRange.Add(new RealWorkHour()
+                {
+                    StartOn = realWorkHour.StartOn,
+                    EndOn = realWorkHour.EndOn,
+                    TimeShiftId = realWorkHour.TimeShiftId,
+                    EmployeeId = realWorkHour.EmployeeId,
+                    Comments = realWorkHour.Comments,
+                    CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                    CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
+                });
             }
             _baseDataWork.WorkHours.AddRange(workHoursToSaveRange);
             _baseDataWork.RealWorkHours.AddRange(realWorkHoursToSaveRange);
@@ -378,16 +339,6 @@ namespace WebApplication.Api
                             isSuccessful = 0,
                             value = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
                                             "αυτές τις ώρες ως άδεια",
-                        });
-                    else if (_baseDataWork.RealWorkHours.AreDatesOverlapingDayOff(
-                        workHour.StartOn, workHour.EndOn, workHour.IsDayOff, id))
-
-                        response.Add(new
-                        {
-                            employeeId = id,
-                            isSuccessful = 0,
-                            value = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
-                                            "αυτές τις ώρες ως ρεπό",
                         });
                     else
                         response.Add(new

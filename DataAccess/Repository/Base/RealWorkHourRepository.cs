@@ -66,8 +66,6 @@ namespace DataAccess.Repository.Base
             if (workHour.IsEdit)
                 filter = filter.And(x => x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn);
 
-            if (workHour.IsDayOff)
-                filter = filter.And(x => x.StartOn.Day == workHour.StartOn.Day);
 
             return Context.RealWorkHours.Any(filter);
         }
@@ -116,15 +114,10 @@ namespace DataAccess.Repository.Base
             var filter = PredicateBuilder.New<WorkHour>();
 
             filter = filter.And(x => x.Employee.Id == employeeId);
-            filter = filter.And(x => x.IsDayOff);
-            if (isDayOff)
-                filter = filter.And(x => startOn.Date == x.StartOn.Date);
-            else
-                filter = filter.And(x => startOn.Date == x.StartOn.Date);
+            filter = filter.And(x => startOn.Date == x.StartOn.Date);
             //filter = filter.And(x => startOn.Day != x.StartOn.Day);
 
-            return Context.WorkHours
-                    .Any(filter);
+            return false;
         }
 
         public async Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId)

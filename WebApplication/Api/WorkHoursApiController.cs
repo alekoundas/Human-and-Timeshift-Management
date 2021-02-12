@@ -220,7 +220,6 @@ namespace WebApplication.Api
                     EndOn = workHour.EndOn,
                     TimeShiftId = workHour.TimeShiftId,
                     EmployeeId = workHour.EmployeeId,
-                    IsDayOff = workHour.IsDayOff,
                     Comments = workHour.Comments,
                     CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
                     CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
@@ -250,7 +249,6 @@ namespace WebApplication.Api
                 {
                     workHourToModify.StartOn = workHour.NewStartOn;
                     workHourToModify.EndOn = workHour.NewEndOn;
-                    workHourToModify.IsDayOff = workHour.IsDayOff;
                     workHourToModify.Comments = workHour.Comments;
                     _baseDataWork.Update(workHourToModify);
                     await _baseDataWork.SaveChangesAsync();
@@ -317,7 +315,6 @@ namespace WebApplication.Api
                     WorkHourId = group.Select(x => x.Id).FirstOrDefault(),
                     StartOn = group.Key.StartOn,
                     EndOn = group.Key.EndOn,
-                    IsDayOff = group.Select(x => x.IsDayOff).FirstOrDefault(),
                     Comments = group.Select(x => x.Comments).FirstOrDefault(),
                     EmployeeIds = group.Select(x => x.EmployeeId).ToList()
                 });

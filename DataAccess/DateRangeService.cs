@@ -69,11 +69,10 @@ namespace DataAccess.Service
                 if (this.StartTime <= this.StartTime.Date.Add(EndNightHours))
                     currentStartDate = this.StartTime.Date.Add(EndNightHours);
 
-
                 if (!(this.StartTime.Date.Add(StartNightHours) <= this.StartTime))
                     this._Seconds = currentEndDate.Subtract(currentStartDate).TotalSeconds;
 
-                currentStartDate = this.StartTime.AddDays(1).Date.Add(StartNightHours);
+                currentStartDate = this.StartTime.AddDays(1).Date.Add(EndNightHours);
                 currentEndDate = this.EndTime;
 
                 if (this.EndTime.Date.Add(StartNightHours) <= this.EndTime)
@@ -170,7 +169,7 @@ namespace DataAccess.Service
                     if (!(this.StartTime.Date.Add(StartNightHours) <= this.StartTime))
                         this._Seconds = currentEndDate.Subtract(currentStartDate).TotalSeconds;
 
-                    currentStartDate = this.StartTime.AddDays(1).Date.Add(StartNightHours);
+                    currentStartDate = this.StartTime.AddDays(1).Date.Add(EndNightHours);
                     currentEndDate = this.EndTime;
 
                     if (this.EndTime.Date.Add(StartNightHours) <= this.EndTime)
@@ -271,7 +270,7 @@ namespace DataAccess.Service
                     if (!(this.StartTime.Date.Add(StartNightHours) <= this.StartTime))
                         this._Seconds = currentEndDate.Subtract(currentStartDate).TotalSeconds;
 
-                    currentStartDate = this.StartTime.AddDays(1).Date.Add(StartNightHours);
+                    currentStartDate = this.StartTime.AddDays(1).Date.Add(EndNightHours);
                     currentEndDate = this.EndTime;
 
                     if (this.EndTime.Date.Add(StartNightHours) <= this.EndTime)

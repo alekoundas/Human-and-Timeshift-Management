@@ -24,7 +24,6 @@ namespace DataAccess.Repository.Base
         public async Task<List<WorkHour>> GetCurrentDayOffAssignedOnCell(DateTime compareDate, int employeeId)
         {
             var filter = PredicateBuilder.New<WorkHour>();
-            filter = filter.And(x => x.IsDayOff == true);
             filter = filter.And(x => x.EmployeeId == employeeId);
             filter = filter.And(x => x.StartOn.Date == compareDate.Date);
 
@@ -78,15 +77,11 @@ namespace DataAccess.Repository.Base
             filterOr = filterOr.Or(x => x.StartOn <= workHour.EndOn && workHour.EndOn <= x.EndOn);
             filterOr = filterOr.Or(x => workHour.StartOn < x.StartOn && x.EndOn < workHour.EndOn);
 
-            if (workHour.IsDayOff)
-                filter = filter
-                    .And(x => x.StartOn.Day == workHour.StartOn.Day);
-
             if (workHour.IsEdit)
                 filter = filter.And(x => x.StartOn != workHour.ExcludeStartOn && x.EndOn != workHour.ExcludeEndOn);
 
             filter = filter.And(x => x.Employee.Id == employeeId);
-            filter = filter.And(x => !(workHour.StartOn.Day != x.StartOn.Day && x.IsDayOff == true));
+            filter = filter.And(x => !(workHour.StartOn.Day != x.StartOn.Day));
             filter = filter.And(filterOr);
 
             //var asdfasdf = Context.WorkHours.Where(filter);

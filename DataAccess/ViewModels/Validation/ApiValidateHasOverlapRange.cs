@@ -2,15 +2,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccess.ViewModels
+namespace DataAccess.ViewModels.Validation
 {
-    public class WorkHourHasOverlapRange
+    public class ApiValidateHasOverlapRange
     {
-        [JsonProperty(PropertyName = "startOn")]
+
+        [JsonProperty(PropertyName = "startOn", Required = Required.Always)]
         public DateTime StartOn { get; set; }
 
-        [JsonProperty(PropertyName = "endOn")]
+        [JsonProperty(PropertyName = "endOn", Required = Required.Always)]
         public DateTime EndOn { get; set; }
+
 
         [JsonProperty(PropertyName = "excludeStartOn")]
         public DateTime ExcludeStartOn { get; set; }
@@ -18,12 +20,11 @@ namespace DataAccess.ViewModels
         [JsonProperty(PropertyName = "excludeEndOn")]
         public DateTime ExcludeEndOn { get; set; }
 
+
         [JsonProperty(PropertyName = "isEdit")]
         public bool IsEdit { get; set; }
 
 
-        [JsonProperty(PropertyName = "timeShiftId")]
-        public int TimeShiftId { get; set; }
 
         [JsonProperty(PropertyName = "employeeIds")]
         public List<int> EmployeeIds { get; set; }
