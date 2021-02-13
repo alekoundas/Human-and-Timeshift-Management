@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Timeshift Manager</title>
+    <link rel="icon" href="~/favicon.ico">
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -58,10 +59,10 @@
 <body class="hold-transition skin-blue sidebar-mini fixed">
 
     <div class="wrapper">
-        @await Html.PartialAsync("_Header")
+        @await Html.PartialAsync("_LayoutHeader")
 
         <!-- Left side column. contains the sidebar -->
-        @await Html.PartialAsync("_NavBar")
+        @await Html.PartialAsync("_LayoutNavBar")
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -77,7 +78,7 @@
             @RenderBody()
         </div>
         <!-- Page footer. -->
-        @*@await Html.PartialAsync("_Footer")*@
+        @*@await Html.PartialAsync("_LayoutFooter")*@
 
     </div>
 
