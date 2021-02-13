@@ -144,6 +144,14 @@ namespace Bussiness.Helpers
                 datatable.TimeShiftMonth,
                 dayOfMonth);
 
+            var otherWorkHours = employee.WorkHours.Where(x =>
+                x.TimeShiftId != datatable.FilterByTimeShiftId &&
+                x.StartOn.Year == datatable.TimeShiftYear &&
+                x.StartOn.Month == datatable.TimeShiftMonth &&
+                x.StartOn.Day == dayOfMonth)
+            .ToList();
+
+
             var cellWorkHours = employee.WorkHours.Where(x =>
                x.TimeShiftId == datatable.FilterByTimeShiftId &&
                x.StartOn.Year == datatable.TimeShiftYear &&
@@ -164,23 +172,38 @@ namespace Bussiness.Helpers
             {
                 if (datatable.MakePrintable)
                     return "<div style='width:110px; white-space: nowrap;'>" +
-                            "<center><p><b>ΚΑ</b></p></center>" +
+                                "<center><p><b>ΚΑ</b></p></center>" +
                             "</div>";
                 else
                     return "<div style='width:110px; white-space: nowrap;'>" +
-                            "<center><p><b>Άδεια</b></p></center>" +
+                                "<center><p><b>Άδεια</b></p></center>" +
                             "</div>";
             }
             else if (cellWorkHours.Count() == 0)
             {
-                if (datatable.MakePrintable)
-                    strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
-                            "<center><p><b>Ρ</b></p></center>" +
-                            "</div>";
+                if (otherWorkHours.Count() == 0)
+                {
+                    if (datatable.MakePrintable)
+
+                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                                            "<center><p><b>Ρ</b></p></center>" +
+                                        "</div>";
+                    else
+                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                                            "<center><p><b>Ρεπό</b></p></center>" +
+                                        "</div>";
+                }
                 else
-                    strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
-                           "<center><p><b>Ρεπό</b></p></center>" +
-                           "</div>";
+                {
+                    if (datatable.MakePrintable)
+                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                                            "<center><p><b></b></p></center>" +
+                                        "</div>";
+                    else
+                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                                            "<center><p><b>Δηλώθηκε <br>σε άλλο <br>πόστο</b></p></center>" +
+                                        "</div>";
+                }
             }
             else
                 foreach (var cellWorkHour in cellWorkHours)

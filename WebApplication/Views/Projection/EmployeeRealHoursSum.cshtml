@@ -218,9 +218,9 @@
                     return JSON.stringify(data);
                 })
                 .FooterCallback((row, data, start, end, display) => {
-                    row.children[1].innerHTML = "Σύνολο ώρες: " + data[0].TotalFooterHours;
-                    row.children[2].innerHTML = "Σύνολο ώρες μέρα: " + data[0].TotalFooterHoursDay;
-                    row.children[3].innerHTML = "Σύνολο ώρες νύχτα: " + data[0].TotalFooterHoursNight;
+                    row.children[1].innerHTML = "Σύνολο ώρες: " + data[0]?.TotalFooterHours;
+                    row.children[2].innerHTML = "Σύνολο ώρες μέρα: " + data[0]?.TotalFooterHoursDay;
+                    row.children[3].innerHTML = "Σύνολο ώρες νύχτα: " + data[0]?.TotalFooterHoursNight;
                 })
                 .CompleteDataTable();
 

@@ -1606,22 +1606,12 @@
             allowClear: true,
             ajax: {
                 url: '/api/workplaces/select2',
-                data: (params) => {
+                data: function (params) {
                     var query = {
                         search: params.term,
                         page: params.page || 1
                     }
                     return query;
-                },
-                processResults: (data, params) => {
-                    params.page = params.page || 1;
-
-                    return {
-                        results: data.results,
-                        pagination: {
-                            more: (params.page * 10) < data.count_filtered
-                        }
-                    }
                 }
             }
         }).on('change', () => {

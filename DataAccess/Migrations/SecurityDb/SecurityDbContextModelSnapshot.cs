@@ -15,8 +15,8 @@ namespace DataAccess.Migrations.SecurityDb
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "3.1.5")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("DataAccess.Models.Identity.ApplicationRole", b =>
@@ -35,12 +35,12 @@ namespace DataAccess.Migrations.SecurityDb
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Permition")
                         .HasColumnType("nvarchar(max)");
@@ -55,7 +55,7 @@ namespace DataAccess.Migrations.SecurityDb
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasName("RoleNameIndex")
+                        .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
@@ -112,8 +112,8 @@ namespace DataAccess.Migrations.SecurityDb
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -142,12 +142,12 @@ namespace DataAccess.Migrations.SecurityDb
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -165,17 +165,17 @@ namespace DataAccess.Migrations.SecurityDb
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
+                        .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasName("UserNameIndex")
+                        .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
@@ -342,6 +342,10 @@ namespace DataAccess.Migrations.SecurityDb
                     b.HasOne("DataAccess.Models.Identity.ApplicationUser", "ApplicationUser")
                         .WithMany("ApplicationUserTags")
                         .HasForeignKey("ApplicationUserId");
+
+                    b.Navigation("ApplicationTag");
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserToken", b =>
@@ -369,6 +373,16 @@ namespace DataAccess.Migrations.SecurityDb
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationTag", b =>
+                {
+                    b.Navigation("ApplicationUserTags");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUser", b =>
+                {
+                    b.Navigation("ApplicationUserTags");
                 });
 #pragma warning restore 612, 618
         }

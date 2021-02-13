@@ -15,8 +15,8 @@ namespace DataAccess.Migrations.BaseDb
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "3.1.5")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("DataAccess.Models.Audit.AuditAutoHistory", b =>
@@ -27,8 +27,8 @@ namespace DataAccess.Migrations.BaseDb
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Changed")
-                        .HasColumnType("nvarchar(2048)")
-                        .HasMaxLength(2048);
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -49,13 +49,13 @@ namespace DataAccess.Migrations.BaseDb
 
                     b.Property<string>("RowId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("TableName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
@@ -822,6 +822,10 @@ namespace DataAccess.Migrations.BaseDb
                         .WithMany("Contacts")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Contract", b =>
@@ -837,6 +841,10 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("ContractTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ContractMembership");
+
+                    b.Navigation("ContractType");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Customer", b =>
@@ -845,6 +853,8 @@ namespace DataAccess.Migrations.BaseDb
                         .WithMany("Customers")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Employee", b =>
@@ -863,6 +873,12 @@ namespace DataAccess.Migrations.BaseDb
                         .WithMany("Employees")
                         .HasForeignKey("SpecializationId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Contract");
+
+                    b.Navigation("Specialization");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.EmployeeWorkPlace", b =>
@@ -878,6 +894,10 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("WorkPlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("WorkPlace");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.HourRestriction", b =>
@@ -887,6 +907,8 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("WorkPlaceHourRestrictionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("WorkPlaceHourRestriction");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Leave", b =>
@@ -902,6 +924,10 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("LeaveTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("LeaveType");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.RealWorkHour", b =>
@@ -917,6 +943,10 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("TimeShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TimeShift");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.TimeShift", b =>
@@ -926,6 +956,8 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("WorkPlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("WorkPlace");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.WorkHour", b =>
@@ -941,6 +973,10 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("TimeShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TimeShift");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.WorkPlace", b =>
@@ -949,6 +985,8 @@ namespace DataAccess.Migrations.BaseDb
                         .WithMany("WorkPlaces")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.WorkPlaceHourRestriction", b =>
@@ -958,6 +996,81 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("WorkPlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("WorkPlace");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.Company", b =>
+                {
+                    b.Navigation("Customers");
+
+                    b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.Contract", b =>
+                {
+                    b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.ContractMembership", b =>
+                {
+                    b.Navigation("Contracts");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.ContractType", b =>
+                {
+                    b.Navigation("Contracts");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.Customer", b =>
+                {
+                    b.Navigation("Contacts");
+
+                    b.Navigation("WorkPlaces");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.Employee", b =>
+                {
+                    b.Navigation("Contacts");
+
+                    b.Navigation("EmployeeWorkPlaces");
+
+                    b.Navigation("Leaves");
+
+                    b.Navigation("RealWorkHours");
+
+                    b.Navigation("WorkHours");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.LeaveType", b =>
+                {
+                    b.Navigation("Leaves");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.Specialization", b =>
+                {
+                    b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.TimeShift", b =>
+                {
+                    b.Navigation("RealWorkHours");
+
+                    b.Navigation("WorkHours");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.WorkPlace", b =>
+                {
+                    b.Navigation("EmployeeWorkPlaces");
+
+                    b.Navigation("TimeShifts");
+
+                    b.Navigation("WorkPlaceHourRestrictions");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Entity.WorkPlaceHourRestriction", b =>
+                {
+                    b.Navigation("HourRestrictions");
                 });
 #pragma warning restore 612, 618
         }

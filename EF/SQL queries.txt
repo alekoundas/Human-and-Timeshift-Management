@@ -1,0 +1,6 @@
+#Select every real workhour that doesnt belong to the timeshif(ex wrong month)
+select r1.Id,r1.StartOn,r1.TimeShiftId ,r2.Id,r2.StartOn,r2.TimeShiftId from RealWorkHours r1 inner join RealWorkHours r2 on r1.Id= r2.Id where MONTH(r1.StartOn) <>MONTH(r2.StartOn) and r1.TimeShiftId= r2.TimeShiftId
+
+update RealWorkHours set TimeShiftId=238
+where TimeShiftId =117 AND MONTH(StartOn) = 2
+

@@ -241,11 +241,12 @@
         const GetDaysColumns = () =>
             GetDaysToAppentNums().map(num =>
                 CreateThElement(GetSelectedDate(num), "Σύνολο ώρες") +
-                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Μέρα") +
-                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Σάββατο Μέρα") +
-                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Σάββατο Νύχτα") +
-                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Κυριακή Μέρα") +
-                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Κυριακή Νύχτα")
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες μέρα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες νύχτα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Σάββατο μέρα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Σάββατο νύχτα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Κυριακή μέρα") +
+                CreateThElement(GetSelectedDate(num), "Σύνολο ώρες Κυριακή νύχτα")
             ).join();
 
         const DeleteDataTableHTML = () =>

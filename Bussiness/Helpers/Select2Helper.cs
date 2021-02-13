@@ -170,10 +170,8 @@ namespace Bussiness.Helpers
                 {
                     id = result.Id,
                     Text = result.WorkPlace.Title + " - " +
-                        result.Title + " " +
-                        result.Month + "/" +
-                        result.Month
-                });
+                        result.Title
+                }); ;
 
             pegination.More = hasMore;
             return new Select2Response() { Results = results, Pagination = pegination };
