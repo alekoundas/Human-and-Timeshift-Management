@@ -1407,8 +1407,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     x.Key.WorkPlace,
                     MaxPermitedSeconds = x.Key.WorkPlace.WorkPlaceHourRestrictions
                         .FirstOrDefault(y => y.Month == x.Key.Date.Month && y.Year == x.Key.Date.Year)
-                        .HourRestrictions.FirstOrDefault(y => y.Day == x.Key.Date.Day)
-                        .MaxTicks,
+                        ?.HourRestrictions.FirstOrDefault(y => y.Day == x.Key.Date.Day)
+                        ?.MaxTicks,
                     TotalDaySeconds = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalSeconds)
                                      .Sum()
                 })
@@ -1438,7 +1438,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             return this;
         }
 
-        private static string GetTime(double seconds)
+        private static string GetTime(double? seconds)
         {
             var hours = (seconds / 3600).ToString();
             seconds %= 3600;
