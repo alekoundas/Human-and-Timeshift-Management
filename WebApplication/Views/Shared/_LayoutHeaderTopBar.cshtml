@@ -14,16 +14,16 @@
         <ul class="nav navbar-nav">
             <!--messages-->
             <!--<li class="dropdown messages-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa fa-envelope-o"></i>
-                    <span class="label label-success">4</span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li class="header">You have 4 messages</li>
-                    <li>-->
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-envelope-o"></i>
+                <span class="label label-success">4</span>
+            </a>
+            <ul class="dropdown-menu">
+                <li class="header">You have 4 messages</li>
+                <li>-->
             <!-- inner menu: contains the actual data -->
             <!--<ul class="menu">
-                <li>-->
+            <li>-->
             <!-- start message -->
             <!--<a href="#">
                     <div class="pull-left">
@@ -42,74 +42,65 @@
                     <li class="footer"><a href="#">See All Messages</a></li>
                 </ul>
             </li>-->
-            <!-- Notifications: style can be found in dropdown.less -->
-            <li class="dropdown notifications-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="Notification_Dropdown_Bell">
-                    <i class="fa fa-bell-o"></i>
-                    <span class="label label-warning" id="Notification_Badge" style="display:none;"></span>
-                </a>
-                <ul class="dropdown-menu" id="AppendNotificationHTML">
-                    @*<li class="header">You have 10 notifications</li>*@
-                    <li>
-                        <ul class="menu">
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-users text-aqua"></i> 5 new members joined today
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="footer"> @Html.LinkText("Notification", "Index", "Προβολή όλων", "Notification_View")</li>
-                </ul>
-            </li>
-
-
             <!-- If user is Logged In we show diferent body in menu modal -->
             @if (User.Identity.IsAuthenticated)
-            {
-<li class="dropdown user user-menu">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="fa fa-user" aria-hidden="true"></i>
-    </a>
-    <ul class="dropdown-menu">
+            {<!-- Notifications: style can be found in dropdown.less -->
+                                <li class="dropdown notifications-menu">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="Notification_Dropdown_Bell">
+                                        <i class="fa fa-bell-o"></i>
+                                        <span class="label label-warning" id="Notification_Badge" style="display:none;"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" id="AppendNotificationHTML">
+                                        <li class="footer"> @Html.LinkText("Notification", "Index", "Προβολή όλων", "Notification_View")</li>
+                                    </ul>
+                                </li>
 
-        <li class="user-header">
-            <p style="text-align: center; vertical-align: middle; line-height: 30px; "><b>My</b>Services</p>
-        </li>
-        <li class="user-body">
-            <div class="row">
-                <div class=" text-center">
-                    <p>Oνοματεπώνυμο: @Context.User.FindFirstValue("FirstName") @Context.User.FindFirstValue("LastName")</p>
-                </div>
-                <div class=" text-center">
-                    <p>Email: @Context.User.FindFirstValue("Email")</p>
-                </div>
-            </div>
-        </li>
-        <li class="user-footer">
 
-            <div class="pull-right">
-                <div class=" text-center">
-                    @*<b> @Html.LinkButton("User", "Profile/" + Context.User.FindFirstValue("UserID"), "Προφίλ")</b>*@
-                    <b> @Html.LinkButton("Account", "Logout", "Αποσύνδεση")</b>
-                </div>
-            </div>
-        </li>
-    </ul>
-</li> }
-            else
-            {
-<li class="dropdown user user-menu">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="fa fa-sign-in" aria-hidden="true"></i>
-    </a>
-    <ul class="dropdown-menu">
-        <li class="user-body">
-            @Html.LinkButton("Account", "Login", "Είσοδος")
 
-        </li>
-    </ul>
-</li>}
+
+                                                <li class="dropdown user user-menu">
+                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                        <i class="fa fa-user" aria-hidden="true"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu">
+
+                                                        <li class="user-header">
+                                                            <p style="text-align: center; vertical-align: middle; line-height: 30px; "><b>My</b>Services</p>
+                                                        </li>
+                                                        <li class="user-body">
+                                                            <div class="row">
+                                                                <div class=" text-center">
+                                                                    <p>Oνοματεπώνυμο: @Context.User.FindFirstValue("FirstName") @Context.User.FindFirstValue("LastName")</p>
+                                                                </div>
+                                                                <div class=" text-center">
+                                                                    <p>Email: @Context.User.FindFirstValue("Email")</p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li class="user-footer">
+
+                                                            <div class="pull-right">
+                                                                <div class=" text-center">
+                                                                    @*<b> @Html.LinkButton("User", "Profile/" + Context.User.FindFirstValue("UserID"), "Προφίλ")</b>*@
+                                                                    <b> @Html.LinkButton("Account", "Logout", "Αποσύνδεση")</b>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </li> }
+                                                            else
+                                                            {
+                                                <li class="dropdown user user-menu">
+                                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                        <i class="fa fa-sign-in" aria-hidden="true"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li class="user-body">
+                                                            @Html.LinkButton("Account", "Login", "Είσοδος")
+
+                                                        </li>
+                                                    </ul>
+                                                </li>}
         </ul>
     </div>
 </nav>

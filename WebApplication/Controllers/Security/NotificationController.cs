@@ -42,7 +42,7 @@ namespace WebApplication.Controllers.Security
             return View();
         }
 
-        [Authorize(Roles = "Notification_Create")]
+        [Authorize(Roles = "AdministrationBatchNotificationCreate_View")]
         public IActionResult Create()
         {
             ViewData["Title"] = "Προσθήκη ειδοποίησης";
@@ -50,7 +50,7 @@ namespace WebApplication.Controllers.Security
         }
 
         [HttpPost]
-        [Authorize(Roles = "Notification_Create")]
+        [Authorize(Roles = "AdministrationBatchNotificationCreate_View")]
         public async Task<IActionResult> Create(NotificationCreate notification)
         {
             if (ModelState.IsValid)

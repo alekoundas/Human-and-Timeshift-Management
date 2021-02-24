@@ -173,10 +173,10 @@ namespace Business.Seed
 
                     //Administration
                     userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
+                    userManager.AddToRoleAsync(user, "AdministrationBatchNotificationCreate_View").Wait();
 
                     //Notification
                     userManager.AddToRoleAsync(user, "Notification_View").Wait();
-                    userManager.AddToRoleAsync(user, "Notification_Create").Wait();
                 }
             }
 
@@ -342,10 +342,10 @@ namespace Business.Seed
 
                     //Administration
                     userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
+                    userManager.AddToRoleAsync(user, "AdministrationBatchNotificationCreate_View").Wait();
 
                     //Notification
                     userManager.AddToRoleAsync(user, "Notification_View").Wait();
-                    userManager.AddToRoleAsync(user, "Notification_Create").Wait();
                 }
             }
         }
@@ -493,9 +493,9 @@ namespace Business.Seed
 
             //Administration
             CreateRole(roleManager, "AdministrationBatchTimeshiftCreate", "Μαζική_δημ_χρονοδιαγραμμάτών", "View");
+            CreateRole(roleManager, "AdministrationBatchNotificationCreate", "Μαζική_δημ_χρονοδιαγραμμάτών", "View");
 
             //Notification
-            CreateRole(roleManager, "Notification", "Ειδοποιήσεις", "Create");
             CreateRole(roleManager, "Notification", "Ειδοποιήσεις", "View");
         }
 

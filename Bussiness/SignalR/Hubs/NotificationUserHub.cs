@@ -69,6 +69,7 @@ namespace Bussiness.SignalR.Hubs
                         notification.Id,
                         notification.IsSeen);
 
+                response += " <li class=footer'><a href='/Notification/Index'>Προβολή όλων </a></li>";
                 return response;
             }
 
@@ -79,7 +80,11 @@ namespace Bussiness.SignalR.Hubs
         {
             string CreateHtml(string title, string description) =>
                 "<p>" +
-                $"{title}" +
+                    $"<b>{title}</b>" +
+                "</p>" +
+                "&nbsp;" +
+                "<p>" +
+                    $"{description}" +
                 "</p>";
 
             var userId = HttpAccessorService.GetLoggeInUser_Id;

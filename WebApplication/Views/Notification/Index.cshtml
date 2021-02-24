@@ -41,10 +41,15 @@
             $(() => {
                 new DataTableService('#NotificationsDatatable')
                     .ForApiController('notifications')
-                    .AddColumn(true, true, "TitleHeader")
-                    .AddColumn(true, true, "TitleBody")
+                    .AddColumn(true, true, "Title")
+                    .AddColumn(true, true, "Description")
                     .AddColumn(true, true, "CreatedOn")
-                    .AddColumn(true, true, "IsSeen")
+                    .AddColumn(true, true, "IsSeen", ((a, b, data, d) => {
+                        if (data["IsSeen"] != null)
+                            return data["IsSeen"] == true ? "Ναι" : "Οχι";
+                        else
+                            return "";
+                    }))
                     .AddColumn(false, false, "Buttons")
                     .FixedLeftColums(2)
                     .AjaxData((data, type, row, meta) => {
@@ -53,7 +58,7 @@
                     })
                     .CreatedRow((row, data, dataIndex) => {
                         if (!data.IsSeen)
-                            $(row).css('background-color', '#AAAFB4');
+                            $(row).css('background-color', '#ffffe0');
                     })
                     .CompleteDataTable();
             })

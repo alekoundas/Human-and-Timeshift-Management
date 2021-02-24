@@ -38,11 +38,17 @@ if (LoggedInUserId !== "") {
 
     //Open modal
     $(document).on('click', '.NotificationDropdownRowTitle', (e) => {
+        document.getElementById('Notification_Modal_Body').innerHTML = "";
+
         connection.invoke('GetModalNotification', e.target.parentNode.id.split('_')[1])
             .then(result => SetNotificationInModal(result))
             .catch(err => console.error(err.toString()));
 
         connection.invoke('SetNotificationIsSeen', e.target.parentNode.id.split('_')[1], "true")
+            .catch(err => console.error(err.toString()));
+
+        connection.invoke('GetCurrentUnreadNotifications')
+            .then(unreadCount => SetNotificationBadge(unreadCount))
             .catch(err => console.error(err.toString()));
     })
 
