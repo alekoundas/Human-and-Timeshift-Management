@@ -1,6 +1,6 @@
 ﻿using Bussiness;
 using DataAccess;
-using DataAccess.Models.Identity;
+using DataAccess.Models.Security;
 using DataAccess.Repository.Security.Interface;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -247,42 +247,3 @@ namespace WebApplication.Controllers
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//// GET:  User/Edit/Id
-//[Authorize(Roles = "User_Edit")]
-//public IActionResult Edit(string id)
-//{
-//    var viewModel = _datawork.ApplicationUsers.Get(id);
-//    return View(viewModel);
-//}
-
-//// POST:  User/Edit
-//[HttpPost]
-//[ValidateAntiForgeryToken]
-//[Authorize(Roles = "User_Edit")]
-//public IActionResult Edit([FromBody] ApplicationUser viewModel)
-//{
-//    if (ModelState.IsValid)
-//    {
-//        _datawork.ApplicationUsers.Update(viewModel);
-//        _datawork.Complete();
-//        TempData["StatusMessage"] = "Ο χρήστης ενημερώθηκε με επιτυχία.";
-
-//        return RedirectToAction(nameof(Edit), new { id = viewModel.Id });
-
-//    }
-//    TempData["StatusMessage"] = "Ωχ! Ο χρήστης δεν ενημερώθηκε.";
-//    return View(viewModel);
-//}

@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Identity;
+﻿using DataAccess.Configurations;
+using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,13 @@ namespace DataAccess
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ApplicationUserRole> ApplicationUserRoles { get; set; }
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new NotificationConfiguration());
+        }
     }
 }

@@ -5,7 +5,7 @@ using DataAccess;
 using DataAccess.Libraries.Datatable;
 using DataAccess.Libraries.Select2;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Identity;
+using DataAccess.Models.Security;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Http;

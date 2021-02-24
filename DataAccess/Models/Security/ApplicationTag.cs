@@ -1,7 +1,7 @@
 ﻿using DataAccess.Models.Audit;
 using System.Collections.Generic;
 
-namespace DataAccess.Models.Identity
+namespace DataAccess.Models.Security
 {
     public class ApplicationTag : BaseEntity
     {

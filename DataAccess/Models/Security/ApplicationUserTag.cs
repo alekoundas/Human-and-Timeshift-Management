@@ -1,4 +1,4 @@
-﻿namespace DataAccess.Models.Identity
+﻿namespace DataAccess.Models.Security
 {
     public class ApplicationUserTag
     {

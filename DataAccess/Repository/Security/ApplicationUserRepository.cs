@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Security;
 using DataAccess.Repository.Security.Interface;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +26,11 @@ namespace DataAccess.Repository
         public ApplicationUser Get(string id)
         {
             return SecurityDbContext.Users.FirstOrDefault(x => x.Id == id);
+        }
+
+        public async Task<List<string>> GetAllIds()
+        {
+            return await SecurityDbContext.Users.Select(x => x.Id).ToListAsync();
         }
 
         public async Task<List<ApplicationUser>> GetWithPagging(

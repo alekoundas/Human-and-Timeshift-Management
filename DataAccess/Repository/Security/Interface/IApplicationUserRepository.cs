@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,7 @@ namespace DataAccess.Repository.Security.Interface
     public interface IApplicationUserRepository : ISecurityRepository<ApplicationUser>
     {
         ApplicationUser Get(string id);
+        Task<List<string>> GetAllIds();
         Task<List<ApplicationUser>> GetWithPagging(
            Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> orderingInfo,
            int pageSize = 10,

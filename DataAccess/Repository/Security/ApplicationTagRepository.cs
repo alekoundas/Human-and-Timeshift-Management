@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Security;
 using DataAccess.Repository.Security.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;

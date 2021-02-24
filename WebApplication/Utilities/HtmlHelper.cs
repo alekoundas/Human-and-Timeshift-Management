@@ -18,6 +18,14 @@ namespace WebApplication.Utilities
 
             return new HtmlString("");
         }
+        public static IHtmlContent LinkText(this IHtmlHelper html, string controller, string action, string buttonName, string permition = "")
+        {
+            var link = "href=/" + controller + "/" + action;
+            if (IsOkToShow(permition) || controller == "Account")
+                return new HtmlString("<a " + link + " >" + buttonName + " </a></li>");
+
+            return new HtmlString("");
+        }
 
         public static IHtmlContent ButtonCreateNew(this IHtmlHelper html, string controller)
         {

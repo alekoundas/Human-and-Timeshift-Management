@@ -1,6 +1,6 @@
 ﻿using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Identity;
+using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;

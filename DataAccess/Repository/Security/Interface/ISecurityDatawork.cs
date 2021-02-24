@@ -5,9 +5,12 @@ namespace DataAccess.Repository.Security.Interface
 {
     public interface ISecurityDatawork : IDisposable
     {
-        IApplicationRoleRepository ApplicationRoles { get; }
-        IApplicationUserRepository ApplicationUsers { get; }
-        IApplicationUserRoleRepository ApplicationUserRoles { get; }
+        public IApplicationRoleRepository ApplicationRoles { get; }
+        public IApplicationTagRepository ApplicationTags { get; }
+        public IApplicationUserRepository ApplicationUsers { get; }
+        public IApplicationUserRoleRepository ApplicationUserRoles { get; }
+        public IApplicationUserTagRepository ApplicationUserTags { get; }
+        public INotificationRepository Notifications { get; }
         Task<int> SaveChangesAsync();
     }
 }

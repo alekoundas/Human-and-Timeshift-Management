@@ -30,6 +30,8 @@ namespace DataAccess
         public DbSet<ContractMembership> ContractMemberships { get; set; }
         public DbSet<WorkPlaceHourRestriction> WorkPlaceHourRestrictions { get; set; }
 
+
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -54,8 +56,10 @@ namespace DataAccess
             builder.ApplyConfiguration(new EmployeeWorkPlaceConfiguration());
             builder.ApplyConfiguration(new ContractMembershipConfiguration());
             builder.ApplyConfiguration(new WorkPlaceHourRestrictionConfiguration());
+
+            //builder.ApplyConfiguration(new NotificationConfiguration());
         }
 
     }
-    
+
 }

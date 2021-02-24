@@ -3,8 +3,10 @@ using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Libraries.Datatable;
-using DataAccess.Models.Identity;
+using DataAccess.Libraries.Select2;
+using DataAccess.Models.Security;
 using DataAccess.ViewModels;
+using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace WebApplication.Api.Security
 {
-    [Route("api/users/")]
+    [Route("api/users")]
     [ApiController]
     public class UserApiController : ControllerBase
     {
@@ -127,6 +129,30 @@ namespace WebApplication.Api.Security
                 return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
             else
                 return null;
+        }
+
+
+        // POST: api/users/select2
+        [HttpPost("select2")]
+        public async Task<ActionResult<ApplicationUser>> Select2([FromBody] Select2 select2)
+        {
+
+            var customers = new List<ApplicationUser>();
+            var select2Helper = new Select2Helper();
+            var filter = PredicateBuilder.New<ApplicationUser>();
+            filter = filter.And(x => true);
+
+
+            if (!string.IsNullOrWhiteSpace(select2.Search))
+                filter = filter.And(x => x.FirstName.Contains(select2.Search) || x.LastName.Contains(select2.Search));
+
+            customers = await _securityDatawork.ApplicationUsers
+                .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
+
+            var total = await _securityDatawork.ApplicationUsers.CountAllAsyncFiltered(filter);
+            var hasMore = (select2.Page * 10) < total;
+
+            return Ok(select2Helper.CreateUsersResponse(customers, hasMore));
         }
 
     }

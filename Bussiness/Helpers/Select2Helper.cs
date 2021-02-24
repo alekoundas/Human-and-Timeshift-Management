@@ -1,5 +1,6 @@
 ﻿using DataAccess.Libraries.Select2;
 using DataAccess.Models.Entity;
+using DataAccess.Models.Security;
 using System.Collections.Generic;
 
 namespace Bussiness.Helpers
@@ -175,6 +176,24 @@ namespace Bussiness.Helpers
 
             pegination.More = hasMore;
             return new Select2Response() { Results = results, Pagination = pegination };
+
+        }
+
+        public Select2ResponseSecurity CreateUsersResponse(IEnumerable<ApplicationUser> timeShifts, bool hasMore)
+        {
+            var results = new List<Select2ResultSecurity>();
+            var pegination = new Select2Pagination();
+
+            foreach (var result in timeShifts)
+                results.Add(new Select2ResultSecurity()
+                {
+                    id = result.Id,
+                    Text = result.FirstName + " - " +
+                        result.LastName
+                });
+
+            pegination.More = hasMore;
+            return new Select2ResponseSecurity() { Results = results, Pagination = pegination };
 
         }
     }

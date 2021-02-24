@@ -9,6 +9,13 @@ namespace Bussiness
     public class SecurityDataWork : ISecurityDatawork
     {
         private readonly SecurityDbContext _dbcontext;
+        public IApplicationRoleRepository ApplicationRoles { get; }
+        public IApplicationTagRepository ApplicationTags { get; }
+        public IApplicationUserRepository ApplicationUsers { get; }
+        public IApplicationUserRoleRepository ApplicationUserRoles { get; }
+        public IApplicationUserTagRepository ApplicationUserTags { get; }
+        public INotificationRepository Notifications { get; }
+
         public SecurityDataWork(SecurityDbContext context)
         {
             _dbcontext = context;
@@ -18,13 +25,10 @@ namespace Bussiness
             ApplicationUsers = new ApplicationUserRepository(_dbcontext);
             ApplicationUserRoles = new ApplicationUserRoleRepository(_dbcontext);
             ApplicationUserTags = new ApplicationUserTagRepository(_dbcontext);
+            Notifications = new NotificationRepository(_dbcontext);
+
         }
 
-        public IApplicationRoleRepository ApplicationRoles { get; }
-        public IApplicationTagRepository ApplicationTags { get; }
-        public IApplicationUserRepository ApplicationUsers { get; }
-        public IApplicationUserRoleRepository ApplicationUserRoles { get; }
-        public IApplicationUserTagRepository ApplicationUserTags { get; }
 
         public async Task<int> SaveChangesAsync()
         {

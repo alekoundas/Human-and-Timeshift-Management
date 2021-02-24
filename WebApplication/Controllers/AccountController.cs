@@ -1,12 +1,15 @@
 ﻿using Bussiness;
+using Bussiness.SignalR;
+using Bussiness.SignalR.Hubs;
 using DataAccess;
-using DataAccess.Models.Identity;
+using DataAccess.Models.Security;
 using DataAccess.Repository.Security.Interface;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,16 +24,21 @@ namespace WebApplication.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginViewModel> _logger;
-
+        private readonly IHubContext<NotificationUserHub> _notificationUserHubContext;
+        private readonly IUserConnectionManager _userConnectionManager;
         public AccountController(SecurityDbContext dbContex,
             SignInManager<ApplicationUser> signInManager,
             ILogger<LoginViewModel> logger,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IHubContext<NotificationUserHub> notificationUserHubContext,
+            IUserConnectionManager userConnectionManager)
         {
             _datawork = new SecurityDataWork(dbContex);
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _notificationUserHubContext = notificationUserHubContext;
+            _userConnectionManager = userConnectionManager;
         }
 
         // GET: Account/Login
@@ -102,6 +110,13 @@ namespace WebApplication.Controllers
                             claimsPrincipal,
                             new AuthenticationProperties { IsPersistent = viewModel.RememberMe });
 
+
+                        //var connections = _userConnectionManager.GetUserConnections(user.Id);
+                        //if (connections != null)
+                        //    foreach (var connectionId in connections)
+                        //        await _notificationUserHubContext.Clients.Client(connectionId)
+                        //                    .SendAsync("CheckNotificationBadgeCount");
+
                         if (string.IsNullOrWhiteSpace(viewModel.ReturnUrl))
                             return RedirectToAction("Index", "Home");
                         else
@@ -114,6 +129,7 @@ namespace WebApplication.Controllers
             TempData["StatusMessage"] = "Ωχ! Τα στοιχεία που δώσατε, φαίνεται να είναι λανθασμένα";
             return View();
         }
+
         // GET: Account/Register
         [HttpGet]
         public IActionResult Register(string returnUrl = null)

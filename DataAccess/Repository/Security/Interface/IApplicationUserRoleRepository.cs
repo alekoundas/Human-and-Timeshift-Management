@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Threading.Tasks;

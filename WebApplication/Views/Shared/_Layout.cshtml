@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using DataAccess.Models.Security
+@using System.Security.Claims;
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -57,7 +60,6 @@
 
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
-
     <div class="wrapper">
         @await Html.PartialAsync("_LayoutHeader")
 
@@ -81,24 +83,36 @@
         @*@await Html.PartialAsync("_LayoutFooter")*@
 
     </div>
-
+    <script>
+        var LoggedInUserId = "@Context.User.FindFirstValue("UserID")";
+    </script>
     <!-- jQuery -->
     <script src="~/libs/jquery/jquery.min.js"></script>
     <!-- Moment-->
     <script src="~/libs/moment.js/moment-with-locales.js"></script>
     <!-- Bootstrap 3.3.7 -->
     <script src="~/libs/bootstrap/js/bootstrap.min.js"></script>
+    <!-- SignalR -->
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script src="~/js/Custom/SignalR/Audio/PlayAudioService.js"></script>
+    <script src="~/js/Custom/SignalR/Notification.js"></script>
+    <audio id="Notification" controls hidden>
+        <source src="~/js/Custom/SignalR/Audio/Notification.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="Message" controls hidden>
+        <source src="~/js/Custom/SignalR/Audio/Message.wav" />
+    </audio>
 
     <!-- Datatable-->
     <script src="~/js/Datatable/Datatable.js"></script>
     <script src="~/js/Datatable/dataTables.fixedColumns.min.js"></script>
-    <script src="~/js/Datatable/pdfmake.min.js"></script>
     <script src="~/js/Datatable/vfs_fonts.js"></script>
     <script src="~/js/Datatable/jszip.min.js"></script>
     <script src="~/js/Datatable/dataTables.colReorder.min.js"></script>
     <script src="~/js/Datatable/dataTables.scroller.min.js"></script>
     <script src="~/js/Datatable/dataTables.bootstrap.min.js"></script>
     <script src="~/js/Datatable/dataTables.buttons.min.js"></script>
+    @*<script src="~/js/Datatable/pdfmake.min.js"></script>*@
     <script src="~/js/Datatable/buttons.flash.min.js"></script>
     <script src="~/js/Datatable/buttons.html5.min.js"></script>
     <script src="~/js/Datatable/buttons.print.min.js"></script>

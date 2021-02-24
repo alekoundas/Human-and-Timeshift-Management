@@ -1,0 +1,61 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-2"> </div>
+    <div class="col-md-8">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-body table-responsive">
+                <table id="NotificationsDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Τίτλος</th>
+                            <th>Περιγραφή</th>
+                            <th>Ημερομηνια</th>
+                            <th>Αναγνώσθηκε</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Τίτλος</th>
+                            <th>Περιγραφή</th>
+                            <th>Ημερομηνια</th>
+                            <th>Αναγνώσθηκε</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2"> </div>
+
+</div>
+<partial name="_ExcelModals" model='new {Entity = "Employee" }'>
+
+
+    @section Scripts {
+        <script>
+            $(() => {
+                new DataTableService('#NotificationsDatatable')
+                    .ForApiController('notifications')
+                    .AddColumn(true, true, "TitleHeader")
+                    .AddColumn(true, true, "TitleBody")
+                    .AddColumn(true, true, "CreatedOn")
+                    .AddColumn(true, true, "IsSeen")
+                    .AddColumn(false, false, "Buttons")
+                    .FixedLeftColums(2)
+                    .AjaxData((data, type, row, meta) => {
+                        data.Predicate = 'NotificationIndex';
+                        return JSON.stringify(data);
+                    })
+                    .CreatedRow((row, data, dataIndex) => {
+                        if (!data.IsSeen)
+                            $(row).css('background-color', '#AAAFB4');
+                    })
+                    .CompleteDataTable();
+            })
+        </script>
+    }

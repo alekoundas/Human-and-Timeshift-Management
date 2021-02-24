@@ -1395,7 +1395,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
             var entities = (await _baseDatawork.RealWorkHours
-                .GetPaggingWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes))
+                .GetWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes))
                 .GroupBy(x => new
                 {
                     x.StartOn.Date,

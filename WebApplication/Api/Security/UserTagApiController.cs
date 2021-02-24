@@ -1,6 +1,6 @@
 ﻿using Bussiness;
 using DataAccess;
-using DataAccess.Models.Identity;
+using DataAccess.Models.Security;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;

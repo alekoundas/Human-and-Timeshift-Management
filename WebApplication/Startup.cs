@@ -1,6 +1,8 @@
 ﻿using Business.Seed;
+using Bussiness.SignalR;
+using Bussiness.SignalR.Hubs;
 using DataAccess;
-using DataAccess.Models.Identity;
+using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -90,6 +92,9 @@ namespace WebApplication
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddRazorPages();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddSignalR();
+            services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -139,7 +144,10 @@ namespace WebApplication
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ConnectionHub>("/ConnectionHub");//SignalR
+                endpoints.MapHub<NotificationUserHub>("/NotificationUserHub");
             });
+
         }
     }
 }

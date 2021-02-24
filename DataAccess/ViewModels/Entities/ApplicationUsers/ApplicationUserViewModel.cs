@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Security;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 

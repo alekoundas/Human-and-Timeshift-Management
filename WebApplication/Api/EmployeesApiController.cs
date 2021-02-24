@@ -1,6 +1,7 @@
 ﻿using Bussiness;
 using Bussiness.Helpers;
 using Bussiness.Service;
+using Bussiness.SignalR.Hubs;
 using DataAccess;
 using DataAccess.Libraries.Datatable;
 using DataAccess.Libraries.Select2;
@@ -8,6 +9,7 @@ using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using WebApplication.Utilities;
 
 namespace WebApplication.Api
 {
@@ -26,38 +27,26 @@ namespace WebApplication.Api
         private BaseDbContext _context;
         private readonly BaseDatawork _baseDataWork;
         private readonly SecurityDataWork _securityDatawork;
-
-        public EmployeesApiController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
+        private readonly IHubContext<ConnectionHub> _notificationHubContext;
+        public EmployeesApiController(
+            BaseDbContext BaseDbContext,
+            SecurityDbContext SecurityDbContext,
+            IHubContext<ConnectionHub> notificationHubContext)
         {
             _context = BaseDbContext;
             _baseDataWork = new BaseDatawork(BaseDbContext);
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
+            _notificationHubContext = notificationHubContext;
         }
 
         [HttpGet("testapi")]
-        public ActionResult<Employee> testapi()
+        public async Task<ActionResult<Employee>> testapiAsync()
         {
-            var select = new SelectLambdaBuilder<Employee>()
-                .CreateSelect()
-                .WithProperty("Id")
-                .WithProperty("FirstName")
-                .WithProperty("LastName")
-                .WithProperty2(x => x.Company.Id)
-                //.WithClass<WorkHour>("workhours")
-                //.AddClass<Specialization>("Id")
-                .CompleteSelect();
 
 
-            //var aaaa = _context.Employees.Select(x => new Employee { FirstName = x.FirstName, LastName = x.LastName }).ToList();
-            var aaa = _context.Employees
-                .Include(x => x.EmployeeWorkPlaces)
-                .Include(x => x.Specialization)
-                .Include(x => x.WorkHours)
-                .Select(select)
-                .ToList();
-
-            //return Ok(aaaa);
-            return Ok(aaa);
+            var sdsdsd = _notificationHubContext.Clients.All;
+            await _notificationHubContext.Clients.All.SendAsync("sendToUser", "mpleeeeee", "skata");
+            return Ok();
         }
 
         // GET: api/employees/deactivate/5

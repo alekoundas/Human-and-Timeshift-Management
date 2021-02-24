@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
 
 namespace DataAccess.Libraries.Select2
 {
@@ -9,6 +7,7 @@ namespace DataAccess.Libraries.Select2
     {
         [JsonProperty(PropertyName = "results")]
         public ICollection<Select2Result> Results { get; set; }
+
         [JsonProperty(PropertyName = "pagination")]
         public Select2Pagination Pagination { get; set; }
     }

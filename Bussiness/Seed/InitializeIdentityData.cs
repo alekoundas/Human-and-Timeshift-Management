@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using System;
 
@@ -173,6 +173,10 @@ namespace Business.Seed
 
                     //Administration
                     userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
+
+                    //Notification
+                    userManager.AddToRoleAsync(user, "Notification_View").Wait();
+                    userManager.AddToRoleAsync(user, "Notification_Create").Wait();
                 }
             }
 
@@ -338,6 +342,10 @@ namespace Business.Seed
 
                     //Administration
                     userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
+
+                    //Notification
+                    userManager.AddToRoleAsync(user, "Notification_View").Wait();
+                    userManager.AddToRoleAsync(user, "Notification_Create").Wait();
                 }
             }
         }
@@ -409,7 +417,6 @@ namespace Business.Seed
 
             //Customer
             CreateRole(roleManager, "Customer", "Πελάτη", "View");
-            CreateRole(roleManager, "Customer", "Πελάτη", "Create");
             CreateRole(roleManager, "Customer", "Πελάτη", "Edit");
             CreateRole(roleManager, "Customer", "Πελάτη", "Deactivate");
             CreateRole(roleManager, "Customer", "Πελάτη", "Delete");
@@ -483,9 +490,13 @@ namespace Business.Seed
             CreateRole(roleManager, "ProjectionRealWorkHourRestrictions", "Προβολή_ΠαρουσίεςΗμ", "View");
             CreateRole(roleManager, "ProjectionTimeShiftSuggestions", "Προβολή_ΥποδείξειςΧρονοδιαγράμματος", "View");
             CreateRole(roleManager, "ProjectionHoursWithComments", "Προβολή_ΒάρδιεςΜεΣχόλια", "View");
+
             //Administration
             CreateRole(roleManager, "AdministrationBatchTimeshiftCreate", "Μαζική_δημ_χρονοδιαγραμμάτών", "View");
 
+            //Notification
+            CreateRole(roleManager, "Notification", "Ειδοποιήσεις", "Create");
+            CreateRole(roleManager, "Notification", "Ειδοποιήσεις", "View");
         }
 
         private static void CreateRole(RoleManager<ApplicationRole> roleManager, string controllerName, string greekName, string permitionName)

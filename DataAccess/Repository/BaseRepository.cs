@@ -60,15 +60,12 @@ namespace DataAccess.Repository
             return await qry.ToListAsync();
         }
 
-        public IQueryable<TEntity> GetPaggingWithFilterQueryable(
+        public async Task<List<TEntity>> GetWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
             Expression<Func<TEntity, bool>> filter,
-            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
-            int pageSize = 10,
-            int pageIndex = 1)
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
         {
             var qry = (IQueryable<TEntity>)_set;
-            //qry = qry.AsExpandable();
 
             if (includes != null)
                 foreach (var include in includes)
@@ -80,10 +77,7 @@ namespace DataAccess.Repository
             if (orderingInfo != null)
                 qry = orderingInfo(qry);
 
-            if (pageSize != -1 && pageSize != 0)
-                qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return qry;
+            return await qry.ToListAsync();
         }
 
 

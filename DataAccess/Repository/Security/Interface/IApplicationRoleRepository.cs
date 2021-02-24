@@ -1,11 +1,6 @@
-﻿using System;
+﻿using DataAccess.Models.Security;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using DataAccess.Models.Identity;
-using Microsoft.AspNetCore.Identity;
 
 namespace DataAccess.Repository.Security.Interface
 {

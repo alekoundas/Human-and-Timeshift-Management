@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.Models.Identity
+namespace DataAccess.Models.Security
 {
     public class ApplicationUser : IdentityUser
     {
@@ -25,6 +25,7 @@ namespace DataAccess.Models.Identity
         public int? EmployeeId { get; set; }
 
         public ICollection<ApplicationUserTag> ApplicationUserTags { get; set; }
+        public ICollection<Notification> Notifications { get; set; }
 
         //Audit
         [Display(Name = "Δημηουργήθηκε απο")]

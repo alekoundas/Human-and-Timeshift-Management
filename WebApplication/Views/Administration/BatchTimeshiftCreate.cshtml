@@ -101,50 +101,50 @@
 
     <script>
 
-const GetMonthValue = () =>
-        document.getElementById('MonthPicker').value.split('/')[0];
+        const GetMonthValue = () =>
+            document.getElementById('MonthPicker').value.split('/')[0];
 
-    const GetMonthValueLocalized = () => {
-        var objDate = new Date();
-        objDate.setDate(1);
-        objDate.setMonth(GetMonthValue() - 1);
+        const GetMonthValueLocalized = () => {
+            var objDate = new Date();
+            objDate.setDate(1);
+            objDate.setMonth(GetMonthValue() - 1);
 
-        return objDate.toLocaleString("el-gr", { month: "long" });
-    }
+            return objDate.toLocaleString("el-gr", { month: "long" });
+        }
 
-    const GetYearValue = () =>
-        document.getElementById('MonthPicker').value.split('/')[1];
+        const GetYearValue = () =>
+            document.getElementById('MonthPicker').value.split('/')[1];
 
-    const GetDataTableData = (id) =>
-        $('#AdministrationBatchTimeshiftCreateDatatable').DataTable().rows().data()
-            .filter(data => data.Id == id)[0];
+        const GetDataTableData = (id) =>
+            $('#AdministrationBatchTimeshiftCreateDatatable').DataTable().rows().data()
+                .filter(data => data.Id == id)[0];
 
-    const GetSliderCheckedWorkPlaceIds = () =>
-        [...document.getElementsByClassName('ToggleSliders')]
-            .filter(slider => slider.checked)
-            .map(slider => slider.getAttribute('entityId'));
+        const GetSliderCheckedWorkPlaceIds = () =>
+            [...document.getElementsByClassName('ToggleSliders')]
+                .filter(slider => slider.checked)
+                .map(slider => slider.getAttribute('entityId'));
 
-    //set new name again on every input
-    const FixHTMLArrayIndex = () => {
-        var count = 0;
-        [...document.getElementsByClassName('WorkPlaceInputs')]
-            .forEach(input => input.localName = 'WorkPlaceIds[' + count++ + ']')
-    }
+        //set new name again on every input
+        const FixHTMLArrayIndex = () => {
+            var count = 0;
+            [...document.getElementsByClassName('WorkPlaceInputs')]
+                .forEach(input => input.localName = 'WorkPlaceIds[' + count++ + ']')
+        }
 
-    //Append WorkPlaces to div
-    $(document).on('click', '#AppendWorkPlaces', (e) => {
-        document.getElementById('AppendHTMLDiv').innerHTML = '';
-        var count = 0;
-        [...GetSliderCheckedWorkPlaceIds()].forEach((workPlaceId) =>
-            AppendHTMLToDiv(count++, workPlaceId))
-    });
+        //Append WorkPlaces to div
+        $(document).on('click', '#AppendWorkPlaces', (e) => {
+            document.getElementById('AppendHTMLDiv').innerHTML = '';
+            var count = 0;
+            [...GetSliderCheckedWorkPlaceIds()].forEach((workPlaceId) =>
+                AppendHTMLToDiv(count++, workPlaceId))
+        });
 
-    //Delete WorkPlace TODO
-    $(document).on('click', '.WorkPlaceDeleteButton', (e) => {
-        var num = e.target.getAttribute('num')
-        document.getElementById('WorkPlaceRowNum_' + num).remove();
-        FixHTMLArrayIndex();
-    });
+        //Delete WorkPlace TODO
+        $(document).on('click', '.WorkPlaceDeleteButton', (e) => {
+            var num = e.target.getAttribute('num')
+            document.getElementById('WorkPlaceRowNum_' + num).remove();
+            FixHTMLArrayIndex();
+        });
     </script>
 
     <script>

@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using DataAccess.Models.Identity;
+﻿using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
 {
@@ -24,7 +23,7 @@ namespace WebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityResult result = await roleManager.CreateAsync(new ApplicationRole() { Name= name });
+                IdentityResult result = await roleManager.CreateAsync(new ApplicationRole() { Name = name });
                 if (result.Succeeded)
                     return RedirectToAction("Index");
                 else

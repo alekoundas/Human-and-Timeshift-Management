@@ -18,7 +18,7 @@ namespace DataAccess
         public static string GetLoggeInUser_Id
         {
             get => new HttpContextAccessor().HttpContext.User.Claims
-                .FirstOrDefault(x => x.Type == "UserID").Value;
+                .FirstOrDefault(x => x.Type == "UserID")?.Value;
         }
     }
 }

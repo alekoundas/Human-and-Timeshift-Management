@@ -20,12 +20,10 @@ namespace DataAccess.Repository.Interface
             List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
             int pageSize = 10,
             int pageIndex = 1);
-        IQueryable<TEntity> GetPaggingWithFilterQueryable(
+        Task<List<TEntity>> GetWithFilter(
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
            Expression<Func<TEntity, bool>> filter = null,
-           List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
-           int pageSize = 10,
-           int pageIndex = 1);
+           List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
 
         Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter);
 

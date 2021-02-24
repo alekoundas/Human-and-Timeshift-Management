@@ -1,0 +1,139 @@
+﻿@model DataAccess.ViewModels.NotificationCreate
+
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonBackToList("Notification")
+                </div>
+            </div>
+
+            <hr />
+
+            <form asp-controller="Notification" asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="box-body">
+
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Description" class="form-control" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="IsSendEveryone" class="control-label"></label>
+                        <div class="input-group">
+                            <input type="checkbox" asp-for="IsSendEveryone" class="filterSlider" id="IsSendEveryone">
+                            <span asp-validation-for="IsSendEveryone" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group" id="UsersBlock">
+                        <label asp-for="UserIds" class="control-label"></label>
+                        <div id="AppendHTMLDiv" style="width:100%"></div>
+                        <div class="input-group" style="width:70%">
+                            <div class="row">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-4">
+                                    <p>Προσθήκη Υπαλληλου </p>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="button" id="AppendUsers" class="btn btn-success btn-circle"><i class="fa fa-plus"></i></button>
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Αποθήκευση" class="btn btn-primary " />
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Custom/Contacts.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+
+        //Append Employees to div
+        var count = 0;
+        $(document).on('click', '#AppendUsers', (e) => {
+            document.getElementById('AppendHTMLDiv').innerHTML = '';
+            AppendHTMLToDiv(count);
+            Select2(count++)
+        });
+
+        $('#IsSendEveryone').change(() => {
+            if (document.getElementById('IsSendEveryone').checked == true) {
+                document.getElementById('UsersBlock').style.display = 'none';
+                document.getElementById('AppendHTMLDiv').innerHTML = '';
+            }
+            else
+                document.getElementById('UsersBlock').style.display = '';
+        })
+
+    </script>
+    <script>
+        $('#IsSendEveryone').bootstrapToggle({
+            on: 'Ναί',
+            off: 'Όχι',
+            onstyle: 'primary',
+            offstyle: 'primary'
+        });
+        const Select2 = num =>
+            $('#UserSelect2_' + num).select2({
+                ajax: {
+                    type: "POST",
+                    url: '/api/users/select2',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: (params) => JSON.stringify({
+                        search: params.term,
+                        page: params.page || 1
+                    })
+                }
+            })
+    </script>
+
+    <script>
+        var AppendHTMLToDiv = (currNum) =>
+            document.getElementById('AppendHTMLDiv').insertAdjacentHTML('beforeend',
+                '<div style="padding-left:40px;" class="row" id="UserRowNum_' + currNum + '">' +
+                '<div style="width: 100%;">' +
+                '<div style="width: 60%; float: left;">' +
+                '<select  name="UserIds[' + currNum + ']"id="UserSelect2_' + currNum + '" style="width:70%"></select>' +
+                '</div >' +
+                '<div style="width: 5%; float: left;">&nbsp;</div >' +
+                '<div style="width: 20%; float: left;">' +
+                //'<button type="button" class= "btn btn-danger WorkPlaceDeleteButton" Num=' + currNum + '" > <i class="fa fa-trash"></i></button >' +
+                '</div >' +
+                '</div >' +
+                '</div >'
+            );
+    </script>
+}

@@ -16,10 +16,10 @@ namespace DataAccess.Migrations.SecurityDb
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationRole", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -61,7 +61,7 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationTag", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationTag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,7 +86,7 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("ApplicationTags");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -181,7 +181,7 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserLogin", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -203,7 +203,7 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserRole", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserRole", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -218,7 +218,7 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("AspNetUserRoles");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserTag", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserTag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -240,7 +240,7 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("ApplicationUserTags");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserToken", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserToken", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -257,6 +257,48 @@ namespace DataAccess.Migrations.SecurityDb
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Security.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsSeen")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -307,39 +349,39 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserLogin", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserLogin", b =>
                 {
-                    b.HasOne("DataAccess.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserRole", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserRole", b =>
                 {
-                    b.HasOne("DataAccess.Models.Identity.ApplicationRole", null)
+                    b.HasOne("DataAccess.Models.Security.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataAccess.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserTag", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserTag", b =>
                 {
-                    b.HasOne("DataAccess.Models.Identity.ApplicationTag", "ApplicationTag")
+                    b.HasOne("DataAccess.Models.Security.ApplicationTag", "ApplicationTag")
                         .WithMany("ApplicationUserTags")
                         .HasForeignKey("ApplicationTagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataAccess.Models.Identity.ApplicationUser", "ApplicationUser")
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", "ApplicationUser")
                         .WithMany("ApplicationUserTags")
                         .HasForeignKey("ApplicationUserId");
 
@@ -348,18 +390,29 @@ namespace DataAccess.Migrations.SecurityDb
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUserToken", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserToken", b =>
                 {
-                    b.HasOne("DataAccess.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Security.Notification", b =>
+                {
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", "ApplicationUser")
+                        .WithMany("Notifications")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("DataAccess.Models.Identity.ApplicationRole", null)
+                    b.HasOne("DataAccess.Models.Security.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -368,21 +421,23 @@ namespace DataAccess.Migrations.SecurityDb
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("DataAccess.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationTag", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationTag", b =>
                 {
                     b.Navigation("ApplicationUserTags");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationUser", b =>
                 {
                     b.Navigation("ApplicationUserTags");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }
