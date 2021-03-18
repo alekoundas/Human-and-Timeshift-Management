@@ -12,7 +12,7 @@
             </div>
             <hr />
 
-            <div class="box-body table-responsive">
+            <div class="box-body table table-responsive">
 
                 <table id="EmployeesCurrentDayDatatable" class="table table-bordered table-hover table-responsive stripe">
                     <thead>
@@ -154,7 +154,8 @@
                     BuildRealWorkHourEditDto(startOn, endOn))
             })
             $('#RealWorkHour_Modal').modal('hide')
-            $('#EmployeesCurrentDayDatatable').DataTable().ajax.reload();
+            $('#EmployeesCurrentDayDatatable').DataTable().destroy();
+            datatableService();
 
         });
     </script>
@@ -276,6 +277,7 @@
             hourFormat: 24,
             format: "DD/MM/YYYY HH:mm",
             dateSeparator: '/-/',
+            showCalendars: false,
             target: $("#CalentimInput"),
             locale: "el",
             onafterselect: () => {
@@ -283,19 +285,17 @@
                 var startOn = dateRange.split('/-/')[0];
                 var endOn = dateRange.split('/-/')[1];
 
-                document.getElementById('NewEndOn').value = endOn;
-                document.getElementById('NewStartOn').value = startOn;
+                startOn = new DateService().ConvertFrom.String.DDMMYYYY_HHMM(startOn).To.TimeStamp();
+                endOn = new DateService().ConvertFrom.String.DDMMYYYY_HHMM(endOn).To.TimeStamp();
 
-                startOn = moment(startOn, 'DD/MM/YYYY HH:mm').valueOf()
-                endOn = moment(endOn, 'DD/MM/YYYY HH:mm').valueOf()
+                if (endOn < startOn)
+                    endOn = new Date(endOn).setDate(new Date(endOn).getDate() + 1).valueOf();
+
+                document.getElementById('NewStartOn').value = new DateService().ConvertFrom.TimeStamp(startOn).To.DDMMYYYYHHMM();
+                document.getElementById('NewEndOn').value = new DateService().ConvertFrom.TimeStamp(endOn).To.DDMMYYYYHHMM();
 
                 document.getElementById('EndOn').value = endOn;
-
                 document.getElementById('StartOn').value = startOn;
-                //HandleTimeRangeSpan(data);
-                //ValidateEmployeeWithRangeToRealWorkhour();
-                //ValidateEmployeesWithRestrictionMaxHours();
-                //ValidateEmployeesWithRestrictionHasOvertime();
             },
             onaftershow: () =>
                 //Fix Calentim width
@@ -303,7 +303,8 @@
                     .forEach((calentim) =>
                         calentim.setAttribute('style', 'width: 400px;'))
         });
-        $(() => new DataTableService('#EmployeesCurrentDayDatatable')
+
+        datatableService = () => new DataTableService('#EmployeesCurrentDayDatatable')
             .ForApiController('projections')
             .AddColumn(true, true, "EmployeeLastName")
             .AddColumn(true, true, "EmployeeFirstName")
@@ -311,11 +312,12 @@
             .AddColumn(true, true, "StartOn_string")
             .AddColumn(true, true, "EndOn_string")
             .AddColumn(false, false, "Buttons")
-            .FixedLeftColums(2)
             .AjaxData((data, type, row, meta) => {
                 data.predicate = 'ProjectionCurrentDay';
                 return JSON.stringify(data);
             })
-            .CompleteDataTable());
+            .CompleteDataTable();
+        $(() => datatableService())
+
     </script>
 }

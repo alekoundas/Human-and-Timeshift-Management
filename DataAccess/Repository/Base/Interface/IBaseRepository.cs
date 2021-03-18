@@ -9,10 +9,13 @@ namespace DataAccess.Repository.Interface
 {
     public interface IBaseRepository<TEntity> where TEntity : class
     {
+        //Excell reflection call
+        Task<List<TEntity>> GetAllAsync();
         Task<TEntity> FindAsync(int id);
         Task<int> CountAllAsync();
         Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> filter);
         Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector);
+        Task<List<TResult>> SelectAllAsyncFiltered<TResult>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TResult>> selector);
 
         Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
@@ -22,6 +25,10 @@ namespace DataAccess.Repository.Interface
             int pageIndex = 1);
         Task<List<TEntity>> GetWithFilter(
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+           Expression<Func<TEntity, bool>> filter = null,
+           List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
+        IQueryable<TEntity> GetWithFilterQueryable(
+         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
            Expression<Func<TEntity, bool>> filter = null,
            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
 

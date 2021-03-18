@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Threading;
@@ -85,11 +86,13 @@ namespace WebApplication
 
 
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("el-GR");
-            services.AddControllersWithViews()
+            //services.AddControllersWithViews()
+            services.AddMvcCore()
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling =
-                        Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+                        ReferenceLoopHandling.Ignore)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             services.AddRazorPages();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

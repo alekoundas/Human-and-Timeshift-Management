@@ -1,10 +1,14 @@
-﻿using DataAccess;
+﻿using Bussiness.Service;
+using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +16,7 @@ namespace WebApplication.Controllers
 {
     public class RealWorkHourController : MasterController
     {
+        private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         public RealWorkHourController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
@@ -71,6 +76,7 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RealWorkHourCreate viewModel)
         {
+            //var timeshift = _baseDataWork.TimeShifts.Where(x => x.Id == viewModel.TimeShiftId).FirstOrDefault();
             var changeCount = 0;
             if (ModelState.IsValid)
             {
@@ -143,26 +149,102 @@ namespace WebApplication.Controllers
             return View(realWorkHour);
         }
 
-        // GET: RealWorkHours/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var realWorkHour = await _context.RealWorkHours
-                .Include(r => r.Employee)
-                .Include(r => r.TimeShift)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (realWorkHour == null)
-                return NotFound();
-
-            return View(realWorkHour);
-        }
-
         private bool RealWorkHourExists(int id)
         {
             return _context.RealWorkHours.Any(e => e.Id == id);
+        }
+
+        public async Task<ActionResult> DownloadExcelTemplate(int? id)
+        {
+            var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == id);
+            var daysInMonth = DateTime.DaysInMonth(timeshift.Year, timeshift.Month);
+            var excelColumns = new List<string>(new string[] {
+                "EmployeeId",
+                "Comments",
+                "TimeShiftId"
+            });
+            for (int i = 0; i < daysInMonth; i++)
+            {
+                excelColumns.Add("Day_" + i);
+            }
+
+            var excelPackage = (await (new ExcelService<RealWorkHour>(_context)
+                .AddLookupFilter(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == id)))
+               .CreateNewExcel("RealWorkHours"))
+               .AddSheetAsync(excelColumns))
+               .CompleteExcel(out var errors);
+
+            if (errors.Count == 0)
+                using (var package = excelPackage)
+                    return File(package.GetAsByteArray(), XlsxContentType, "RealWorkHours.xlsx");
+            else
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
+        }
+
+        public async Task<ActionResult> DownloadExcelWithData(int? id)
+        {
+            var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == id);
+            var daysInMonth = DateTime.DaysInMonth(timeshift.Year, timeshift.Month);
+            var excelColumns = new List<string>(new string[] {
+                "EmployeeId",
+                "Comments",
+                "TimeShiftId"
+            });
+            for (int i = 0; i < daysInMonth; i++)
+            {
+                excelColumns.Add("Day_" + i);
+            }
+
+            var excelPackage = (await (new ExcelService<RealWorkHour>(_context)
+                .AddLookupFilter(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == id)))
+             .CreateNewExcel("RealWorkHours"))
+             .AddSheetAsync(excelColumns, "RealWorkHours"))
+             .CompleteExcel(out var errors);
+
+            if (errors.Count == 0)
+                using (var package = excelPackage)
+                    return File(package.GetAsByteArray(), XlsxContentType, "RealWorkHours.xlsx");
+            else
+                TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+            return View();
+        }
+
+        public async Task<ActionResult> Import(IFormFile ImportExcel)
+        {
+            if (ImportExcel == null)
+                TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
+            else
+            {
+                var realWorkHours = (await (new ExcelService<RealWorkHour>(_context)
+                    .ExtractDataFromExcel(ImportExcel)))
+                    .ValidateExtractedData()
+                    .RetrieveExtractedData(out var errors);
+
+                if (errors.Count == 0)
+                {
+
+                    _baseDataWork.RealWorkHours.RemoveRange(_baseDataWork.RealWorkHours
+                        .Where(x => x.TimeShiftId == realWorkHours[0].TimeShiftId).ToList());
+
+                    var status_delete = await _baseDataWork.SaveChangesAsync();
+
+                    _baseDataWork.RealWorkHours.AddRange(realWorkHours);
+                    var status = await _baseDataWork.SaveChangesAsync();
+
+                    if (status > 0)
+                        TempData["StatusMessage"] = realWorkHours.Count +
+                    " εγγραφές προστέθηκαν με επιτυχία";
+                    else
+                        TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
+                }
+                else
+                    TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+            }
+
+            return View("Index");
         }
     }
 }

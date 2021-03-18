@@ -133,9 +133,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 dictionary.Add("StartOn_string", result.StartOn.ToString());
                 dictionary.Add("EndOn_string", result.EndOn.ToString());
 
-                dictionary.Add("Buttons", "");
-                //dictionary.Add("Buttons", dataTableHelper
-                //   .GetCurrentDayButtons(result));
+                //dictionary.Add("Buttons", "");
+                dictionary.Add("Buttons", dataTableHelper
+                   .GetCurrentDayButtons(result));
 
                 returnObjects.Add(expandoObj);
             }
@@ -1383,34 +1383,37 @@ namespace Bussiness.Service.DataTableServiceWorkers
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
             var includes = new List<Func<IQueryable<RealWorkHour>, IIncludableQueryable<RealWorkHour, object>>>();
-            includes.Add(x => x.Include(y => y.Employee));
-            includes.Add(x => x.Include(y => y.TimeShift)
-                .ThenInclude(y => y.WorkPlace)
-                .ThenInclude(y => y.WorkPlaceHourRestrictions)
-                .ThenInclude(y => y.HourRestrictions));
 
             filter = filter.And(x => _datatable.StartOn <= x.StartOn && x.StartOn <= _datatable.EndOn);
+            filter = filter.And(x => x.TimeShift.WorkPlace.WorkPlaceHourRestrictions.Where(y => y.Month == x.StartOn.Month && y.Year == x.StartOn.Year).Any());
 
             if (_datatable.FilterByWorkPlaceId != 0)
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
             var entities = (await _baseDatawork.RealWorkHours
-                .GetWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes))
+                .GetWithFilterQueryable(x => x.OrderBy(y => y.StartOn), filter, includes).Select(x => new
+                {
+                    x.StartOn,
+                    x.EndOn,
+                    x.TimeShift.WorkPlace.Title,
+                    x.TimeShift.WorkPlace.WorkPlaceHourRestrictions
+                        .FirstOrDefault(y => y.Month == x.StartOn.Month && y.Year == x.StartOn.Year)
+                        .HourRestrictions.FirstOrDefault(y => y.Day == x.StartOn.Day)
+                        .MaxTicks,
+                }).ToListAsync())
                 .GroupBy(x => new
                 {
                     x.StartOn.Date,
-                    x.TimeShift.WorkPlace
+                    x.Title,
+                    x.MaxTicks
                 })
                 .Select(x => new
                 {
                     x.Key.Date,
-                    x.Key.WorkPlace,
-                    MaxPermitedSeconds = x.Key.WorkPlace.WorkPlaceHourRestrictions
-                        .FirstOrDefault(y => y.Month == x.Key.Date.Month && y.Year == x.Key.Date.Year)
-                        ?.HourRestrictions.FirstOrDefault(y => y.Day == x.Key.Date.Day)
-                        ?.MaxTicks,
+                    x.Key.Title,
+                    MaxPermitedSeconds = x.Key.MaxTicks,
                     TotalDaySeconds = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalSeconds)
-                                     .Sum()
+                        .Sum()
                 })
                 .ToList();
 
@@ -1425,7 +1428,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     var expandoObj = new ExpandoObject();
                     var dictionary = (IDictionary<string, object>)expandoObj;
 
-                    dictionary.Add("WorkPlaceTitle", result.WorkPlace.Title);
+                    dictionary.Add("WorkPlaceTitle", result.Title);
                     dictionary.Add("DateError", result.Date.ToShortDateString());
                     dictionary.Add("Error", $"Μέγιστο όριο ημέρας: {GetTime(result.MaxPermitedSeconds) } Εισήχθησαν: {GetTime(result.TotalDaySeconds) }");
 

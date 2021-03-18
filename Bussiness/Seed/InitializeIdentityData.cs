@@ -157,6 +157,9 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "RealWorkHour_Import").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Export").Wait();
 
+                    userManager.AddToRoleAsync(user, "WorkHour_Import").Wait();
+                    userManager.AddToRoleAsync(user, "WorkHour_Export").Wait();
+
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionConcentric_View").Wait();
@@ -326,6 +329,9 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "RealWorkHour_Import").Wait();
                     userManager.AddToRoleAsync(user, "RealWorkHour_Export").Wait();
 
+                    userManager.AddToRoleAsync(user, "WorkHour_Import").Wait();
+                    userManager.AddToRoleAsync(user, "WorkHour_Export").Wait();
+
                     //Projection
                     userManager.AddToRoleAsync(user, "ProjectionDifference_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionConcentric_View").Wait();
@@ -467,6 +473,9 @@ namespace Business.Seed
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Delete");
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Import");
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Export");
+
+            CreateRole(roleManager, "WorkHour", "Βάρδια", "Import");
+            CreateRole(roleManager, "WorkHour", "Βάρδια", "Export");
 
             //WorkPlaceHourRestriction
             CreateRole(roleManager, "WorkPlaceHourRestriction", "ΠεριορισμόςΠόστου", "View");

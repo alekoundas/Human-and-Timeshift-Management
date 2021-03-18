@@ -20,9 +20,19 @@ namespace DataAccess.Repository
             _set = Context.Set<TEntity>();
         }
 
+        //excell reflection call
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            return await _set.ToListAsync();
+        }
+
         public async Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector)
         {
             return (List<TResult>)await _set.Select(selector).ToListAsync();
+        }
+        public async Task<List<TResult>> SelectAllAsyncFiltered<TResult>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TResult>> selector)
+        {
+            return (List<TResult>)await _set.Where(predicate).Select(selector).ToListAsync();
         }
 
         public async Task<int> CountAllAsync()
@@ -78,6 +88,25 @@ namespace DataAccess.Repository
                 qry = orderingInfo(qry);
 
             return await qry.ToListAsync();
+        }
+        public IQueryable<TEntity> GetWithFilterQueryable(
+         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+         Expression<Func<TEntity, bool>> filter,
+         List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
+        {
+            var qry = (IQueryable<TEntity>)_set;
+
+            if (includes != null)
+                foreach (var include in includes)
+                    qry = include(qry);
+
+            if (filter != null)
+                qry = qry.Where(filter);
+
+            if (orderingInfo != null)
+                qry = orderingInfo(qry);
+
+            return qry;
         }
 
 

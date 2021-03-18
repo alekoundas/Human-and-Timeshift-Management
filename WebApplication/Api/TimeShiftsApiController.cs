@@ -34,6 +34,7 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
         }
 
+        //RealWorkHourCreate
         // GET: api/TimeShiftsApi
         [HttpGet("{id}")]
         public async Task<ActionResult<TimeShift>> GetTimeShift(int id)
@@ -143,9 +144,7 @@ namespace WebApplication.Api
             {
                 bool isLastDayOfMonth = (DateTime.Now.Day == DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
                 bool isFirstDayOfMonth = DateTime.Now.Day == 1;
-                if (isLastDayOfMonth)
-                    filter = filter.And(x => x.Month == DateTime.Now.Month || x.Month == DateTime.Now.Month + 1);
-                else if (isFirstDayOfMonth)
+                if (isFirstDayOfMonth)
                     filter = filter.And(x => x.Month == DateTime.Now.Month || x.Month == DateTime.Now.Month - 1);
                 else
                     filter = filter.And(x => x.Month == DateTime.Now.Month);

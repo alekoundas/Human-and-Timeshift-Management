@@ -30,7 +30,7 @@
                             <div class="form-group">
                                 <label class="control-label">Πόστο</label>
                                 <div class="input-group" style="width:100%">
-                                    <select class="TimeShift_Select2" asp-for="TimeShiftId" style="width:70%"></select>
+                                    <select id="TimeShift_Select2" asp-for="TimeShiftId" style="width:70%"></select>
                                     <span asp-validation-for="TimeShiftId" class="text-danger"></span>
                                     <span style="display:none;" id="TimeShiftWarningSpan" class="text-warning">   </span>
 
@@ -97,7 +97,7 @@
     <!-- Dtos-->
     <script>
         const BuildHasOverlapWorkHourDto = (startDate, endDate) => ({
-            timeShiftId: document.getElementById('TimeShiftId').value,
+            timeShiftId: document.getElementById('TimeShift_Select2').value,
             startOn: TimeConverter(startDate),
             endOn: TimeConverter(endDate)
         });
@@ -105,16 +105,16 @@
             employeeIds: employeeIds,
             startOn: TimeConverter(startDate),
             endOn: TimeConverter(endDate),
-            timeShiftId: document.getElementById('TimeShiftId').value //for "belongs" only
+            timeShiftId: document.getElementById('TimeShift_Select2').value //for "belongs" only
         });
         const BuildValidateHasOvertimeDto = (startDate, endDate, employeeIds) => ([{
             startOn: TimeConverter(startDate),
             endOn: TimeConverter(endDate),
             employeeIds: employeeIds,
-            timeShiftId: document.getElementById('TimeShiftId').value //for "belongs" only
+            timeShiftId: document.getElementById('TimeShift_Select2').value //for "belongs" only
         }]);
         const BuildSelect2Dto = (params) => ({
-            timeShiftId: document.getElementById('TimeShiftId').value,
+            timeShiftId: document.getElementById('TimeShift_Select2').value,
             search: params.term,
             page: params.page || 1,
             existingIds: GetAlreadyAppendedEmployeeIds()
@@ -125,7 +125,7 @@
     <!--///             Handlers            ///-->
     <!--///////////////////////////////////////-->
     <script>
-        const HandleSubmitButton = () =>
+const HandleSubmitButton = () =>
             [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
                 .filter(span => span.style.display == '').length > 0 ?
                 HideSaveButton() : ShowSaveButton();
@@ -200,22 +200,22 @@
     <script>
         /**/
         const ValidateEmployeesWithRangeToRealWorkhour = () => {
-            var startOn = document.getElementById('StartOn').value;
-            var endOn = document.getElementById('EndOn').value;
-            var employeeIds = GetAlreadyAppendedEmployeeIds();
+                var startOn = document.getElementById('StartOn').value;
+                var endOn = document.getElementById('EndOn').value;
+                var employeeIds = GetAlreadyAppendedEmployeeIds();
 
-            $.ajax({
-                type: "POST",
-                url: '/api/realworkhours/hasoverlap',
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                data: JSON.stringify(
-                    BuildValidateWorkHourDto(startOn, endOn, employeeIds))
-            }).done((data) => {
-                ShowResultPerEmployeeDropdown(data);
-                HandleSubmitButton();
-            });
-        };
+                $.ajax({
+                    type: "POST",
+                    url: '/api/realworkhours/hasoverlap',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify(
+                        BuildValidateWorkHourDto(startOn, endOn, employeeIds))
+                }).done((data) => {
+                    ShowResultPerEmployeeDropdown(data);
+                    HandleSubmitButton();
+                });
+            };
 
         const ValidateEmployeesWithRangeToWorkHour = () => {
             var startOn = document.getElementById('StartOn').value;
@@ -409,7 +409,7 @@
         }
 
         //TimeShift Select2
-        $('.TimeShift_Select2').select2({
+        $('#TimeShift_Select2').select2({
             ajax: {
                 url: '/api/timeshifts/select2',
                 data: (params) => ({
@@ -419,6 +419,23 @@
                 })
             }
         }).on('change', (e) => {
+            if (new Date().getDate() == 1)
+                $.ajax({
+                    type: "GET",
+                    url: '/api/timeshifts/' + document.getElementById('TimeShift_Select2').value
+                }).done((data) => {
+                    var currentDate = document.getElementById('StartOn').value;
+                    currentDate = new DateService().ConvertFrom.Input(currentDate).To.Date();
+                    currentDate.setMonth(data.month - 1);
+                    if (new Date().getMonth() != data.month)
+                        currentDate.setDate(new DateService().GetDaysOfMonth(data.year, data.month));
+
+                    currentDate = new DateService().ConvertFrom.Date(currentDate).To.Input();
+
+                    document.getElementById('StartOn').value = currentDate;
+                    document.getElementById('EndOn').value = currentDate;
+                });
+
             if (e.target.value != "") {
                 document.getElementById('EmployeesDiv').style = 'display:;';
                 document.getElementById('TimeRangeDiv').style = 'display:;';

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DataAccess.Models.Entity;
 using DataAccess.Repository.Base.Interface;
-using DataAccess;
-using DataAccess.Models.Entity;
 
 namespace DataAccess.Repository.Base
 {
-    public class CompanyRepository:BaseRepository<Company>,ICompanyRepository
+    public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
     {
         public CompanyRepository(BaseDbContext dbContext) : base(dbContext)
         {

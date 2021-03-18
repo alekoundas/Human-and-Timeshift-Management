@@ -269,9 +269,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-
                 var apiUrl = UrlHelper.EmployeeWorkPlace(result.Id, _datatable.GenericId);
-
 
                 dictionary.Add("Id", result.Id);
                 dictionary.Add("FirstName", result.FirstName);
@@ -306,6 +304,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.Specialization));
             includes.Add(x => x.Include(y => y.Company));
+            includes.Add(x => x.Include(y => y.EmployeeWorkPlaces));
 
             if (!_datatable.FilterByIncludedEmployees)
                 _filter = _filter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.GenericId));
@@ -327,9 +326,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-
                 var apiUrl = UrlHelper.EmployeeWorkPlace(result.Id, _datatable.GenericId);
-
 
                 dictionary.Add("Id", result.Id);
                 dictionary.Add("FirstName", result.FirstName);

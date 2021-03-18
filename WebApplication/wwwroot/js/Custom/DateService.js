@@ -6,24 +6,48 @@
         this._dateTs = 0;
     }
 
-    #Convert = () => ({
-        To: ({
-            Api: () => { return this.#CompleteTimeWithZerosForApiPost(this._dateTs) },
-            YYYMMDDHHMM: () => { return "poytses" }
+    ConvertFrom = ({
+        Api: (date) => {
+            if (date)
+                this._dateTs = moment(date, 'YYYY/MM/DD HH:mm:ss').valueOf();
+            return this.#Convert();
+        },
+        Date: (date) => {
+            if (date)
+                this._dateTs = date.valueOf();
+            return this.#Convert();
+        },
+        Input: (date) => {
+            if (date)
+                this._dateTs = moment(date, 'YYYY/MM/DD HH:mm:ss').valueOf();
+            return this.#Convert();
+        },
+        TimeStamp: (date) => {
+            if (date)
+                this._dateTs = date;
+            return this.#Convert();
+        },
+        String: ({//ex. 18/03/2021 22:19
+            DDMMYYYY_HHMM: (date) => {
+                this._dateTs = moment(date, 'DD/MM/YYYY HH:mm:ss').valueOf();
+                console.log("this._dateTs", this._dateTs)
+                return this.#Convert();
+            }
         })
     })
 
-    ConvertFrom = ({
-        Api: (date) => {
-            this._dateTs = moment(date, 'YYYY/MM/DD HH:mm:ss').valueOf();
-            return this.#Convert();
-        },
-        TimeStamp: (dateTs) => {
-            this._dateTs = dateTs;
-            return this.#Convert();
-        }
-    })
+    GetDaysOfMonth = (year, month) =>
+        new Date(year, month, 0).getDate();
 
+    #Convert = () => ({
+        To: ({
+            Api: () => this.#CompleteTimeWithZerosForApiPost(this._dateTs),
+            Date: () => new Date(this._dateTs),
+            TimeStamp: () => this._dateTs,
+            Input: () => this.#CompleteTimeWithZerosForApiPost(this._dateTs),
+            DDMMYYYYHHMM: () => moment(new Date(this._dateTs)).format('DD/MM/YYYY HH:MM')
+        })
+    })
 
     #CompleteTimeWithZerosForApiPost = dateTs => {
         if (dateTs) {

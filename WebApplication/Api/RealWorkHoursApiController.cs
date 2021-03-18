@@ -87,18 +87,42 @@ namespace WebApplication.Api
             return CreatedAtAction("GetRealWorkHour", new { id = realWorkHour.Id }, realWorkHour);
         }
 
-        // DELETE: api/realworkhours/5
+        // DELETE: api/realworkhours/id
         [HttpDelete("{id}")]
-        public async Task<ActionResult<RealWorkHour>> DeleteRealWorkHour(int id)
+        public async Task<ActionResult<DeleteViewModel>> Delete(int id)
         {
+            var response = new DeleteViewModel();
             var realWorkHour = await _context.RealWorkHours.FindAsync(id);
+
             if (realWorkHour == null)
                 return NotFound();
 
-            _context.RealWorkHours.Remove(realWorkHour);
-            await _baseDataWork.SaveChangesAsync();
+            _baseDataWork.RealWorkHours.Remove(realWorkHour);
 
-            return realWorkHour;
+            var status = await _baseDataWork.SaveChangesAsync();
+
+            if (status >= 1)
+            {
+                response.IsSuccessful = true;
+                response.ResponseBody = "Η βάρδια " +
+                    realWorkHour.StartOn.ToString() +
+                    " - " +
+                    realWorkHour.EndOn.ToString() +
+                    " διαγράφηκε με επιτυχία.";
+            }
+            else
+            {
+                response.IsSuccessful = false;
+                response.ResponseBody = "Ωχ! Η βάρδια " +
+                    realWorkHour.StartOn.ToString() +
+                    " - " +
+                    realWorkHour.EndOn.ToString() +
+                    " ΔΕΝ διαγράφηκε!";
+            }
+
+            response.ResponseTitle = "Διαγραφή βάρδιας";
+            response.Entity = realWorkHour;
+            return response;
         }
 
 
