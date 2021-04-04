@@ -47,13 +47,16 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
         private Func<IQueryable<Employee>, IOrderedQueryable<Employee>> SetOrderBy()
         {
+
+            if (_columnName == "Title")
+                return null;
             if (_columnName != "")
                 return x => x.OrderBy(_columnName + " " + _orderDirection.ToUpper());
             else
                 return null;
         }
 
-        private Func<IQueryable<WorkPlace>, IOrderedQueryable<WorkPlace>> SetOrderByWorkPlace()
+        private Func<IQueryable<RealWorkHour>, IOrderedQueryable<RealWorkHour>> SetOrderByRealWorkHour()
         {
             if (_columnName != "")
                 return x => x.OrderBy(_columnName + " " + _orderDirection.ToUpper());
@@ -335,13 +338,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             if (_datatable.FilterByWorkPlaceId != 0)
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
 
-            var entitiesasd = (await _baseDatawork.RealWorkHours
-.GetPaggingWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes, _pageSize, _pageIndex))
-.GroupBy(x => new
-{
-    x.StartOn.Date,
-    x.Employee
-}).ToList();
+
             var entities = (await _baseDatawork.RealWorkHours
             .GetPaggingWithFilter(x => x.OrderBy(y => y.StartOn), filter, includes, _pageSize, _pageIndex))
             .GroupBy(x => new
@@ -663,18 +660,29 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
         public async Task<ProjectionDataTableWorker> ProjectionEmployeeRealHoursSum()
         {
-            var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
-            includes.Add(x => x.Include(y => y.Customer).ThenInclude(z => z.Company));
-            includes.Add(x => x.Include(y => y.TimeShifts).ThenInclude(z => z.RealWorkHours));
+            var includes = new List<Func<IQueryable<RealWorkHour>, IIncludableQueryable<RealWorkHour, object>>>();
+            includes.Add(x => x.Include(y => y.TimeShift).ThenInclude(z => z.WorkPlace));
 
-            var filter = PredicateBuilder.New<WorkPlace>();
+            var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => true);
 
-            if (_datatable.FilterByWorkPlaceId != 0)
-                filter = filter.And(x => x.Id == _datatable.FilterByWorkPlaceId);
+            if (_datatable.FilterByEmployeeId != 0)
+                filter = filter.And(x => x.EmployeeId == _datatable.FilterByEmployeeId);
 
-            var entities = await _baseDatawork.WorkPlaces
-                .GetPaggingWithFilter(SetOrderByWorkPlace(), filter, includes, _pageSize, _pageIndex);
+            if (_datatable.FilterByWorkPlaceId != 0)
+                filter = filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
+
+            var entities = (await _baseDatawork.RealWorkHours
+                .GetPaggingWithFilter(null, filter, includes, _pageSize, _pageIndex))
+                .GroupBy(x => x.TimeShift.WorkPlace)
+                .Select(x => new
+                {
+                    WorkPlace = x.Key,
+                    TotalHours = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalSeconds).Sum(),
+                    TotalHoursDay = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds).Sum(),
+                    TotalHoursNight = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds).Sum()
+                });
+
 
 
             //Mapping
@@ -682,68 +690,24 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var dataTableHelper = new DataTableHelper<WorkPlace>();
             var returnObjects = new List<ExpandoObject>();
 
-            var realWorkHoursFilter = PredicateBuilder.New<RealWorkHour>();
 
-            if (_datatable.FilterByEmployeeId != 0)
-                realWorkHoursFilter = realWorkHoursFilter.And(x => x.EmployeeId == _datatable.FilterByEmployeeId);
-
-            realWorkHoursFilter = realWorkHoursFilter.And(x =>
-                _datatable.StartOn.Date <= x.StartOn.Date && x.EndOn.Date <= _datatable.EndOn.Date);
+            var totalFooter = entities.Select(x => x.TotalHours).Sum();
+            var totalFooterDay = entities.Select(x => x.TotalHoursDay).Sum();
+            var totalFooterNight = entities.Select(x => x.TotalHoursNight).Sum();
 
 
-            var totalFooter = entities.Select(x => x.TimeShifts
-                .Select(x => x.RealWorkHours
-                    .Where(realWorkHoursFilter)
-                    .Select(x => Math.Abs((x.EndOn - x.StartOn).TotalSeconds))
-                    .Sum())
-                .Sum())
-                .Sum();
-
-            var totalFooterDay = entities.Select(x => x.TimeShifts
-              .Select(x => x.RealWorkHours
-                  .Where(realWorkHoursFilter)
-                  .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds)
-                    .Sum())
-                  .Sum())
-                .Sum();
-
-            var totalFooterNight = entities.Select(x => x.TimeShifts
-              .Select(x => x.RealWorkHours
-                  .Where(realWorkHoursFilter)
-                  .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds)
-                    .Sum())
-                  .Sum())
-               .Sum();
 
             foreach (var result in entities)
             {
                 var expandoObj = new ExpandoObject();
                 var dictionary = (IDictionary<string, object>)expandoObj;
 
-                dictionary.Add("Title", result.Title);
-                var totalSeconds = result.TimeShifts
-                    .Where(x => x.WorkPlaceId == result.Id)
-                    .Select(x => x.RealWorkHours
-                        .Where(realWorkHoursFilter)
-                        .Select(x => Math.Abs((x.EndOn - x.StartOn).TotalSeconds))
-                        .Sum())
-                    .Sum();
+                dictionary.Add("Title", result.WorkPlace.Title);
+                var totalSeconds = result.TotalHours;
+                var totalSecondsDay = result.TotalHoursDay;
+                var totalSecondsNight = result.TotalHoursNight;
 
-                var totalSecondsDay = result.TimeShifts
-                     .Where(x => x.WorkPlaceId == result.Id)
-                     .Select(x => x.RealWorkHours
-                        .Where(realWorkHoursFilter)
-                        .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds)
-                        .Sum())
-                    .Sum();
 
-                var totalSecondsNight = result.TimeShifts
-                     .Where(x => x.WorkPlaceId == result.Id)
-                     .Select(x => x.RealWorkHours
-                        .Where(realWorkHoursFilter)
-                        .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds)
-                        .Sum())
-                    .Sum();
 
                 if (_datatable.ShowHoursInPercentage)
                 {
@@ -771,10 +735,124 @@ namespace Bussiness.Service.DataTableServiceWorkers
             }
 
             EntitiesMapped = returnObjects;
-            EntitiesTotal = await _baseDatawork.WorkPlaces.CountAllAsyncFiltered(filter);
+            EntitiesTotal = 0;
 
             return this;
         }
+        //  public async Task<ProjectionDataTableWorker> ProjectionEmployeeRealHoursSum()
+        //{
+        //    var includes = new List<Func<IQueryable<WorkPlace>, IIncludableQueryable<WorkPlace, object>>>();
+        //    includes.Add(x => x.Include(y => y.Customer).ThenInclude(z => z.Company));
+        //    includes.Add(x => x.Include(y => y.TimeShifts).ThenInclude(z => z.RealWorkHours));
+
+        //    var filter = PredicateBuilder.New<WorkPlace>();
+        //    filter = filter.And(x => true);
+
+        //    if (_datatable.FilterByWorkPlaceId != 0)
+        //        filter = filter.And(x => x.Id == _datatable.FilterByWorkPlaceId);
+
+        //    var entities = await _baseDatawork.WorkPlaces
+        //        .GetPaggingWithFilter(SetOrderByWorkPlace(), filter, includes, _pageSize, _pageIndex);
+
+
+        //    //Mapping
+        //    var expandoService = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<WorkPlace>();
+        //    var returnObjects = new List<ExpandoObject>();
+
+        //    var realWorkHoursFilter = PredicateBuilder.New<RealWorkHour>();
+
+        //    if (_datatable.FilterByEmployeeId != 0)
+        //        realWorkHoursFilter = realWorkHoursFilter.And(x => x.EmployeeId == _datatable.FilterByEmployeeId);
+
+        //    realWorkHoursFilter = realWorkHoursFilter.And(x =>
+        //        _datatable.StartOn.Date <= x.StartOn.Date && x.EndOn.Date <= _datatable.EndOn.Date);
+
+
+        //    var totalFooter = entities.Select(x => x.TimeShifts
+        //        .Select(x => x.RealWorkHours
+        //            .Where(realWorkHoursFilter)
+        //            .Select(x => Math.Abs((x.EndOn - x.StartOn).TotalSeconds))
+        //            .Sum())
+        //        .Sum())
+        //        .Sum();
+
+        //    var totalFooterDay = entities.Select(x => x.TimeShifts
+        //      .Select(x => x.RealWorkHours
+        //          .Where(realWorkHoursFilter)
+        //          .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds)
+        //            .Sum())
+        //          .Sum())
+        //        .Sum();
+
+        //    var totalFooterNight = entities.Select(x => x.TimeShifts
+        //      .Select(x => x.RealWorkHours
+        //          .Where(realWorkHoursFilter)
+        //          .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds)
+        //            .Sum())
+        //          .Sum())
+        //       .Sum();
+
+        //    foreach (var result in entities)
+        //    {
+        //        var expandoObj = new ExpandoObject();
+        //        var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //        dictionary.Add("Title", result.Title);
+        //        var totalSeconds = result.TimeShifts
+        //            .Where(x => x.WorkPlaceId == result.Id)
+        //            .Select(x => x.RealWorkHours
+        //                .Where(realWorkHoursFilter)
+        //                .Select(x => Math.Abs((x.EndOn - x.StartOn).TotalSeconds))
+        //                .Sum())
+        //            .Sum();
+
+        //        var totalSecondsDay = result.TimeShifts
+        //             .Where(x => x.WorkPlaceId == result.Id)
+        //             .Select(x => x.RealWorkHours
+        //                .Where(realWorkHoursFilter)
+        //                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds)
+        //                .Sum())
+        //            .Sum();
+
+        //        var totalSecondsNight = result.TimeShifts
+        //             .Where(x => x.WorkPlaceId == result.Id)
+        //             .Select(x => x.RealWorkHours
+        //                .Where(realWorkHoursFilter)
+        //                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds)
+        //                .Sum())
+        //            .Sum();
+
+        //        if (_datatable.ShowHoursInPercentage)
+        //        {
+        //            dictionary.Add("TotalHours", totalSeconds / 60 / 480);
+        //            dictionary.Add("TotalHoursDay", totalSecondsDay / 60 / 480);
+        //            dictionary.Add("TotalHoursNight", totalSecondsNight / 60 / 480);
+
+        //            dictionary.Add("TotalFooterHours", totalFooter / 60 / 480);
+        //            dictionary.Add("TotalFooterHoursDay", totalFooterDay / 60 / 480);
+        //            dictionary.Add("TotalFooterHoursNight", totalFooterNight / 60 / 480);
+        //        }
+        //        else
+        //        {
+        //            dictionary.Add("TotalHours", ((int)totalSeconds / 60 / 60).ToString() + ":" + ((int)totalSeconds / 60 % 60).ToString());
+        //            dictionary.Add("TotalHoursDay", ((int)totalSecondsDay / 60 / 60).ToString() + ":" + ((int)totalSecondsDay / 60 % 60).ToString());
+        //            dictionary.Add("TotalHoursNight", ((int)totalSecondsNight / 60 / 60).ToString() + ":" + ((int)totalSecondsNight / 60 % 60).ToString());
+
+        //            dictionary.Add("TotalFooterHours", ((int)totalFooter / 60 / 60).ToString() + ":" + ((int)totalFooter / 60 % 60).ToString());
+        //            dictionary.Add("TotalFooterHoursDay", ((int)totalFooterDay / 60 / 60).ToString() + ":" + ((int)totalFooterDay / 60 % 60).ToString());
+        //            dictionary.Add("TotalFooterHoursNight", ((int)totalFooterNight / 60 / 60).ToString() + ":" + ((int)totalFooterNight / 60 % 60).ToString());
+        //        }
+
+        //        if (totalSeconds != 0 || totalSecondsDay != 0 || totalSecondsNight != 0)
+        //            returnObjects.Add(expandoObj);
+        //    }
+
+        //    EntitiesMapped = returnObjects;
+        //    EntitiesTotal = await _baseDatawork.WorkPlaces.CountAllAsyncFiltered(filter);
+
+        //    return this;
+        //}
 
         public async Task<ProjectionDataTableWorker> ProjectionPresenceDaily()
         {
@@ -1084,7 +1162,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 filter = PredicateBuilder.New<WorkHour>();
                 filter = filter.And(x => x.Employee.WorkHours
                      .Where(y => y.Id != x.Id)
-                     .Any(y => (x.StartOn - y.EndOn).TotalHours < 11));
+                     .Any(y => x.EndOn.AddHours(11) >= y.StartOn && x.StartOn.AddHours(-11) <= y.EndOn));
                 var overTimeEntities = entities.Where(filter).ToList();
                 foreach (var result in overTimeEntities)
                 {
@@ -1156,11 +1234,19 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.Employee?.Contract?.WorkingDaysPerWeek
                     })
                     .Where(x => x.Key.WorkingDaysPerWeek != null)
-                    .Where(x => x.Key.WorkingDaysPerWeek < x.Count())
+                    //.Where(x => x.Key.WorkingDaysPerWeek < x.Count())
                     .Select(x => new
                     {
+                        day = (x.Key.Week * 7),
+                        Day0 = x.Count(y => y.StartOn.Date == new DateTime(y.StartOn.Year, 1, 1).AddDays((x.Key.Week * 7) + 1).Date),
+                        Day1 = x.Count(y => y.StartOn.Date == new DateTime(y.StartOn.Year, 1, 1).AddDays((x.Key.Week * 7) + 2).Date),
+                        Day2 = x.Count(y => y.StartOn.Date == new DateTime(y.StartOn.Year, 1, 1).AddDays((x.Key.Week * 7) + 3).Date),
+                        Day3 = x.Count(y => y.StartOn.Date == new DateTime(y.StartOn.Year, 1, 1).AddDays((x.Key.Week * 7) + 4).Date),
+                        Day4 = x.Count(y => y.StartOn.Date == new DateTime(y.StartOn.Year, 1, 1).AddDays((x.Key.Week * 7) + 5).Date),
+                        Day5 = x.Count(y => y.StartOn.Date == new DateTime(y.StartOn.Year, 1, 1).AddDays((x.Key.Week * 7) + 6).Date),
+                        Day6 = x.Count(y => y.StartOn.Date == new DateTime(y.StartOn.Year, 1, 1).AddDays((x.Key.Week * 7) + 7).Date),
                         WorkHours = x.ToList(),
-                        Error = $"Βάρδια ξεπερνάει το όριο 'Εργάσιμες ημέρες ανα εβδομάδα' με όριο '{x.Key.WorkingDaysPerWeek}' στην ημέρα '{x.Key.Week}'"
+                        Error = $"Βάρδια ξεπερνάει το όριο 'Εργάσιμες ημέρες ανα εβδομάδα' με όριο '{x.Key.WorkingDaysPerWeek}' στην εβδομάδα '{x.Key.Week}'"
                     })
                     .ToList();
                 foreach (var group in workingDaysPerWeekEntities)
@@ -1196,19 +1282,19 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     })
                     .Where(x => x.Key.HoursPerWeek != null)
                     .Select(x =>
-                {
-                    sum = 0.0;
-                    return new
                     {
-                        WorkHours = x.TakeWhile(y =>
-                    {
-                        sum += new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalHours;
-                        return sum < x.Key.HoursPerWeek;
-                    }).ToList(),
-                        Error = $"Βάρδια ξεπερνάει το όριο 'Εργάσιμες ώρες ανα εβδομάδα' με όριο '{x.Key.HoursPerWeek}' στην ημέρα '{x.Key.Week}'"
+                        sum = 0.0;
+                        return new
+                        {
+                            WorkHours = x.TakeWhile(y =>
+                            {
+                                sum += new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalHours;
+                                return sum < x.Key.HoursPerWeek;
+                            }).ToList(),
+                            Error = $"Βάρδια ξεπερνάει το όριο 'Εργάσιμες ώρες ανα εβδομάδα' με όριο '{x.Key.HoursPerWeek}' στην εβδομαδα '{x.Key.Week}'"
 
-                    };
-                })
+                        };
+                    })
                     .ToList();
                 foreach (var group in hoursPerWeekEntities)
                 {

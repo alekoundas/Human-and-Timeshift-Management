@@ -145,17 +145,22 @@
         $(document).on('click', '#SubmitButton', (element) => {
             var startOn = document.getElementById('StartOn').value;
             var endOn = document.getElementById('EndOn').value;
-            $.ajax({
-                type: "POST",
-                url: '/api/realworkhours/editEmployeeRealWorkhour',
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                data: JSON.stringify(
-                    BuildRealWorkHourEditDto(startOn, endOn))
-            })
-            $('#RealWorkHour_Modal').modal('hide')
-            $('#EmployeesCurrentDayDatatable').DataTable().destroy();
-            datatableService();
+            console.log(startOn);
+            console.log(endOn);
+            if (startOn && endOn) {
+
+                $.ajax({
+                    type: "POST",
+                    url: '/api/realworkhours/editEmployeeRealWorkhour',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify(
+                        BuildRealWorkHourEditDto(startOn, endOn))
+                })
+                $('#RealWorkHour_Modal').modal('hide')
+                $('#EmployeesCurrentDayDatatable').DataTable().destroy();
+                datatableService();
+            }
 
         });
     </script>

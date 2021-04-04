@@ -125,7 +125,7 @@
     <!--///             Handlers            ///-->
     <!--///////////////////////////////////////-->
     <script>
-const HandleSubmitButton = () =>
+        const HandleSubmitButton = () =>
             [...document.getElementsByClassName('EmployeeSelect2ErrorSpan')]
                 .filter(span => span.style.display == '').length > 0 ?
                 HideSaveButton() : ShowSaveButton();
@@ -200,22 +200,22 @@ const HandleSubmitButton = () =>
     <script>
         /**/
         const ValidateEmployeesWithRangeToRealWorkhour = () => {
-                var startOn = document.getElementById('StartOn').value;
-                var endOn = document.getElementById('EndOn').value;
-                var employeeIds = GetAlreadyAppendedEmployeeIds();
+            var startOn = document.getElementById('StartOn').value;
+            var endOn = document.getElementById('EndOn').value;
+            var employeeIds = GetAlreadyAppendedEmployeeIds();
 
-                $.ajax({
-                    type: "POST",
-                    url: '/api/realworkhours/hasoverlap',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: JSON.stringify(
-                        BuildValidateWorkHourDto(startOn, endOn, employeeIds))
-                }).done((data) => {
-                    ShowResultPerEmployeeDropdown(data);
-                    HandleSubmitButton();
-                });
-            };
+            $.ajax({
+                type: "POST",
+                url: '/api/realworkhours/hasoverlap',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(
+                    BuildValidateWorkHourDto(startOn, endOn, employeeIds))
+            }).done((data) => {
+                ShowResultPerEmployeeDropdown(data);
+                HandleSubmitButton();
+            });
+        };
 
         const ValidateEmployeesWithRangeToWorkHour = () => {
             var startOn = document.getElementById('StartOn').value;
@@ -459,7 +459,7 @@ const HandleSubmitButton = () =>
         $('#AppendEmployeeForm').on('click', (e) => {
 
             document.getElementById('EmployeeInput').insertAdjacentHTML('beforeend',
-                '<div class="row" id = "EmployeeRowNum_' + Count + '">' +
+                '<div class="row EmploeeDiv" id = "EmployeeRowNum_' + Count + '">' +
                 '<div style="width: 100%;">' +
                 '<div style="width: 15%; float: left;">&nbsp;</div>' +
                 '<div style="width: 50%; float: left;">' +
@@ -480,8 +480,13 @@ const HandleSubmitButton = () =>
 
         // Delete employee Select2
         $('#EmployeeInput').on('click', '.DeleteEmployeeSelect2', (e) => {
-
+            var count = 0;
             document.getElementById('EmployeeRowNum_' + e.target.id).remove();
+            [...document.getElementsByClassName("EmployeesSelect2")].forEach(x => x.id = "EmployeesSelect2Num_" + count++);
+            count = 0;
+            [...document.getElementsByClassName("EmployeesSelect2")].forEach(x => x.setAttribute("name", "Employees[" + count++ + "]"));
+            count = 0;
+            [...document.getElementsByClassName("EmploeeDiv")].forEach(x => x.id = "EmployeeRowNum_" + count++);
             HandleSubmitButton();
         });
 

@@ -97,7 +97,8 @@
                             <select class="Specialization_Select2" asp-for="SpecializationId" style="width:50%">
                                 @if (Model.Specialization != null)
                                 {
-                    <option value="@Model.SpecializationId" selected="selected">@Model.Specialization.Name</option>}
+                    <option value="@Model.SpecializationId" selected="selected">@Model.Specialization.Name</option>
+}
                             </select>
                             <span asp-validation-for="SpecializationId" class="text-danger"></span>
                         </div>
@@ -109,7 +110,8 @@
                             <select class="Company_Select2" asp-for="CompanyId" style="width:50%">
                                 @if (Model.CompanyId != null)
                                 {
-                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>}
+                    <option value="@Model.CompanyId" selected="selected">@Model.Company.Title</option>
+}
                             </select>
                             <span asp-validation-for="CompanyId" class="text-danger"></span>
                         </div>
@@ -121,7 +123,8 @@
                             <select class="Contract_Select2" asp-for="ContractId" style="width:50%">
                                 @if (Model.ContractId != null)
                                 {
-                    <option value="@Model.ContractId" selected="selected">@Model.Contract.Title</option>}
+                    <option value="@Model.ContractId" selected="selected">@Model.Contract.Title</option>
+}
                             </select>
                             <span asp-validation-for="ContractId" class="text-danger"></span>
                         </div>
