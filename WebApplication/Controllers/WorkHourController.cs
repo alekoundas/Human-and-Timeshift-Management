@@ -1,11 +1,15 @@
-﻿using Bussiness.Service;
+﻿using Bussiness.Helpers;
+using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,24 +34,32 @@ namespace WebApplication.Controllers
             var daysInMonth = DateTime.DaysInMonth(timeshift.Year, timeshift.Month);
             var excelColumns = new List<string>(new string[] {
                 "EmployeeId",
-                "Comments",
                 "TimeShiftId"
             });
+            var cultureInfo = new CultureInfo("el-GR");
             for (int i = 1; i <= daysInMonth; i++)
             {
-                excelColumns.Add("Day_" + i);
+                var date = new DateTime(
+                    timeshift.Year,
+                    timeshift.Month,
+                    i,
+                    0, 0, 0);
+                var dayStr = date.ToString("ddd,d-MMM", cultureInfo);
+
+                excelColumns.Add(dayStr);
             }
             var timeShiftFilter = PredicateBuilder.New<TimeShift>(true);
             timeShiftFilter = timeShiftFilter.And(x => x.Id == id);
 
             var employeeFilter = PredicateBuilder.New<Employee>();
-            employeeFilter = employeeFilter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == id)));
+            employeeFilter = employeeFilter
+                .And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == id)));
 
             var excelPackage = (await (new ExcelService<WorkHour>(_context)
                 .AddLookupFilter(employeeFilter)
                 .AddLookupFilter(timeShiftFilter)
                .CreateNewExcel("WorkHours"))
-               .AddSheetAsync(excelColumns))
+               .AddSheetDatesAsync(excelColumns))
                .CompleteExcel(out var errors);
 
             if (errors.Count == 0)
@@ -65,24 +77,39 @@ namespace WebApplication.Controllers
             var daysInMonth = DateTime.DaysInMonth(timeshift.Year, timeshift.Month);
             var excelColumns = new List<string>(new string[] {
                 "EmployeeId",
-                "Comments",
                 "TimeShiftId"
             });
+            var cultureInfo = new CultureInfo("el-GR");
             for (int i = 1; i <= daysInMonth; i++)
             {
-                excelColumns.Add("Day_" + i);
+                var date = new DateTime(
+                    timeshift.Year,
+                    timeshift.Month,
+                    i,
+                    0, 0, 0);
+                var dayStr = date.ToString("ddd,d-MMM", cultureInfo);
+
+                excelColumns.Add(dayStr);
             }
             var timeShiftFilter = PredicateBuilder.New<TimeShift>(true);
             timeShiftFilter = timeShiftFilter.And(x => x.Id == id);
 
             var employeeFilter = PredicateBuilder.New<Employee>();
-            employeeFilter = employeeFilter.And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == id)));
+            employeeFilter = employeeFilter
+                .And(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == id)));
+
+            var includes = new List<Func<IQueryable<WorkHour>, IIncludableQueryable<WorkHour, object>>>();
+            includes.Add(x => x.Include(y => y.Employee));
+            includes.Add(x => x.Include(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
+
 
             var excelPackage = (await (new ExcelService<WorkHour>(_context)
                 .AddLookupFilter(employeeFilter)
                 .AddLookupFilter(timeShiftFilter)
+                .AddExpressionTreeFilter(ExpressionTreeHelper.WherePropertyEquals<WorkHour>("TimeShiftId", id.ToString()))
+                .AddExpressionTreeIncludes(includes)
              .CreateNewExcel("WorkHours"))
-             .AddSheetAsync(excelColumns, "WorkHours"))
+             .AddSheetDatesAsync(excelColumns, "WorkHours"))
              .CompleteExcel(out var errors);
 
             if (errors.Count == 0)

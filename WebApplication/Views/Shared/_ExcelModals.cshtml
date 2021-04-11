@@ -17,9 +17,9 @@
                             @if (ViewData.Eval("Entity") == "RealWorkHour" || ViewData.Eval("Entity") == "WorkHour")
                             {
                 <a href="@Url.Content("~/"+ViewData.Eval("Entity")+"/DownloadExcelTemplate/"+ViewData.Eval("TimeshiftId"))"><button type="button" class="btn btn-primary">Λήψη</button></a> }
-                            else
-                            {
-                <a href="@Url.Action("DownloadExcelTemplate", ViewData.Eval("Entity"))"><button type="button" class="btn btn-primary">Λήψη</button></a>}
+            else
+            {
+<a href="@Url.Action("DownloadExcelTemplate", ViewData.Eval("Entity"))"><button type="button" class="btn btn-primary">Λήψη</button></a>}
                             <span class="text-danger"></span>
                         </div>
                     </div>
@@ -60,23 +60,29 @@
                 </button>
                 <h4 class="modal-title">Εξαγωγή δεδομένων με χρήση Excel</h4>
             </div>
-            <form asp-controller="@ViewData.Eval("Entity")" asp-action="Import" enctype="multipart/form-data" method="post">
-                <div class="modal-body">
 
-                    <div class="form-group">
-                        <label class="control-label">Λήψη excel </label>
-                        <div class="input-group">
-                            <a href="@Url.Action("DownloadExcelWithData", ViewData.Eval("Entity"))"><button type="button" class="btn btn-primary">Λήψη</button></a>
-                            <span class="text-danger"></span>
-                        </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label class="control-label">Λήψη excel </label>
+                    <div class="input-group">
+                        @if (ViewData.Eval("Entity") == "RealWorkHour" || ViewData.Eval("Entity") == "WorkHour")
+                        {
+            <a href="@Url.Content("~/"+ViewData.Eval("Entity")+"/DownloadExcelWithData/"+ViewData.Eval("TimeshiftId"))"><button type="button" class="btn btn-primary">Λήψη</button></a> }
+        else
+        {
+<a href="@Url.Action("DownloadExcelWithData", ViewData.Eval("Entity"))"><button type="button" class="btn btn-primary">Λήψη</button></a>}
+
+
+
+                        <span class="text-danger"></span>
                     </div>
+                </div>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Κλείσιμο</button>
-                    @*<button type="submit" class="btn btn-primary pull-right">Υποβολή</button>*@
-                </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Κλείσιμο</button>
+            </div>
         </div>
     </div>
 </div>

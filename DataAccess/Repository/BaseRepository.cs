@@ -89,6 +89,7 @@ namespace DataAccess.Repository
 
             return await qry.ToListAsync();
         }
+
         public IQueryable<TEntity> GetWithFilterQueryable(
          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
          Expression<Func<TEntity, bool>> filter,
@@ -108,7 +109,6 @@ namespace DataAccess.Repository
 
             return qry;
         }
-
 
         public int Count(Expression<Func<TEntity, bool>> predicate)
         {
@@ -170,6 +170,8 @@ namespace DataAccess.Repository
             return await qry.FirstOrDefaultAsync(filter);
         }
 
+
+        //Reflection
         public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter)
         {
             return await _set.Where(filter).ToListAsync();

@@ -39,22 +39,19 @@ namespace WebApplication.Controllers
 
         // GET: RealWorkHours/Details/5
         [Authorize(Roles = "RealWorkHour_View")]
-
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var realWorkHour = await _context.RealWorkHours
                 .Include(r => r.Employee)
                 .Include(r => r.TimeShift)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (realWorkHour == null)
-            {
                 return NotFound();
-            }
+
             ViewData["Title"] = "Σύνολο πραγματικών βαρδιών";
 
 
@@ -63,7 +60,6 @@ namespace WebApplication.Controllers
 
         // GET: RealWorkHours/Create
         [Authorize(Roles = "RealWorkHour_Create")]
-
         public IActionResult Create()
         {
             ViewData["Title"] = "Προσθήκη πραγματικής βαρδιας";
@@ -106,7 +102,6 @@ namespace WebApplication.Controllers
 
         // GET: RealWorkHours/Edit/5
         [Authorize(Roles = "RealWorkHour_Edit")]
-
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -115,8 +110,10 @@ namespace WebApplication.Controllers
             var realWorkHour = await _context.RealWorkHours.FindAsync(id);
             if (realWorkHour == null)
                 return NotFound();
+
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", realWorkHour.EmployeeId);
             ViewData["TimeShiftId"] = new SelectList(_context.TimeShifts, "Id", "Id", realWorkHour.TimeShiftId);
+
             return View(realWorkHour);
         }
 

@@ -473,6 +473,7 @@ namespace Business.Seed
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Delete");
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Import");
             CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Export");
+            CreateRole(roleManager, "RealWorkHour", "ΠραγματικήΒάρδια", "Export");
 
             CreateRole(roleManager, "WorkHour", "Βάρδια", "Import");
             CreateRole(roleManager, "WorkHour", "Βάρδια", "Export");
