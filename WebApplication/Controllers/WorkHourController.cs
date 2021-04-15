@@ -33,6 +33,8 @@ namespace WebApplication.Controllers
             var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == id);
             var daysInMonth = DateTime.DaysInMonth(timeshift.Year, timeshift.Month);
             var excelColumns = new List<string>(new string[] {
+                "Excel_Properties",
+                "Excel_Values",
                 "EmployeeId",
                 "TimeShiftId"
             });
@@ -76,9 +78,12 @@ namespace WebApplication.Controllers
             var timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == id);
             var daysInMonth = DateTime.DaysInMonth(timeshift.Year, timeshift.Month);
             var excelColumns = new List<string>(new string[] {
+                "Excel_Properties",
+                "Excel_Values",
                 "EmployeeId",
                 "TimeShiftId"
             });
+
             var cultureInfo = new CultureInfo("el-GR");
             for (int i = 1; i <= daysInMonth; i++)
             {
@@ -87,10 +92,10 @@ namespace WebApplication.Controllers
                     timeshift.Month,
                     i,
                     0, 0, 0);
-                var dayStr = date.ToString("ddd,d-MMM", cultureInfo);
 
-                excelColumns.Add(dayStr);
+                excelColumns.Add(date.ToString("ddd,d-MMM", cultureInfo));
             }
+
             var timeShiftFilter = PredicateBuilder.New<TimeShift>(true);
             timeShiftFilter = timeShiftFilter.And(x => x.Id == id);
 

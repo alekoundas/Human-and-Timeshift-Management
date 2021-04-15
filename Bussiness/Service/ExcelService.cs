@@ -49,6 +49,36 @@ namespace Bussiness.Service
             return this;
         }
 
+
+        public ExcelService<TEntity> CreateNewExcelDateRange(string fileName)
+        {
+            var fileinfo = new FileInfo(@"ExcelVBA\TimeRangeFunction.xlsm");
+
+            //this.ExcelPackage = new ExcelPackage(fileinfo);
+            this.ExcelPackage = new ExcelPackage();
+            this.ExcelPackage.Workbook.CreateVBAProject();
+            this.ExcelPackage.Workbook.Properties.Author = "PureMethod";
+            this.ExcelPackage.Workbook.Properties.Title = fileName;
+            this.ExcelPackage.Workbook.Properties.Subject = fileName + "δεδομένα απο την βάση";
+            this.ExcelPackage.Workbook.Properties.Created = DateTime.Now;
+
+            //var moduleTimeRange = this.ExcelPackage.Workbook.VbaProject.Modules.AddModule("Module1");
+            //            moduleTimeRange.Code = @"
+            //Public Function TimeRangeValidate(cell As String) As Boolean
+            //    Dim cellStr As String
+            //    Dim regexOne As Object
+
+            //    Set regexOne = New RegExp
+            //    regexOne.Pattern = ""((?:[01]\d:[0-5][0-9]|2[0-3]:[0-5][0-9])(?:\s?)-(?:\s?)(?:[01]\d:[0-5][0-9]|2[0-3]:[0-5][0-9])(?:\s?,\s?)?)+\s+$""
+            //    cellStr = Range(cell).Value
+
+            //    TimeRangeValidate = regexOne.Test(cellStr)
+            //End Function
+            //";
+
+            return this;
+        }
+
         public ExcelService<TEntity> AddLookupFilter(Expression<Func<Employee, bool>> predicate)
         {
             _employeeFilter = predicate;
@@ -82,12 +112,50 @@ namespace Bussiness.Service
             {
                 if (colTitle.Contains(","))//WorkHours
                 {
-                    SetColValidation(colTitle, colCount, "Time");
+                    SetColValidation(colTitle, colCount, "TimeRange");
                     _worksheet.Cells[rowCount, colCount++].Value = colTitle;
-                    SetColValidation(colTitle, colCount, "Time");
-                    _worksheet.Cells[rowCount, colCount++].Value = colTitle;
-                    _worksheet.Cells[rowCount, colCount - 2, rowCount, colCount - 1].Merge = true;
-
+                    //SetColValidation(colTitle, colCount, "TimeRange");
+                    //_worksheet.Cells[rowCount, colCount++].Value = colTitle;
+                    //_worksheet.Cells[rowCount, colCount - 2, rowCount, colCount - 1].Merge = true;
+                }
+                else if (colTitle.Contains("Excel_"))
+                {
+                    switch (colTitle)
+                    {
+                        case "Excel_Properties":
+                            _worksheet.Cells[1, 1].Value = "Excel_Properties";
+                            _worksheet.Cells[2, colCount].Value = "Π";
+                            _worksheet.Cells[3, colCount].Value = "Β";
+                            _worksheet.Cells[4, colCount].Value = "Α";
+                            _worksheet.Cells[5, colCount].Value = "Custom_1";
+                            _worksheet.Cells[6, colCount].Value = "Custom_2";
+                            _worksheet.Cells[7, colCount].Value = "Custom_3";
+                            _worksheet.Cells[8, colCount].Value = "Custom_4";
+                            _worksheet.Cells[9, colCount].Value = "Custom_5";
+                            _worksheet.Cells[10, colCount].Value = "Custom_6";
+                            _worksheet.Cells[11, colCount].Value = "Custom_7";
+                            _worksheet.Cells[12, colCount].Value = "Custom_8";
+                            _worksheet.Cells[13, colCount].Value = "Custom_9";
+                            _worksheet.Cells[14, colCount++].Value = "Custom_10";
+                            break;
+                        case "Excel_Values":
+                            _worksheet.Cells[1, 2].Value = "Excel_Values";
+                            _worksheet.Cells[2, colCount].Value = "";
+                            _worksheet.Cells[3, colCount].Value = "";
+                            _worksheet.Cells[4, colCount].Value = "";
+                            _worksheet.Cells[5, colCount].Value = "";
+                            _worksheet.Cells[6, colCount].Value = "";
+                            _worksheet.Cells[7, colCount].Value = "";
+                            _worksheet.Cells[8, colCount].Value = "";
+                            _worksheet.Cells[9, colCount].Value = "";
+                            _worksheet.Cells[10, colCount].Value = "";
+                            _worksheet.Cells[11, colCount].Value = "";
+                            _worksheet.Cells[12, colCount].Value = "";
+                            _worksheet.Cells[13, colCount++].Value = "";
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 else
                 {
@@ -108,9 +176,6 @@ namespace Bussiness.Service
 
             if (dataWorkEntity != null)
             {
-
-
-
                 //ex _dataWork.entity
                 var propertyValue = _baseDataWork
                     .GetType()
@@ -134,31 +199,26 @@ namespace Bussiness.Service
                     .GetValue(method);
 
                 //Add rows with data (if any)
+                rowCount++;
                 foreach (var result in results)
                 {
-                    rowCount++;
                     colCount = 1;
-                    var currentEmployeeRow = 0;
+                    var excelColEmployeeId = 0;
+                    var excelRowEmployeeId = 0;
                     var employeeId = result
                         .GetType()
                         .GetProperty("EmployeeId")
                         .GetValue(result);
 
+                    //Find EmployeeId col in excel
+                    for (int col = 1; col <= _worksheet.Dimension.Columns; col++)
+                        if (_worksheet.Cells[1, col].Value.ToString().Contains("EmployeeId"))
+                            excelColEmployeeId = col;
 
-                    //Find employee row in excel
+                    //Find EmployeeId row in excel if exists
                     for (int row = 1; row <= _worksheet.Dimension.Rows; row++)
-                    {
-                        if (_worksheet.Cells[row, 1].Value.ToString() == employeeId.ToString())
-                        {
-                            currentEmployeeRow = row;
-                        }
-                    }
-
-                    //If not found set rowCount
-                    if (currentEmployeeRow == 0)
-                    {
-                        currentEmployeeRow = rowCount;
-                    }
+                        if (_worksheet.Cells[row, excelColEmployeeId].Value?.ToString() == employeeId.ToString())
+                            excelRowEmployeeId = row;
 
                     //Add dates
                     foreach (var colTitle in colTitles)
@@ -167,29 +227,47 @@ namespace Bussiness.Service
                         {
                             var startOn = (DateTime)result.GetType().GetProperty("StartOn").GetValue(result);
                             var endOn = (DateTime)result.GetType().GetProperty("EndOn").GetValue(result);
+                            var timeRange = startOn.ToString("HH:mm") + "-" + endOn.ToString("HH:mm");
                             var colTitleDay = colTitle.Split(",")[1].Split("-")[0];
                             var excelColDay = 0;
+
                             //Find day col in excel
                             for (int col = 1; col <= _worksheet.Dimension.Columns; col++)
-                            {
                                 if (_worksheet.Cells[1, col].Value.ToString().Contains(","))
-                                    if (_worksheet.Cells[1, col].Value.ToString().Split(",")[1].Split("-")[0] == colTitleDay.ToString())
-                                    {
+                                    if (_worksheet.Cells[1, col].Value.ToString().Split(",")[1].Split("-")[0] == colTitleDay)
                                         excelColDay = col;
+
+                            //if employee row exists
+                            if (excelRowEmployeeId != 0)
+                            {
+                                if (colTitleDay == startOn.Day.ToString())
+                                    if (!(_worksheet.Cells[excelRowEmployeeId, excelColDay].Value?.ToString().Length < 10))
+                                    {
+                                        _worksheet.Cells[excelRowEmployeeId, excelColDay].Value = timeRange;
+                                    }
+                                    else
+                                    {
+                                        _worksheet.InsertRow(excelRowEmployeeId, 1);
+                                        _worksheet.Cells[excelRowEmployeeId + 1, excelColDay].Value = timeRange;
+                                        rowCount++;
                                     }
                             }
-                            excelColDay--;
-
-
-                            if (colTitleDay == startOn.Day.ToString())
-                                _worksheet.Cells[currentEmployeeRow, excelColDay].Value = startOn.ToString("hh:mm");
-
-                            if (colTitleDay == endOn.Day.ToString())
-                                _worksheet.Cells[currentEmployeeRow, ++excelColDay].Value = endOn.ToString("hh:mm");
+                            else
+                            {
+                                if (colTitleDay == startOn.Day.ToString())
+                                {
+                                    _worksheet.Cells[rowCount, excelColDay].Value = timeRange;
+                                    rowCount++;
+                                }
+                            }
                         }
-                        else
+                        else if (colTitle.Contains("Excel_"))
                         {
-                            _worksheet.Cells[currentEmployeeRow, colCount++].Value =
+                            colCount++;
+                        }
+                        else if (excelRowEmployeeId == 0)
+                        {
+                            _worksheet.Cells[rowCount, colCount++].Value =
                             result.GetType().GetProperty(colTitle).GetValue(result);
                         }
                     }
@@ -200,22 +278,27 @@ namespace Bussiness.Service
                 {
                     for (int col = 1; col <= _worksheet.Dimension.Columns; col++)
                     {
-                        if (_worksheet.Cells[1, col].Value.ToString().EndsWith("Id"))
+                        if (_worksheet.Cells[1, col].Value.ToString() == "EmployeeId")
                         {
-                            if (_worksheet.Cells[1, col].Value == "EmployeeId")
+                            var entity = results.FirstOrDefault(x =>
+                               x.GetType().GetProperty("EmployeeId").GetValue(x).ToString() == _worksheet.Cells[row, col].Value?.ToString());
+
+                            if (entity != null)
                             {
-                                var entity = results.FirstOrDefault(x =>
-                                   x.GetType().GetProperty("EmployeeId").GetValue(x).ToString() == _worksheet.Cells[row, col].Value.ToString());
                                 var detail = entity.GetType().GetProperty("Employee").GetValue(entity);
                                 var fullName = detail.GetType().GetProperty("FullName").GetValue(detail);
                                 var vatNumber = detail.GetType().GetProperty("VatNumber").GetValue(detail);
 
                                 _worksheet.Cells[row, col].Value = "[VatNumber]:" + vatNumber + "_[FullName]:" + fullName;
                             }
-                            else if (_worksheet.Cells[1, col].Value == "TimeShiftId")
+                        }
+                        else if (_worksheet.Cells[1, col].Value.ToString() == "TimeShiftId")
+                        {
+                            var entity = results.FirstOrDefault(x =>
+                               x.GetType().GetProperty("TimeShiftId").GetValue(x).ToString() == _worksheet.Cells[row, col].Value?.ToString());
+
+                            if (entity != null)
                             {
-                                var entity = results.FirstOrDefault(x =>
-                                   x.GetType().GetProperty("TimeShiftId").GetValue(x).ToString() == _worksheet.Cells[row, col].Value.ToString());
                                 var detail = entity.GetType().GetProperty("TimeShift").GetValue(entity);
                                 var id = detail.GetType().GetProperty("Id").GetValue(detail);
                                 var title = detail.GetType().GetProperty("Title").GetValue(detail);
@@ -315,6 +398,10 @@ namespace Bussiness.Service
 
         public async Task<ExcelService<TEntity>> ExtractDataDaysFromExcel(IFormFile ImportExcel)
         {
+
+
+
+
             var timeshift = new TimeShift();
             _exportedInstances = new List<TEntity>();
             var genericEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
@@ -324,6 +411,37 @@ namespace Bussiness.Service
                 using (ExcelPackage excelPackage = new ExcelPackage(stream))
                 {
                     var worksheet = excelPackage.Workbook.Worksheets[0];
+                    var excelColExcel_Properties = 0;
+                    var excelColExcel_Values = 0;
+                    var excelProperties = new Dictionary<string, string>();
+
+                    //Find Excel_Properties col in excel
+                    for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                        if (worksheet.Cells[1, col].Value?.ToString() == "Excel_Properties")
+                            excelColExcel_Properties = col;
+
+                    //Find Excel_Values col in excel
+                    for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                        if (worksheet.Cells[1, col].Value?.ToString() == "Excel_Values")
+                            excelColExcel_Values = col;
+
+                    //Find Excel_Values row in excel 
+                    for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+                        if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Π")
+                            excelProperties.Add("Π", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
+                        else if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Α")
+                            excelProperties.Add("Α", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
+                        else if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Β")
+                            excelProperties.Add("Β", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
+                        else if ((bool)worksheet.Cells[row, excelColExcel_Properties].Value?.ToString().Contains("Custom_"))
+                            excelProperties.Add(
+                                worksheet.Cells[row, excelColExcel_Properties].Value.ToString(),
+                                worksheet.Cells[row, excelColExcel_Values].Value?.ToString());
+
+
+
+
+
                     for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
                     {
                         genericEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
@@ -337,21 +455,54 @@ namespace Bussiness.Service
 
                         for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.End.Column; j++)
                         {
-                            var propertyName = worksheet.Cells[1, j].Value.ToString();
-                            if (propertyName.Contains(","))//WorkHours
+                            var colTitle = worksheet.Cells[1, j].Value.ToString();
+
+                            if (colTitle == "Excel_Properties" || colTitle == "Excel_Values")
                             {
+
+                            }
+                            else if (colTitle.Contains(","))//WorkHours
+                            {
+                                int colDay = Int32.Parse(colTitle.Split(",")[1].Split("-")[0].ToString());
                                 var startOn = worksheet.Cells[i, j].Value?.ToString();
-                                var endOn = worksheet.Cells[i, ++j].Value?.ToString();
-                                var setStartOn = default(DateTime);
-                                var setEndOn = default(DateTime);
+                                var endOn = worksheet.Cells[i, j].Value?.ToString();
 
                                 if (startOn != null && endOn != null)
                                 {
+                                    if (excelProperties.Any(x => startOn == x.Key))
+                                    {
+                                        startOn = excelProperties
+                                            .FirstOrDefault(x => startOn == x.Key)
+                                            .Value?.Split("-")[0];
+
+                                        endOn = excelProperties
+                                            .FirstOrDefault(x => endOn == x.Key)
+                                            .Value?.Split("-")[1];
+
+                                        if (startOn == null || endOn == null)
+                                        {
+                                            AddError("error", "startOn-endOn");
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        startOn = startOn.Split("-")[0];
+                                        endOn = endOn.Split("-")[0];
+                                    }
+
+                                    var setStartOn = default(DateTime);
+                                    var setEndOn = default(DateTime);
+
                                     DateTime.TryParse(startOn, out setStartOn);
                                     DateTime.TryParse(endOn, out setEndOn);
 
-                                    setStartOn = new DateTime(timeshift.Year, timeshift.Month, Int32.Parse(propertyName.Split(",")[1].Split("-")[0].ToString()), setStartOn.TimeOfDay.Hours, setStartOn.TimeOfDay.Minutes, 0);
-                                    setEndOn = new DateTime(timeshift.Year, timeshift.Month, Int32.Parse(propertyName.Split(",")[1].Split("-")[0].ToString()), setEndOn.TimeOfDay.Hours, setEndOn.TimeOfDay.Minutes, 0);
+                                    if (setStartOn > setEndOn)
+                                        setEndOn = new DateTime(timeshift.Year, timeshift.Month, colDay + 1, setEndOn.TimeOfDay.Hours, setEndOn.TimeOfDay.Minutes, 0);
+                                    else
+                                        setEndOn = new DateTime(timeshift.Year, timeshift.Month, colDay, setEndOn.TimeOfDay.Hours, setEndOn.TimeOfDay.Minutes, 0);
+
+                                    setStartOn = new DateTime(timeshift.Year, timeshift.Month, colDay, setStartOn.TimeOfDay.Hours, setStartOn.TimeOfDay.Minutes, 0);
 
                                     var currentDayEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
                                     var genericInstanceProperties = genericEntityInstance.GetType().GetProperties();
@@ -389,13 +540,13 @@ namespace Bussiness.Service
                                     if (await GetIdForExtractedEntity(worksheet, i, j) != 0)
                                     {
                                         var propertyValue = await GetIdForExtractedEntity(worksheet, i, j);
-                                        if (propertyName == "TimeShiftId")
+                                        if (colTitle == "TimeShiftId")
                                             timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == (int)propertyValue);
-                                        AddPropertyValueToInstance(genericEntityInstance, propertyValue, propertyName);
+                                        AddPropertyValueToInstance(genericEntityInstance, propertyValue, colTitle);
                                     }
                                 }
                                 else if (genericEntityInstance.GetType().GetProperty(worksheet.Cells[1, j].Value.ToString()).PropertyType.Name == "String")
-                                    AddPropertyValueToInstance(genericEntityInstance, worksheet.Cells[i, j].Value?.ToString(), propertyName);
+                                    AddPropertyValueToInstance(genericEntityInstance, worksheet.Cells[i, j].Value?.ToString(), colTitle);
                             }
                         }
                     }
@@ -612,6 +763,23 @@ namespace Bussiness.Service
             var excelDateTimeValidation = _worksheet.Cells[2, colCount, 50000, colCount];
             switch (propertyType)
             {
+                case "TimeRange":
+                    //var rangeValidation = excelDateTimeValidation.DataValidation.AddCustomDataValidation();
+
+                    ////rangeValidation.ShowErrorMessage = true;
+                    //////Minimum allowed time
+                    ////rangeValidation.Formula.ExcelFormula = @"=ADDRESS(1;1;4)";
+
+                    //////Maximum allowed time
+                    //////rangeValidation.AllowBlank = true;
+                    ////rangeValidation.ErrorStyle = ExcelDataValidationWarningStyle.stop;
+                    ////rangeValidation.ErrorTitle = "Αδύνατη εισαγωγή ώρας";
+                    ////rangeValidation.Error = "Η ώρα πρεπει να ειναι της μορφής: hh:mm (πχ 21:20) ";
+
+                    //rangeValidation.ShowInputMessage = true;
+                    //rangeValidation.Prompt = "Η ώρα πρεπει να ειναι της μορφής: hh:mm (πχ 00:00 - 23:59)";
+                    //rangeValidation.PromptTitle = "Εισαγωγή ώρας";
+                    break;
                 case "Time":
                     var timeValidation = excelDateTimeValidation.DataValidation.AddTimeDataValidation();
 

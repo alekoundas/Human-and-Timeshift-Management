@@ -1,0 +1,10 @@
+﻿Public Function TimeRangeValidate(cell As String) As Boolean
+    Dim cellStr As String
+    Dim regexOne As Object
+
+    Set regexOne = New RegExp
+    regexOne.Pattern = "((?:[01]\d:[0-5][0-9]|2[0-3]:[0-5][0-9])(?:\s?)-(?:\s?)(?:[01]\d:[0-5][0-9]|2[0-3]:[0-5][0-9])(?:\s?,\s?)?)+\s+$"
+    cellStr = Range(cell).Value
+
+    TimeRangeValidate = regexOne.Test(cellStr)
+End Function
