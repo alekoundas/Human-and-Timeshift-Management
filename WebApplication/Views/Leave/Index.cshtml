@@ -50,7 +50,6 @@
         $(() =>
             new DataTableService('#LeaveDatatable')
                 .ForApiController('leaves')
-                .StartOrderFromCol(1)
                 .AddColumn(true, true, "EmployeeFullName")
                 .AddColumn(true, true, "StartOn", (a, b, data, d) => {
                     if (data.StartOn != null)
@@ -67,7 +66,6 @@
                 .AddColumn(true, true, "ApprovedBy")
                 .AddColumn(true, true, "LeaveTypeName")
                 .AddColumn(false, false, "Buttons")
-                .FixedLeftColums(1)
                 .AjaxData((data, type, row, meta) => {
                     data.Predicate = 'LeaveIndex';
                     return JSON.stringify(data);

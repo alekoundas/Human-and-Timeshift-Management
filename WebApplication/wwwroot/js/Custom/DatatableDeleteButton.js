@@ -28,7 +28,6 @@ $(document).on('click', '.DatatableDeleteButton', element =>
                 url: element.target.getAttribute('urlattr'),
                 dataType: "json",
                 success: (response) => {
-                    console.log(response);
                     swal(response.responseTitle, response.responseBody, (response.isSuccessful ? 'success' : 'error'));
                 }
             }).then(() =>

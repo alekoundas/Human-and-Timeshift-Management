@@ -13,7 +13,7 @@ namespace WebApplication.Utilities
         public static IHtmlContent LinkButton(this IHtmlHelper html, string controller, string action, string buttonName, string permition = "")
         {
             var link = "href=/" + controller + "/" + action;
-            if (IsOkToShow(permition) || controller == "Account")
+            if (IsOkToShow(permition) || controller == "Account" || permition == "")
                 return new HtmlString("<li class='user-body'><a " + link + " ><i class='fa fa-circle-o'></i> " + buttonName + " </a></li>");
 
             return new HtmlString("");

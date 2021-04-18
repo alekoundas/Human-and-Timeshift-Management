@@ -121,7 +121,6 @@ namespace WebApplication.Controllers
 
 
         // GET:  User/Profile/Id
-        //[Authorize(Roles = "User_Edit")]
         public async Task<IActionResult> Profile(string id)
         {
             if (id == null)
@@ -150,7 +149,7 @@ namespace WebApplication.Controllers
                 }).ToList();
 
             ViewData["Title"] = "Προφίλ χρήστη";
-            ViewData["UserRolesTable"] = "Οι ρόλοι μου";
+            ViewData["UserWorkHours"] = "Οι βάρδιες μου";
 
             return View(returnViewModel);
         }

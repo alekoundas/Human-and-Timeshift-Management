@@ -125,8 +125,8 @@ namespace Bussiness.Service
                         case "Excel_Properties":
                             _worksheet.Cells[1, 1].Value = "Excel_Properties";
                             _worksheet.Cells[2, colCount].Value = "Π";
-                            _worksheet.Cells[3, colCount].Value = "Β";
-                            _worksheet.Cells[4, colCount].Value = "Α";
+                            _worksheet.Cells[3, colCount].Value = "Α";
+                            _worksheet.Cells[4, colCount].Value = "Β";
                             _worksheet.Cells[5, colCount].Value = "Custom_1";
                             _worksheet.Cells[6, colCount].Value = "Custom_2";
                             _worksheet.Cells[7, colCount].Value = "Custom_3";
@@ -488,7 +488,7 @@ namespace Bussiness.Service
                                     else
                                     {
                                         startOn = startOn.Split("-")[0];
-                                        endOn = endOn.Split("-")[0];
+                                        endOn = endOn.Split("-")[1];
                                     }
 
                                     var setStartOn = default(DateTime);

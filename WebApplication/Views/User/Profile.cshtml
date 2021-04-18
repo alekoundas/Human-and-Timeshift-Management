@@ -78,19 +78,7 @@
             <hr />
             <div class="box-body">
                 <div style="width:100%;" id="BoxWorkPlace">
-                    @if (User.IsInRole("User_Edit"))
-                    {
-        <div style="width:100%; float:left;">
-            Προσθήκη πόστου
-            <button id="ButtonAddWorkPlace" class="btn btn-success"><i class="fa fa-plus"></i></button>
-        </div>}
-
                     <div style="width:100%; float:left;" id="DivToAppendSelect2"></div>
-                    @if (User.IsInRole("User_Edit"))
-                    {
-        <div class="form-group pull-right">
-            <button @*style="display:none;"*@ value="Αποθήκευση" class="btn btn-primary" id="ButtonSaveWorkPlaces">Αποθήκευση</button>
-        </div>}
                 </div>
             </div>
         </div>
@@ -107,7 +95,7 @@
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
-                <h3 class="box-title">@ViewData["UserRolesTable"]</h3>
+                <h3 class="box-title">@ViewData["UserWorkHours"]</h3>
             </div>
             <hr />
             <div class="box-body table-responsive">
@@ -325,23 +313,23 @@
             });
 
          $(() => {
-     var dataTable = new DataTableService('#rolesDatatable')
-         .ForApiController('role')
-         .AddColumn(true, true, "GreekName")
-         .AddColumn(false, false, "View")
-         .AddColumn(false, false, "Edit")
-         .AddColumn(false, false, "Create")
-         .AddColumn(false, false, "Deactivate")
-         .AddColumn(false, false, "Delete")
-         .AddColumn(false, false, "Import")
-         .AddColumn(false, false, "Export")
-         .AjaxData((data, type, row, meta) => {
-              data.Predicate='UserEdit'
-              data.userId = '@Model.Id';
-             return JSON.stringify(data);
-         })
-         .FnDrawCallback(() =>
-             $('.ToggleSliders').bootstrapToggle({
+            new DataTableService('#rolesDatatable')
+                .ForApiController('role')
+             .AddColumn(true, true, "GreekName")
+             .AddColumn(false, false, "View")
+             .AddColumn(false, false, "Edit")
+             .AddColumn(false, false, "Create")
+             .AddColumn(false, false, "Deactivate")
+             .AddColumn(false, false, "Delete")
+             .AddColumn(false, false, "Import")
+             .AddColumn(false, false, "Export")
+             .AjaxData((data, type, row, meta) => {
+                  data.Predicate='UserEdit'
+                  data.userId = '@Model.Id';
+                 return JSON.stringify(data);
+             })
+             .FnDrawCallback(() =>
+                 $('.ToggleSliders').bootstrapToggle({
                  on: 'Ναί',
                  off: 'Όχι'
              }))
@@ -408,7 +396,7 @@
             '</div >' +
             '<div style="width: 5%; float: left;">&nbsp;</div >' +
             '<div style="width: 20%; float: left;">' +
-            GetHtmlButtons() +
+            //GetHtmlButtons() +
             '</div >' +
             '</div >';
 

@@ -40,8 +40,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
         private Func<IQueryable<Leave>, IOrderedQueryable<Leave>> SetOrderBy()
         {
-            if (_columnName != "")
+            if (_columnName == "EmployeeFullName")
+                return x => x.OrderBy("Employee.FirstName" + " " + _orderDirection.ToUpper());
+            else if (_columnName == "LeaveTypeName")
+                return x => x.OrderBy("LeaveType.Name" + " " + _orderDirection.ToUpper());
+            else if (_columnName != "")
                 return x => x.OrderBy(_columnName + " " + _orderDirection.ToUpper());
+
             else
                 return null;
         }
