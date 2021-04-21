@@ -27,11 +27,11 @@ namespace WebApplication.Api
         private BaseDatawork _baseDataWork;
         private readonly SecurityDataWork _securityDatawork;
         public TimeShiftsApiController(BaseDbContext BaseDbContext,
-            SecurityDbContext SecurityDbContext)
+            SecurityDbContext securityDbContext)
         {
             _context = BaseDbContext;
             _baseDataWork = new BaseDatawork(BaseDbContext);
-            _securityDatawork = new SecurityDataWork(SecurityDbContext);
+            _securityDatawork = new SecurityDataWork(securityDbContext);
         }
 
         //RealWorkHourCreate
@@ -142,12 +142,20 @@ namespace WebApplication.Api
 
             if (predicate == "RealWorkHourCreate")
             {
-                bool isLastDayOfMonth = (DateTime.Now.Day == DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
-                bool isFirstDayOfMonth = DateTime.Now.Day == 1;
-                if (isFirstDayOfMonth)
-                    filter = filter.And(x => x.Month == DateTime.Now.Month || x.Month == DateTime.Now.Month - 1);
-                else
-                    filter = filter.And(x => x.Month == DateTime.Now.Month);
+                filter = filter.And(x => x.Month == DateTime.Now.Month);
+            }
+            else if (predicate == "RealWorkHourClockIn")
+            {
+                filter = filter.And(x => x.Month == DateTime.Now.Month);
+                var loggedInUserId = HttpAccessorService.GetLoggeInUser_Id;
+                if (loggedInUserId != null)
+                {
+                    var user = _securityDatawork.ApplicationUsers.Get(loggedInUserId);
+                    if (user.IsEmployee)
+                        filter = filter.And(x =>
+                            x.WorkPlace.EmployeeWorkPlaces
+                                .Any(y => y.EmployeeId == user.EmployeeId));
+                }
             }
             else
             {

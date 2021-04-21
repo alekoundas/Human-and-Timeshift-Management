@@ -123,23 +123,23 @@ namespace Bussiness.Service
                     switch (colTitle)
                     {
                         case "Excel_Properties":
-                            _worksheet.Cells[1, 1].Value = "Excel_Properties";
+                            _worksheet.Cells[1, colCount].Value = "Excel_Properties";
                             _worksheet.Cells[2, colCount].Value = "Π";
                             _worksheet.Cells[3, colCount].Value = "Α";
-                            _worksheet.Cells[4, colCount].Value = "Β";
-                            _worksheet.Cells[5, colCount].Value = "Custom_1";
-                            _worksheet.Cells[6, colCount].Value = "Custom_2";
-                            _worksheet.Cells[7, colCount].Value = "Custom_3";
-                            _worksheet.Cells[8, colCount].Value = "Custom_4";
-                            _worksheet.Cells[9, colCount].Value = "Custom_5";
-                            _worksheet.Cells[10, colCount].Value = "Custom_6";
-                            _worksheet.Cells[11, colCount].Value = "Custom_7";
-                            _worksheet.Cells[12, colCount].Value = "Custom_8";
-                            _worksheet.Cells[13, colCount].Value = "Custom_9";
-                            _worksheet.Cells[14, colCount++].Value = "Custom_10";
+                            _worksheet.Cells[4, colCount].Value = "Ν";
+                            _worksheet.Cells[5, colCount].Value = "";
+                            _worksheet.Cells[6, colCount].Value = "Π1";
+                            _worksheet.Cells[7, colCount].Value = "Α1";
+                            _worksheet.Cells[8, colCount].Value = "Ν1";
+                            _worksheet.Cells[9, colCount].Value = "";
+                            _worksheet.Cells[10, colCount].Value = "Π2";
+                            _worksheet.Cells[11, colCount].Value = "Α2";
+                            _worksheet.Cells[12, colCount].Value = "Ν2";
+                            _worksheet.Cells[13, colCount].Value = "";
+                            _worksheet.Cells[14, colCount++].Value = "ΠΑ";
                             break;
                         case "Excel_Values":
-                            _worksheet.Cells[1, 2].Value = "Excel_Values";
+                            _worksheet.Cells[1, colCount].Value = "Excel_Values";
                             _worksheet.Cells[2, colCount].Value = "";
                             _worksheet.Cells[3, colCount].Value = "";
                             _worksheet.Cells[4, colCount].Value = "";
@@ -151,7 +151,8 @@ namespace Bussiness.Service
                             _worksheet.Cells[10, colCount].Value = "";
                             _worksheet.Cells[11, colCount].Value = "";
                             _worksheet.Cells[12, colCount].Value = "";
-                            _worksheet.Cells[13, colCount++].Value = "";
+                            _worksheet.Cells[13, colCount].Value = "";
+                            _worksheet.Cells[14, colCount++].Value = "";
                             break;
                         default:
                             break;
@@ -212,7 +213,7 @@ namespace Bussiness.Service
 
                     //Find EmployeeId col in excel
                     for (int col = 1; col <= _worksheet.Dimension.Columns; col++)
-                        if (_worksheet.Cells[1, col].Value.ToString().Contains("EmployeeId"))
+                        if (_worksheet.Cells[1, col].Value?.ToString() == "EmployeeId")
                             excelColEmployeeId = col;
 
                     //Find EmployeeId row in excel if exists
@@ -233,9 +234,10 @@ namespace Bussiness.Service
 
                             //Find day col in excel
                             for (int col = 1; col <= _worksheet.Dimension.Columns; col++)
-                                if (_worksheet.Cells[1, col].Value.ToString().Contains(","))
-                                    if (_worksheet.Cells[1, col].Value.ToString().Split(",")[1].Split("-")[0] == colTitleDay)
-                                        excelColDay = col;
+                                if (_worksheet.Cells[1, col].Value?.ToString().Length > 0)
+                                    if (_worksheet.Cells[1, col].Value.ToString().Contains(","))
+                                        if (_worksheet.Cells[1, col].Value.ToString().Split(",")[1].Split("-")[0] == colTitleDay)
+                                            excelColDay = col;
 
                             //if employee row exists
                             if (excelRowEmployeeId != 0)
@@ -278,7 +280,7 @@ namespace Bussiness.Service
                 {
                     for (int col = 1; col <= _worksheet.Dimension.Columns; col++)
                     {
-                        if (_worksheet.Cells[1, col].Value.ToString() == "EmployeeId")
+                        if (_worksheet.Cells[1, col].Value?.ToString() == "EmployeeId")
                         {
                             var entity = results.FirstOrDefault(x =>
                                x.GetType().GetProperty("EmployeeId").GetValue(x).ToString() == _worksheet.Cells[row, col].Value?.ToString());
@@ -289,10 +291,10 @@ namespace Bussiness.Service
                                 var fullName = detail.GetType().GetProperty("FullName").GetValue(detail);
                                 var vatNumber = detail.GetType().GetProperty("VatNumber").GetValue(detail);
 
-                                _worksheet.Cells[row, col].Value = "[VatNumber]:" + vatNumber + "_[FullName]:" + fullName;
+                                _worksheet.Cells[row, col].Value = "[FullName]:" + fullName + "_[VatNumber]:" + vatNumber;
                             }
                         }
-                        else if (_worksheet.Cells[1, col].Value.ToString() == "TimeShiftId")
+                        else if (_worksheet.Cells[1, col].Value?.ToString() == "TimeShiftId")
                         {
                             var entity = results.FirstOrDefault(x =>
                                x.GetType().GetProperty("TimeShiftId").GetValue(x).ToString() == _worksheet.Cells[row, col].Value?.ToString());
@@ -427,13 +429,14 @@ namespace Bussiness.Service
 
                     //Find Excel_Values row in excel 
                     for (int row = 1; row <= worksheet.Dimension.Rows; row++)
-                        if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Π")
-                            excelProperties.Add("Π", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
-                        else if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Α")
-                            excelProperties.Add("Α", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
-                        else if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Β")
-                            excelProperties.Add("Β", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
-                        else if ((bool)worksheet.Cells[row, excelColExcel_Properties].Value?.ToString().Contains("Custom_"))
+                        //if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Π")
+                        //    excelProperties.Add("Π", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
+                        //else if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Α")
+                        //    excelProperties.Add("Α", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
+                        //else if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString() == "Ν")
+                        //    excelProperties.Add("Ν", worksheet.Cells[row, excelColExcel_Values].Value.ToString());
+                        //else if ((bool)worksheet.Cells[row, excelColExcel_Properties].Value?.ToString().Contains("Custom_"))
+                        if (worksheet.Cells[row, excelColExcel_Properties].Value?.ToString().Length > 0)
                             excelProperties.Add(
                                 worksheet.Cells[row, excelColExcel_Properties].Value.ToString(),
                                 worksheet.Cells[row, excelColExcel_Values].Value?.ToString());
@@ -832,7 +835,7 @@ namespace Bussiness.Service
             else if (colTitle == "CustomerId")
                 colData = await _baseDataWork.Customers.SelectAllAsync(x => "[VatNumber]:" + x.VatNumber + "_[IdentifyingName]:" + x.IdentifyingName);
             else if (colTitle == "EmployeeId")
-                colData = await _baseDataWork.Employees.SelectAllAsyncFiltered(_employeeFilter, x => "[VatNumber]:" + x.VatNumber + "_[FullName]:" + x.FullName);
+                colData = await _baseDataWork.Employees.SelectAllAsyncFiltered(_employeeFilter, x => "[FullName]:" + x.FullName + "_[VatNumber]:" + x.VatNumber);
             else if (colTitle == "SpecializationId")
                 colData = await _baseDataWork.Specializations.SelectAllAsync(x => "[Name]:" + x.Name);
             else if (colTitle == "LeaveTypeId")
@@ -895,7 +898,7 @@ namespace Bussiness.Service
             }
             if (entityName == "Employee")
             {
-                var VatNumber = excelCellValue?.Split("_")[0]?.Split(":")[1];
+                var VatNumber = excelCellValue?.Split("_")[1]?.Split(":")[1];
                 if (VatNumber != null)
                     id = (await _baseDataWork.Employees
                     .FirstAsync(x => x.VatNumber == VatNumber))?

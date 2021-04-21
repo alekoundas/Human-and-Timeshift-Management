@@ -17,5 +17,8 @@ namespace DataAccess.ViewModels
 
         [JsonProperty(PropertyName = "Comments")]
         public string Comments { get; set; }
+
+        public bool IsInProgress { get; set; } = false;
+
     }
 }

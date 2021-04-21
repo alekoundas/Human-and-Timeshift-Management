@@ -179,49 +179,49 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var totalFooter = entities
                 .Select(x => x.RealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => Math.Abs((x.EndOn - x.StartOn).TotalSeconds))
+                    .Select(x => Math.Abs((x.EndOn.Value - x.StartOn).TotalSeconds))
                 .Sum())
             .Sum();
 
             var totalFooterDay = entities
                 .Select(x => x.RealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds)
+                    .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToDayWork().TotalSeconds)
                 .Sum())
             .Sum();
 
             var totalFooterNight = entities
                 .Select(x => x.RealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds)
+                    .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToNightWork().TotalSeconds)
                 .Sum())
             .Sum();
 
             var totalFooterSaturdayDay = entities
                 .Select(x => x.RealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSaturdayDayWork().TotalSeconds)
+                    .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSaturdayDayWork().TotalSeconds)
                 .Sum())
             .Sum();
 
             var totalFooterSaturdayNight = entities
                 .Select(x => x.RealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSaturdayNightWork().TotalSeconds)
+                    .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSaturdayNightWork().TotalSeconds)
                 .Sum())
             .Sum();
 
             var totalFooterSundayDay = entities
                 .Select(x => x.RealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSundayDayWork().TotalSeconds)
+                    .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSundayDayWork().TotalSeconds)
                 .Sum())
             .Sum();
 
             var totalFooterSundayNight = entities
                 .Select(x => x.RealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSundayNightWork().TotalSeconds)
+                    .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSundayNightWork().TotalSeconds)
                 .Sum())
             .Sum();
 
@@ -251,31 +251,31 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                 var totalSeconds = resultRealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToTotalWork().TotalSeconds)
+                    .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToTotalWork().TotalSeconds)
                     .Sum();
                 var totalSecondsDay = resultRealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
+                    .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToDayWork().TotalSeconds)
                     .Sum();
                 var totalSecondsNight = resultRealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
+                    .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToNightWork().TotalSeconds)
                     .Sum();
                 var totalSecondsSaturdayDay = resultRealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSaturdayDayWork().TotalSeconds)
+                    .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSaturdayDayWork().TotalSeconds)
                     .Sum();
                 var totalSecondsSaturdayNight = resultRealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSaturdayNightWork().TotalSeconds)
+                    .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSaturdayNightWork().TotalSeconds)
                     .Sum();
                 var totalSecondsSundayDay = resultRealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSundayDayWork().TotalSeconds)
+                    .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSundayDayWork().TotalSeconds)
                     .Sum();
                 var totalSecondsSundayNight = resultRealWorkHours
                     .Where(filterRealWorkHours)
-                    .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSundayNightWork().TotalSeconds)
+                    .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSundayNightWork().TotalSeconds)
                     .Sum();
 
                 if (_datatable.ShowHoursInPercentage)
@@ -351,25 +351,25 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 x.Key.Date,
                 x.Key.Employee,
                 TotalSeconds = x.ToList()
-                                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalSeconds)
+                                .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToTotalWork().TotalSeconds)
                                 .Sum(),
                 TotalDaySeconds = x.ToList()
-                                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds)
+                                .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToDayWork().TotalSeconds)
                                 .Sum(),
                 TotalNightSeconds = x.ToList()
-                                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds)
+                                .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToNightWork().TotalSeconds)
                                 .Sum(),
                 TotalSaturdayDaySeconds = x.ToList()
-                                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSaturdayDayWork().TotalSeconds)
+                                .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSaturdayDayWork().TotalSeconds)
                                 .Sum(),
                 TotalSaturdayNightSeconds = x.ToList()
-                                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSaturdayNightWork().TotalSeconds)
+                                .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSaturdayNightWork().TotalSeconds)
                                 .Sum(),
                 TotalSundayDaySeconds = x.ToList()
-                                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSundayDayWork().TotalSeconds)
+                                .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSundayDayWork().TotalSeconds)
                                 .Sum(),
                 TotalSundayNightSeconds = x.ToList()
-                                .Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToSundayNightWork().TotalSeconds)
+                                .Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToSundayNightWork().TotalSeconds)
                                 .Sum(),
             })
             .ToList();
@@ -563,7 +563,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 .GetPaggingWithFilter(x => x.OrderBy(y => y.StartOn), filterRealWorkHour, includesRealWorkHour, _pageSize, _pageIndex);
 
             var totalFooterRealWorkHours = entitiesRealWorkHour
-                    .Select(x => Math.Abs((x.EndOn - x.StartOn).TotalSeconds))
+                    .Select(x => Math.Abs((x.EndOn.Value - x.StartOn).TotalSeconds))
                     .Sum();
 
             var realWorkHours = entitiesRealWorkHour
@@ -678,9 +678,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 .Select(x => new
                 {
                     WorkPlace = x.Key,
-                    TotalHours = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalSeconds).Sum(),
-                    TotalHoursDay = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToDayWork().TotalSeconds).Sum(),
-                    TotalHoursNight = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToNightWork().TotalSeconds).Sum()
+                    TotalHours = x.Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToTotalWork().TotalSeconds).Sum(),
+                    TotalHoursDay = x.Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToDayWork().TotalSeconds).Sum(),
+                    TotalHoursNight = x.Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToNightWork().TotalSeconds).Sum()
                 });
 
 
@@ -877,7 +877,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             var totalFooterSeconds = entities.Select(x => x.RealWorkHours
                     .Where(x => x.StartOn.Date == DateTime.Now.Date)
-                    .Select(x => Math.Abs((x.EndOn - x.StartOn).TotalSeconds))
+                    .Select(x => Math.Abs((x.EndOn.Value - x.StartOn).TotalSeconds))
                     .Sum())
                 .Sum();
             foreach (var result in entities)
@@ -897,7 +897,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     todayCell += "<p style='white-space:nowrap;'>" +
                         realWorkHour.StartOn.ToShortTimeString() +
                         " - " +
-                        realWorkHour.EndOn.ToShortTimeString() +
+                        realWorkHour.EndOn.Value.ToShortTimeString() +
                         "</p></br>";
                 }
                 dictionary.Add("FirstName", result.FirstName);
@@ -957,7 +957,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                     var totalFooterSeconds = totalRealWorkHours
                             .Where(filterRealWorkHours)
-                            .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToTotalWork().TotalSeconds)
+                            .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToTotalWork().TotalSeconds)
                         .Sum();
 
                     var realWorkHoursToday = result.RealWorkHours
@@ -1021,12 +1021,12 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
                     var totalFooterSeconds = totalRealWorkHours
                             .Where(realWorkHoursFilter)
-                            .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToTotalWork().TotalSeconds)
+                            .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToTotalWork().TotalSeconds)
                         .Sum();
 
                     var totalSeconds = result.RealWorkHours
                         .Where(realWorkHoursFilter)
-                        .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToTotalWork().TotalSeconds)
+                        .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToTotalWork().TotalSeconds)
                         .Sum();
 
 
@@ -1083,7 +1083,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 {
                     var totalFooterSeconds = entities.Select(x => x.RealWorkHours
                             .Where(x => x.StartOn.Date == _datatable.SpecificDates[i])
-                            .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToTotalWork().TotalSeconds)
+                            .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToTotalWork().TotalSeconds)
                             .Sum())
                         .Sum();
 
@@ -1106,7 +1106,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         dayCell += "<p style='white-space:nowrap;'>" +
                             realWorkHour.StartOn.ToShortTimeString() +
                             " - " +
-                            realWorkHour.EndOn.ToShortTimeString() +
+                            realWorkHour.EndOn.Value.ToShortTimeString() +
                             "</p></br>";
 
                     if (dayOffs.Count > 0)
@@ -1498,7 +1498,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     x.Key.Date,
                     x.Key.Title,
                     MaxPermitedSeconds = x.Key.MaxTicks,
-                    TotalDaySeconds = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalSeconds)
+                    TotalDaySeconds = x.Select(y => new DateRangeService(y.StartOn, y.EndOn.Value).ConvertToTotalWork().TotalSeconds)
                         .Sum()
                 })
                 .ToList();

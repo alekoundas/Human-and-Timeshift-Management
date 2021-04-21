@@ -29,7 +29,7 @@ namespace DataAccess.Repository.Base
 
             filter = filter.And(x => x.StartOn.Year == year);
             filter = filter.And(x => x.StartOn.Month == month);
-            filter = filter.And(x => x.StartOn.Day <= day && day <= x.EndOn.Day);
+            filter = filter.And(x => x.StartOn.Day <= day && day <= x.EndOn.Value.Day);
 
             return await Context.RealWorkHours.Where(filter).ToListAsync();
         }
@@ -45,7 +45,7 @@ namespace DataAccess.Repository.Base
                 .Where(x =>
                    x.TimeShiftId == viewModel.TimeShiftId && (
                    x.StartOn.Day == viewModel.CellDay ||
-                   x.EndOn.Day == viewModel.CellDay))
+                   x.EndOn.Value.Day == viewModel.CellDay))
                 .ToListAsync();
         }
 
@@ -138,11 +138,11 @@ namespace DataAccess.Repository.Base
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
 
             filter = filter.And(x =>
-                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Value.Date <= endOn.Date));
 
             return Context.RealWorkHours
                 .Where(filter)
-                .Select(x => (x.EndOn - x.StartOn).TotalSeconds)
+                .Select(x => (x.EndOn.Value - x.StartOn).TotalSeconds)
                 .Select(x => Math.Abs(x))
                 .ToList()
                 .Sum();
@@ -157,12 +157,12 @@ namespace DataAccess.Repository.Base
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
 
             filter = filter.And(x =>
-                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Value.Date <= endOn.Date));
 
             return Context.RealWorkHours
                    .Where(filter)
                    .ToList()
-                   .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSaturdayDayWork().TotalSeconds)
+                   .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSaturdayDayWork().TotalSeconds)
                    .Sum();
         }
 
@@ -175,12 +175,12 @@ namespace DataAccess.Repository.Base
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
 
             filter = filter.And(x =>
-                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Value.Date <= endOn.Date));
 
             return Context.RealWorkHours
                 .Where(filter)
                 .ToList()
-                .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSaturdayNightWork().TotalSeconds)
+                .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSaturdayNightWork().TotalSeconds)
                 .Sum();
         }
 
@@ -193,12 +193,12 @@ namespace DataAccess.Repository.Base
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
 
             filter = filter.And(x =>
-                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Value.Date <= endOn.Date));
 
             return Context.RealWorkHours
                  .Where(filter)
                  .ToList()
-                 .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSundayDayWork().TotalSeconds)
+                 .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSundayDayWork().TotalSeconds)
                  .Sum();
         }
 
@@ -211,12 +211,12 @@ namespace DataAccess.Repository.Base
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
 
             filter = filter.And(x =>
-                    (startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date));
+                    (startOn.Date <= x.StartOn.Date && x.EndOn.Value.Date <= endOn.Date));
 
             return Context.RealWorkHours
                  .Where(filter)
                  .ToList()
-                 .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToSundayNightWork().TotalSeconds)
+                 .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToSundayNightWork().TotalSeconds)
                  .Sum();
         }
 
@@ -232,12 +232,12 @@ namespace DataAccess.Repository.Base
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
 
             filter = filter.And(x =>
-                startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date);
+                startOn.Date <= x.StartOn.Date && x.EndOn.Value.Date <= endOn.Date);
 
             return Context.RealWorkHours
               .Where(filter)
               .ToList()
-              .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
+              .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToDayWork().TotalSeconds)
               .Sum();
         }
 
@@ -253,12 +253,12 @@ namespace DataAccess.Repository.Base
                 filter = filter.And(x => x.TimeShift.WorkPlaceId == workplaceId);
 
             filter = filter.And(x =>
-               startOn.Date <= x.StartOn.Date && x.EndOn.Date <= endOn.Date);
+               startOn.Date <= x.StartOn.Date && x.EndOn.Value.Date <= endOn.Date);
 
             return Context.RealWorkHours
                .Where(filter)
                .ToList()
-               .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
+               .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToNightWork().TotalSeconds)
                .Sum();
         }
 
@@ -270,12 +270,12 @@ namespace DataAccess.Repository.Base
             var filter = PredicateBuilder.New<RealWorkHour>();
             filter = filter.And(x => x.EmployeeId == employeeId);
             filter = filter.And(x =>
-                compareDate.Date == x.StartOn.Date && x.EndOn.Date == compareDate.Date);
+                compareDate.Date == x.StartOn.Date && x.EndOn.Value.Date == compareDate.Date);
 
             return Context.RealWorkHours
                 .Where(filter)
                 .ToList()
-                .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToDayWork().TotalSeconds)
+                .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToDayWork().TotalSeconds)
                 .Sum();
         }
 
@@ -291,7 +291,7 @@ namespace DataAccess.Repository.Base
             return Context.RealWorkHours
                 .Where(filter)
                 .ToList()
-                .Select(x => new DateRangeService(x.StartOn, x.EndOn).ConvertToNightWork().TotalSeconds)
+                .Select(x => new DateRangeService(x.StartOn, x.EndOn.Value).ConvertToNightWork().TotalSeconds)
                 .Sum();
         }
 

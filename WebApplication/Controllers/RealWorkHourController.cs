@@ -1,4 +1,5 @@
-﻿using Bussiness.Service;
+﻿using Bussiness;
+using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -19,10 +20,12 @@ namespace WebApplication.Controllers
         private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
-        public RealWorkHourController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
+        private SecurityDataWork _securityDataWork;
+        public RealWorkHourController(BaseDbContext baseDbContext, SecurityDbContext securityDbContext)
         {
-            _context = BaseDbContext;
-            _baseDataWork = new BaseDatawork(BaseDbContext);
+            _context = baseDbContext;
+            _baseDataWork = new BaseDatawork(baseDbContext);
+            _securityDataWork = new SecurityDataWork(securityDbContext);
         }
 
 
@@ -145,6 +148,73 @@ namespace WebApplication.Controllers
             ViewData["TimeShiftId"] = new SelectList(_context.TimeShifts, "Id", "Id", realWorkHour.TimeShiftId);
             return View(realWorkHour);
         }
+
+        // GET: RealWorkHours
+        //[Authorize(Roles = "RealWorkHourTimeClock_View")]
+        public async Task<IActionResult> TimeClock()
+        {
+            ViewData["Title"] = "Προσθήκη βάρδιας";
+
+            var loggedInUserId = HttpAccessorService.GetLoggeInUser_Id;
+            if (loggedInUserId != null)
+            {
+                var user = _securityDataWork.ApplicationUsers.Get(loggedInUserId);
+                if (user.IsEmployee)
+                {
+                    var realWorkHour = await _baseDataWork.RealWorkHours
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId == user.EmployeeId &&
+                            x.IsInProgress);
+
+                    if (realWorkHour != null)
+                        return View("TimeClock", new RealWorkHourTimeClock
+                        {
+                            TimeShiftId = realWorkHour.TimeShiftId,
+                            Comments = realWorkHour.Comments,
+                            EmployeeId = (int)user.EmployeeId
+                        });
+                }
+
+                return View("TimeClock", new RealWorkHourTimeClock
+                {
+                    EmployeeId = (int)user.EmployeeId
+                });
+            }
+            return View();
+        }
+
+        // POST: RealWorkHours
+        //[Authorize(Roles = "RealWorkHourTimeClock_View")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TimeClock(RealWorkHourTimeClock viewModel)
+        {
+            ViewData["Title"] = "Προσθήκη βάρδιας";
+
+            var loggedInUserId = HttpAccessorService.GetLoggeInUser_Id;
+            if (loggedInUserId != null)
+            {
+                var realWorkHour = await _baseDataWork.RealWorkHours
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == viewModel.EmployeeId &&
+                        x.IsInProgress);
+
+                if (realWorkHour == null)//Clock-In
+                    _context.RealWorkHours
+                        .Add(RealWorkHourTimeClock.ClockIn(viewModel));
+                else//Clock-Out
+                {
+                    realWorkHour.IsInProgress = false;
+                    realWorkHour.EndOn = viewModel.CurrentDate;
+                    viewModel.TimeShiftId = 0;
+                }
+            }
+            await _baseDataWork.SaveChangesAsync();
+
+            return View("TimeClock", viewModel);
+        }
+
+
 
         private bool RealWorkHourExists(int id)
         {

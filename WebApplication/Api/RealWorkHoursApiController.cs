@@ -126,6 +126,53 @@ namespace WebApplication.Api
         }
 
 
+        //// POST: api/realworkhours
+        //[HttpPost("ClockIn")]
+        //public async Task<ActionResult<RealWorkHour>> ClockIn(
+        //    [FromBody] RealWorkHourTimeClock viewModel)
+        //{
+        //    var user = _securityDatawork.ApplicationUsers.Get(viewModel.UserId);
+        //    if (user.IsEmployee)
+        //    {
+        //        viewModel.EmployeeId = user.EmployeeId;
+        //        _context.RealWorkHours.Add(RealWorkHourTimeClock.ClockIn(viewModel));
+
+        //        await _baseDataWork.SaveChangesAsync();
+        //    }
+
+        //    return Ok(new { });
+        //}
+
+        //// POST: api/realworkhours
+        //[HttpPost("ClockOut")]
+        //public async Task<ActionResult<RealWorkHour>> ClockOut(
+        //    [FromBody] RealWorkHourTimeClock viewModel)
+        //{
+        //    var user = _securityDatawork.ApplicationUsers.Get(viewModel.UserId);
+        //    if (user.IsEmployee)
+        //    {
+        //        var realWorkHour = await _context.RealWorkHours.
+        //            FirstOrDefaultAsync(x =>
+        //                x.IsInProgress == true &&
+        //                x.EmployeeId == user.EmployeeId);
+
+        //        realWorkHour.EndOn = viewModel.CurrentDate;
+        //        realWorkHour.IsInProgress = false;
+        //        if (viewModel.Comments.Length > 1)
+        //        {
+        //            if (realWorkHour.Comments.Length > 1)
+        //                realWorkHour.Comments =
+        //                    "ClockIn:'" + realWorkHour.Comments + "'" +
+        //                    "ClockOut:'" + viewModel.Comments + "'";
+        //            else
+        //                realWorkHour.Comments = viewModel.Comments;
+        //        }
+
+        //        await _baseDataWork.SaveChangesAsync();
+        //    }
+
+        //    return Ok(new { });
+        //}
 
 
 
@@ -149,7 +196,7 @@ namespace WebApplication.Api
                 {
                     WorkHourId = group.Select(x => x.Id).FirstOrDefault(),
                     StartOn = group.Key.StartOn,
-                    EndOn = group.Key.EndOn,
+                    EndOn = group.Key.EndOn.Value,
                     //IsDayOff = group.Select(x => x.IsDayOff).FirstOrDefault(),
                     Comments = group.Select(x => x.Comments).FirstOrDefault(),
                     EmployeeIds = group.Select(x => x.EmployeeId).ToList()
@@ -167,8 +214,13 @@ namespace WebApplication.Api
             foreach (var employeeId in workHourViewModel.EmployeeIds)
                 filter = filter.Or(x => x.EmployeeId == employeeId);
 
-            filter = filter.And(x => x.StartOn == workHourViewModel.StartOn &&
-                x.EndOn == workHourViewModel.EndOn);
+            filter = filter.And(x =>
+                x.StartOn.Date == workHourViewModel.StartOn.Date &&
+                x.StartOn.Hour == workHourViewModel.StartOn.Hour &&
+                x.StartOn.Minute == workHourViewModel.StartOn.Minute &&
+                x.EndOn.Value.Date == workHourViewModel.EndOn.Date &&
+                x.EndOn.Value.Hour == workHourViewModel.EndOn.Hour &&
+                x.EndOn.Value.Minute == workHourViewModel.EndOn.Minute);
 
             var realWorkHours = await _baseDataWork.RealWorkHours.GetFiltered(filter);
             if (realWorkHours.Count > 0)
@@ -232,10 +284,14 @@ namespace WebApplication.Api
             {
                 var workHourToModify = await _baseDataWork.RealWorkHours
                     .FirstOrDefaultAsync(x =>
-                        x.StartOn == realWorkHour.StartOn &&
-                        x.EndOn == realWorkHour.EndOn &&
+                        x.StartOn.Date == realWorkHour.StartOn.Date &&
+                        x.StartOn.Hour == realWorkHour.StartOn.Hour &&
+                        x.StartOn.Minute == realWorkHour.StartOn.Minute &&
+                        x.EndOn.Value.Date == realWorkHour.EndOn.Date &&
+                        x.EndOn.Value.Hour == realWorkHour.EndOn.Hour &&
+                        x.EndOn.Value.Minute == realWorkHour.EndOn.Minute &&
                         x.EmployeeId == realWorkHour.EmployeeId
-                 );
+                    );
 
                 //if workhour exists for employee, edit it
                 if (workHourToModify != null)

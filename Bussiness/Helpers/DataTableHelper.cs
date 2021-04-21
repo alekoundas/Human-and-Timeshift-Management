@@ -166,16 +166,16 @@ namespace Bussiness.Helpers
                    x.StartOn.Day <= dayOfMonth)
                 .ToList();
 
-            var strToReturn = "<div style='width:120px; white-space: nowrap;'>";
+            var strToReturn = "<div style='width:110px; display:block;'>";
 
             if (cellLeaves.Count() > 0)
             {
                 if (datatable.MakePrintable)
-                    return "<div style='width:110px; white-space: nowrap;'>" +
+                    return "<div style='width:90px; display:block; float: left;'>" +
                                 "<center><p><b>ΚΑ</b></p></center>" +
                             "</div>";
                 else
-                    return "<div style='width:110px; white-space: nowrap;'>" +
+                    return "<div style='width:90px; display:block; float: left;'>" +
                                 "<center><p><b>Άδεια</b></p></center>" +
                             "</div>";
             }
@@ -185,22 +185,22 @@ namespace Bussiness.Helpers
                 {
                     if (datatable.MakePrintable)
 
-                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                        strToReturn += "<div style='width:90px; display:block; float: left;'>" +
                                             "<center><p><b>Ρ</b></p></center>" +
                                         "</div>";
                     else
-                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                        strToReturn += "<div style='width:90px; display:block; float: left;'>" +
                                             "<center><p><b>Ρεπό</b></p></center>" +
                                         "</div>";
                 }
                 else
                 {
                     if (datatable.MakePrintable)
-                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                        strToReturn += "<div style='width:90px; display:block; float: left;'>" +
                                             "<center><p><b></b></p></center>" +
                                         "</div>";
                     else
-                        strToReturn += "<div style='width:110px; white-space: nowrap;'>" +
+                        strToReturn += "<div style='width:90px; display:block; float: left;'>" +
                                             "<center><p><b>Δηλώθηκε <br>σε άλλο <br>πόστο</b></p></center>" +
                                         "</div>";
                 }
@@ -218,31 +218,34 @@ namespace Bussiness.Helpers
                         {
                             strToReturn += "<div style='width:18px;display:block; float: left;'> ";
                             strToReturn += celStartOn.ToString("HH");
+                            strToReturn += "</div>";
                         }
                         else
                         {
                             strToReturn += "<div style='width:38px;display:block; float: left;'> ";
                             strToReturn += celStartOn.ToString("HH:mm");
+                            strToReturn += "</div>";
                         }
                     else
                     {
                         strToReturn += "<div style='width:50px;display:block; float: left;'> ";
                         strToReturn += celStartOn.ToShortTimeString();
+                        strToReturn += "</div>";
                     }
 
                     // "-" or "--"
-                    strToReturn += "</div>";
                     if (datatable.MakePrintable)
                     {
                         strToReturn += "<div style='width:12px;display:block; float: left;'> ";
                         strToReturn += "--";
+                        strToReturn += "</div>";
                     }
                     else
                     {
                         strToReturn += "<div style='width:8px;display:block; float: left;'> ";
                         strToReturn += "-";
+                        strToReturn += "</div>";
                     }
-                    strToReturn += "</div>";
 
                     //End on
                     if (datatable.ShowHoursIn24h)
@@ -252,14 +255,16 @@ namespace Bussiness.Helpers
                             strToReturn += celEndOn.ToString("HH");
                         else
                             strToReturn += celEndOn.ToString("HH:mm");
+
+                        strToReturn += "</div>";
                     }
                     else
                     {
                         strToReturn += "<div style='width:50px; display:block; float: left;'>";
                         strToReturn += celEndOn.ToShortTimeString();
+                        strToReturn += "</div>";
                     }
 
-                    strToReturn += "</div>";
                 }
 
             strToReturn += "</div>";
@@ -300,10 +305,11 @@ namespace Bussiness.Helpers
                                                                               //x.EmployeeId == employeeId)
                 .ToList();
 
-            var strToReturn = "<div style='width:110px; white-space: nowrap;'>";
+            var strToReturn = "<div style='width:110px; display:block;'>";
+
 
             if (cellLeaves.Count() > 0)
-                return "<div style='width:110px; white-space: nowrap;'>" +
+                return "<div style='width:90px; white-space: nowrap;'>" +
                  "<center><p><b>Άδεια</b></p></center>" +
                   "</div>";
             else
@@ -319,32 +325,39 @@ namespace Bussiness.Helpers
                     {
                         strToReturn += "<div style='width:38px;display:block; float: left;'> ";
                         strToReturn += celStartOn.ToString("HH:mm");
+                        strToReturn += "</div>";
                     }
                     else
                     {
                         strToReturn += "<div style='width:50px;display:block; float: left;'> ";
                         strToReturn += celStartOn.ToShortTimeString();
+                        strToReturn += "</div>";
                     }
 
-                    // "-" or "--"
-                    strToReturn += "</div>";
-                    strToReturn += "<div style='width:8px;display:block; float: left;'> ";
-                    strToReturn += "-";
-                    strToReturn += "</div>";
+                    // "-" 
+                    strToReturn += "<div style='width:8px;display:block; float: left;'> - </div>";
 
                     //End on
                     if (datatable.ShowHoursIn24h)
                     {
                         strToReturn += "<div style='width:38px; display:block; float: left;'>";
-                        strToReturn += celEndOn.ToString("HH:mm");
+                        if (celEndOn.HasValue)
+                            strToReturn += celEndOn.Value.ToString("HH:mm");
+                        else
+                            strToReturn += "...";
+
+                        strToReturn += "</div>";
                     }
                     else
                     {
                         strToReturn += "<div style='width:50px; display:block; float: left;'>";
-                        strToReturn += celEndOn.ToShortTimeString();
-                    }
+                        if (celEndOn.HasValue)
+                            strToReturn += celEndOn.Value.ToShortTimeString();
+                        else
+                            strToReturn += "...";
 
-                    strToReturn += "</div>";
+                        strToReturn += "</div>";
+                    }
                 }
                 strToReturn += "</div>";
 
@@ -363,18 +376,14 @@ namespace Bussiness.Helpers
 
                 if (datatable.GenericId != 0)
                 {
-                    if (true)
-                    {
+                    if (currentUserRoles.Contains("RealWorkHour_Create"))
+                        strToReturn += FaIconAdd(compareDay, "", employee.Id,
+                            compareMonth, compareYear);
 
-                        if (currentUserRoles.Contains("RealWorkHour_Create"))
-                            strToReturn += FaIconAdd(compareDay, "", employee.Id,
-                                compareMonth, compareYear);
-
-                        if (currentUserRoles.Contains("RealWorkHour_Edit"))
-                            if (cellRealWorkHours.Count() > 0)
-                                strToReturn += FaIconEdit(compareDay, "green", employee.Id,
-                                       datatable.GenericId, compareMonth, compareYear);
-                    }
+                    if (currentUserRoles.Contains("RealWorkHour_Edit"))
+                        if (cellRealWorkHours.Count() > 0)
+                            strToReturn += FaIconEdit(compareDay, "green", employee.Id,
+                                   datatable.GenericId, compareMonth, compareYear);
                 }
                 return strToReturn;
             }
@@ -389,7 +398,7 @@ namespace Bussiness.Helpers
                 cellBody += "<p white-space: nowrap;'>" +
                     realWorkHour.StartOn.ToShortTimeString() +
                     " - " +
-                    realWorkHour.EndOn.ToShortTimeString() +
+                    realWorkHour.EndOn.Value.ToShortTimeString() +
                     "</p></br>";
             }
 

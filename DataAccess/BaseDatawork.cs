@@ -91,7 +91,7 @@ namespace DataAccess
                 x => x.EndOn.Date >= startOn.Date && x.StartOn.Date <= endOn.Date;
 
             Expression<Func<RealWorkHour, bool>> realWorkHourFilter =
-                x => x.EndOn.Date >= startOn.Date && x.StartOn.Date <= endOn.Date;
+                x => x.EndOn.Value.Date >= startOn.Date && x.StartOn.Date <= endOn.Date;
 
             await _dbcontext.WorkHours.Include(x => x.Employee)
                 .Where(WorkHourFilter)

@@ -68,6 +68,6 @@ namespace DataAccess.Models.Entity
 
 
         [NotMapped]
-        public string FullName { get { return FirstName + " - " + LastName; } }
+        public string FullName { get { return LastName + " - " + FirstName; } }
     }
 }

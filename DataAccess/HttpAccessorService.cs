@@ -8,10 +8,10 @@ namespace DataAccess
         public static string GetLoggeInUser_FullName
         {
             get => new HttpContextAccessor().HttpContext.User.Claims
-                .FirstOrDefault(x => x.Type == "FirstName").Value +
+                .FirstOrDefault(x => x.Type == "LastName").Value +
                 " - " +
                 new HttpContextAccessor().HttpContext.User.Claims
-                    .FirstOrDefault(x => x.Type == "LastName").Value +
+                    .FirstOrDefault(x => x.Type == "FirstName").Value +
                 "";
         }
 

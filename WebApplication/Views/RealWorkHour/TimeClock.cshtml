@@ -1,0 +1,186 @@
+﻿@model DataAccess.ViewModels.RealWorkHourTimeClock
+@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                </div>
+            </div>
+            <hr />
+            <form asp-controller="RealWorkHour" asp-action="TimeClock" method="post">
+                <div class="box-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="CurrentDate" class="CalentimInput" />
+                    <input type="hidden" asp-for="EmployeeId" />
+
+
+                    <div class="form-group">
+                        <label class="control-label">Πόστο</label>
+                        <div class="input-group" style="width:100%">
+                            <select id="WorkPlace_Select2" style="width:70%"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="TimeShiftId" class="control-label"></label>
+                        <div class="input-group">
+                            <select id="TimeShift_Select2" asp-for="TimeShiftId" style="width:100%"></select>
+                            <span asp-validation-for="TimeShiftId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Comments" class="control-label"></label>
+                        <div class="input-group">
+                            <textarea asp-for="Comments" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <hr />
+
+
+                    <div class="form-group pull-right">
+                        @if (Model.TimeShiftId == 0)
+                        {
+            <input type="submit" value="Clock-In" class="btn btn-primary" /> }
+        else
+        {
+
+<input type="submit" value="Clock-Out" class="btn btn-warning" />}
+                    </div>
+            </form>
+
+
+        </div>
+    </div>
+</div>
+<div class="col-md-3"> </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div id="DataTableDiv"></div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <script>
+        //Temp set current date
+        $(() => document.getElementById('CurrentDate').value = new DateService().ConvertFrom.TimeStamp(Date.now()).To.Input())
+
+
+        //Workplaces Filter
+        $('#WorkPlace_Select2').select2({
+            placeholder: "Επέλεξε πόστο",
+            allowClear: true,
+            ajax: {
+                url: '/api/workplaces/select2',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                    return query;
+                }
+            }
+        }).on('change', () => {
+            $('#TimeShift_Select2').val([]).trigger('change');
+        })
+
+        //TimeShift Filter
+        $('#TimeShift_Select2').select2({
+            placeholder: "Επέλεξε χρονοδιάγραμμα",
+            allowClear: true,
+            ajax: {
+                url: '/api/timeshifts/select2',
+                data: params => {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                        predicate: "RealWorkHourClockIn",
+                        workPlaceId: GetWorkPlaceFilterValue()
+                    }
+                }
+            }
+        }).on('change', () => {
+            $('#EmployeesWorkhoursDatatable').DataTable().ajax.reload();
+            if (GetTimeShiftFilterValue() != undefined && GetTimeShiftFilterValue() != '')
+                $.get('/api/timeshifts/' + GetTimeShiftFilterValue(), response => {
+                    DestroyDataTable();
+                    DeleteDataTableHTML();
+                    AppendNewDataTableHTML();
+                    InitDatatable();
+                });
+        });
+        //Datatable
+        const InitDatatable = () =>
+            new DataTableService('#EmployeesWorkhoursDatatable')
+                .ForApiController('employees')
+                .StartOrderFromCol(1)
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "Day")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'RealWorkHourClockIn';
+                    data.genericId = GetTimeShiftFilterValue();
+
+                    return JSON.stringify(data);
+                })
+                .CreatedRow((row, data, dataIndex) => {
+                    if (!data.IsActive)
+                        $(row).css('background-color', '#AAAFB4');
+                })
+                .CompleteDataTable();
+
+        const AppendNewDataTableHTML = () =>
+            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
+                '<div class="box-body table-responsive">' +
+                '<table id="EmployeesWorkhoursDatatable" class="table table-bordered table-hover table-responsive stripe">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' +
+                '<th>Σήμερα</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tfoot>' +
+                '<tr>' +
+                '<th>Επίθετο</th>' +
+                '<th>Όνομα</th>' + '' +
+                '<th>Σήμερα</th>' +
+                '</tr>' +
+                '</tfoot>' +
+                '</table>' +
+                '</div>' +
+                '');
+
+        var DestroyDataTable = () => {
+            if (document.getElementById('EmployeesWorkhoursDatatable') != null)
+                $('#EmployeesWorkhoursDatatable')
+                    .DataTable().destroy();
+        }
+
+        const DeleteDataTableHTML = () =>
+            document.getElementById('EmployeesWorkhoursDatatable')?.remove();
+
+        const GetTimeShiftFilterValue = () =>
+            $('#TimeShift_Select2').find(':selected').val()
+
+        const GetWorkPlaceFilterValue = () =>
+            $('#WorkPlace_Select2').find(':selected').val()
+
+    </script>
+}

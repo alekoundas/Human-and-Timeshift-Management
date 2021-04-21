@@ -13,6 +13,7 @@ namespace Bussiness.Service
     public class DataTableService
     {
         public Datatable _datatable { get; }
+        private SecurityDataWork _securityDataWork { get; }
         private BaseDatawork _baseDatawork { get; }
         private HttpContext _httpContext { get; }
         private Object _currentWorker { get; set; }
@@ -22,11 +23,21 @@ namespace Bussiness.Service
         protected string _columnName { get => _datatable.Columns[_datatable.Order[0].Column].Data; }
         protected string _orderDirection { get => _datatable.Order[0].Dir; }
 
-        public DataTableService(Datatable datatable, BaseDatawork baseDatawork, HttpContext httpContext)
+        public DataTableService(
+            Datatable datatable,
+            BaseDatawork baseDatawork,
+            HttpContext httpContext,
+            SecurityDataWork securityDataWork = null)
         {
             _datatable = datatable;
             _baseDatawork = baseDatawork;
             _httpContext = httpContext;
+
+            if (securityDataWork != null)
+            {
+                _securityDataWork = securityDataWork;
+
+            }
         }
 
         public async Task<DataTableService> ConvertData<TEntity>(string nonDbModelName = "")
@@ -35,7 +46,7 @@ namespace Bussiness.Service
             //so string is nessecery
             if (nonDbModelName != "")
 
-            switch (nonDbModelName)
+                switch (nonDbModelName)
                 {
                     case "Projection":
                         _currentWorker = new ProjectionDataTableWorker(_datatable, _baseDatawork, _httpContext);
@@ -59,7 +70,7 @@ namespace Bussiness.Service
                         _currentWorker = new ContractMembershipDataTableWorker(_datatable, _baseDatawork, _httpContext);
                         break;
                     case "Employee":
-                        _currentWorker = new EmployeeDataTableWorker(_datatable, _baseDatawork, _httpContext);
+                        _currentWorker = new EmployeeDataTableWorker(_datatable, _baseDatawork, _securityDataWork, _httpContext);
                         break;
                     case "Customer":
                         _currentWorker = new CustomerDataTableWorker(_datatable, _baseDatawork, _httpContext);

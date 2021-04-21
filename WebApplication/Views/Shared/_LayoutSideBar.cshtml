@@ -32,7 +32,8 @@
         @Html.LinkButton("Customer", "Index", "Πελάτης", "Customer_View")
         @Html.LinkButton("Customer", "Create", "Προσθήκη πελάτη", "Customer_Create")
     </ul>
-</li>}
+</li>
+}
 
             <!-- WorkPlace -->
             @if (Html.HasAnyChildButton("WorkPlace"))
@@ -49,7 +50,8 @@
         @Html.LinkButton("WorkPlaceHourRestriction", "Index", "Περιορσμοί μέγιστης εισαγωγής", "WorkPlaceHourRestriction_View")
         @Html.LinkButton("WorkPlace", "Create", "Προσθήκη Πόστου", "WorkPlace_Create")
     </ul>
-</li>}
+</li>
+}
 
             <!--TimeShift -->
             @if (Html.HasAnyChildButton("TimeShift"))
@@ -65,7 +67,8 @@
         @Html.LinkButton("Timeshift", "Index", "Χρονοδιάγραμμα", "TimeShift_View")
         @Html.LinkButton("Timeshift", "Create", "Προσθήκη Χρονοδιαγράμματος", "TimeShift_Create")
     </ul>
-</li>}
+</li>
+}
 
             <!--RealWorkHour -->
             @if (Html.HasAnyChildButton("RealWorkHour"))
@@ -79,9 +82,11 @@
     </a>
     <ul class="treeview-menu">
         @Html.LinkButton("RealWorkHour", "Index", "Π.βάρδιες", "RealWorkHour_View")
+        @Html.LinkButton("RealWorkHour", "TimeClock", "ClockIn", "RealWorkHourTimeClock_View")
         @Html.LinkButton("RealWorkHour", "Create", "Προσθήκη π.βάρδιας", "RealWorkHour_Create")
     </ul>
-</li>}
+</li>
+}
 
 
 
@@ -103,7 +108,8 @@
         @Html.LinkButton("Employee", "Index", "Υπάλληλοι", "Employee_View")
         @Html.LinkButton("Employee", "Create", "Προσθήκη υπαλλήλου", "Employee_Create")
     </ul>
-</li>}
+</li>
+}
 
             <!-- Leave -->
             @if (Html.HasAnyChildButton("Contract"))
@@ -119,7 +125,8 @@
         @Html.LinkButton("Contract", "Index", "Συμβάσεις", "Contract_View")
         @Html.LinkButton("Contract", "Create", "Προσθήκη σύμβασης", "Contract_Create")
     </ul>
-</li>}
+</li>
+}
 
             <!-- Leave -->
             @if (Html.HasAnyChildButton("Leave"))
@@ -135,7 +142,8 @@
         @Html.LinkButton("Leave", "Index", "Άδειες", "Leave_View")
         @Html.LinkButton("Leave", "Create", "Προσθήκη άδειας", "Leave_Create")
     </ul>
-</li>}
+</li>
+}
 
 
 
@@ -237,7 +245,8 @@
                                                         @Html.LinkButton("ContractMembership", "Index", "Είδη ιδιότητας σύμβασης", "ContractMembership_View")
                                                         @Html.LinkButton("ContractMembership", "Create", "Προσθήκη ιδιότητας σύμβασης", "ContractMembership_Create")
                                                     </ul>
-                                                </li>}
+                                                </li>
+}
 
 
             <li class="header">Διαχείριση</li>
@@ -258,7 +267,8 @@
         @Html.LinkButton("Company", "Index", "Εταιρίες", "Company_View")
         @Html.LinkButton("Company", "Create", "Προσθήκη εταιρίας", "Company_Create")
     </ul>
-</li>}
+</li>
+}
 
             <!-- User -->
             @if (Html.HasAnyChildButton("User"))
@@ -275,7 +285,8 @@
         @Html.LinkButton("User", "Create", "Προσθήκη χρήστη", "User_Create")
 
     </ul>
-</li>}
+</li>
+}
 
             <!-- Administration -->
             @if (Html.HasAnyChildButton("Administration"))
@@ -292,8 +303,7 @@
         @Html.LinkButton("Administration", "BatchTimeshiftCreate", "Μαζική δημ. χρονοδιαγράμματος", "AdministrationBatchTimeshiftCreate_View")
         @Html.LinkButton("Notification", "Create", "Δημιουργια ειδοποίησης", "AdministrationBatchNotificationCreate_View")
     </ul>
-</li>
- } @* Register *@
+</li> } @* Register *@
             <!-- Register -->
             @*<li class="treeview ">
                     <a href="#">

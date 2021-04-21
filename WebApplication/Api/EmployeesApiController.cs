@@ -266,7 +266,7 @@ namespace WebApplication.Api
         [HttpPost("datatable")]
         public async Task<ActionResult<Employee>> Datatable([FromBody] Datatable datatable)
         {
-            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext)
+            var results = (await new DataTableService(datatable, _baseDataWork, HttpContext, _securityDatawork)
                 .ConvertData<Employee>())
                 .CompleteResponse<Employee>();
 

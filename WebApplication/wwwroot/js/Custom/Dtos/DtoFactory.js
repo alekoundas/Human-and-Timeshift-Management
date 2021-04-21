@@ -1,4 +1,5 @@
 ﻿
 class DtoFactory {
-    HasOverlap = () => HasOverlapDto()
+    HasOverlap = (...args) => HasOverlapDto(...args)
+    ClockIn = (...args) => ClockInDto(...args)
 }

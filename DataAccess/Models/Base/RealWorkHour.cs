@@ -6,7 +6,10 @@ namespace DataAccess.Models.Entity
     public class RealWorkHour : BaseEntity
     {
         public DateTime StartOn { get; set; }
-        public DateTime EndOn { get; set; }
+        public DateTime? EndOn { get; set; }
+
+        public bool IsInProgress { get; set; }
+
 
         public int TimeShiftId { get; set; }
         public TimeShift TimeShift { get; set; }

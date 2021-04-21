@@ -907,17 +907,20 @@
                     .map(select2 => select2.id.split('_')[3]);
 
             //Calentim
-            const SetCalentimInputValue = (workHourId, startTs, endTs) =>
-                document.getElementById('CalentimInputNum_' + workHourId)
+            const SetCalentimInputValue = (workHourId, startTs, endTs) => {
+
+                return document.getElementById('CalentimInputNum_' + workHourId)
                     .value = startTs + '/-/' + endTs;
+            }
 
             const GetCalentimInputValue = workHourId =>
                 document.getElementById('CalentimInputNum_' + workHourId)
                     .value.split('/-/');
 
-            const SetCalentimInputDatabaseValue = (workHourId, startTs, endTs) =>
-                document.getElementById('CalentimInputDatabaseNum_' + workHourId)
+            const SetCalentimInputDatabaseValue = (workHourId, startTs, endTs) => {
+                return document.getElementById('CalentimInputDatabaseNum_' + workHourId)
                     .value = startTs + '/-/' + endTs;
+            }
 
             const GetCalentimInputDatabaseValue = workHourId =>
                 document.getElementById('CalentimInputDatabaseNum_' + workHourId)
@@ -1132,7 +1135,7 @@
                 var dateRange = GetCalentimInputValue(workHourId)
                 var startTs = moment(dateRange[0], 'DD/MM/YYYY HH:mm').valueOf();
                 var endTs = moment(dateRange[1], 'DD/MM/YYYY HH:mm').valueOf();
-
+                console.log(dateRange);
                 if (isNaN(startTs) || isNaN(endTs)) {
                     startTs = dateRange[0];
                     endTs = dateRange[1];
@@ -1208,12 +1211,11 @@
                         var num = WorkHourId;
                         var startTs = ConvertFromApiToTimestamp(workHour.startOn);
                         var endTs = ConvertFromApiToTimestamp(workHour.endOn);
-
                         AppendNewWorkHourToEditModal(WorkHourId, workHour.WorkHourId);
-
                         //set new Calentim instance
                         CalentimEdit(CelentimDate, WorkHourId, workHour.startOn,
                             workHour.endOn);
+                        SetCalentimInputValue(WorkHourId, startTs, endTs);
                         HandleConvertAndSetCalentimInputValue(WorkHourId);
 
                         HandleShowWorkHourRangeToModal(WorkHourId);
@@ -1688,7 +1690,6 @@
 
                 if (dbEndDate != undefined)
                     setEndDate = dbEndDate;
-
                 $('#CalentimButtonNum_' + workHourId).calentim({
                     dateSeparator: '/-/',
                     startDate: new Date(setStartDate),
@@ -1763,6 +1764,7 @@
                                 calentim.setAttribute('style', 'width: 600px;'))
                 })
             };
+
             var Calentim = (currentDate, workHourId, dbStartDate, dbEndDate) => {
                 var setStartDate = currentDate;
                 var setEndDate = currentDate;

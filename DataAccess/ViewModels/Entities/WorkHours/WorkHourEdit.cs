@@ -23,7 +23,6 @@ namespace DataAccess.ViewModels
         [JsonProperty(PropertyName = "timeShiftId", Required = Required.Default)]
         public int TimeShiftId { get; set; }
 
-
         [JsonProperty(PropertyName = "employeeId", Required = Required.Default)]
         public int EmployeeId { get; set; }
     }

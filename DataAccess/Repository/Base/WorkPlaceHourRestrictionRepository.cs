@@ -1,7 +1,6 @@
 ﻿using DataAccess.Models.Entity;
 using DataAccess.Repository.Base.Interface;
 using LinqKit;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Linq;
 
@@ -42,7 +41,7 @@ namespace DataAccess.Repository.Base
 
             var currentSeconds = Context.RealWorkHours
                .Where(realWorkHourFilter)
-               .Select(x => Math.Abs(x.StartOn.Subtract(x.EndOn).TotalSeconds))
+               .Select(x => Math.Abs(x.StartOn.Subtract(x.EndOn.Value).TotalSeconds))
                .ToList()
                .Sum();
 
@@ -71,7 +70,7 @@ namespace DataAccess.Repository.Base
 
             var currentSeconds = Context.RealWorkHours
                 .Where(realWorkHourFilter)
-                .Select(x => Math.Abs(x.StartOn.Subtract(x.EndOn).TotalSeconds))
+                .Select(x => Math.Abs(x.StartOn.Subtract(x.EndOn.Value).TotalSeconds))
                 .ToList()
                 .Sum();
 

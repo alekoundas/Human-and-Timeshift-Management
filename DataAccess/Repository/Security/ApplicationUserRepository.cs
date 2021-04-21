@@ -68,58 +68,7 @@ namespace DataAccess.Repository
             return await SecurityDbContext.Roles.FirstOrDefaultAsync(filter);
         }
 
-        public List<ApplicationUser> GetUsersByPredicate(string searchterm)
-        {
-            return SecurityDbContext.Users.Where(a => a.UserName.Contains(searchterm)).ToList();
-        }
-        public List<ApplicationUser> GetUsersByPredicateStringSplitted(string searchterm)
-        {
-            //var dbUsers = _securityDataWork.ApplicationUsers.GetUsersByPredicate(userCredentials.UserName);
-            //var dbUser = dbUsers.SingleOrDefault(x => x.UserName.Split('|')[1].Contains(searchterm));
-            var dbUsers = SecurityDbContext.Users.Where(a => a.UserName.Contains(searchterm)).ToList();
-            return dbUsers.Where(a => a.UserName.Split('|')[1].Contains(searchterm)).ToList();
-        }
 
-        public string GetUserMailAddress(string userId)
-        {
-            return SecurityDbContext.Users.SingleOrDefault(x => x.Id == userId).Email;
-        }
-
-        //public List<string> GetRoleUserMail(string roleId)
-        //{
-        //    List<string> emails = new List<string>();
-        //    var listUsers = SecurityDbContext.ApplicationUserRoles.Where(x => x.RoleId == roleId).ToList();
-        //    foreach (var listUsersItem in listUsers)
-        //    {
-        //        var listUsersItemTemp = SecurityDbContext.Users.SingleOrDefault(x => x.Id == listUsersItem.UserId).Email;
-        //        emails.Add(listUsersItemTemp);
-        //    }
-        //    return emails;
-        //}
-
-        //public string GetUserFullName(string userId)
-        //{
-        //    var userProfile = SecurityDbContext.Users.SingleOrDefault(a => a.Id == userId);
-        //    return userProfile.Profile.FirstName + " " + userProfile.Profile.LastName;
-        //}
-
-        //public ApplicationUserProfile GetUserProfileForDocument(int userId)
-        //{
-        //    return SecurityDbContext.Users.Where(x => x.Profile.UserId == userId).Select(c => c.Profile).FirstOrDefault();
-        //}
-
-        //public ApplicationUser CreateUser(ApplicationUser applicationUser)
-        //{
-        //    var result = _userManager.Create(applicationUser);
-        //    return result.Succeeded ? applicationUser : null;
-        //}
-
-
-
-        //public ApplicationUser FindUserById(int id)
-        //{
-        //    return _userManager.FindById(id);
-        //}
 
         public void DeleteUser(int id)
         {

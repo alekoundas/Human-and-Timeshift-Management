@@ -64,7 +64,7 @@
         @await Html.PartialAsync("_LayoutHeader")
 
         <!-- Left side column. contains the sidebar -->
-        @await Html.PartialAsync("_LayoutNavBar")
+        @await Html.PartialAsync("_LayoutSideBar")
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -139,7 +139,9 @@
     <!-- AdminLTE App -->
     <script src="~/libs/admin-lte/js/adminlte.min.js"></script>
     <!-- Custom -->
+    <script src="~/js/Custom/DateService.js"></script>
     <script src="~/js/Custom/Dtos/Validation/HasOverlapDto.js"></script>
+    <script src="~/js/Custom/Dtos/Validation/ClockInDto.js"></script>
     <script src="~/js/Custom/Dtos/DtoFactory.js"></script>
     <script src="~/js/Custom/AlertMessage.js"></script>
     <script src="~/js/Custom/Excel.js"></script>
@@ -147,7 +149,6 @@
     <script src="~/js/Custom/DatatableDeactivateButton.js"></script>
     <script src="~/js/Custom/DataTableService.js"></script>
     <script src="~/js/Custom/ValidationService.js"></script>
-    <script src="~/js/Custom/DateService.js"></script>
     @RenderSection("Scripts", required: false)
     <!-- ASP.NET site script -->
     <environment include="Development">
