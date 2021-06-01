@@ -14,5 +14,5 @@ EntityFrameworkCore\add-migration InitializeDb -Context SecurityDbContext -Proje
 
 EntityFrameworkCore\remove-migration -Context SecurityDbContext -Project DataAccess
 
-EntityFrameworkCore\update-database -Context SecurityDbContext -Project DataAccess
 EntityFrameworkCore\update-database -Context SecurityDbContext -Project DataAccess -Migration 
+EntityFrameworkCore\update-database -Context SecurityDbContext -Project DataAccess
