@@ -423,6 +423,7 @@ namespace Business.Seed
 
             //Customer
             CreateRole(roleManager, "Customer", "Πελάτη", "View");
+            CreateRole(roleManager, "Customer", "Πελάτη", "Create");
             CreateRole(roleManager, "Customer", "Πελάτη", "Edit");
             CreateRole(roleManager, "Customer", "Πελάτη", "Deactivate");
             CreateRole(roleManager, "Customer", "Πελάτη", "Delete");

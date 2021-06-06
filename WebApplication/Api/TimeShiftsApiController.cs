@@ -139,14 +139,17 @@ namespace WebApplication.Api
             if (!canShowDeactivated)
                 filter = filter.And(x => x.IsActive == true);
 
+            var info = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
+            DateTimeOffset localServerTime = DateTimeOffset.Now;
+            DateTimeOffset localDate = TimeZoneInfo.ConvertTime(localServerTime, info);
 
             if (predicate == "RealWorkHourCreate")
             {
-                filter = filter.And(x => x.Month == DateTime.Now.Month);
+                filter = filter.And(x => x.Month == localDate.Month);
             }
             else if (predicate == "RealWorkHourClockIn")
             {
-                filter = filter.And(x => x.Month == DateTime.Now.Month);
+                filter = filter.And(x => x.Month == localDate.Month);
                 var loggedInUserId = HttpAccessorService.GetLoggeInUser_Id;
                 if (loggedInUserId != null)
                 {

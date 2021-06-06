@@ -838,8 +838,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
             includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
 
+
+            var info = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
+            DateTimeOffset localServerTime = DateTimeOffset.Now;
+            DateTimeOffset localDate = TimeZoneInfo.ConvertTime(localServerTime, info);
+
             //Get employees that have a realworkhour today
-            _filter = _filter.And(x => x.RealWorkHours.Any(y => y.StartOn.Date == DateTime.Now.Date));
+            _filter = _filter.And(x => x.RealWorkHours.Any(y => y.StartOn.Date == localDate.Date));
 
             if (_datatable.FilterByWorkPlaceId != 0)
                 _filter = _filter.And(x => x.EmployeeWorkPlaces
@@ -855,7 +860,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var returnObjects = new List<ExpandoObject>();
 
             var totalFooterSeconds = entities.Select(x => x.RealWorkHours
-                    .Where(x => x.StartOn.Date == DateTime.Now.Date)
+                    .Where(x => x.StartOn.Date == localDate.Date)
                     .Select(x => Math.Abs((x.EndOn.Value - x.StartOn).TotalSeconds))
                     .Sum())
                 .Sum();
@@ -867,7 +872,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var todayCell = "";
                 var workPlaceName = "";
                 var realWorkHours = result.RealWorkHours
-                    .Where(x => x.StartOn.Date == DateTime.Now.Date)
+                    .Where(x => x.StartOn.Date == localDate.Date)
                     .ToList();
 
                 foreach (var realWorkHour in realWorkHours)
