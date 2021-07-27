@@ -1,0 +1,190 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Filter"]</h3>
+            </div>
+
+            <hr />
+
+            <div class="box-body">
+                <div style="width:100%;">
+                    <div style="width:50%; float:left;">
+                        <div class="form-group">
+                            <label class="control-label">Χρονοδιάγραμμα </label>
+                            <div class="input-group" style="width:100%">
+                                <select id="TimeShift_Select2" style="width:70%"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label"> Επιλογή μήνα και έτους</label>
+                            <div class="input-group" style="width:100%">
+                                <input type="text" id="MonthFilter" class="form-control" style="width:70%" readonly />
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                                <label class="control-label">Πόστο</label>
+                                <div class="input-group" style="width:100%">
+                                    <select id="WorkPlace_Select2" style="width:70%"></select>
+                                </div>
+                            </div>*@
+                    </div>
+
+                    <div style="width:50%; float:left;">
+                        <label class="control-label">Μέρες ρεπού και άνω</label>
+                        <div class="input-group">
+                            <input type="number" min="2" value="2" id="FilterDayOff" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-danger" style="margin-top:5%;">
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+                <table id="EmployeeConsecutiveDayOff" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>ΑΦΜ</th>
+                            <th>Πόστο</th>
+                            <th>Χρονοδιάγραμμα</th>
+                            <th>Τελευταία ημέρα εργ.</th>
+                            <th>Συνεχής μέρες</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Επίθετο</th>
+                            <th>Όνομα</th>
+                            <th>ΑΦΜ</th>
+                            <th>Πόστο</th>
+                            <th>Χρονοδιάγραμμα</th>
+                            <th>Τελευταία ημέρα εργ.</th>
+                            <th>Συνεχής μέρες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/jQueryMonthPicker/MonthPicker.js"></script>
+
+    <script>
+        const GetSelectedTimeshiftId = () =>
+            document.getElementById('TimeShift_Select2').value;
+
+        const GetSelectedMonth = () =>
+            document.getElementById('MonthFilter').value.split('/')[0];
+
+        const GetSelectedYear = () =>
+            document.getElementById('MonthFilter').value.split('/')[1];
+
+
+
+        //const GetSelectedWorkPlaceId = () =>
+        //    document.getElementById('WorkPlace_Select2').value;
+
+        const GetDayOffChoiceValue = () =>
+            document.getElementById('FilterDayOff').value;
+
+        $('#FilterDayOff').on('change', () => $('#EmployeeConsecutiveDayOff').DataTable().ajax.reload());
+
+    </script>
+
+    <script>
+
+        //TimeShift Select2
+        $('#TimeShift_Select2').select2({
+            placeholder: "Επέλεξε χρονοδιάγραμμα",
+            allowClear: true,
+            ajax: {
+                url: '/api/timeshifts/select2',
+                data: (params) => ({
+                    search: params.term,
+                    page: params.page || 1
+                })
+            }
+        }).on('change', () =>
+            $('#EmployeeConsecutiveDayOff').DataTable().ajax.reload());
+
+        $('#MonthFilter').MonthPicker({
+            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
+            OnAfterChooseMonth: function () {
+                var month = $(this).val().split('/')[0];
+                var year = $(this).val().split('/')[1];
+                $('#EmployeeConsecutiveDayOff').DataTable().ajax.reload();
+            }
+        });
+
+        //$('#WorkPlace_Select2').select2({
+        //    placeholder: "Επέλεξε πόστο",
+        //    allowClear: true,
+        //    ajax: {
+        //        type: "POST",
+        //        url: '/api/workplaces/select2',
+        //        contentType: "application/json; charset=utf-8",
+        //        dataType: "json",
+        //        data: (params) => JSON.stringify(BuildSelect2Dto(params))
+        //    }
+        //}).on('change', () =>
+        //    $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+
+
+
+        var dataTable = new DataTableService('#EmployeeConsecutiveDayOff')
+            .ForApiController('projections')
+            .AddColumn(false, false, "LastName")
+            .AddColumn(false, false, "FirstName")
+            .AddColumn(false, false, "VatNumber")
+            .AddColumn(false, false, "WorkPlaceTitle")
+            .AddColumn(false, false, "TimeShiftTitle")
+            .AddColumn(false, false, "LastConsecutiveDay")
+            .AddColumn(false, false, "ConsecutiveDays")
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'ProjectionEmployeeConsecutiveDayOff';
+
+                if (GetSelectedTimeshiftId() != '')
+                    data.filterByTimeShiftId = GetSelectedTimeshiftId();
+
+                if (GetSelectedMonth() != '')
+                    data.filterByMonth = GetSelectedMonth();
+
+                if (GetSelectedYear() != '')
+                    data.filterByYear = GetSelectedYear();
+
+                //if (GetSelectedWorkPlaceId() != '')
+                //    data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+
+
+
+                data.filterByConsecutiveDayOffCount = GetDayOffChoiceValue();
+                return JSON.stringify(data);
+            })
+            .CompleteDataTable();
+
+
+
+    </script>
+}

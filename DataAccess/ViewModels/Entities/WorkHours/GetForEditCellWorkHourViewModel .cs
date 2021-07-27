@@ -29,11 +29,19 @@ namespace DataAccess.ViewModels
 
 
 
-        [JsonProperty(PropertyName = "employeeId", Required = Required.Default)]
+        [JsonProperty(PropertyName = "employeeId")]
         public int EmployeeId { get; set; }
 
 
-        [JsonProperty(PropertyName = "workHourId", Required = Required.Default)]
+        [JsonProperty(PropertyName = "workHourId")]
         public int WorkHourId { get; set; }
+
+
+        [JsonProperty(PropertyName = "createdBy_FullName")]
+        public string CreatedBy_FullName { get; set; }
+
+
+        [JsonProperty(PropertyName = "createdOn")]
+        public DateTime CreatedOn { get; set; }
     }
 }

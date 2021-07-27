@@ -437,9 +437,9 @@ namespace Bussiness.Helpers
                 (state ? "checked" : "") +
               ">";
 
-        public string GetCurrentDayButtons(RealWorkHour realWorkHour)
+        public string GetCurrentDayButtons(int realWorkHourId)
 
-           => CurrentDayFaIconEdit(realWorkHour.Id) + DeleteButton("RealWorkHours", realWorkHour.Id.ToString());
+           => CurrentDayFaIconEdit(realWorkHourId) + DeleteButton("RealWorkHours", realWorkHourId.ToString());
 
         private static string CurrentDayFaIconEdit(int realWorkHourId)
            => @"<i class='fa fa-pencil faIconEdit' realworkhourid='" + realWorkHourId + "'></i>";

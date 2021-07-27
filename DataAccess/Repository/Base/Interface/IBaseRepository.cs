@@ -30,7 +30,9 @@ namespace DataAccess.Repository.Interface
         IQueryable<TEntity> GetWithFilterQueryable(
          Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
            Expression<Func<TEntity, bool>> filter = null,
-           List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null);
+           List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+           int pageSize = 10,
+           int pageIndex = 1);
 
         Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter);
 

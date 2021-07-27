@@ -114,27 +114,27 @@
         }).on('change', () =>
             $('#PresenceDailyDatatable').DataTable().ajax.reload());
 
-        $(() => {
-            var dataTable = new DataTableService('#PresenceDailyDatatable')
-                .ForApiController('projections')
-                .AddColumn(true, true, "LastName")
-                .AddColumn(true, true, "FirstName")
-                .AddColumn(true, true, "ErpCode")
-                .AddColumn(true, true, "VatNumber")
-                .AddColumn(true, true, "WorkPlace_RealWorkHour")
-                .AddColumn(false, false, "Today")
-                .FixedLeftColums(2)
-                .AjaxData((data, type, row, meta) => {
-                    data.predicate = 'ProjectionPresenceDaily';
-                    if (GetSelectedWorkPlaceId() != '')
-                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
-                    return JSON.stringify(data);
-                })
-                .FooterCallback((row, data, start, end, display) => {
-                    row.children[5].innerHTML = "Σήμερα σύνολο: " + data[0]?.Today_FooterTotal;
-                })
-                .CompleteDataTable();
-        })
+
+
+        var dataTable = new DataTableService('#PresenceDailyDatatable')
+            .ForApiController('projections')
+            .AddColumn(true, true, "LastName")
+            .AddColumn(true, true, "FirstName")
+            .AddColumn(true, true, "ErpCode")
+            .AddColumn(true, true, "VatNumber")
+            .AddColumn(true, true, "WorkPlace_RealWorkHour")
+            .AddColumn(false, false, "Today")
+            .FixedLeftColums(2)
+            .AjaxData((data, type, row, meta) => {
+                data.predicate = 'ProjectionPresenceDaily';
+                if (GetSelectedWorkPlaceId() != '')
+                    data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+                return JSON.stringify(data);
+            })
+            .FooterCallback((row, data, start, end, display) => {
+                row.children[5].innerHTML = "Σήμερα σύνολο: " + data[0]?.Today_FooterTotal;
+            })
+            .CompleteDataTable();
 
     </script>
 }

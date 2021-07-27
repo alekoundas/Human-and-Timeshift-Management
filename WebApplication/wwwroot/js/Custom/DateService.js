@@ -30,7 +30,6 @@
         String: ({//ex. 18/03/2021 22:19
             DDMMYYYY_HHMM: (date) => {
                 this._dateTs = moment(date, 'DD/MM/YYYY HH:mm:ss').valueOf();
-                console.log("this._dateTs", this._dateTs)
                 return this.#Convert();
             }
         })

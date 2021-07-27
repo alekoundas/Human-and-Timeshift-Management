@@ -173,6 +173,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionEmployeeConsecutiveDayOff_View").Wait();
 
                     //Administration
                     userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
@@ -345,6 +346,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionEmployeeConsecutiveDayOff_View").Wait();
 
                     //Administration
                     userManager.AddToRoleAsync(user, "AdministrationBatchTimeshiftCreate_View").Wait();
@@ -498,6 +500,7 @@ namespace Business.Seed
             CreateRole(roleManager, "ProjectionRealWorkHoursAnalyticallySum", "Προβολή_Π.ΒάρδιεςΑναλΩρες", "View");
             CreateRole(roleManager, "ProjectionRealWorkHoursSpecificDates", "Προβολή_ΕπιλεγμένεςΗμ", "View");
             CreateRole(roleManager, "ProjectionEmployeeRealHoursSum", "Προβολή_ώρεςΑναΕργαζ", "View");
+            CreateRole(roleManager, "ProjectionEmployeeConsecutiveDayOff", "Προβολή_ΣυνεχήςΡεπόΑναΕργαζ", "View");
             CreateRole(roleManager, "ProjectionPresenceDaily", "Προβολή_ΠαρουσίεςΗμ", "View");
             CreateRole(roleManager, "ProjectionRealWorkHourRestrictions", "Προβολή_ΠαρουσίεςΗμ", "View");
             CreateRole(roleManager, "ProjectionTimeShiftSuggestions", "Προβολή_ΥποδείξειςΧρονοδιαγράμματος", "View");

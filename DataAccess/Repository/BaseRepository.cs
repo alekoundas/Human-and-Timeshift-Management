@@ -91,9 +91,11 @@ namespace DataAccess.Repository
         }
 
         public IQueryable<TEntity> GetWithFilterQueryable(
-         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-         Expression<Func<TEntity, bool>> filter,
-         List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null)
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+            Expression<Func<TEntity, bool>> filter,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+            int pageSize = 10,
+            int pageIndex = 1)
         {
             var qry = (IQueryable<TEntity>)_set;
 

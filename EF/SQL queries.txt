@@ -7,8 +7,17 @@ inner join TimeShifts t on r.TimeShiftId= t.Id
 where t.Month=1 and MONTH(r.StartOn)=2
 
 #Update wrong realworkhour timesiftId
-update RealWorkHours set TimeShiftId=238
-where TimeShiftId =117 AND MONTH(StartOn) = 2
+DECLARE @TIMESHIFT_ID  INT,
+		@MONTH INT
+
+SET @MONTH = 7
+SET @TIMESHIFT_ID= 1240
+
+
+
+
+update RealWorkHours set TimeShiftId=(SELECT TimeShifts.Id FROM TimeShifts WHERE TimeShifts.WorkPlaceId= (SELECT WorkPlaceId FROM TimeShifts WHERE Id=@TIMESHIFT_ID) AND TimeShifts.Month=@MONTH )
+where TimeShiftId =@TIMESHIFT_ID AND MONTH(StartOn) =@MONTH
 
 #
 select * from RealWorkHours where TimeShiftId =154 order by StartOn

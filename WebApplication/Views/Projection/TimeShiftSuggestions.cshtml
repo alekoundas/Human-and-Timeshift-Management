@@ -147,15 +147,16 @@
             document.getElementById('SliderWorkingHoursPerDay').checked == true;
 
         const GetStartOn = () =>
-            new Date(moment(document.getElementById('SearchRangeInput').value
-                .split('/-/')[0], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
+             new DateService()
+                .ConvertFrom.String.DDMMYYYY_HHMM(
+                    document.getElementById('SearchRangeInput').value.split('/-/')[0])
+                .To.Api()
 
-        const GetEndOn = () => {
-            var date = new Date(moment(document.getElementById('SearchRangeInput').value
-                .split('/-/')[1], 'DD/MM/YYYY').format('MM/DD/YYYY HH:mm'));
-            date.setHours(23, 59, 59, 59);
-            return new Date(date);
-        }
+        const GetEndOn = () => 
+             new DateService()
+                .ConvertFrom.String.DDMMYYYY_HHMM(
+                    document.getElementById('SearchRangeInput').value.split('/-/')[1])
+                .To.Api()
 
         const setHoursToMax = date => {
             var newDate = new Date(date);
@@ -237,8 +238,8 @@
                     data.filterByValidateWorkingHoursPerDay = GetSliderWorkingHoursPerDayValue();
                     if (GetStartOn() != "Invalid Date") {
 
-                        data.StartOn = GetStartOn();
-                        data.EndOn = GetEndOn();
+                        data.startOn = GetStartOn();
+                        data.endOn = GetEndOn();
                     }
                     return JSON.stringify(data);
                 })

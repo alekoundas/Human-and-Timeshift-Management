@@ -4,6 +4,7 @@ using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -221,6 +222,7 @@ namespace WebApplication.Api
                     TimeShiftId = workHour.TimeShiftId,
                     EmployeeId = workHour.EmployeeId,
                     Comments = workHour.Comments,
+                    CreatedOn = DateTime.Now,
                     CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
                     CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
                 });
@@ -263,6 +265,7 @@ namespace WebApplication.Api
                         EndOn = workHour.NewEndOn,
                         TimeShiftId = workHour.TimeShiftId,
                         EmployeeId = workHour.EmployeeId,
+                        CreatedOn = DateTime.Now,
                         CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
                         CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
                     });
@@ -316,7 +319,9 @@ namespace WebApplication.Api
                     StartOn = group.Key.StartOn,
                     EndOn = group.Key.EndOn,
                     Comments = group.Select(x => x.Comments).FirstOrDefault(),
-                    EmployeeIds = group.Select(x => x.EmployeeId).ToList()
+                    EmployeeIds = group.Select(x => x.EmployeeId).ToList(),
+                    CreatedBy_FullName= group.Select(x => x.CreatedBy_FullName).FirstOrDefault(),
+                    CreatedOn= group.Select(x => x.CreatedOn).FirstOrDefault()
                 });
 
             return Ok(response);

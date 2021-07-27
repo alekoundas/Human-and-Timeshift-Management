@@ -711,6 +711,9 @@
 
                 SetCommentDatabaseValue(workHourId, workHour.comments);
                 SetCommentValue(workHourId, workHour.comments);
+
+                SetAuditCreatedOn(workHourId, workHour.createdOn);
+                SetAuditFullName(workHourId, workHour.createdBy_FullName);
             }
 
 
@@ -960,6 +963,15 @@
                     .innerHTML = FindDaysDifference(startTs, endTs) *
                 FindHourDifferencePerDay(startTs, endTs);
 
+            const SetAuditFullName = (workHourId, value) =>
+                document.getElementById('AuditFullNameNum_' + workHourId)
+                    .innerHTML = value;
+
+            const SetAuditCreatedOn = (workHourId, value) =>
+                document.getElementById('AuditCreatedOnNum_' + workHourId)
+                    .innerHTML = new DateService()
+                        .ConvertFrom.Api(value)
+                        .To.DDMMYYYYHHMM();
 
         </script>
 
@@ -1178,6 +1190,8 @@
             };
 
         </script>
+
+
         <!--///////////////////////////////////////-->
         <!--///             Events              ///-->
         <!--///////////////////////////////////////-->
@@ -1979,6 +1993,8 @@
                     'Ημέρες: </br> ' +
                     'Ώρες ανα μέρα: </br>' +
                     'Ώρες συνολο: </br>' +
+                    'Δημ. απο: </br>' +
+                    'Δημ. στις: </br>' +
                     '</div>' +
                     '<div style="width: 30%; float: left;">' +
                     '<span class="DateSpan IsEdit" id="DateStartOnEndOnNum_' + workHourId + '"></span></br> ' +
@@ -1987,7 +2003,9 @@
                     '<span style="display:none;"><span id="NewTimeStartOnEndOnNum_' + workHourId + '"></span></br></span>' +
                     '<span id="TotalDaysNum_' + workHourId + '"></span> </br>' +
                     '<span id="TotalHoursPerDayNum_' + workHourId + '"></span> </br>' +
-                    '<span id="TotalHoursNum_' + workHourId + '"></span>' +
+                    '<span id="TotalHoursNum_' + workHourId + '"></span> </br>' +
+                    '<span id="AuditFullNameNum_' + workHourId + '"></span> </br>' +
+                    '<span id="AuditCreatedOnNum_' + workHourId + '"></span>' +
                     '</div>' +
                     '<div style="width: 20%; float: left;">' +
                     '<button style="display: none; " class="btn btn-primary WorkHourSaveButton" id="WorkHourSaveButtonNum_' + workHourId + '" workhourid="' + workHourId + '" data-loading="<img style=\'height:15px; width:15px;\' src=\'/img/LoadingBox.gif\' alt=\'loading gif\'/>" data-reset="<i class=\'fa fa-floppy-o\' ></i>"><i class="fa fa-floppy-o" ></i></button>' +

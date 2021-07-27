@@ -148,7 +148,8 @@
                 rightColumns: this._fixedRightColums
             },
             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
-            iDisplayLength: 150,
+            iDisplayLength: -1
+            ,
             dom: 'Bfrtlp',
             buttons: [/*'copy', 'csv', */'excel', /*'pdf',*/ 'print'],
             language: {

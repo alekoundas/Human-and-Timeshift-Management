@@ -100,5 +100,13 @@ namespace WebApplication.Controllers
             ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
             return View();
         }
+
+        [Authorize(Roles = "ProjectionEmployeeConsecutiveDayOff_View")]
+        public IActionResult EmployeeConsecutiveDayOff()
+        {
+            ViewData["Title"] = "Συνεχής ρεπό ανα εργαζόμενο";
+            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            return View();
+        }
     }
 }
