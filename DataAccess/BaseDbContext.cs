@@ -57,7 +57,6 @@ namespace DataAccess
             builder.ApplyConfiguration(new ContractMembershipConfiguration());
             builder.ApplyConfiguration(new WorkPlaceHourRestrictionConfiguration());
 
-            //builder.ApplyConfiguration(new NotificationConfiguration());
         }
 
     }

@@ -30,6 +30,11 @@
                     </div>
                 </div>
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -104,8 +109,7 @@
                     return query;
                 }
             }
-        }).on('change', () =>
-            $('#EmployeesRealWorkHoursAnalytically').DataTable().ajax.reload());
+        });
 
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
@@ -117,12 +121,6 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            onafterselect: () => {
-                DestroyDataTable();
-                DeleteDataTableHTML();
-                AppendNewDataTableHTML();
-                CreateDataTable();
-            },
             onaftershow: () =>
                 //Fix Calentim width
                 [...document.getElementsByClassName('calentim-input')]
@@ -132,6 +130,16 @@
 
         var DestroyDataTable = () => $('#EmployeesRealWorkHoursAnalytically')
             .DataTable().destroy();
+
+        $('#DataTableSearch').on('click', () => {
+
+            DeleteDataTableHTML();
+            AppendNewDataTableHTML();
+            if (!$.fn.dataTable.isDataTable("#EmployeesRealWorkHoursAnalytically"))
+                CreateDataTable();
+
+            $('#EmployeesRealWorkHoursAnalytically').DataTable().ajax.reload();
+        });
 
         var CreateDataTable = () =>
             new DataTableService('#EmployeesRealWorkHoursAnalytically')
@@ -179,7 +187,7 @@
             '</th>';
 
         const DeleteDataTableHTML = () =>
-            document.getElementById('EmployeesRealWorkHoursAnalytically').remove();
+            document.getElementById('DataTableDiv').innerHTML='';
 
         const AppendNewDataTableHTML = () =>
             document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
@@ -206,7 +214,5 @@
                 '');
 
         $(document).ready(AppendNewDataTableHTML());
-        $(document).ready(CreateDataTable());
-
     </script>
 }

@@ -1,0 +1,65 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+
+<div class="row">
+    <div class="col-md-3"> </div>
+    <div class="col-md-6">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonCreateNew("LogEntity")
+                    @Html.ButtonImport("LogEntity")
+                    @Html.ButtonExport("LogEntity")
+                </div>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="LogEntityDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>Τίτλος</th>
+                            <th>Ελληνικός τίτλος</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Τίτλος</th>
+                            <th>Ελληνικός τίτλος</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+
+</div>
+<partial name="_ExcelModals" model='new {Entity = "LogEntity" }'>
+
+
+    @section Scripts {
+        <script>
+            $(() => {
+                var dataTable = new DataTableService('#LogEntityDatatable')
+                    .ForApiController('LogEntities')
+                    .AddColumn(true, true, "Title")
+                    .AddColumn(true, true, "Title_GR")
+                    .AddColumn(false, false, "Buttons")
+                    .AjaxData((data, type, row, meta) => {
+                        data.Predicate = 'LogEntityIndex';
+                        return JSON.stringify(data);
+                    })
+                    .CreatedRow((row, data, dataIndex) => {
+                        if (!data.IsActive)
+                            $(row).css('background-color', '#AAAFB4');
+                    })
+                    .CompleteDataTable();
+            })
+        </script>
+    }

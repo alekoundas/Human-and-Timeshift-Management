@@ -1,4 +1,5 @@
 ﻿const ButtonLoadingToggle = async className => {
+    console.log(className );
     var response = "";
     [...document.getElementsByClassName(className)].forEach(button => {
         var loading = button.dataset.loading;

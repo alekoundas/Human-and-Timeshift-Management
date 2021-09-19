@@ -18,7 +18,6 @@ namespace WebApplication.Controllers
 {
     public class UserController : MasterController
     {
-        private readonly ISecurityDatawork _datawork;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly BaseDatawork _baseDataWork;
@@ -30,7 +29,6 @@ namespace WebApplication.Controllers
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
         {
-            _datawork = new SecurityDataWork(dbContext);
             _baseDataWork = new BaseDatawork(BaseDbContext);
             _securityDataWork = new SecurityDataWork(SecurityDbContext);
             _signInManager = signInManager;
@@ -74,7 +72,7 @@ namespace WebApplication.Controllers
         {
             if (viewModel.Password1 == viewModel.Password2)
             {
-                var user = await _datawork.ApplicationUsers
+                var user = await _securityDataWork.ApplicationUsers
                     .FirstOrDefaultAsync(x => x.Id == viewModel.UserId);
 
                 if (user == null)
@@ -126,7 +124,7 @@ namespace WebApplication.Controllers
             if (id == null)
                 return NotFound();
 
-            var user = _datawork.ApplicationUsers.Get(id.ToString());
+            var user = _securityDataWork.ApplicationUsers.Get(id.ToString());
             if (user == null)
                 return NotFound();
 
@@ -138,7 +136,7 @@ namespace WebApplication.Controllers
                     .Select(x => new StringBuilder(x.FullName + " - " + x.ErpCode).ToString())
                     .FirstOrDefault();
 
-            var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
+            var applicationWorkPlaceRoles = await _securityDataWork.ApplicationRoles
                 .GetWorkPlaceRolesByUserId(user.Id);
 
             returnViewModel.WorkPlaceRoles = applicationWorkPlaceRoles
@@ -161,7 +159,7 @@ namespace WebApplication.Controllers
             if (id == null)
                 return NotFound();
 
-            var user = _datawork.ApplicationUsers.Get(id.ToString());
+            var user = _securityDataWork.ApplicationUsers.Get(id.ToString());
             if (user == null)
                 return NotFound();
 
@@ -177,7 +175,7 @@ namespace WebApplication.Controllers
                     .Select(x => new StringBuilder(x.FullName + " - " + x.ErpCode).ToString())
                     .FirstOrDefault();
 
-            var applicationWorkPlaceRoles = await _datawork.ApplicationRoles
+            var applicationWorkPlaceRoles = await _securityDataWork.ApplicationRoles
                 .GetWorkPlaceRolesByUserId(user.Id);
 
             returnViewModel.WorkPlaceRoles = applicationWorkPlaceRoles
@@ -200,7 +198,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "User_Edit")]
         public async Task<IActionResult> Edit(string id, ApplicationUserEdit applicationUser)
         {
-            var user = _datawork.ApplicationUsers.Get(id.ToString());
+            var user = _securityDataWork.ApplicationUsers.Get(id.ToString());
             if (user == null)
                 return NotFound();
 
@@ -234,7 +232,7 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "User_View")]
         public IActionResult Details(string id)
         {
-            var viewModel = _datawork.ApplicationUsers.Get(id);
+            var viewModel = _securityDataWork.ApplicationUsers.Get(id);
             ViewData["Title"] = "Προβολή χρήστη";
 
             return View(viewModel);
@@ -242,7 +240,7 @@ namespace WebApplication.Controllers
 
         private bool UserExists(string id)
         {
-            return _datawork.ApplicationUsers.Get(id) == null;
+            return _securityDataWork.ApplicationUsers.Get(id) == null;
         }
     }
 }

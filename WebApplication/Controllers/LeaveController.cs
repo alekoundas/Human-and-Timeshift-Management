@@ -113,6 +113,8 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
+            leave.EndOn.AddDays(1).AddSeconds(-1);
+
             if (ModelState.IsValid)
             {
                 try

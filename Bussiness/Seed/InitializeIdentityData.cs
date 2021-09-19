@@ -1,18 +1,88 @@
-﻿using DataAccess.Models.Security;
+﻿using DataAccess;
+using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Linq;
 
 namespace Business.Seed
 {
     public class InitializeIdentityData
     {
-        public static void SeedData(
+        public static void SeedUsersAndRoles(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager)
         {
             SeedRoles(roleManager);
             SeedUsers(userManager);
         }
+
+
+        public static void SeedLogTables(SecurityDbContext context)
+        {
+
+            //LogEntity
+            AddLogTypeIfNotExist(context, "Create", "Δημιουργία");
+            AddLogTypeIfNotExist(context, "Delete", "Διαγραφή");
+            AddLogTypeIfNotExist(context, "Edit", "Επεξεργασία");
+            AddLogTypeIfNotExist(context, "Login", "Σύνδεση");
+            AddLogTypeIfNotExist(context, "Logout", "Αποσύνδεση");
+
+            //LogType
+            AddLogEntityIfNotExist(context, "Leave", "Άδεια");
+            AddLogEntityIfNotExist(context, "LogType", "Είδος Log");
+            AddLogEntityIfNotExist(context, "Company", "Εταιρίες");
+            AddLogEntityIfNotExist(context, "Customer", "Πελάτης");
+            AddLogEntityIfNotExist(context, "Employee", "Υπάλληλος");
+            AddLogEntityIfNotExist(context, "WorkHour", "Βάρδια");
+            AddLogEntityIfNotExist(context, "Contract", "Σύμβαση");
+            AddLogEntityIfNotExist(context, "WorkPlace", "Πόστο");
+            AddLogEntityIfNotExist(context, "LeaveType", "Είδος άδειας");
+            AddLogEntityIfNotExist(context, "TimeShift", "Χρονοδιάγραμμα");
+            AddLogEntityIfNotExist(context, "LogEntity", "Log οντότητας");
+            AddLogEntityIfNotExist(context, "ContractType", "Είδος Log");
+            AddLogEntityIfNotExist(context, "RealWorkHour", "Π.Βάρδια");
+            AddLogEntityIfNotExist(context, "Specialization", "Ειδικότητα");
+            AddLogEntityIfNotExist(context, "HourRestriction", "Περιορισμοί Π.Βάρδιας");
+            AddLogEntityIfNotExist(context, "EmployeeWorkPlace", "Υπάλληλος ανα Πόστο");
+            AddLogEntityIfNotExist(context, "ContractMembership", "Ιδιότητα σύμβασης");
+
+            context.SaveChanges();
+        }
+
+
+
+        private static void AddLogTypeIfNotExist(SecurityDbContext context, string title, string title_GR)
+        {
+            if (!context.LogTypes.Any(x => x.Title == title))
+                context.Add(new LogType
+                {
+                    Title = title,
+                    Title_GR = title_GR,
+                    CreatedBy_FullName = "Database Seeder",
+                    CreatedBy_Id = "",
+                    CreatedOn = DateTime.Now,
+                    IsActive = true
+                });
+        }
+
+        private static void AddLogEntityIfNotExist(SecurityDbContext context, string title, string title_GR)
+        {
+            if (!context.LogEntities.Any(x => x.Title == title))
+                context.Add(new LogEntity
+                {
+                    Title = title,
+                    Title_GR = title_GR,
+                    CreatedBy_FullName = "Database Seeder",
+                    CreatedBy_Id = "",
+                    CreatedOn = DateTime.Now,
+                    IsActive = true
+                });
+        }
+
+
+
+
+
         protected static void SeedUsers(UserManager<ApplicationUser> userManager)
         {
             if (userManager.FindByNameAsync("Admin").Result == null)
@@ -181,6 +251,28 @@ namespace Business.Seed
 
                     //Notification
                     userManager.AddToRoleAsync(user, "Notification_View").Wait();
+
+                    //Log
+                    userManager.AddToRoleAsync(user, "Log_View").Wait();
+                    userManager.AddToRoleAsync(user, "Log_Export").Wait();
+
+                    //LogType
+                    //userManager.AddToRoleAsync(user, "LogType_View").Wait();
+                    //userManager.AddToRoleAsync(user, "LogType_Create").Wait();
+                    //userManager.AddToRoleAsync(user, "LogType_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "LogType_Deactivate").Wait();
+                    //userManager.AddToRoleAsync(user, "LogType_Delete").Wait();
+                    //userManager.AddToRoleAsync(user, "LogType_Import").Wait();
+                    //userManager.AddToRoleAsync(user, "LogType_Export").Wait();
+
+                    ////LogEntity
+                    //userManager.AddToRoleAsync(user, "LogEntity_View").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Create").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Deactivate").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Delete").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Import").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Export").Wait();
                 }
             }
 
@@ -354,6 +446,28 @@ namespace Business.Seed
 
                     //Notification
                     userManager.AddToRoleAsync(user, "Notification_View").Wait();
+
+                    //Log
+                    userManager.AddToRoleAsync(user, "Log_View").Wait();
+                    userManager.AddToRoleAsync(user, "Log_Export").Wait();
+
+                    //LogType
+                    userManager.AddToRoleAsync(user, "LogType_View").Wait();
+                    userManager.AddToRoleAsync(user, "LogType_Create").Wait();
+                    userManager.AddToRoleAsync(user, "LogType_Edit").Wait();
+                    userManager.AddToRoleAsync(user, "LogType_Deactivate").Wait();
+                    userManager.AddToRoleAsync(user, "LogType_Delete").Wait();
+                    userManager.AddToRoleAsync(user, "LogType_Import").Wait();
+                    userManager.AddToRoleAsync(user, "LogType_Export").Wait();
+
+                    ////LogEntity
+                    //userManager.AddToRoleAsync(user, "LogEntity_View").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Create").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Edit").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Deactivate").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Delete").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Import").Wait();
+                    //userManager.AddToRoleAsync(user, "LogEntity_Export").Wait();
                 }
             }
         }
@@ -512,6 +626,29 @@ namespace Business.Seed
 
             //Notification
             CreateRole(roleManager, "Notification", "Ειδοποιήσεις", "View");
+
+            //Log
+            CreateRole(roleManager, "Log", "Log", "View");
+            CreateRole(roleManager, "Log", "Log", "Export");
+
+            //LogEntity
+            CreateRole(roleManager, "LogEntity", "LogΟντότητας", "View");
+            CreateRole(roleManager, "LogEntity", "LogΟντότητας", "Create");
+            CreateRole(roleManager, "LogEntity", "LogΟντότητας", "Edit");
+            CreateRole(roleManager, "LogEntity", "LogΟντότητας", "Deactivate");
+            CreateRole(roleManager, "LogEntity", "LogΟντότητας", "Delete");
+            CreateRole(roleManager, "LogEntity", "LogΟντότητας", "Import");
+            CreateRole(roleManager, "LogEntity", "LogΟντότητας", "Export");
+
+            //LogType
+            CreateRole(roleManager, "LogType", "ΕίδοςLog", "View");
+            CreateRole(roleManager, "LogType", "ΕίδοςLog", "Create");
+            CreateRole(roleManager, "LogType", "ΕίδοςLog", "Edit");
+            CreateRole(roleManager, "LogType", "ΕίδοςLog", "Deactivate");
+            CreateRole(roleManager, "LogType", "ΕίδοςLog", "Delete");
+            CreateRole(roleManager, "LogType", "ΕίδοςLog", "Import");
+            CreateRole(roleManager, "LogType", "ΕίδοςLog", "Export");
+
         }
 
         private static void CreateRole(RoleManager<ApplicationRole> roleManager, string controllerName, string greekName, string permitionName)

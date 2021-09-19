@@ -1,4 +1,5 @@
-﻿using Bussiness.Service;
+﻿using Bussiness;
+using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApplication.Controllers
@@ -16,10 +18,14 @@ namespace WebApplication.Controllers
         private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
-        public WorkPlaceController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
+        private SecurityDataWork _securityDataWork;
+        public WorkPlaceController(
+            BaseDbContext BaseDbContext, 
+            SecurityDbContext SecurityDbContext)
         {
             _context = BaseDbContext;
             _baseDataWork = new BaseDatawork(BaseDbContext);
+            _securityDataWork = new SecurityDataWork(SecurityDbContext);
         }
 
         // GET: WorkPlace
@@ -46,6 +52,11 @@ namespace WebApplication.Controllers
 
             ViewData["Title"] = "Προβολή πόστου";
             ViewData["EmployeeDataTable"] = "Σύνολο υπαλλήλων";
+            ViewData["UserIds"] = _securityDataWork.ApplicationUsers
+                .Query
+                .Where(x => x.UserRoles.Any(y => y.Role.WorkPlaceId == id.ToString()))
+                .Select(x => x.Id)
+                .ToList();
 
             return View(workPlace);
         }
@@ -97,6 +108,11 @@ namespace WebApplication.Controllers
 
             ViewData["Title"] = "Επεξεργασία πόστου";
             ViewData["EmployeeDataTable"] = "Σύνολο υπαλλήλων";
+            ViewData["UserIds"] = _securityDataWork.ApplicationUsers
+                .Query
+                .Where(x=>x.UserRoles.Any(y=>y.Role.WorkPlaceId== id.ToString()))
+                .Select(x=>x.Id)
+                .ToList();
             return View(WorkPlaceEdit.CreateFrom(workPlace));
         }
 

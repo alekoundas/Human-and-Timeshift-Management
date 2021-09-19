@@ -1,7 +1,7 @@
 ﻿class DataTableService {
     constructor(selector) {
         this._dataTable;
-        this._url = '/api/specializations/datatable';
+        this._url;
         this._startOrderFrom = 0;
         this._selector = selector;
         this._ajaxData;
@@ -141,11 +141,11 @@
             responsive: true,
             processing: true,
             autoWidth: false,
-            colReorder: true,
+            //colReorder: true,
             scrollX: true,
-            fixedColumns: {
-                leftColumns: this._fixedLeftColums,
-                rightColumns: this._fixedRightColums
+            colReorder: {
+                fixedColumnsLeft: this._fixedLeftColums,
+                fixedColumnsRight: this._fixedRightColums
             },
             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
             iDisplayLength: -1

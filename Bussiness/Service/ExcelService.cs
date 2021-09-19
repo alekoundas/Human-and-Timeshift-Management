@@ -398,11 +398,13 @@ namespace Bussiness.Service
             return _exportedInstances;
         }
 
+
         public async Task<ExcelService<TEntity>> ExtractDataDaysFromExcel(IFormFile ImportExcel)
         {
 
-
-
+            var SetterDelegatesCache_Int = new Dictionary<string, Action<TEntity, int>>();
+            var SetterDelegatesCache_String = new Dictionary<string, Action<TEntity, String>>();
+            var SetterDelegatesCache_DateTime = new Dictionary<string, Action<TEntity, DateTime>>();
 
             var timeshift = new TimeShift();
             _exportedInstances = new List<TEntity>();
@@ -444,7 +446,6 @@ namespace Bussiness.Service
 
 
 
-
                     for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
                     {
                         genericEntityInstance = (TEntity)Activator.CreateInstance(typeof(TEntity));
@@ -452,7 +453,50 @@ namespace Bussiness.Service
                         //TODO:convert to arrow
                         void AddPropertyValueToInstance<TValue>(TEntity instance, TValue value, string propertyName)
                         {
-                            instance.GetType().GetProperty(propertyName).SetValue(instance, value, null);
+                            if (instance.GetType().GetProperty(propertyName).PropertyType.Name == "DateTime")
+                            {
+                                if (!SetterDelegatesCache_DateTime.ContainsKey(propertyName))
+                                {
+                                    var setter = (Action<TEntity, DateTime>)Delegate.CreateDelegate(typeof(Action<TEntity, DateTime>), null, typeof(TEntity).GetProperty(propertyName).GetSetMethod());
+                                    SetterDelegatesCache_DateTime.Add(propertyName, setter);
+                                }
+                                var setterDelegate = SetterDelegatesCache_DateTime.GetValueOrDefault(propertyName);
+                                DateTime.TryParse(value.ToString(), out var date);
+                                setterDelegate(instance, date);
+                            }
+                            else if (instance.GetType().GetProperty(propertyName).PropertyType.Name == "Int32")
+                            {
+                                if (propertyName != "Id")
+                                {
+
+                                    if (!SetterDelegatesCache_Int.ContainsKey(propertyName))
+                                    {
+                                        var setter = (Action<TEntity, int>)Delegate.CreateDelegate(typeof(Action<TEntity, int>), null, typeof(TEntity).GetProperty(propertyName).GetSetMethod());
+                                        SetterDelegatesCache_Int.Add(propertyName, setter);
+                                    }
+                                    var setterDelegate = SetterDelegatesCache_Int.GetValueOrDefault(propertyName);
+                                    Int32.TryParse(value.ToString(), out var val);
+                                    setterDelegate(instance, val);
+                                }
+                            }
+                            else if (instance.GetType().GetProperty(propertyName).PropertyType.Name == "String")
+                            {
+                                if (!SetterDelegatesCache_String.ContainsKey(propertyName))
+                                {
+                                    var setter = (Action<TEntity, string>)Delegate.CreateDelegate(typeof(Action<TEntity, string>), null, typeof(TEntity).GetProperty(propertyName).GetSetMethod());
+                                    SetterDelegatesCache_String.Add(propertyName, setter);
+                                }
+                                var setterDelegate = SetterDelegatesCache_String.GetValueOrDefault(propertyName);
+                                setterDelegate(instance, value.ToString());
+                            }
+
+
+
+
+
+
+
+                            //instance.GetType().GetProperty(propertyName).SetValue(instance, value, null);
                         }
 
 
@@ -544,7 +588,8 @@ namespace Bussiness.Service
                                     {
                                         var propertyValue = await GetIdForExtractedEntity(worksheet, i, j);
                                         if (colTitle == "TimeShiftId")
-                                            timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == (int)propertyValue);
+                                            if (timeshift.Id == 0)
+                                                timeshift = await _baseDataWork.TimeShifts.FirstOrDefaultAsync(x => x.Id == (int)propertyValue);
                                         AddPropertyValueToInstance(genericEntityInstance, propertyValue, colTitle);
                                     }
                                 }
@@ -555,6 +600,7 @@ namespace Bussiness.Service
                     }
                 }
             }
+
             return this;
         }
 
@@ -718,6 +764,7 @@ namespace Bussiness.Service
                     new WorkHourExcelWorker(_baseDbContext)
                         .ValidateHoursInTimeshift(_exportedInstances, out hoursInTimeshiftError)
                         .ValidateEmployeeInTimeshift(_exportedInstances, out eployeeInTimeshiftError)
+                        .ValidateSameTimeshift(_exportedInstances, out eployeeInTimeshiftError)
                         .CompleteValidations();
                     break;
                 default:
@@ -872,6 +919,7 @@ namespace Bussiness.Service
             excelDataValidationList.PromptTitle = "Εισαγωγή";
         }
 
+
         private async Task<int> GetIdForExtractedEntity(ExcelWorksheet worksheet, int row, int column)
         {
             int? id = 0;
@@ -899,6 +947,7 @@ namespace Bussiness.Service
             if (entityName == "Employee")
             {
                 var VatNumber = excelCellValue?.Split("_")[1]?.Split(":")[1];
+
                 if (VatNumber != null)
                     id = (await _baseDataWork.Employees
                     .FirstAsync(x => x.VatNumber == VatNumber))?

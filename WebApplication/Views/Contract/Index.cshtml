@@ -1,17 +1,6 @@
 ﻿@model IEnumerable<DataAccess.Models.Entity.ContractMembership>
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
-<style>
-    /* Ensure that the demo table scrolls */
-    th, td {
-        white-space: nowrap;
-    }
-
-    div.dataTables_wrapper {
-        width: 800px;
-        margin: 0 auto;
-    }
-</style>
 <div class="row">
     <div class="col-md-2"> </div>
     <div class="col-md-8">
@@ -69,7 +58,7 @@
     @section Scripts {
         <script>
             $(() => {
-                var dataTable = new DataTableService('#ContractMembershipsDatatable')
+                new DataTableService('#ContractMembershipsDatatable')
                     .ForApiController('contracts')
                     .AddColumn(true, true, "Title")
                     .AddColumn(true, true, "HoursPerWeek")

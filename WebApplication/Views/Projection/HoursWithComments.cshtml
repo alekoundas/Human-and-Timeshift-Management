@@ -40,10 +40,12 @@
 
                     </div>
                 </div>
-
-
-
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -149,9 +151,6 @@
             offstyle: 'primary'
         });
 
-        $('.filterSlider').change(e =>
-            $('#EmployeeHoursWithCommentsDatatable').DataTable().ajax.reload());
-
         $('#Employee_Select2').select2({
             placeholder: "Επέλεξε υπάλληλο",
             allowClear: true,
@@ -162,8 +161,7 @@
                 dataType: "json",
                 data: (params) => JSON.stringify(BuildSelect2Dto(params))
             }
-        }).on('change', () =>
-            $('#EmployeeHoursWithCommentsDatatable').DataTable().ajax.reload());
+        });
 
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
@@ -175,8 +173,7 @@
                 dataType: "json",
                 data: (params) => JSON.stringify(BuildSelect2Dto(params))
             }
-        }).on('change', () =>
-            $('#EmployeeHoursWithCommentsDatatable').DataTable().ajax.reload());
+        });
 
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
@@ -188,10 +185,6 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            onafterselect: () => {
-                DestroyDataTable();
-                CreateDataTable();
-            },
             onaftershow: () =>
                 //Fix Calentim width
                 [...document.getElementsByClassName('calentim-input')]
@@ -199,6 +192,13 @@
                         calentim.setAttribute('style', 'width: 400px;'))
         });
 
+
+        $('#DataTableSearch').on('click', () => {
+            if (!$.fn.dataTable.isDataTable("#EmployeeHoursWithCommentsDatatable"))
+                CreateDataTable();
+
+            $('#EmployeeHoursWithCommentsDatatable').DataTable().ajax.reload();
+        });
         var DestroyDataTable = () => $('#EmployeeHoursWithCommentsDatatable')
             .DataTable().destroy();
 
@@ -227,8 +227,6 @@
                     return JSON.stringify(data);
                 })
                 .CompleteDataTable();
-
-        $(document).ready(CreateDataTable());
 
     </script>
 }

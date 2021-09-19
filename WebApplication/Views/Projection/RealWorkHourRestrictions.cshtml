@@ -31,6 +31,11 @@
                 </div>
 
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -100,8 +105,7 @@
                     return query;
                 }
             }
-        }).on('change', () =>
-            $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload());
+        });
 
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
@@ -113,10 +117,6 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            onafterselect: () => {
-                $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload()
-
-            },
             onaftershow: () =>
                 //Fix Calentim width
                 [...document.getElementsByClassName('calentim-input')]
@@ -124,23 +124,34 @@
                         calentim.setAttribute('style', 'width: 400px;'))
         });
 
-        var table = new DataTableService('#RealWorkHourRestrictionsDatatable')
-            .ForApiController('projections')
-            .StartOrderFromCol(0)
-            .AddColumn(true, true, "WorkPlaceTitle")
-            .AddColumn(false, false, "DateError")
-            .AddColumn(false, false, "Error")
-            .FixedLeftColums(2)
-            .AjaxData((data, type, row, meta) => {
-                data.predicate = 'ProjectionRealWorkHourRestrictions';
-                if (GetSelectedWorkPlaceId() != '')
-                    data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+        const DestroyDataTable = () => $('#RealWorkHourRestrictionsDatatable')
+            .DataTable().destroy();
 
-                data.StartOn = new DateService().ConvertFrom.TimeStamp(GetStartOn().valueOf()).To.Api();
-                data.EndOn = new DateService().ConvertFrom.TimeStamp(GetEndOn().valueOf()).To.Api();
-                return JSON.stringify(data);
-            })
-            .CompleteDataTable();
+        $('#DataTableSearch').on('click', () => {
+            if (!$.fn.dataTable.isDataTable("#RealWorkHourRestrictionsDatatable"))
+                CreateDataTable();
+
+            $('#RealWorkHourRestrictionsDatatable').DataTable().ajax.reload();
+        });
+
+        var CreateDataTable = () =>
+            new DataTableService('#RealWorkHourRestrictionsDatatable')
+                .ForApiController('projections')
+                .StartOrderFromCol(0)
+                .AddColumn(true, true, "WorkPlaceTitle")
+                .AddColumn(false, false, "DateError")
+                .AddColumn(false, false, "Error")
+                .FixedLeftColums(2)
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionRealWorkHourRestrictions';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+
+                    data.StartOn = new DateService().ConvertFrom.TimeStamp(GetStartOn().valueOf()).To.Api();
+                    data.EndOn = new DateService().ConvertFrom.TimeStamp(GetEndOn().valueOf()).To.Api();
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
 
     </script>
 }

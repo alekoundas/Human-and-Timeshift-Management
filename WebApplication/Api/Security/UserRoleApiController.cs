@@ -3,6 +3,7 @@ using DataAccess;
 using DataAccess.Models.Security;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -17,9 +18,17 @@ namespace WebApplication.Api.Security
     {
         private SecurityDbContext _securityDbContext;
         private BaseDatawork _baseDataWork;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly SecurityDataWork _securityDatawork;
-        public UserRoleApiController(SecurityDbContext securityDbContext, BaseDbContext baseDbContext)
+        public UserRoleApiController(
+            SecurityDbContext securityDbContext,
+            BaseDbContext baseDbContext,
+            RoleManager<ApplicationRole> roleManager,
+            UserManager<ApplicationUser> userManager)
         {
+            _roleManager = roleManager;
+            _userManager = userManager;
             _securityDbContext = securityDbContext;
             _securityDatawork = new SecurityDataWork(securityDbContext);
             _baseDataWork = new BaseDatawork(baseDbContext);
@@ -62,93 +71,46 @@ namespace WebApplication.Api.Security
         [HttpPost("updateworkplaceroles")]
         public async Task<ActionResult> UpdateWorkPlaceRoles([FromBody] ApiUpdateWorkPlaceRoles viewModel)
         {
-            var userRolesToDelete = await _securityDatawork.ApplicationUserRoles
-                 .GetUserRolesToDelete(viewModel.WorkPlaceIdsToDelete, viewModel.UserId);
+            var user = await _userManager.FindByIdAsync(viewModel.UserId);
 
-            _securityDatawork.ApplicationUserRoles.RemoveRange(userRolesToDelete);
-            await _securityDatawork.SaveChangesAsync();
-            foreach (var workPlaceValue in viewModel.WorkPlacesValues)
+            //Delete other roles from user
+            var roles = (await _userManager.GetRolesAsync(user))
+                .Where(x => x.Contains("Specific_WorkPlace_"))
+                .ToList();
+            await _userManager.RemoveFromRolesAsync(user, roles.ToArray());
+            await _userManager.UpdateAsync(user);
+
+
+            foreach (var workPlaceId in viewModel.WorkPlaceIds)
             {
-
-                //If role exists in db
-                if (_securityDatawork.ApplicationRoles
-                    .IsWorkPlaceIdAnExistingRole(workPlaceValue.NewWorkPlaceId.ToString()))
+                //If role doesnt exists in db, create it
+                if (!await _roleManager.RoleExistsAsync("Specific_WorkPlace_" + workPlaceId))
                 {
-                    var newRole = await _securityDatawork.ApplicationRoles
-                        .FirstOrDefaultAsync(x => x.WorkPlaceId == workPlaceValue.NewWorkPlaceId.ToString());
+                    var workPlace = _baseDataWork.WorkPlaces
+                        .Query
+                        .First(x => x.Id == workPlaceId);
 
-                    //If user has edited an WorkPlace Role
-                    if (workPlaceValue.ExistingWorkPlaceId != workPlaceValue.NewWorkPlaceId.ToString() && workPlaceValue.ExistingWorkPlaceId != "")
+                    await _roleManager.CreateAsync(new ApplicationRole()
                     {
-                        var existingRole = await _securityDatawork.ApplicationUsers
-                            .GetRoleByWorkPlaceAndUser(workPlaceValue.ExistingWorkPlaceId, viewModel.UserId);
-                        var existingUserRole = await _securityDatawork.ApplicationUserRoles
-                            .FirstOrDefaultAsync(x => x.RoleId == existingRole.Id && x.UserId == viewModel.UserId);
-                        var newUserRole = new ApplicationUserRole();
-
-                        _securityDatawork.ApplicationUserRoles.Remove(existingUserRole);
-                        await _securityDatawork.SaveChangesAsync();
-
-                        newUserRole.RoleId = newRole.Id;
-                        newUserRole.UserId = viewModel.UserId;
-                        _securityDatawork.ApplicationUserRoles.Add(newUserRole);
-
-                        await _securityDatawork.SaveChangesAsync();
-
-                    }
-                    else
-                    {
-                        _securityDatawork.ApplicationUserRoles.Add(new ApplicationUserRole
-                        {
-                            UserId = viewModel.UserId,
-                            RoleId = newRole.Id
-                        });
-                        await _securityDatawork.SaveChangesAsync();
-                    }
-
-                    //if (await _securityDatawork.ApplicationUsers
-                    //    .HasWorkPlaceRole(workPlaceValue.NewWorkPlaceId.ToString(), viewModel.UserId))
-
-                }
-                else
-                {
-                    //Create Role then
-                    var workPlace = await _baseDataWork.WorkPlaces
-                    .FirstOrDefaultAsync(x => x.Id == workPlaceValue.NewWorkPlaceId);
-
-                    var role = new ApplicationRole()
-                    {
-                        Name = "Specific_WorkPlace_" + workPlaceValue.NewWorkPlaceId.ToString(),
-                        WorkPlaceId = workPlaceValue.NewWorkPlaceId.ToString(),
+                        Name = "Specific_WorkPlace_" + workPlaceId.ToString(),
+                        WorkPlaceId = workPlaceId.ToString(),
                         WorkPlaceName = workPlace.Title
-                    };
-
-                    _securityDatawork.ApplicationRoles.Add(role);
-                    await _securityDatawork.SaveChangesAsync();
-
-                    _securityDatawork.ApplicationUserRoles.Add(new ApplicationUserRole
-                    {
-                        UserId = viewModel.UserId,
-                        RoleId = role.Id
                     });
-                    await _securityDatawork.SaveChangesAsync();
-
                 }
+                //Assign it
+                await _userManager.AddToRoleAsync(user, "Specific_WorkPlace_" + workPlaceId);
             }
 
+            await _userManager.UpdateAsync(user);
 
-            await _securityDbContext.SaveChangesAsync();
 
-            var applicationWorkPlaceRoles = await _securityDatawork.ApplicationRoles
-              .GetWorkPlaceRolesByUserId(viewModel.UserId);
 
-            return Ok(applicationWorkPlaceRoles
-                .Select(x => new WorkPlaceRoleValues
-                {
-                    WorkPlaceId = x.WorkPlaceId,
-                    Name = x.WorkPlaceName
-                }).ToList());
+            roles = (await _userManager.GetRolesAsync(user))
+                .Where(x => x.Contains("Specific_WorkPlace_"))
+                .Select(x => x.Split('_')[2])
+                .ToList();
 
+            return Ok(roles);
         }
     }
 }

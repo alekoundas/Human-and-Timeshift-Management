@@ -20,6 +20,9 @@ namespace DataAccess.Repository
             _set = Context.Set<TEntity>();
         }
 
+        public IQueryable<TEntity> Query => Context.Set<TEntity>();
+
+
         //excell reflection call
         public async Task<List<TEntity>> GetAllAsync()
         {

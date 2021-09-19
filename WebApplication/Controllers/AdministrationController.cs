@@ -21,7 +21,7 @@ namespace WebApplication.Controllers
         public IActionResult BatchTimeshiftCreate()
         {
             ViewData["Title"] = "Μαζική δημιουργια χρονοδιαγραμμάτών";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             ViewData["Form"] = "Χρονοδιαγράμματα προς μαζική εισαγωγή";
             return View();
         }
@@ -46,7 +46,7 @@ namespace WebApplication.Controllers
 
             }
             ViewData["Title"] = "Μαζική δημιουργια χρονοδιαγραμμάτών";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             ViewData["Form"] = "Χρονοδιαγράμματα προς μαζική εισαγωγή";
             return View();
         }

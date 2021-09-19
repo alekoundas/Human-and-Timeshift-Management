@@ -9,15 +9,22 @@ namespace DataAccess.Repository.Security.Interface
 {
     public interface ISecurityRepository<TEntity> where TEntity : class
     {
+        IQueryable<TEntity> Query { get; }
+
         Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> filter);
         TEntity Get(int id);
         Task<List<TEntity>> GetPaggingWithFilter(
-    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
-    Expression<Func<TEntity, bool>> filter = null,
-    List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
-    int pageSize = 10,
-    int pageIndex = 1);
-
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+            Expression<Func<TEntity, bool>> filter = null,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+            int pageSize = 10,
+            int pageIndex = 1);
+        IQueryable<TEntity> GetWithFilterQueryable(
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+            Expression<Func<TEntity, bool>> filter = null,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+            int pageSize = 10,
+            int pageIndex = 1);
         Task<List<TEntity>> GetWithFilter(
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
            Expression<Func<TEntity, bool>> filter,

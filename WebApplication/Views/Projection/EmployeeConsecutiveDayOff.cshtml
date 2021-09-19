@@ -28,12 +28,6 @@
                                 <span class="text-danger"></span>
                             </div>
                         </div>
-                        @*<div class="form-group">
-                                <label class="control-label">Πόστο</label>
-                                <div class="input-group" style="width:100%">
-                                    <select id="WorkPlace_Select2" style="width:70%"></select>
-                                </div>
-                            </div>*@
                     </div>
 
                     <div style="width:50%; float:left;">
@@ -43,8 +37,12 @@
                         </div>
                     </div>
                 </div>
-
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -101,15 +99,8 @@
         const GetSelectedYear = () =>
             document.getElementById('MonthFilter').value.split('/')[1];
 
-
-
-        //const GetSelectedWorkPlaceId = () =>
-        //    document.getElementById('WorkPlace_Select2').value;
-
         const GetDayOffChoiceValue = () =>
             document.getElementById('FilterDayOff').value;
-
-        $('#FilterDayOff').on('change', () => $('#EmployeeConsecutiveDayOff').DataTable().ajax.reload());
 
     </script>
 
@@ -126,65 +117,45 @@
                     page: params.page || 1
                 })
             }
-        }).on('change', () =>
-            $('#EmployeeConsecutiveDayOff').DataTable().ajax.reload());
-
-        $('#MonthFilter').MonthPicker({
-            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button(),
-            OnAfterChooseMonth: function () {
-                var month = $(this).val().split('/')[0];
-                var year = $(this).val().split('/')[1];
-                $('#EmployeeConsecutiveDayOff').DataTable().ajax.reload();
-            }
         });
 
-        //$('#WorkPlace_Select2').select2({
-        //    placeholder: "Επέλεξε πόστο",
-        //    allowClear: true,
-        //    ajax: {
-        //        type: "POST",
-        //        url: '/api/workplaces/select2',
-        //        contentType: "application/json; charset=utf-8",
-        //        dataType: "json",
-        //        data: (params) => JSON.stringify(BuildSelect2Dto(params))
-        //    }
-        //}).on('change', () =>
-        //    $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+        $('#MonthFilter').MonthPicker({
+            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button()
+        });
+        const DestroyDataTable = () => $('#EmployeeConsecutiveDayOff')
+            .DataTable().destroy();
+        $('#DataTableSearch').on('click', () => {
+            if (!$.fn.dataTable.isDataTable("#EmployeeConsecutiveDayOff"))
+                CreateDataTable();
 
+            $('#EmployeeConsecutiveDayOff').DataTable().ajax.reload();
+        });
 
+        var CreateDataTable = () =>
+            new DataTableService('#EmployeeConsecutiveDayOff')
+                .ForApiController('projections')
+                .AddColumn(false, false, "LastName")
+                .AddColumn(false, false, "FirstName")
+                .AddColumn(false, false, "VatNumber")
+                .AddColumn(false, false, "WorkPlaceTitle")
+                .AddColumn(false, false, "TimeShiftTitle")
+                .AddColumn(false, false, "LastConsecutiveDay")
+                .AddColumn(false, false, "ConsecutiveDays")
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionEmployeeConsecutiveDayOff';
 
-        var dataTable = new DataTableService('#EmployeeConsecutiveDayOff')
-            .ForApiController('projections')
-            .AddColumn(false, false, "LastName")
-            .AddColumn(false, false, "FirstName")
-            .AddColumn(false, false, "VatNumber")
-            .AddColumn(false, false, "WorkPlaceTitle")
-            .AddColumn(false, false, "TimeShiftTitle")
-            .AddColumn(false, false, "LastConsecutiveDay")
-            .AddColumn(false, false, "ConsecutiveDays")
-            .AjaxData((data, type, row, meta) => {
-                data.predicate = 'ProjectionEmployeeConsecutiveDayOff';
+                    if (GetSelectedTimeshiftId() != '')
+                        data.filterByTimeShiftId = GetSelectedTimeshiftId();
 
-                if (GetSelectedTimeshiftId() != '')
-                    data.filterByTimeShiftId = GetSelectedTimeshiftId();
+                    if (GetSelectedMonth() != '')
+                        data.filterByMonth = GetSelectedMonth();
 
-                if (GetSelectedMonth() != '')
-                    data.filterByMonth = GetSelectedMonth();
+                    if (GetSelectedYear() != '')
+                        data.filterByYear = GetSelectedYear();
 
-                if (GetSelectedYear() != '')
-                    data.filterByYear = GetSelectedYear();
-
-                //if (GetSelectedWorkPlaceId() != '')
-                //    data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
-
-
-
-                data.filterByConsecutiveDayOffCount = GetDayOffChoiceValue();
-                return JSON.stringify(data);
-            })
-            .CompleteDataTable();
-
-
-
+                    data.filterByConsecutiveDayOffCount = GetDayOffChoiceValue();
+                    return JSON.stringify(data);
+                })
+                .CompleteDataTable();
     </script>
 }

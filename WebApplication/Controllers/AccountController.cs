@@ -3,16 +3,18 @@ using Bussiness.SignalR;
 using Bussiness.SignalR.Hubs;
 using DataAccess;
 using DataAccess.Models.Security;
-using DataAccess.Repository.Security.Interface;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -20,12 +22,13 @@ namespace WebApplication.Controllers
 {
     public class AccountController : MasterController
     {
-        private readonly ISecurityDatawork _datawork;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginViewModel> _logger;
         private readonly IHubContext<NotificationUserHub> _notificationUserHubContext;
         private readonly IUserConnectionManager _userConnectionManager;
+        private readonly SecurityDataWork _datawork;
+
         public AccountController(SecurityDbContext dbContex,
             SignInManager<ApplicationUser> signInManager,
             ILogger<LoginViewModel> logger,
@@ -82,6 +85,7 @@ namespace WebApplication.Controllers
                     {
                         var roles = new List<ApplicationRole>();
                         var customClaims = new List<Claim>();
+                        var customClaims2 = new List<Claim>();
                         try
                         {
                             roles = await _datawork.ApplicationUserRoles.GetRolesFormLoggedInUserEmail(_userManager, viewModel.LoginUserNameOrEmail);
@@ -109,6 +113,9 @@ namespace WebApplication.Controllers
                         await _signInManager.Context.SignInAsync(IdentityConstants.ApplicationScheme,
                             claimsPrincipal,
                             new AuthenticationProperties { IsPersistent = viewModel.RememberMe });
+
+
+
 
 
                         //var connections = _userConnectionManager.GetUserConnections(user.Id);

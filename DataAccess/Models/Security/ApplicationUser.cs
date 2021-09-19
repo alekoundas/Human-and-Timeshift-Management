@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Security
 {
@@ -24,8 +25,11 @@ namespace DataAccess.Models.Security
 
         public int? EmployeeId { get; set; }
 
+
+        public  ICollection<ApplicationUserRole> UserRoles { get; set; }
         public ICollection<ApplicationUserTag> ApplicationUserTags { get; set; }
         public ICollection<Notification> Notifications { get; set; }
+        public ICollection<Log> Logs { get; set; }
 
         //Audit
         [Display(Name = "Δημηουργήθηκε απο")]

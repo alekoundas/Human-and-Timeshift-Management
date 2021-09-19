@@ -9,7 +9,7 @@ namespace WebApplication.Controllers
         public IActionResult Difference()
         {
             ViewData["Title"] = "Διαφορές βαρδιών απο πραγματικές και χρονόγραμμα";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -17,7 +17,7 @@ namespace WebApplication.Controllers
         public IActionResult CurrentDay()
         {
             ViewData["Title"] = "Σύνολο πραγματικών βαρδιών ημέρας";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -25,7 +25,7 @@ namespace WebApplication.Controllers
         public IActionResult Concentric()
         {
             ViewData["Title"] = "Συνγκεντρωτικό";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -33,7 +33,7 @@ namespace WebApplication.Controllers
         public IActionResult ConcentricSpecificDates()
         {
             ViewData["Title"] = "Συνγκεντρωτικό με επιλεγμένες ημερομηνίες";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -41,7 +41,7 @@ namespace WebApplication.Controllers
         public IActionResult RealWorkHoursAnalytically()
         {
             ViewData["Title"] = "Πραγματικές βάρδιες αναλυτικά";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -49,15 +49,15 @@ namespace WebApplication.Controllers
         public IActionResult RealWorkHoursAnalyticallySum()
         {
             ViewData["Title"] = "Πραγματικές βάρδιες αναλυτικά σε ώρες ";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
         [Authorize(Roles = "ProjectionRealWorkHoursSpecificDates_View")]
         public IActionResult RealWorkHoursSpecificDates()
         {
-            ViewData["Title"] = "Επιλεγμένες ημερομηνίες";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Title"] = "Π.Βάρδιες επιλεγμένες ημερομηνίες";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace WebApplication.Controllers
         public IActionResult PresenceDaily()
         {
             ViewData["Title"] = "Παρουσίες ημέρας";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -73,7 +73,7 @@ namespace WebApplication.Controllers
         public IActionResult EmployeeRealHoursSum()
         {
             ViewData["Title"] = "Ώρες ανα εργαζόμενο";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -81,7 +81,7 @@ namespace WebApplication.Controllers
         public IActionResult RealWorkHourRestrictions()
         {
             ViewData["Title"] = "Έλεγχος υπέρβασης πραγματικών βαρδιών";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -89,15 +89,15 @@ namespace WebApplication.Controllers
         public IActionResult TimeShiftSuggestions()
         {
             ViewData["Title"] = "Υποδείξεις Χρονοδιαγράμματος";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
         [Authorize(Roles = "ProjectionHoursWithComments_View")]
         public IActionResult HoursWithComments()
         {
-            ViewData["Title"] = "Βάρδιες με σχόλια";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Title"] = "(Π)Βάρδιες με σχόλια";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
 
@@ -105,7 +105,7 @@ namespace WebApplication.Controllers
         public IActionResult EmployeeConsecutiveDayOff()
         {
             ViewData["Title"] = "Συνεχής ρεπό ανα εργαζόμενο";
-            ViewData["Filter"] = "Προεραιτικά φίλτρα αναζήτησης";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
             return View();
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using DataAccess;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -85,10 +86,8 @@ namespace WebApplication.Utilities
 
         private static bool IsOkToShow(string permition)
         {
-            httpContext = new HttpContextAccessor();
-
             if (!String.IsNullOrEmpty(permition))
-                return httpContext.HttpContext.User.Claims.Any(x =>
+                return HttpAccessorService.GetLoggeInUser_Claims().Any(x =>
                 x.Value.Split("_")[0] == permition.Split("_")[0] &&
                 x.Value.Split("_")[1] == permition.Split("_")[1]);
             return false;
@@ -96,10 +95,9 @@ namespace WebApplication.Utilities
         private static bool IsOkToShowForNonEntity(string permition)
         {
             var controller = permition.Split('_')[0];
-            httpContext = new HttpContextAccessor();
 
             if (!String.IsNullOrEmpty(controller))
-                return httpContext.HttpContext.User.Claims
+                return HttpAccessorService.GetLoggeInUser_Claims()
                     .Any(x => x.Value.Contains(controller));
             return false;
         }

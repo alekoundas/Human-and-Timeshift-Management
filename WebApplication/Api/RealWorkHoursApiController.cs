@@ -7,6 +7,7 @@ using DataAccess.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,12 +21,14 @@ namespace WebApplication.Api
         private BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         private readonly SecurityDataWork _securityDatawork;
+        private readonly LogService _logService;
 
         public RealWorkHoursApiController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
         {
             _context = BaseDbContext;
             _baseDataWork = new BaseDatawork(BaseDbContext);
             _securityDatawork = new SecurityDataWork(SecurityDbContext);
+            _logService = new LogService(SecurityDbContext);
         }
 
         // POST: api/RealWorkHours/Datatable
@@ -81,9 +84,10 @@ namespace WebApplication.Api
         [HttpPost]
         public async Task<ActionResult<RealWorkHour>> PostRealWorkHour(RealWorkHour realWorkHour)
         {
+
             _context.RealWorkHours.Add(realWorkHour);
             await _baseDataWork.SaveChangesAsync();
-
+            _logService.OnCreateEntity("RealWorkHour", realWorkHour);
             return CreatedAtAction("GetRealWorkHour", new { id = realWorkHour.Id }, realWorkHour);
         }
 
@@ -98,6 +102,7 @@ namespace WebApplication.Api
                 return NotFound();
 
             _baseDataWork.RealWorkHours.Remove(realWorkHour);
+            _logService.OnDeleteEntity("RealWorkHour", realWorkHour);
 
             var status = await _baseDataWork.SaveChangesAsync();
 
@@ -210,27 +215,31 @@ namespace WebApplication.Api
         public async Task<ActionResult<RealWorkHour>> DeleteBatch([FromBody] WorkHourApiViewModel workHourViewModel)
         {
             var filter = PredicateBuilder.New<RealWorkHour>();
-
-            foreach (var employeeId in workHourViewModel.EmployeeIds)
-                filter = filter.Or(x => x.EmployeeId == employeeId);
-
-            filter = filter.And(x =>
-                x.StartOn.Date == workHourViewModel.StartOn.Date &&
-                x.StartOn.Hour == workHourViewModel.StartOn.Hour &&
-                x.StartOn.Minute == workHourViewModel.StartOn.Minute &&
-                x.EndOn.Value.Date == workHourViewModel.EndOn.Date &&
-                x.EndOn.Value.Hour == workHourViewModel.EndOn.Hour &&
-                x.EndOn.Value.Minute == workHourViewModel.EndOn.Minute);
-
-            var realWorkHours = await _baseDataWork.RealWorkHours.GetFiltered(filter);
-            if (realWorkHours.Count > 0)
+            if (workHourViewModel.EmployeeIds.Count > 0)
             {
-                _baseDataWork.RealWorkHours.RemoveRange(realWorkHours);
-                await _baseDataWork.SaveChangesAsync();
 
+                foreach (var employeeId in workHourViewModel.EmployeeIds)
+                    filter = filter.Or(x => x.EmployeeId == employeeId);
+
+                filter = filter.And(x =>
+                    x.StartOn.Date == workHourViewModel.StartOn.Date &&
+                    x.StartOn.Hour == workHourViewModel.StartOn.Hour &&
+                    x.StartOn.Minute == workHourViewModel.StartOn.Minute &&
+                    x.EndOn.Value.Date == workHourViewModel.EndOn.Date &&
+                    x.EndOn.Value.Hour == workHourViewModel.EndOn.Hour &&
+                    x.EndOn.Value.Minute == workHourViewModel.EndOn.Minute);
+
+                var realWorkHours = await _baseDataWork.RealWorkHours.GetFiltered(filter);
+                if (realWorkHours.Count > 0)
+                {
+                    _baseDataWork.RealWorkHours.RemoveRange(realWorkHours);
+                    _logService.OnDeleteEntity("RealWorkHour", realWorkHours as object);
+                    await _baseDataWork.SaveChangesAsync();
+
+                }
             }
 
-            return Ok(new { Value = "Its  me Mario" });
+            return Ok(new { Value = "  __  " });
         }
         // POST: api/realworkhours/deleteEmployeeWorkhours
         [HttpPost("deleteEmployeeWorkhours")]
@@ -246,6 +255,7 @@ namespace WebApplication.Api
                  );
 
                 _baseDataWork.RealWorkHours.Remove(workHourToDelete);
+                _logService.OnDeleteEntity("RealWorkHour", workHourToDelete);
             }
 
             await _baseDataWork.SaveChangesAsync();
@@ -257,18 +267,25 @@ namespace WebApplication.Api
         [HttpPost("editEmployeeRealWorkhour")]
         public async Task<ActionResult<WorkHour>> EditEmployeeRealWorkhour([FromBody] RealWorkHourEdit realWorkHour)
         {
+            var expandoService = new ExpandoService();
+            object logOriginalEntity;
+            object logEditedEntity;
             var workHourToModify = await _baseDataWork.RealWorkHours
                 .FirstOrDefaultAsync(x => x.Id == realWorkHour.RealworkHourId);
 
             //if workhour exists for employee, edit it
             if (workHourToModify != null)
             {
+                logOriginalEntity = expandoService.GetCopyFrom(workHourToModify);
                 workHourToModify.StartOn = realWorkHour.StartOn;
                 workHourToModify.EndOn = realWorkHour.EndOn;
                 workHourToModify.Comments = realWorkHour.Comments;
+                logEditedEntity = expandoService.GetCopyFrom(workHourToModify);
 
                 _baseDataWork.Update(workHourToModify);
                 await _baseDataWork.SaveChangesAsync();
+                _logService.OnEditEntity("RealWorkHour", logOriginalEntity, logEditedEntity);
+
             }
 
             return Ok();
@@ -282,6 +299,11 @@ namespace WebApplication.Api
 
             foreach (var realWorkHour in workHours)
             {
+                var expandoService = new ExpandoService();
+                object logOriginalEntity;
+                object logEditedEntity;
+
+
                 var workHourToModify = await _baseDataWork.RealWorkHours
                     .FirstOrDefaultAsync(x =>
                         x.StartOn.Date == realWorkHour.StartOn.Date &&
@@ -296,12 +318,19 @@ namespace WebApplication.Api
                 //if workhour exists for employee, edit it
                 if (workHourToModify != null)
                 {
+                    logOriginalEntity = expandoService.GetCopyFrom(workHourToModify);
                     workHourToModify.StartOn = realWorkHour.NewStartOn;
                     workHourToModify.EndOn = realWorkHour.NewEndOn;
                     workHourToModify.Comments = realWorkHour.Comments;
+                    logEditedEntity = expandoService.GetCopyFrom(workHourToModify);
 
                     _baseDataWork.Update(workHourToModify);
+
+
+                    _logService.OnEditEntity("RealWorkHour", logOriginalEntity, logEditedEntity);
                 }
+
+
                 //if workhour does NOT exists for employee, create it
                 else
                 {
@@ -317,6 +346,10 @@ namespace WebApplication.Api
             }
 
             _baseDataWork.RealWorkHours.AddRange(realWorkHoursToSaveRange);
+            if (realWorkHoursToSaveRange.Count>0)
+            _logService.OnCreateEntity("RealWorkHour", realWorkHoursToSaveRange as object);
+
+
             await _baseDataWork.SaveChangesAsync();
 
             return Ok(realWorkHoursToSaveRange);
@@ -340,11 +373,14 @@ namespace WebApplication.Api
                     EmployeeId = realWorkHour.EmployeeId,
                     Comments = realWorkHour.Comments,
                     CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
-                    CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id
+                    CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id,
+                    CreatedOn = DateTime.Now
                 });
             }
-            _baseDataWork.WorkHours.AddRange(workHoursToSaveRange);
             _baseDataWork.RealWorkHours.AddRange(realWorkHoursToSaveRange);
+            _logService.OnCreateEntity("RealWorkHour", realWorkHoursToSaveRange as object);
+
+
             await _baseDataWork.SaveChangesAsync();
 
             return Ok(new { realWorkHoursToSaveRange, workHoursToSaveRange });
@@ -373,23 +409,11 @@ namespace WebApplication.Api
                     dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
                     {
                         EmployeeId = id,
-                        ErrorType = "warning",
+                        ErrorType = "error",
                         ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
                                         "αυτές τις ώρες ως άδεια",
                     });
-
-                if (_baseDataWork.RealWorkHours.AreDatesOverlapingDayOff(
-                   apiOverlap.StartOn, apiOverlap.EndOn, false, id))
-
-                    dataToReturn.Add(new ApiRealWorkHourHasOverlapResponse
-                    {
-                        EmployeeId = id,
-                        ErrorType = "warning",
-                        ErrorValue = "<br>Ο χρήστης αυτός έχει ήδη δηλωθεί για " +
-                                        "αυτές τις ώρες ως ρεπό",
-                    });
             };
-
 
             return Ok(dataToReturn);
         }

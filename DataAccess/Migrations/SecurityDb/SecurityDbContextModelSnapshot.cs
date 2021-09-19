@@ -259,6 +259,122 @@ namespace DataAccess.Migrations.SecurityDb
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Security.Log", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EditedJSON")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LogEntityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LogTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OriginalJSON")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("LogEntityId");
+
+                    b.HasIndex("LogTypeId");
+
+                    b.ToTable("Logs");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Security.LogEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title_GR")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Title")
+                        .IsUnique()
+                        .HasFilter("[Title] IS NOT NULL");
+
+                    b.ToTable("LogEntities");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Security.LogType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title_GR")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Title")
+                        .IsUnique()
+                        .HasFilter("[Title] IS NOT NULL");
+
+                    b.ToTable("LogTypes");
+                });
+
             modelBuilder.Entity("DataAccess.Models.Security.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -360,17 +476,21 @@ namespace DataAccess.Migrations.SecurityDb
 
             modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserRole", b =>
                 {
-                    b.HasOne("DataAccess.Models.Security.ApplicationRole", null)
-                        .WithMany()
+                    b.HasOne("DataAccess.Models.Security.ApplicationRole", "Role")
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataAccess.Models.Security.ApplicationUser", null)
-                        .WithMany()
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", "User")
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Security.ApplicationUserTag", b =>
@@ -397,6 +517,31 @@ namespace DataAccess.Migrations.SecurityDb
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Security.Log", b =>
+                {
+                    b.HasOne("DataAccess.Models.Security.ApplicationUser", "ApplicationUser")
+                        .WithMany("Logs")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("DataAccess.Models.Security.LogEntity", "LogEntity")
+                        .WithMany("Logs")
+                        .HasForeignKey("LogEntityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Models.Security.LogType", "LogType")
+                        .WithMany("Logs")
+                        .HasForeignKey("LogTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("LogEntity");
+
+                    b.Navigation("LogType");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Security.Notification", b =>
@@ -428,6 +573,11 @@ namespace DataAccess.Migrations.SecurityDb
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Security.ApplicationRole", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("DataAccess.Models.Security.ApplicationTag", b =>
                 {
                     b.Navigation("ApplicationUserTags");
@@ -437,7 +587,21 @@ namespace DataAccess.Migrations.SecurityDb
                 {
                     b.Navigation("ApplicationUserTags");
 
+                    b.Navigation("Logs");
+
                     b.Navigation("Notifications");
+
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Security.LogEntity", b =>
+                {
+                    b.Navigation("Logs");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Security.LogType", b =>
+                {
+                    b.Navigation("Logs");
                 });
 #pragma warning restore 612, 618
         }

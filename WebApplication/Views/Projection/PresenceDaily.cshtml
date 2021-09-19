@@ -24,6 +24,11 @@
                     </div>
                 </div>
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -111,30 +116,38 @@
                     return query;
                 }
             }
-        }).on('change', () =>
-            $('#PresenceDailyDatatable').DataTable().ajax.reload());
+        });
 
+        const DestroyDataTable = () => $('#PresenceDailyDatatable')
+            .DataTable().destroy();
 
+        $('#DataTableSearch').on('click', () => {
+            if (!$.fn.dataTable.isDataTable("#PresenceDailyDatatable"))
+                CreateDataTable();
 
-        var dataTable = new DataTableService('#PresenceDailyDatatable')
-            .ForApiController('projections')
-            .AddColumn(true, true, "LastName")
-            .AddColumn(true, true, "FirstName")
-            .AddColumn(true, true, "ErpCode")
-            .AddColumn(true, true, "VatNumber")
-            .AddColumn(true, true, "WorkPlace_RealWorkHour")
-            .AddColumn(false, false, "Today")
-            .FixedLeftColums(2)
-            .AjaxData((data, type, row, meta) => {
-                data.predicate = 'ProjectionPresenceDaily';
-                if (GetSelectedWorkPlaceId() != '')
-                    data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
-                return JSON.stringify(data);
-            })
-            .FooterCallback((row, data, start, end, display) => {
-                row.children[5].innerHTML = "Σήμερα σύνολο: " + data[0]?.Today_FooterTotal;
-            })
-            .CompleteDataTable();
+            $('#PresenceDailyDatatable').DataTable().ajax.reload();
+        });
+
+        var CreateDataTable = () =>
+            new DataTableService('#PresenceDailyDatatable')
+                .ForApiController('projections')
+                .AddColumn(true, true, "LastName")
+                .AddColumn(true, true, "FirstName")
+                .AddColumn(true, true, "ErpCode")
+                .AddColumn(true, true, "VatNumber")
+                .AddColumn(true, true, "WorkPlaceTitle")
+                .AddColumn(false, false, "Today")
+                .FixedLeftColums(2)
+                .AjaxData((data, type, row, meta) => {
+                    data.predicate = 'ProjectionPresenceDaily';
+                    if (GetSelectedWorkPlaceId() != '')
+                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+                    return JSON.stringify(data);
+                })
+                .FooterCallback((row, data, start, end, display) => {
+                    row.children[5].innerHTML = "Σήμερα σύνολο: " + data[0]?.Today_FooterTotal;
+                })
+                .CompleteDataTable();
 
     </script>
 }

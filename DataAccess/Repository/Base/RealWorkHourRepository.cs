@@ -109,16 +109,6 @@ namespace DataAccess.Repository.Base
                     .Any(y => y.Employee.Id == employeeId);
         }
 
-        public bool AreDatesOverlapingDayOff(DateTime startOn, DateTime endOn, bool isDayOff, int employeeId)
-        {
-            var filter = PredicateBuilder.New<WorkHour>();
-
-            filter = filter.And(x => x.Employee.Id == employeeId);
-            filter = filter.And(x => startOn.Date == x.StartOn.Date);
-            //filter = filter.And(x => startOn.Day != x.StartOn.Day);
-
-            return false;
-        }
 
         public async Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId)
         {

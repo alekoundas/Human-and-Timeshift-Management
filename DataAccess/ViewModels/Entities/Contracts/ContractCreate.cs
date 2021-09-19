@@ -17,7 +17,7 @@ namespace DataAccess.ViewModels
         public int HoursPerWeek { get; set; }
 
         [Display(Name = "Ώρες ανα ημέρα")]
-        public int HoursPerDay { get; set; }
+        public decimal HoursPerDay { get; set; }
 
         [Display(Name = "Εργάσιμες μέρες εβδομάδας")]
         public int WorkingDaysPerWeek { get; set; }

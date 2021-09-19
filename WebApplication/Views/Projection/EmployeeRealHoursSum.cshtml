@@ -26,7 +26,6 @@
                                 <select id="WorkPlace_Select2" style="width:70%"></select>
                             </div>
                         </div>
-
                     </div>
                     <div style="width:50%; float:left;">
                         <label class="control-label">Χρονικό έυρος</label>
@@ -40,10 +39,12 @@
 
                     </div>
                 </div>
-
-
-
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -143,9 +144,6 @@
             offstyle: 'primary'
         });
 
-        $('.filterSlider').change(e =>
-            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
-
         $('#Employee_Select2').select2({
             placeholder: "Επέλεξε υπάλληλο",
             allowClear: true,
@@ -156,8 +154,7 @@
                 dataType: "json",
                 data: (params) => JSON.stringify(BuildSelect2Dto(params))
             }
-        }).on('change', () =>
-            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+        });
 
         $('#WorkPlace_Select2').select2({
             placeholder: "Επέλεξε πόστο",
@@ -169,8 +166,7 @@
                 dataType: "json",
                 data: (params) => JSON.stringify(BuildSelect2Dto(params))
             }
-        }).on('change', () =>
-            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload());
+        });
 
         $('#SearchRangeInput').calentim({
             showTimePickers: false,
@@ -182,15 +178,19 @@
             format: "DD/MM/YYYY",
             dateSeparator: '/-/',
             locale: "el",
-            onafterselect: () => {
-                DestroyDataTable();
-                CreateDataTable();
-            },
             onaftershow: () =>
                 //Fix Calentim width
                 [...document.getElementsByClassName('calentim-input')]
                     .forEach((calentim) =>
                         calentim.setAttribute('style', 'width: 400px;'))
+        });
+
+      
+        $('#DataTableSearch').on('click', () => {
+            if (!$.fn.dataTable.isDataTable("#EmployeeRealHoursSumDatatable"))
+                CreateDataTable();
+
+            $('#EmployeeRealHoursSumDatatable').DataTable().ajax.reload();
         });
 
         var DestroyDataTable = () => $('#EmployeeRealHoursSumDatatable')
@@ -199,7 +199,7 @@
         var CreateDataTable = () =>
             new DataTableService('#EmployeeRealHoursSumDatatable')
                 .ForApiController('projections')
-                .AddColumn(true, true, "Title")
+                .AddColumn(true, true, "WorkPlaceTitle")
                 .AddColumn(false, false, "TotalHours")
                 .AddColumn(false, false, "TotalHoursDay")
                 .AddColumn(false, false, "TotalHoursNight")
@@ -223,8 +223,6 @@
                     row.children[3].innerHTML = "Σύνολο ώρες νύχτα: " + data[0]?.TotalFooterHoursNight;
                 })
                 .CompleteDataTable();
-
-        $(document).ready(CreateDataTable());
 
     </script>
 }

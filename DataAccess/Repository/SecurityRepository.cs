@@ -21,14 +21,40 @@ namespace DataAccess.Repository
             Context = dbContext;
             _set = Context.Set<TEntity>();
         }
+        public IQueryable<TEntity> Query => Context.Set<TEntity>();
+
         public async Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> selector)
         {
             return await _set.Where(selector).CountAsync();
         }
+
         public TEntity Get(int id)
         {
             return _set.Find(id);
         }
+
+        public IQueryable<TEntity> GetWithFilterQueryable(
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
+            Expression<Func<TEntity, bool>> filter,
+            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>> includes = null,
+            int pageSize = 10,
+            int pageIndex = 1)
+        {
+            var qry = (IQueryable<TEntity>)_set;
+
+            if (includes != null)
+                foreach (var include in includes)
+                    qry = include(qry);
+
+            if (filter != null)
+                qry = qry.Where(filter);
+
+            if (orderingInfo != null)
+                qry = orderingInfo(qry);
+
+            return qry;
+        }
+
         public async Task<List<TEntity>> GetPaggingWithFilter(
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderingInfo,
             Expression<Func<TEntity, bool>> filter,

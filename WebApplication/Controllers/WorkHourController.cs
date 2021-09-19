@@ -1,7 +1,9 @@
-﻿using Bussiness.Helpers;
+﻿using Bussiness;
+using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Models.Entity;
+using DataAccess.Models.Security;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +21,12 @@ namespace WebApplication.Controllers
     {
         private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private readonly BaseDbContext _context;
+        private readonly SecurityDataWork _securityDataWork;
         private BaseDatawork _baseDataWork;
         public WorkHourController(BaseDbContext BaseDbContext, SecurityDbContext SecurityDbContext)
         {
             _context = BaseDbContext;
+            _securityDataWork = new SecurityDataWork(SecurityDbContext);
             _baseDataWork = new BaseDatawork(BaseDbContext);
         }
 
@@ -132,30 +136,84 @@ namespace WebApplication.Controllers
                 TempData["StatusMessage"] = "Ωχ! Φαίνεται πως δεν δόθηκε αρχείο Excel.";
             else
             {
-                var realWorkHours = (await (new ExcelService<WorkHour>(_context)
+                var workHours = (await (new ExcelService<WorkHour>(_context)
                     .ExtractDataDaysFromExcel(ImportExcel)))
                     .ValidateExtractedData()
                     .RetrieveExtractedData(out var errors);
 
-                if (errors.Count == 0)
+                var overlapWorkHours = _baseDataWork.WorkHours.Query
+                    .Include(x => x.TimeShift).ThenInclude(x => x.WorkPlace)
+                    .Include(x => x.Employee)
+                    .Where(x => x.TimeShiftId != workHours.FirstOrDefault().TimeShiftId)
+                    .Where(x => x.StartOn.Year == workHours.FirstOrDefault().StartOn.Year)
+                    .Where(x => x.StartOn.Month == workHours.FirstOrDefault().StartOn.Month)
+                    .Select(x => new WorkHour
+                    {
+                        StartOn = x.StartOn,
+                        EndOn = x.StartOn,
+                        EmployeeId = x.EmployeeId,
+                        Employee = new Employee
+                        {
+                            FirstName = x.Employee.FirstName,
+                            LastName = x.Employee.LastName
+                        },
+                        TimeShift = new TimeShift
+                        {
+                            Title = x.TimeShift.Title,
+                            WorkPlace = new WorkPlace
+                            {
+                                Title = x.TimeShift.WorkPlace.Title
+                            }
+
+                        }
+                    })
+                    .ToList()
+                    .Where(x => workHours.Any(y => y.EmployeeId == x.EmployeeId && x.StartOn.Date <= y.EndOn.Date && y.StartOn.Date <= x.EndOn.Date))
+                    .ToList();
+
+                if (errors.Count == 0 && overlapWorkHours.Count == 0)
                 {
 
                     _baseDataWork.WorkHours.RemoveRange(_baseDataWork.WorkHours
-                        .Where(x => x.TimeShiftId == realWorkHours[0].TimeShiftId).ToList());
+                        .Where(x => x.TimeShiftId == workHours[0].TimeShiftId).ToList());
 
                     var status_delete = await _baseDataWork.SaveChangesAsync();
 
-                    _baseDataWork.WorkHours.AddRange(realWorkHours);
+                    _baseDataWork.WorkHours.AddRange(workHours);
                     var status = await _baseDataWork.SaveChangesAsync();
 
                     if (status > 0)
-                        TempData["StatusMessage"] = realWorkHours.Count +
+                        TempData["StatusMessage"] = workHours.Count +
                     " εγγραφές προστέθηκαν με επιτυχία";
                     else
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }
-                else
+
+
+                if (errors.Count > 0)
                     TempData["StatusMessage"] = "Ωχ! " + string.Join("", errors);
+
+                if (overlapWorkHours.Count > 0)
+                {
+
+                    var error_msg = new List<string>();
+                    foreach (var workHour in overlapWorkHours)
+                    {
+                        error_msg.Add("<br> Βαρδια επικαλύπτεται απο \"" + workHour.StartOn.ToString() + " - " + workHour.EndOn.ToString() + "\" στο ποστο \"" + workHour.TimeShift.WorkPlace.Title + "\" υπάλληλος \"" + workHour.Employee.FullName+ "\"");
+                    }
+
+                    _securityDataWork.Notifications.Add(new Notification
+                    {
+                        ApplicationUserId = HttpAccessorService.GetLoggeInUser_Id,
+                        Title = "Προβλημα εισαγωγής χρονοδιαγράμματος " + overlapWorkHours.First().TimeShift.Title,
+                        Description = string.Join("", error_msg),
+                        IsSeen = false,
+                        CreatedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                        CreatedBy_Id = HttpAccessorService.GetLoggeInUser_Id,
+                        CreatedOn = DateTime.Now
+                    });
+                    await _securityDataWork.SaveChangesAsync();
+                }
             }
 
             return RedirectToAction("index", "TimeShift");

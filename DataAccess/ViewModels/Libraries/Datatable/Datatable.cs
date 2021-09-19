@@ -79,8 +79,8 @@ namespace DataAccess.Libraries.Datatable
         [JsonProperty(PropertyName = "filterByRealWorkHour")]
         public bool FilterByRealWorkHour { get; set; }
 
-        [JsonProperty(PropertyName = "filterByOffsetMinutes")]
-        public int? FilterByOffsetMinutes { get; set; }
+        [JsonProperty(PropertyName = "filterByOffset")]
+        public int FilterByOffset { get; set; }
 
         //Concentric
         [JsonProperty(PropertyName = "showHoursInPercentage")]
@@ -127,6 +127,12 @@ namespace DataAccess.Libraries.Datatable
         [JsonProperty(PropertyName = "filterByYear")]
         public int FilterByYear { get; set; }
 
+        //Log
+        [JsonProperty(PropertyName = "filterByLogEntityId")]
+        public int FilterByLogEntityId { get; set; }
+        [JsonProperty(PropertyName = "filterByLogTypeId")]
+        public int FilterByLogTypeId { get; set; }
+
         //TimeshifSuggestion
         [JsonProperty(PropertyName = "filterByValidateOvertime")]
         public bool FilterByValidateOvertime { get; set; }
@@ -145,5 +151,12 @@ namespace DataAccess.Libraries.Datatable
 
         [JsonProperty(PropertyName = "filterByConsecutiveDayOffCount")]
         public int FilterByConsecutiveDayOffCount { get; set; }
+
+        [JsonProperty(PropertyName = "filterByOffsetMax")]
+        public int? FilterByOffsetMax { get; set; }
+
+        [JsonProperty(PropertyName = "filterByOffsetMin")]
+        public int? FilterByOffsetMin { get; set; }
+
     }
 }

@@ -20,6 +20,47 @@
                                 <select id="WorkPlace_Select2" style="width:70%"></select>
                             </div>
                         </div>
+                        <div style="width:100%; float:left;">
+                            <div style="width:70%; float:left;">
+                                <label class="control-label">Έλεγχος υπερορίας</label>
+                            </div>
+                            <div style="width:30%; float:left;">
+                                <input type="checkbox" class="filterSlider" id="SliderValidateOvertime" checked>
+                            </div>
+                        </div>
+                        <div style="width:100%; float:left;">
+
+                            <div style="width:70%; float:left;">
+                                <label class="control-label">Έλεγχος ρεπό/εβδομάδα</label>
+                            </div>
+                            <div style="width:30%; float:left;">
+                                <input type="checkbox" class="filterSlider" id="SliderValidateDayOfDaysPerWeek" checked>
+                            </div>
+                        </div>
+                        <div style="width:100%; float:left;">
+                            <div style="width:70%; float:left;">
+                                <label class="control-label">Έλεγχος εργ.ημέρες/εβδομάδα</label>
+                            </div>
+                            <div style="width:30%; float:left;">
+                                <input type="checkbox" class="filterSlider" id="SliderValidateWorkDaysPerWeek" checked>
+                            </div>
+                        </div>
+                        <div style="width:100%; float:left;">
+                            <div style="width:70%; float:left;">
+                                <label class="control-label">Έλεγχος ώρες/εβδομάδα</label>
+                            </div>
+                            <div style="width:30%; float:left;">
+                                <input type="checkbox" class="filterSlider" id="SliderValidateHoursPerWeek" checked>
+                            </div>
+                        </div>
+                        <div style="width:100%; float:left;">
+                            <div style="width:70%; float:left;">
+                                <label class="control-label">Έλεγχος ώρες/ημέρα</label>
+                            </div>
+                            <div style="width:30%; float:left;">
+                                <input type="checkbox" class="filterSlider" id="SliderWorkingHoursPerDay" checked>
+                            </div>
+                        </div>
                     </div>
                     <div style="width:50%; float:left;">
                         <div style="width:100%; float:left;">
@@ -28,67 +69,31 @@
                                 <input id="SearchRangeInput" class="form-control" />
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div style="width:60%; float:left;">
-                    <div style="width:100%; float:left;">
-                        <div style="width:70%; float:left;">
-                            <label class="control-label">Έλεγχος υπερορίας</label>
+                        <div style="width: 100%; margin-top: 5px; float: left;">
+                            <label class="control-label">Ελάχιστη τιμή ορίου</label>
+                            <div class="input-group">
+                                <input id="SearchOffsetMin" class="form-control" type="number" />
+                            </div>
                         </div>
-                        <div style="width:30%; float:left;">
-                            <input type="checkbox" class="filterSlider" id="SliderValidateOvertime" checked>
-                        </div>
-                    </div>
-                    <div style="width:70%; float:left;">
-                        <label class="control-label">Έλεγχος ρεπό/εβδομάδα</label>
-                    </div>
-                    <div style="width:30%; float:left;">
-                        <input type="checkbox" class="filterSlider" id="SliderValidateDayOfDaysPerWeek" checked>
-                    </div>
-                    <div style="width:100%; float:left;">
-                        <div style="width:70%; float:left;">
-                            <label class="control-label">Έλεγχος εργ.ημέρες/εβδομάδα</label>
-                        </div>
-                        <div style="width:30%; float:left;">
-                            <input type="checkbox" class="filterSlider" id="SliderValidateWorkDaysPerWeek" checked>
-                        </div>
-                    </div>
-                    <div style="width:100%; float:left;">
-                        <div style="width:70%; float:left;">
-                            <label class="control-label">Έλεγχος ώρες/εβδομάδα</label>
-                        </div>
-                        <div style="width:30%; float:left;">
-                            <input type="checkbox" class="filterSlider" id="SliderValidateHoursPerWeek" checked>
-                        </div>
-                    </div>
-                    <div style="width:100%; float:left;">
-                        <div style="width:70%; float:left;">
-                            <label class="control-label">Έλεγχος ώρες/ημέρα</label>
-                        </div>
-                        <div style="width:30%; float:left;">
-                            <input type="checkbox" class="filterSlider" id="SliderWorkingHoursPerDay" checked>
+                        <div style="width:100%; margin-top:5px; float:left;">
+                            <label class="control-label">Μέγιστη τιμή ορίου</label>
+                            <div class="input-group">
+                                <input id="SearchOffsetMax" class="form-control" type="number" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
 </div>
 
-
-
-@*<div class="row">
-        <div class="col-md-12">
-            <div class="box box-danger" style="margin-top:5%;">
-                <div class="box-header">
-                    <h3 class="box-title">@ViewData["Title"]</h3>
-                </div>
-                <hr />
-                <div id="DataTableDiv"></div>
-            </div>
-        </div>
-    </div>*@
 
 <div class="row">
     <div class="col-md-12">
@@ -131,6 +136,12 @@
         const GetSelectedWorkPlaceId = () =>
             document.getElementById('WorkPlace_Select2').value;
 
+        const GetSeSearchOffsetMax = () =>
+            document.getElementById('SearchOffsetMax').value;
+
+        const GetSeSearchOffsetMin = () =>
+            document.getElementById('SearchOffsetMin').value;
+
         const GetSliderValidateOvertimeValue = () =>
             document.getElementById('SliderValidateOvertime').checked == true;
 
@@ -147,13 +158,13 @@
             document.getElementById('SliderWorkingHoursPerDay').checked == true;
 
         const GetStartOn = () =>
-             new DateService()
+            new DateService()
                 .ConvertFrom.String.DDMMYYYY_HHMM(
                     document.getElementById('SearchRangeInput').value.split('/-/')[0])
                 .To.Api()
 
-        const GetEndOn = () => 
-             new DateService()
+        const GetEndOn = () =>
+            new DateService()
                 .ConvertFrom.String.DDMMYYYY_HHMM(
                     document.getElementById('SearchRangeInput').value.split('/-/')[1])
                 .To.Api()
@@ -181,8 +192,6 @@
             off: ''
         });
 
-        $('.filterSlider').change(e =>
-            $('#TimeShiftSuggestionsDatatable').DataTable().ajax.reload());
 
         $(() => {
             $('#WorkPlace_Select2').select2({
@@ -195,8 +204,7 @@
                         page: params.page || 1
                     })
                 }
-            }).on('change', () =>
-                $('#TimeShiftSuggestionsDatatable').DataTable().ajax.reload());
+            });
 
             $('#SearchRangeInput').calentim({
                 showTimePickers: false,
@@ -207,9 +215,6 @@
                 format: "DD/MM/YYYY",
                 dateSeparator: '/-/',
                 locale: "el",
-                onafterselect: () => {
-                    $('#TimeShiftSuggestionsDatatable').DataTable().ajax.reload();
-                },
                 onaftershow: () =>
                     //Fix Calentim width
                     [...document.getElementsByClassName('calentim-input')]
@@ -218,85 +223,47 @@
             });
 
 
-            //AppendNewDataTableHTML();
-            $(new DataTableService('#TimeShiftSuggestionsDatatable')
-                .ForApiController('projections')
-                .AddColumn(true, true, "LastName")
-                .AddColumn(true, true, "FirstName")
-                .AddColumn(true, true, "ErpCode")
-                .AddColumn(true, true, "WorkHour")
-                .AddColumn(true, true, "Error")
-                .FixedLeftColums(2)
-                .AjaxData((data, type, row, meta) => {
-                    data.predicate = 'ProjectionTimeShiftSuggestions';
-                    if (GetSelectedWorkPlaceId() != '')
-                        data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
-                    data.filterByValidateOvertime = GetSliderValidateOvertimeValue();
-                    data.filterByValidateDayOfDaysPerWeek = GetSliderSliderValidateDayOfDaysPerWeekValue();
-                    data.filterByValidateWorkDaysPerWeek = GetSliderValidateWorkDaysPerWeekValue();
-                    data.filterByValidateHoursPerWeek = GetSliderValidateHoursPerWeekValue();
-                    data.filterByValidateWorkingHoursPerDay = GetSliderWorkingHoursPerDayValue();
-                    if (GetStartOn() != "Invalid Date") {
+            const DestroyDataTable = () => $('#TimeShiftSuggestionsDatatable')
+                .DataTable().destroy();
 
-                        data.startOn = GetStartOn();
-                        data.endOn = GetEndOn();
-                    }
-                    return JSON.stringify(data);
-                })
-                .CompleteDataTable());
+            $('#DataTableSearch').on('click', () => {
+                if (!$.fn.dataTable.isDataTable("#TimeShiftSuggestionsDatatable"))
+                    CreateDataTable();
+
+                $('#TimeShiftSuggestionsDatatable').DataTable().ajax.reload();
+            });
+
+            var CreateDataTable = () =>
+                new DataTableService('#TimeShiftSuggestionsDatatable')
+                    .ForApiController('projections')
+                    .AddColumn(true, true, "LastName")
+                    .AddColumn(true, true, "FirstName")
+                    .AddColumn(true, true, "VatNumber")
+                    .AddColumn(true, true, "WorkHour")
+                    .AddColumn(true, true, "Error")
+                    .FixedLeftColums(2)
+                    .AjaxData((data, type, row, meta) => {
+                        data.predicate = 'ProjectionTimeShiftSuggestions';
+                        if (GetSeSearchOffsetMax() != '')
+                            data.filterByOffsetMax = GetSeSearchOffsetMax();
+                        if (GetSeSearchOffsetMin() != '')
+                            data.filterByOffsetMin = GetSeSearchOffsetMin();
+                        if (GetSelectedWorkPlaceId() != '')
+                            data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
+                        data.filterByValidateOvertime = GetSliderValidateOvertimeValue();
+                        data.filterByValidateDayOfDaysPerWeek = GetSliderSliderValidateDayOfDaysPerWeekValue();
+                        data.filterByValidateWorkDaysPerWeek = GetSliderValidateWorkDaysPerWeekValue();
+                        data.filterByValidateHoursPerWeek = GetSliderValidateHoursPerWeekValue();
+                        data.filterByValidateWorkingHoursPerDay = GetSliderWorkingHoursPerDayValue();
+                        if (GetStartOn() != "Invalid Date") {
+
+                            data.startOn = GetStartOn();
+                            data.endOn = GetEndOn();
+                        }
+                        return JSON.stringify(data);
+                    })
+                    .CompleteDataTable();
         })
-
-    </script>
-
-
-    <script>
-        //Append HTMLTable
-        const AppendNewDataTableHTML = () =>
-            document.getElementById('DataTableDiv').insertAdjacentHTML('beforeend', '' +
-                '<div class="box-body table-responsive">' +
-                '<table id="TimeShiftSuggestionsDatatable" class="table table-bordered table-hover table-responsive stripe">' +
-                '<thead>' +
-                '<tr>' +
-                '<th>Επίθετο</th>' +
-                '<th>Όνομα</th>' +
-                '<th>Erp Code</th>' +
-                GetDaysColumns() +
-                '</tr>' +
-                '</thead>' +
-                '<tfoot>' +
-                '<tr>' +
-                '<th>Επίθετο</th>' +
-                '<th>Όνομα</th>' +
-                '<th>Erp Code</th>' +
-                GetDaysColumns() +
-                '</tr>' +
-                '</tfoot>' +
-                '</table>' +
-                '</div>' +
-                '');
-
-        const GetDaysDifferenceFromRange = () =>
-            Math.ceil(Math.abs(GetEndOn() - GetStartOn()) / (1000 * 60 * 60 * 24))
-
-        const GetDaysColumns = () => {
-            var thElements = '';
-            for (var i = 0; i < GetDaysDifferenceFromRange(); i++) {
-                var colDate = GetStartOn();
-                colDate.setDate(colDate.getDate() + i);
-                thElements = thElements + CreateThElement(colDate);
-            }
-            return thElements;
-        };
-
-        const CreateThElement = date =>
-            '<th style="white-space: nowrap;">' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("MMM") +
-            ' ' +
-            date.getDate() +
-            ' ' +
-            moment(date, 'YYYY/MM/DD HH:mm:ss').lang("el").format("dddd") +
-            '</th>';
-
 
     </script>
 }

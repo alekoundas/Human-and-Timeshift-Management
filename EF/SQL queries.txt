@@ -10,8 +10,8 @@ where t.Month=1 and MONTH(r.StartOn)=2
 DECLARE @TIMESHIFT_ID  INT,
 		@MONTH INT
 
-SET @MONTH = 7
-SET @TIMESHIFT_ID= 1240
+SET @MONTH = 7 -- The month of later month (ex. 2)
+SET @TIMESHIFT_ID= 1240 -- Thhe  problematic id from above
 
 
 

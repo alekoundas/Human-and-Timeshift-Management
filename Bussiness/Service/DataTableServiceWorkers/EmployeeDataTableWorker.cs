@@ -118,8 +118,22 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.Specialization));
             includes.Add(x => x.Include(y => y.Company));
 
+            //var entities = await _baseDatawork.Employees
+            //  .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
             var entities = await _baseDatawork.Employees
-                .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
+                .GetWithFilterQueryable(SetOrderBy(), _filter, includes, _pageSize, _pageIndex)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.FirstName,
+                    x.LastName,
+                    x.ErpCode,
+                    x.VatNumber,
+                    x.IsActive,
+                    SpecializationName = x.Specialization.Name,
+                    CompanyTitle = x.Company.Title
+                })
+                .ToListAsync();
 
             //Mapping
             var expandoService = new ExpandoService();
@@ -137,13 +151,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 dictionary.Add("ErpCode", result.ErpCode);
                 dictionary.Add("VatNumber", result.VatNumber);
                 dictionary.Add("IsActive", result.IsActive);
-                dictionary.Add("SpecializationName", result.Specialization?.Name);
+                dictionary.Add("SpecializationName", result.SpecializationName);
 
-                if (result.Company != null)
-                {
-                    result.Company.Employees = null;
-                    dictionary.Add("CompanyTitle", result.Company.Title);
-                }
+                //if (result.Company != null)
+                //{
+                //    result.Company.Employees = null;
+                //    dictionary.Add("CompanyTitle", result.CompanyTitle);
+                //}
 
                 dictionary.Add("Buttons", dataTableHelper
                     .GetButtons("Employee", "Employees", result.Id.ToString()));
@@ -453,9 +467,11 @@ namespace Bussiness.Service.DataTableServiceWorkers
             includes.Add(x => x.Include(y => y.RealWorkHours));
             includes.Add(x => x.Include(y => y.Leaves));
 
+            //if (_datatable.GenericId != 0)
+            //    _filter = _filter.And(x => (x.EmployeeWorkPlaces
+            //        .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == _datatable.GenericId))));
             if (_datatable.GenericId != 0)
-                _filter = _filter.And(x => (x.EmployeeWorkPlaces
-                    .Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == _datatable.GenericId))));
+                _filter = _filter.And(x => x.RealWorkHours.Any(y => y.TimeShiftId == _datatable.GenericId) || x.EmployeeWorkPlaces.Any(y => y.WorkPlace.TimeShifts.Any(z => z.Id == _datatable.GenericId)));
 
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);

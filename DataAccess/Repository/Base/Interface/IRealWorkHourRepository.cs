@@ -15,7 +15,6 @@ namespace DataAccess.Repository.Base.Interface
         bool IsDateOvertime(ApiRealWorkHoursHasOvertimeRange workHour, int employeeId);
         bool AreDatesOverlaping(DateTime startOn, DateTime endOn, int employeeId);
         bool AreDatesOverlapingLeaves(DateTime startOn, DateTime endOn, int employeeId);
-        bool AreDatesOverlapingDayOff(DateTime startOn, DateTime endOn, bool isDayOff, int employeeId);
         double GetEmployeeTotalSecondsForDay(int employeeId, DateTime compareDate);
         double GetEmployeeTotalSecondsForNight(int employeeId, DateTime compareDate);
         Task<List<RealWorkHour>> GetCurrentAssignedOnCell(DateTime compareDate, int employeeId);

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace DataAccess
 {
@@ -19,6 +21,18 @@ namespace DataAccess
         {
             get => new HttpContextAccessor().HttpContext.User.Claims
                 .FirstOrDefault(x => x.Type == "UserID")?.Value;
+        }
+
+
+
+        public static List<Claim> GetLoggeInUser_Claims()
+        {
+            return new HttpContextAccessor().HttpContext.User.Claims.ToList();
+        }
+
+        public static List<ClaimsIdentity> GetLoggeInUser_Identities()
+        {
+            return new HttpContextAccessor().HttpContext.User.Identities.ToList();
         }
     }
 }

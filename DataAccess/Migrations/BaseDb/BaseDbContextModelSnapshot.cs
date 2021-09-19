@@ -182,8 +182,8 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<decimal>("GrossSalaryPerHour")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("HoursPerDay")
-                        .HasColumnType("int");
+                    b.Property<decimal>("HoursPerDay")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("HoursPerWeek")
                         .HasColumnType("int");

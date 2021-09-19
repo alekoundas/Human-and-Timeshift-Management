@@ -11,6 +11,7 @@ namespace DataAccess.Repository.Interface
     {
         //Excell reflection call
         Task<List<TEntity>> GetAllAsync();
+        IQueryable<TEntity> Query { get; }
         Task<TEntity> FindAsync(int id);
         Task<int> CountAllAsync();
         Task<int> CountAllAsyncFiltered(Expression<Func<TEntity, bool>> filter);

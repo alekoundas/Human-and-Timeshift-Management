@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Audit;
+﻿using DataAccess.Configurations;
+using DataAccess.Models.Audit;
 using DataAccess.Models.Entity;
 using DataAccess.Repository.Base;
 using DataAccess.Repository.Base.Interface;
@@ -133,6 +134,11 @@ namespace DataAccess
                 );
 
             return response;
+        }
+
+        public void Dispose()
+        {
+            _dbcontext.Dispose();
         }
     }
 }

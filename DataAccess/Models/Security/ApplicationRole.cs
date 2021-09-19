@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace DataAccess.Models.Security
 {
@@ -9,5 +10,8 @@ namespace DataAccess.Models.Security
         public string WorkPlaceName { get; set; }
         public string WorkPlaceId { get; set; }
         public string GreekName { get; set; }
+
+        public ICollection<ApplicationUserRole> UserRoles { get; set; }
+
     }
 }

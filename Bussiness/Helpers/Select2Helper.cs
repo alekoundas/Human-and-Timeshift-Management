@@ -143,6 +143,37 @@ namespace Bussiness.Helpers
             return new Select2Response() { Results = results, Pagination = pegination };
         }
 
+        public Select2Response CreateWorkplacesResponse(IEnumerable<LogType> workplaces, bool hasMore)
+        {
+            var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
+            foreach (var result in workplaces)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.Title
+                });
+
+            pegination.More = hasMore;
+            return new Select2Response() { Results = results, Pagination = pegination };
+        }
+        public Select2Response CreateWorkplacesResponse(IEnumerable<LogEntity> workplaces, bool hasMore)
+        {
+            var results = new List<Select2Result>();
+            var pegination = new Select2Pagination();
+
+            foreach (var result in workplaces)
+                results.Add(new Select2Result()
+                {
+                    id = result.Id,
+                    Text = result.Title
+                });
+
+            pegination.More = hasMore;
+            return new Select2Response() { Results = results, Pagination = pegination };
+        }
+
         public Select2Response CreateEmployeesResponse(IEnumerable<Employee> workplaces, bool hasMore)
         {
             var results = new List<Select2Result>();

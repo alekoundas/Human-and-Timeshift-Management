@@ -1,4 +1,5 @@
 ﻿using Business.Seed;
+using Bussiness.Seed;
 using Bussiness.SignalR;
 using Bussiness.SignalR.Hubs;
 using DataAccess;
@@ -6,9 +7,11 @@ using DataAccess.Models.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,17 +37,30 @@ namespace WebApplication
         public void ConfigureServices(IServiceCollection services)
         {
 
-
             services.AddDbContext<BaseDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDbContext<SecurityDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+
+
+
+
             //Seed Base Data
             //var context = services.BuildServiceProvider()
             //           .GetService<BaseDbContext>();
             //InitializeBaseData.SeedData(context);
+
+            //Seed Log Tables
+           var context = services.BuildServiceProvider()
+                      .GetService<SecurityDbContext>();
+            InitializeIdentityData.SeedLogTables(context);
+
+
+
+
+
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -93,6 +109,16 @@ namespace WebApplication
                         ReferenceLoopHandling.Ignore)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
+            // currently all set to max, configure it to your needs!
+            services.Configure<FormOptions>(o => 
+            {
+                o.ValueLengthLimit = int.MaxValue;
+                o.MultipartBodyLengthLimit = long.MaxValue; 
+                o.MultipartBoundaryLengthLimit = int.MaxValue;
+                o.MultipartHeadersCountLimit = int.MaxValue;
+                o.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+
             services.AddRazorPages();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -134,11 +160,16 @@ namespace WebApplication
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            //app.Run(async context =>
+            //{
+            //    context.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize = 100_000_000;
+            //});
+                app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
 
-            InitializeIdentityData.SeedData(userManager, roleManager);
+
+            InitializeIdentityData.SeedUsersAndRoles(userManager, roleManager);
 
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

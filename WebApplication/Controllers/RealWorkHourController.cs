@@ -21,11 +21,13 @@ namespace WebApplication.Controllers
         private readonly BaseDbContext _context;
         private BaseDatawork _baseDataWork;
         private SecurityDataWork _securityDataWork;
+        private LogService _logService;
         public RealWorkHourController(BaseDbContext baseDbContext, SecurityDbContext securityDbContext)
         {
             _context = baseDbContext;
             _baseDataWork = new BaseDatawork(baseDbContext);
             _securityDataWork = new SecurityDataWork(securityDbContext);
+            _logService = new LogService(securityDbContext);
         }
 
 
@@ -33,11 +35,12 @@ namespace WebApplication.Controllers
         [Authorize(Roles = "RealWorkHour_View")]
         public async Task<IActionResult> Index()
         {
-            var baseDbContext = _context.RealWorkHours.Include(r => r.Employee).Include(r => r.TimeShift);
+            //var baseDbContext = _context.RealWorkHours.Include(r => r.Employee).Include(r => r.TimeShift);
             ViewData["Title"] = "Σύνολο πραγματικών βαρδιών";
             ViewData["Filter"] = "Φίλτρα αναζήτησης";
 
-            return View(await baseDbContext.ToListAsync());
+            //return View(await baseDbContext.ToListAsync());
+            return View();
         }
 
         // GET: RealWorkHours/Details/5
@@ -75,8 +78,8 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RealWorkHourCreate viewModel)
         {
-            //var timeshift = _baseDataWork.TimeShifts.Where(x => x.Id == viewModel.TimeShiftId).FirstOrDefault();
             var changeCount = 0;
+            var logList = new List<RealWorkHour>();
             if (ModelState.IsValid)
             {
                 viewModel.Employees.ForEach(id =>
@@ -85,14 +88,21 @@ namespace WebApplication.Controllers
                     var realWorkHour = RealWorkHourCreate
                         .CreateFrom(viewModel);
 
+                    logList.Add(realWorkHour);
+
                     realWorkHour.EmployeeId = id;
                     _baseDataWork.RealWorkHours.Add(realWorkHour);
+
                 });
                 var state = await _baseDataWork.SaveChangesAsync();
                 if (state > 0)
+                {
+                    logList.ForEach(x => _logService.OnCreateEntity("RealWorkHour", x));
+
                     TempData["StatusMessage"] = "Aποθηκεύτηκαν με επιτυχία " +
                         changeCount +
                         " νέες πραγματικές βάρδιες";
+                }
                 else
                     TempData["StatusMessage"] = "Ωχ! Οι αλλαγές ΔΕΝ αποθηκεύτηκαν.";
 
@@ -292,9 +302,11 @@ namespace WebApplication.Controllers
 
                 if (errors.Count == 0)
                 {
+                    var realworkhourstodelete = _baseDataWork.RealWorkHours
+                        .Where(x => x.TimeShiftId == realWorkHours[0].TimeShiftId).ToList();
+                    _baseDataWork.RealWorkHours.RemoveRange(realworkhourstodelete);
+                    realworkhourstodelete.ForEach(x => _logService.OnDeleteEntity("RealWorkHour", x));
 
-                    _baseDataWork.RealWorkHours.RemoveRange(_baseDataWork.RealWorkHours
-                        .Where(x => x.TimeShiftId == realWorkHours[0].TimeShiftId).ToList());
 
                     var status_delete = await _baseDataWork.SaveChangesAsync();
 
@@ -302,8 +314,12 @@ namespace WebApplication.Controllers
                     var status = await _baseDataWork.SaveChangesAsync();
 
                     if (status > 0)
+                    {
+                        realWorkHours.ForEach(x => _logService.OnCreateEntity("RealWorkHour ", x));
+                        
                         TempData["StatusMessage"] = realWorkHours.Count +
-                    " εγγραφές προστέθηκαν με επιτυχία";
+                            " εγγραφές προστέθηκαν με επιτυχία";
+                    }
                     else
                         TempData["StatusMessage"] = "Ωχ! Δεν έγινε προσθήκη νέων εγγραφών.";
                 }

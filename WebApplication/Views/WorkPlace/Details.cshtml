@@ -1,12 +1,11 @@
 ﻿@model DataAccess.Models.Entity.WorkPlace
-
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
-<div class="row">
-    <div class="col-md-3"> </div>
+<div class="row" style="margin-top:5%;">
+    <div class="col-md-1"> </div>
     <div class="col-md-6">
 
-        <div class="box box-danger" style="margin-top:5%;">
+        <div class="box box-danger">
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
@@ -47,7 +46,20 @@
 
         </div>
     </div>
-    <div class="col-md-3"> </div>
+    <div class="col-md-4">
+
+        <div class="box box-danger">
+            <div class="box-header">
+                <h3 class="box-title"> Αρχιφύλακες πόστου</h3>
+            </div>
+            <hr />
+            <div class="box-body">
+                <div style="width:100%;" id="BoxWorkPlace">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"> </div>
 </div>
 
 <div class="row">
@@ -129,6 +141,16 @@
                     off: 'Όχι'
                 }))
             .CompleteDataTable());
+
+             //Append existing ApplicationUsers
+         var UserIds= @Html.Raw(Json.Serialize(@ViewData["UserIds"]))
+         $(() =>
+             new AppendListService('BoxWorkPlace')
+                 .Init()
+                 .ForApiController('users')
+                 .SetEditState(false)
+                 .AppendExistingIds([...UserIds])
+                 .Complete())
 
         const GetSliderFilterValue = () =>
             document.getElementById('SliderFilter').checked != true;

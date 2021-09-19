@@ -136,23 +136,27 @@ namespace WebApplication.Api.Security
         [HttpPost("select2")]
         public async Task<ActionResult<ApplicationUser>> Select2([FromBody] Select2 select2)
         {
-
-            var customers = new List<ApplicationUser>();
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<ApplicationUser>();
             filter = filter.And(x => true);
 
+            if (select2.FromEntityIdString?.Length > 0)
+                filter = filter.And(x => x.Id == select2.FromEntityIdString);
+
+            if (select2.ExistingIdsString?.Count > 0)
+                foreach (var id in select2.ExistingIdsString)
+                    filter = filter.And(x => x.Id != id);
 
             if (!string.IsNullOrWhiteSpace(select2.Search))
                 filter = filter.And(x => x.FirstName.Contains(select2.Search) || x.LastName.Contains(select2.Search));
 
-            customers = await _securityDatawork.ApplicationUsers
+            var entities = await _securityDatawork.ApplicationUsers
                 .GetPaggingWithFilter(null, filter, null, 10, select2.Page);
 
             var total = await _securityDatawork.ApplicationUsers.CountAllAsyncFiltered(filter);
             var hasMore = (select2.Page * 10) < total;
 
-            return Ok(select2Helper.CreateUsersResponse(customers, hasMore));
+            return Ok(select2Helper.CreateUsersResponse(entities, hasMore));
         }
 
     }

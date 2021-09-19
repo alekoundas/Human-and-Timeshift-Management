@@ -248,6 +248,30 @@
                          @Html.LinkButton("ContractMembership", "Create", "Προσθήκη ιδιότητας σύμβασης", "ContractMembership_Create")
                      </ul>
                  </li>
+                  <li class="treeview ">
+                        <a href="#">
+                            <i class="fa fa-database"></i> <span>Τύπος Log</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            @Html.LinkButton("LogType", "Index", "Είδη Log", "LogType_View")
+                            @Html.LinkButton("LogType", "Create", "Προσθήκη είδους Log", "LogType_Create")
+                        </ul>
+                  </li>
+                   <li class="treeview ">
+                      <a href="#">
+                          <i class="fa fa-database"></i> <span>Log οντότητας</span>
+                          <span class="pull-right-container">
+                              <i class="fa fa-angle-left pull-right"></i>
+                          </span>
+                      </a>
+                      <ul class="treeview-menu">
+                          @Html.LinkButton("LogEntity", "Index", "Log οντότητες", "LogEntity_View")
+                          @Html.LinkButton("LogEntity", "Create", "Προσθήκη Log οντότητας", "LogEntity_Create")
+                      </ul>
+                  </li>
              }
 
 
@@ -306,6 +330,10 @@
                      </ul>
                  </li>
              }
+
+            <li class="treeview-menu">
+                @Html.LinkButton("Log", "Index", "Log εφαρμογής", "Log_View")
+            </li>
             
             @* Register *@
             <!-- Register -->

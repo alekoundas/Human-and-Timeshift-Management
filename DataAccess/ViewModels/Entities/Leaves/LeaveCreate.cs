@@ -37,7 +37,7 @@ namespace DataAccess.ViewModels
                 results.Add(new Leave()
                 {
                     StartOn = viewModel.StartOn,
-                    EndOn = viewModel.EndOn,
+                    EndOn = viewModel.EndOn.AddDays(1).AddSeconds(-1),
                     Description = viewModel.Description,
                     ApprovedBy = viewModel.ApprovedBy,
                     LeaveTypeId = viewModel.LeaveTypeId,

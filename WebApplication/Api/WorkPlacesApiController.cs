@@ -140,6 +140,10 @@ namespace WebApplication.Api
             if (select2.FromEntityId != 0)
                 filter = filter.And(x => x.Id == select2.FromEntityId);
 
+            if (select2.ExistingIds?.Count > 0)
+                foreach (var workPlaceId in select2.ExistingIds)
+                    filter = filter.And(x => x.Id != workPlaceId);
+
             if (!string.IsNullOrWhiteSpace(select2.Search))
                 filter = filter.And(x => x.Title.Contains(select2.Search));
 

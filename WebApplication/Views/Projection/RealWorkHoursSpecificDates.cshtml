@@ -37,6 +37,11 @@
 
 
             </div>
+
+            <div class="box-footer" style="text-align:center;">
+                <button id="DataTableSearch" class="btn btn-primary"><i class="fa fa-search"></i> Αναζήτηση</button>
+            </div>
+
         </div>
     </div>
     <div class="col-md-3"> </div>
@@ -139,8 +144,7 @@
                     return query;
                 }
             }
-        }).on('change', () =>
-            $('#RealWorkHoursSpecificDatesDatatable').DataTable().ajax.reload());
+        });
 
         const InitiateCalentim = num =>
             $('#CalnentimNum_' + num).calentim({
@@ -154,12 +158,6 @@
                 format: "DD/MM/YYYY",
                 dateSeparator: '/-/',
                 locale: "el",
-                onafterselect: () => {
-                    DestroyDataTable();
-                    DeleteDataTableHTML();
-                    AppendNewDataTableHTML();
-                    CreateDataTable();
-                },
                 onaftershow: () =>
                     //Fix Calentim width
                     [...document.getElementsByClassName('calentim-input')]
@@ -167,6 +165,16 @@
                             calentim.setAttribute('style', 'width: 400px;'))
             });
 
+
+        $('#DataTableSearch').on('click', () => {
+
+            DeleteDataTableHTML();
+            AppendNewDataTableHTML();
+            if (!$.fn.dataTable.isDataTable("#RealWorkHoursSpecificDatesDatatable"))
+                CreateDataTable();
+
+            $('#RealWorkHoursSpecificDatesDatatable').DataTable().ajax.reload();
+        });
 
         var CreateDataTable = () =>
             new DataTableService('#RealWorkHoursSpecificDatesDatatable')
@@ -234,6 +242,5 @@
                 '');
 
         $(document).ready(AppendNewDataTableHTML());
-        $(document).ready(CreateDataTable());
     </script>
 }

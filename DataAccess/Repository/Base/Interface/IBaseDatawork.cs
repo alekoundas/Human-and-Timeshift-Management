@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DataAccess.Repository.Interface
 {
-    public interface IBaseDatawork
+    public interface IBaseDatawork :IDisposable
     {
         Task<int> SaveChangesAsync();
         void Update<TEntity>(TEntity model);

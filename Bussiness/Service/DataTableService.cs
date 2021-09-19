@@ -81,6 +81,15 @@ namespace Bussiness.Service
                     case "LeaveType":
                         _currentWorker = new LeaveTypeDataTableWorker(_datatable, _baseDatawork, _httpContext);
                         break;
+                    case "LogType":
+                        _currentWorker = new LogTypeDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
+                    case "Log":
+                        _currentWorker = new LogDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
+                    case "LogEntity":
+                        _currentWorker = new LogEntityDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
                     case "Specialization":
                         _currentWorker = new SpecializationDataTableWorker(_datatable, _baseDatawork, _httpContext);
                         break;
