@@ -4,14 +4,16 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    partial class BaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210929202018_AmendmentTable")]
+    partial class AmendmentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,9 +84,6 @@ namespace DataAccess.Migrations.BaseDb
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("NewEndOn")
                         .HasColumnType("datetime2");
 
@@ -98,8 +97,6 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("Id");
 
@@ -867,12 +864,6 @@ namespace DataAccess.Migrations.BaseDb
 
             modelBuilder.Entity("DataAccess.Models.Entity.Amendment", b =>
                 {
-                    b.HasOne("DataAccess.Models.Entity.Employee", "Employee")
-                        .WithMany("Amendments")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DataAccess.Models.Entity.RealWorkHour", "RealWorkHour")
                         .WithMany()
                         .HasForeignKey("RealWorkHourId");
@@ -882,8 +873,6 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("TimeShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Employee");
 
                     b.Navigation("RealWorkHour");
 
@@ -1116,8 +1105,6 @@ namespace DataAccess.Migrations.BaseDb
 
             modelBuilder.Entity("DataAccess.Models.Entity.Employee", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("Contacts");
 
                     b.Navigation("EmployeeWorkPlaces");

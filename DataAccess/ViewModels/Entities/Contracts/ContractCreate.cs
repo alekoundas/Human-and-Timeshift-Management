@@ -11,10 +11,10 @@ namespace DataAccess.ViewModels
         [Required]
         [ContractValidateUnique]
         [Display(Name = "Τίτλος")]
-        public string Title { get; set; }
+        public virtual string Title { get; set; }
 
         [Display(Name = "Ώρες ανα εβδομάδα")]
-        public int HoursPerWeek { get; set; }
+        public decimal HoursPerWeek { get; set; }
 
         [Display(Name = "Ώρες ανα ημέρα")]
         public decimal HoursPerDay { get; set; }
@@ -36,11 +36,11 @@ namespace DataAccess.ViewModels
         [Display(Name = "Τύπος σύμβασης")]
         public int ContractTypeId { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
+
         [Display(Name = "Καθαρός μισθός ανα ώρα")]
         public decimal GrossSalaryPerHour { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
+        
         [Display(Name = "Μικτός μισθός ανα ώρα")]
         public decimal NetSalaryPerHour { get; set; }
 
@@ -52,6 +52,7 @@ namespace DataAccess.ViewModels
                 Title = viewModel.Title,
                 HoursPerWeek = viewModel.HoursPerWeek,
                 HoursPerDay = viewModel.HoursPerDay,
+                WorkingDaysPerWeek = viewModel.WorkingDaysPerWeek,
                 DayOfDaysPerWeek = viewModel.DayOfDaysPerWeek,
                 Description = viewModel.Description,
                 GrossSalaryPerHour = viewModel.GrossSalaryPerHour,

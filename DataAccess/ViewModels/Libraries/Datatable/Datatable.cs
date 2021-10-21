@@ -149,14 +149,12 @@ namespace DataAccess.Libraries.Datatable
         [JsonProperty(PropertyName = "filterByValidateWorkingHoursPerDay")]
         public bool FilterByValidateWorkingHoursPerDay { get; set; }
 
-        [JsonProperty(PropertyName = "filterByConsecutiveDayOffCount")]
-        public int FilterByConsecutiveDayOffCount { get; set; }
 
-        [JsonProperty(PropertyName = "filterByOffsetMax")]
-        public int? FilterByOffsetMax { get; set; }
 
-        [JsonProperty(PropertyName = "filterByOffsetMin")]
-        public int? FilterByOffsetMin { get; set; }
+        [JsonProperty(PropertyName = "filterByConsecutiveDayOff_Max")]
+        public int? FilterByConsecutiveDayOff_Max { get; set; }
 
+        [JsonProperty(PropertyName = "filterByConsecutiveDayOff_Min")]
+        public int? FilterByConsecutiveDayOff_Min { get; set; }
     }
 }

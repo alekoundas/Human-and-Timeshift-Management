@@ -211,6 +211,8 @@
                 else
                     return start + ' - ' + end;
             }
+            const ConvertForTimeSpan = (startTs, endTs) =>
+                moment(parseInt(startTs)).format('HH:mm') + ' - ' + moment(parseInt(endTs)).format('HH:mm');
 
             const SetTimeStampTimeToMax = timeStamp =>
                 new Date(parseInt(timeStamp)).setHours(23, 59, 59).valueOf();
@@ -218,8 +220,6 @@
             const SetTimeStampTimeToMin = timeStamp =>
                 new Date(parseInt(timeStamp)).setHours(00, 00, 00).valueOf();
 
-            const ConvertForTimeSpan = (startTs, endTs) =>
-                moment(parseInt(startTs)).format('HH:mm') + ' - ' + moment(parseInt(endTs)).format('HH:mm');
 
             const ConvertFromApiToTimestamp = date =>
                 moment(date, 'YYYY/MM/DD HH:mm:ss').valueOf()

@@ -3,7 +3,7 @@ using DataAccess.Repository.Interface;
 
 namespace DataAccess.Repository.Base.Interface
 {
-    public interface ICompanyRepository : IBaseRepository<Company>
+    public interface IAmendmentRepository : IBaseRepository<Amendment>
     {
     }
 }

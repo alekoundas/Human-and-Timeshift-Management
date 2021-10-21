@@ -93,6 +93,14 @@ namespace WebApplication.Controllers
             return View();
         }
 
+        [Authorize(Roles = "ProjectionErganiSuggestions_View")]
+        public IActionResult ErganiSuggestions()
+        {
+            ViewData["Title"] = "Υποδείξεις Εργάνη";
+            ViewData["Filter"] = "Προαιρετικά φίλτρα αναζήτησης";
+            return View();
+        }
+
         [Authorize(Roles = "ProjectionHoursWithComments_View")]
         public IActionResult HoursWithComments()
         {

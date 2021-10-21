@@ -17,6 +17,9 @@ namespace DataAccess.Models.Entity
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
 
+        public int? AmendmentId { get; set; }
+        public Amendment Amendment { get; set; }
+
         public string Comments { get; set; }
     }
 }

@@ -132,7 +132,7 @@ namespace WebApplication.Api
             var select2Helper = new Select2Helper();
             var filter = PredicateBuilder.New<WorkPlace>();
             filter = filter.And(x => true);
-            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<Customer>(HttpContext);
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<WorkPlace>(HttpContext);
 
             if (!canShowDeactivated)
                 filter = filter.And(x => x.IsActive == true);

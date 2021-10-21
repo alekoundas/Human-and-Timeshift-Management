@@ -4,14 +4,16 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataAccess.Migrations.BaseDb
 {
     [DbContext(typeof(BaseDbContext))]
-    partial class BaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210921170850_AddContractDecimal")]
+    partial class AddContractDecimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,54 +62,6 @@ namespace DataAccess.Migrations.BaseDb
                     b.HasKey("Id");
 
                     b.ToTable("AuditAutoHistory");
-                });
-
-            modelBuilder.Entity("DataAccess.Models.Entity.Amendment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Comments")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy_FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy_Id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("NewEndOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("NewStartOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("RealWorkHourId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TimeShiftId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("RealWorkHourId");
-
-                    b.HasIndex("TimeShiftId");
-
-                    b.ToTable("Amendments");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Entity.Company", b =>
@@ -621,9 +575,6 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AmendmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
 
@@ -653,8 +604,6 @@ namespace DataAccess.Migrations.BaseDb
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AmendmentId");
 
                     b.HasIndex("EmployeeId");
 
@@ -865,31 +814,6 @@ namespace DataAccess.Migrations.BaseDb
                     b.ToTable("WorkPlaceHourRestrictions");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Entity.Amendment", b =>
-                {
-                    b.HasOne("DataAccess.Models.Entity.Employee", "Employee")
-                        .WithMany("Amendments")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataAccess.Models.Entity.RealWorkHour", "RealWorkHour")
-                        .WithMany()
-                        .HasForeignKey("RealWorkHourId");
-
-                    b.HasOne("DataAccess.Models.Entity.TimeShift", "TimeShift")
-                        .WithMany("Amendments")
-                        .HasForeignKey("TimeShiftId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("RealWorkHour");
-
-                    b.Navigation("TimeShift");
-                });
-
             modelBuilder.Entity("DataAccess.Models.Entity.Contact", b =>
                 {
                     b.HasOne("DataAccess.Models.Entity.Customer", "Customer")
@@ -1011,10 +935,6 @@ namespace DataAccess.Migrations.BaseDb
 
             modelBuilder.Entity("DataAccess.Models.Entity.RealWorkHour", b =>
                 {
-                    b.HasOne("DataAccess.Models.Entity.Amendment", "Amendment")
-                        .WithMany()
-                        .HasForeignKey("AmendmentId");
-
                     b.HasOne("DataAccess.Models.Entity.Employee", "Employee")
                         .WithMany("RealWorkHours")
                         .HasForeignKey("EmployeeId")
@@ -1026,8 +946,6 @@ namespace DataAccess.Migrations.BaseDb
                         .HasForeignKey("TimeShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Amendment");
 
                     b.Navigation("Employee");
 
@@ -1116,8 +1034,6 @@ namespace DataAccess.Migrations.BaseDb
 
             modelBuilder.Entity("DataAccess.Models.Entity.Employee", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("Contacts");
 
                     b.Navigation("EmployeeWorkPlaces");
@@ -1141,8 +1057,6 @@ namespace DataAccess.Migrations.BaseDb
 
             modelBuilder.Entity("DataAccess.Models.Entity.TimeShift", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("RealWorkHours");
 
                     b.Navigation("WorkHours");

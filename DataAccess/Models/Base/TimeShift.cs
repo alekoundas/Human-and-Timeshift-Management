@@ -25,8 +25,8 @@ namespace DataAccess.Models.Entity
         public int WorkPlaceId { get; set; }
         public WorkPlace WorkPlace { get; set; }
 
+        public ICollection<Amendment> Amendments { get; set; }
         public ICollection<WorkHour> WorkHours { get; set; }
-
         public ICollection<RealWorkHour> RealWorkHours { get; set; }
 
 

@@ -143,6 +143,32 @@ namespace WebApplication.Controllers
             return View(timeShift);
         }
 
+
+        // GET: TimeShifts/Amendment
+        [Authorize(Roles = "TimeShiftAmendment_View")]
+        public async Task<IActionResult> Amendment()
+        {
+            ViewData["Title"] = "Προβολή χρονοδιαγράμματος προς τροποποίηση";
+            ViewData["DataTable"] = "Σύνολο υπαλλήλων πόστου";
+
+            return View();
+        }
+
+        // GET: TimeShifts/AmendmentApprove
+        [Authorize(Roles = "TimeShiftAmendmentApprove_View")]
+        public async Task<IActionResult> AmendmentApprove()
+        {
+            ViewData["Title"] = "Προβολή τροποποιήσεων";
+            ViewData["DataTable"] = "Σύνολο υπαλλήλων πόστου";
+
+            return View();
+        }
+
+       
+
+
+
+
         [HttpGet]
         public async Task<ActionResult> DownloadExcelTemplate()
         {

@@ -61,7 +61,7 @@ namespace Bussiness.Helpers
             return stringToReturn;
         }
 
-        public string GetButtonForRoles(string controller, string permition, string userId, List<ApplicationRole> userRoles, List<ApplicationRole> applicationRoles)
+        public string GetButtonForRoles(string controller, string permition, string userId, List<ApplicationRole> applicationRoles)
         {
             var stringToReturn = "";
             var isDisabled = true;
@@ -74,11 +74,13 @@ namespace Bussiness.Helpers
             if (currentUserRoles.Contains("User_Edit"))
                 isDisabled = false;
 
+            //Get role id
             var roleId = applicationRoles.FirstOrDefault(x =>
                 x.Controller == controller && x.Permition == permition)?.Id;
 
-            //2.Check if user from id has specific role
-            var isChecked = userRoles
+            //2.Check if user  has specific role
+            var isChecked = applicationRoles
+                .Where(x => x.UserRoles.Any(y => y.User.Id == userId))
                 .Any(x => x.Controller == controller && x.Permition == permition);
 
             if (roleId != null)
@@ -163,7 +165,7 @@ namespace Bussiness.Helpers
             var cellLeaves = employee.Leaves.Where(x =>
                    x.StartOn.Year == datatable.TimeShiftYear &&
                    x.StartOn.Month == datatable.TimeShiftMonth &&
-                   x.StartOn.Day <= dayOfMonth)
+                   x.StartOn.Day <= dayOfMonth && dayOfMonth <= x.EndOn.Day)
                 .ToList();
 
             var strToReturn = "<div style='width:110px; display:block;'>";
@@ -387,6 +389,78 @@ namespace Bussiness.Helpers
                 }
                 return strToReturn;
             }
+        }
+
+        public string GetAmendmentCellBodyWorkHours(int compareDay, Employee employee)
+        {
+            var cellRealWorkHours = employee.RealWorkHours
+                .Where(x => x.StartOn.Day == compareDay)
+                .ToList();
+
+            var cellAmendments = employee.Amendments
+                .Where(x => x.NewStartOn.Day == compareDay)
+                .Where(x => x.RealWorkHourId == null)
+                .ToList();
+
+            var strToReturn = $"<div style='width:110px; display:block;' class='DatatableCell' id='Day_{compareDay}_EmployeeId_{employee.Id}' >";
+                
+
+            foreach (var cellWorkHour in cellRealWorkHours)
+            {
+                if (cellWorkHour.AmendmentId == null)
+                {
+                    //start on
+                    strToReturn += "<div style='width:38px;display:block; float: left;'> ";
+                    strToReturn += cellWorkHour.StartOn.ToString("HH:mm");
+                    strToReturn += "</div>";
+
+                    // "-" 
+                    strToReturn += "<div style='width:8px;display:block; float: left;'> - </div>";
+
+                    //End on
+                    strToReturn += "<div style='width:38px; display:block; float: left;'>";
+                    strToReturn += (cellWorkHour.EndOn.HasValue == true) ? cellWorkHour.EndOn.Value.ToString("HH:mm") : "...";
+                    strToReturn += "</div>";
+                }
+                else
+                {
+                    //start on
+                    strToReturn += "<div style='width:38px;display:block; float: left; color:#ff7d00;'> ";
+                    strToReturn += cellWorkHour.Amendment.NewStartOn.ToString("HH:mm");
+                    strToReturn += "</div>";
+
+                    // "-" 
+                    strToReturn += "<div style='width:8px;display:block; float: left; color:#ff7d00;'> - </div>";
+
+                    //End on
+                    strToReturn += "<div style='width:38px; display:block; float: left; color:#ff7d00;'>";
+                    strToReturn += cellWorkHour.Amendment.NewEndOn.ToString("HH:mm");
+                    strToReturn += "</div>";
+
+
+                }
+            }
+            foreach (var cellWorkHour in cellAmendments)
+            {
+                //start on
+                strToReturn += "<div style='width:38px;display:block; float: left; color:#ff7d00;'> ";
+                strToReturn += cellWorkHour.NewStartOn.ToString("HH:mm");
+                strToReturn += "</div>";
+
+                // "-" 
+                strToReturn += "<div style='width:8px;display:block; float: left; color:#ff7d00;'> - </div>";
+
+                //End on
+                strToReturn += "<div style='width:38px; display:block; float: left; color:#ff7d00;'>";
+                strToReturn += cellWorkHour.NewEndOn.ToString("HH:mm");
+                strToReturn += "</div>";
+
+            }
+            strToReturn += "</div>";
+
+
+
+            return strToReturn;
         }
 
         public string GetProjectionRealWorkHoursAnalyticallyCellBody(

@@ -22,6 +22,7 @@ namespace DataAccess
         public DbSet<WorkPlace> WorkPlaces { get; set; }
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<TimeShift> TimeShifts { get; set; }
+        public DbSet<Amendment> Amendments { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<RealWorkHour> RealWorkHours { get; set; }
         public DbSet<Specialization> Specializations { get; set; }
@@ -47,8 +48,9 @@ namespace DataAccess
             builder.ApplyConfiguration(new WorkHourConfiguration());
             builder.ApplyConfiguration(new EmployeeConfiguration());
             builder.ApplyConfiguration(new LeaveTypeConfiguration());
-            builder.ApplyConfiguration(new TimeShiftConfiguration());
             builder.ApplyConfiguration(new WorkPlaceConfiguration());
+            builder.ApplyConfiguration(new TimeShiftConfiguration());
+            builder.ApplyConfiguration(new AmendmentConfiguration());
             builder.ApplyConfiguration(new ContractTypeConfiguration());
             builder.ApplyConfiguration(new RealWorkHourConfiguration());
             builder.ApplyConfiguration(new SpecializationConfiguration());

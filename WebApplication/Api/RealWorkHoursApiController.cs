@@ -210,6 +210,7 @@ namespace WebApplication.Api
             return Ok(response);
         }
 
+
         // POST: api/realworkhours/deletebatch
         [HttpPost("deletebatch")]
         public async Task<ActionResult<RealWorkHour>> DeleteBatch([FromBody] WorkHourApiViewModel workHourViewModel)
@@ -346,8 +347,8 @@ namespace WebApplication.Api
             }
 
             _baseDataWork.RealWorkHours.AddRange(realWorkHoursToSaveRange);
-            if (realWorkHoursToSaveRange.Count>0)
-            _logService.OnCreateEntity("RealWorkHour", realWorkHoursToSaveRange as object);
+            if (realWorkHoursToSaveRange.Count > 0)
+                _logService.OnCreateEntity("RealWorkHour", realWorkHoursToSaveRange as object);
 
 
             await _baseDataWork.SaveChangesAsync();

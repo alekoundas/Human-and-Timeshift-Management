@@ -62,7 +62,7 @@ namespace DataAccess.Models.Entity
 
         [Display(Name = "Πραγμαατικές Βάρδιες")]
         public ICollection<RealWorkHour> RealWorkHours { get; set; }
-
+        public ICollection<Amendment> Amendments { get; set; }
         public ICollection<EmployeeWorkPlace> EmployeeWorkPlaces { get; set; }
         public ICollection<Leave> Leaves { get; set; }
 

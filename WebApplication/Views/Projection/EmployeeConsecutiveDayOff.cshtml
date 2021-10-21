@@ -22,19 +22,27 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="control-label"> Επιλογή μήνα και έτους</label>
-                            <div class="input-group" style="width:100%">
-                                <input type="text" id="MonthFilter" class="form-control" style="width:70%" readonly />
-                                <span class="text-danger"></span>
+                            <label class="control-label">Χρονικό έυρος</label>
+                            <div class="input-group">
+                                <input id="SearchRangeInput" class="form-control" />
                             </div>
                         </div>
                     </div>
 
                     <div style="width:50%; float:left;">
-                        <label class="control-label">Μέρες ρεπού και άνω</label>
-                        <div class="input-group">
-                            <input type="number" min="2" value="2" id="FilterDayOff" class="form-control" />
+                        <div class="form-group">
+
+                            <label class="control-label">Μέρες ρεπού και άνω</label>
+                            <div class="input-group">
+                                <input type="number" min="2" value="2" id="FilterDayOff_Max" class="form-control" />
+                            </div>
                         </div>
+                        @*<div class="form-group">
+                            <label class="control-label">Μέρες ρεπού και άνω</label>
+                            <div class="input-group">
+                                <input type="number" min="2" value="2" id="FilterDayOff_Min" class="form-control" />
+                            </div>
+                        </div>*@
                     </div>
                 </div>
             </div>
@@ -65,7 +73,7 @@
                             <th>ΑΦΜ</th>
                             <th>Πόστο</th>
                             <th>Χρονοδιάγραμμα</th>
-                            <th>Τελευταία ημέρα εργ.</th>
+                            @*<th>Τελευταία ημέρα εργ.</th>*@
                             <th>Συνεχής μέρες</th>
                         </tr>
                     </thead>
@@ -76,7 +84,7 @@
                             <th>ΑΦΜ</th>
                             <th>Πόστο</th>
                             <th>Χρονοδιάγραμμα</th>
-                            <th>Τελευταία ημέρα εργ.</th>
+                            @*<th>Τελευταία ημέρα εργ.</th>*@
                             <th>Συνεχής μέρες</th>
                         </tr>
                     </tfoot>
@@ -90,6 +98,22 @@
     <script src="~/js/jQueryMonthPicker/MonthPicker.js"></script>
 
     <script>
+        const ConvertDateForApi = timeStamp =>
+    CompleteTimeWithZerosForApiPost(new Date(parseInt(timeStamp)));
+        CompleteTimeWithZerosForApiPost = date => {
+            var year = date.getFullYear();
+            var month = String((date.getMonth() + 1)).length == 1 ?
+                '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+            var day = String(date.getDate()).length == 1 ?
+                '0' + date.getDate() : date.getDate();
+            var hour = String(date.getHours()).length == 1 ?
+                '0' + date.getHours() : date.getHours();
+            var min = String(date.getMinutes()).length == 1 ?
+                '0' + date.getMinutes() : date.getMinutes();
+
+            return year + '-' + month + '-' + day + 'T' + hour + ':' + min;
+        }
+
         const GetSelectedTimeshiftId = () =>
             document.getElementById('TimeShift_Select2').value;
 
@@ -99,12 +123,37 @@
         const GetSelectedYear = () =>
             document.getElementById('MonthFilter').value.split('/')[1];
 
-        const GetDayOffChoiceValue = () =>
-            document.getElementById('FilterDayOff').value;
+        const GetFilterDayOff_Max = () =>
+            document.getElementById('FilterDayOff_Max').value;
+
+        const GetFilterDayOff_Min = () =>
+            document.getElementById('FilterDayOff_Min').value;
+
+        const GetStartOn = () => ConvertDateForApi(moment(document.getElementById('SearchRangeInput').value
+            .split('/-/')[0], 'DD/MM/YYYY').valueOf());
+
+        const GetEndOn = () =>
+            ConvertDateForApi(new Date(moment(document.getElementById('SearchRangeInput').value
+                .split('/-/')[1], 'DD/MM/YYYY').valueOf()).setHours(23, 59, 59).valueOf());
 
     </script>
 
     <script>
+
+        $('#SearchRangeInput').calentim({
+            showTimePickers: false,
+            startOnMonday: true,
+            showFooter: false,
+            calendarCount: 1,
+            format: "DD/MM/YYYY",
+            dateSeparator: '/-/',
+            locale: "el",
+            onaftershow: () =>
+                //Fix Calentim width
+                [...document.getElementsByClassName('calentim-input')]
+                    .forEach((calentim) =>
+                        calentim.setAttribute('style', 'width: 400px;'))
+        });
 
         //TimeShift Select2
         $('#TimeShift_Select2').select2({
@@ -119,11 +168,10 @@
             }
         });
 
-        $('#MonthFilter').MonthPicker({
-            Button: () => $('<button type="button" class=" btn btn-primary"><i class="fa fa-calendar"></i></button>').button()
-        });
+
         const DestroyDataTable = () => $('#EmployeeConsecutiveDayOff')
             .DataTable().destroy();
+
         $('#DataTableSearch').on('click', () => {
             if (!$.fn.dataTable.isDataTable("#EmployeeConsecutiveDayOff"))
                 CreateDataTable();
@@ -139,21 +187,21 @@
                 .AddColumn(false, false, "VatNumber")
                 .AddColumn(false, false, "WorkPlaceTitle")
                 .AddColumn(false, false, "TimeShiftTitle")
-                .AddColumn(false, false, "LastConsecutiveDay")
+                //.AddColumn(false, false, "LastConsecutiveDay")
                 .AddColumn(false, false, "ConsecutiveDays")
                 .AjaxData((data, type, row, meta) => {
                     data.predicate = 'ProjectionEmployeeConsecutiveDayOff';
 
+                    data.StartOn = GetStartOn();
+                    data.EndOn = GetEndOn();
+
                     if (GetSelectedTimeshiftId() != '')
                         data.filterByTimeShiftId = GetSelectedTimeshiftId();
 
-                    if (GetSelectedMonth() != '')
-                        data.filterByMonth = GetSelectedMonth();
 
-                    if (GetSelectedYear() != '')
-                        data.filterByYear = GetSelectedYear();
 
-                    data.filterByConsecutiveDayOffCount = GetDayOffChoiceValue();
+                    data.filterByConsecutiveDayOff_Max = GetFilterDayOff_Max();
+                    //data.filterByConsecutiveDayOff_Min = GetFilterDayOff_Min();
                     return JSON.stringify(data);
                 })
                 .CompleteDataTable();

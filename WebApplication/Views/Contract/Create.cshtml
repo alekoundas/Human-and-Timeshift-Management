@@ -49,16 +49,14 @@
                     <div class="form-group">
                         <label asp-for="HoursPerWeek" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="HoursPerWeek" class="form-control" value="0">
-                            <span asp-validation-for="HoursPerWeek" class="text-danger"></span>
+                            <input name="HoursPerWeek" class="form-control"  pattern="^\d*(\,\d{0,2})?$" value="0,00">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label asp-for="HoursPerDay" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="HoursPerDay" class="form-control" value="0.00">
-                            <span asp-validation-for="HoursPerDay" class="text-danger"></span>
+                            <input name="HoursPerDay" pattern="^\d*(\,\d{0,2})?$" class="form-control" value="0,00">
                         </div>
                     </div>
 
@@ -66,16 +64,14 @@
                     <div class="form-group">
                         <label asp-for="GrossSalaryPerHour" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="GrossSalaryPerHour" class="form-control" value="0.00">
-                            <span asp-validation-for="GrossSalaryPerHour" class="text-danger"></span>
+                            <input name="GrossSalaryPerHour" pattern="^\d*(\,\d{0,2})?$" class="form-control" value="0,00">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label asp-for="NetSalaryPerHour" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="NetSalaryPerHour" class="form-control" value="0.00">
-                            <span asp-validation-for="NetSalaryPerHour" class="text-danger"></span>
+                            <input name="NetSalaryPerHour" pattern="^\d*(\,\d{0,2})?$" class="form-control" value="0,00">
                         </div>
                     </div>
 
@@ -121,6 +117,23 @@
 
 
     <script>
+        //Decimal regex
+        $(document).on('keydown', 'input[pattern]', function (e) {
+            var input = $(this);
+            var oldVal = input.val();
+            var regex = new RegExp(input.attr('pattern'), 'g');
+
+            setTimeout(function () {
+                var newVal = input.val();
+                if (!regex.test(newVal)) {
+                    input.val(oldVal);
+                }
+            }, 1);
+        });
+
+
+
+
         $('.ContractMembership_Select2').select2({
             allowClear: true,
             ajax: {

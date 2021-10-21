@@ -56,7 +56,22 @@ namespace Bussiness.Service
                 }
             else
                 switch (typeof(TEntity).Name)
-                {
+                    {
+                    case "LogType":
+                        _currentWorker = new LogTypeDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
+                    case "Log":
+                        _currentWorker = new LogDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
+                    case "LogEntity":
+                        _currentWorker = new LogEntityDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
+                    case "ApplicationUser":
+                        _currentWorker = new ApplicationUserDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
+                    case "ApplicationRole":
+                        _currentWorker = new ApplicationRoleDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
+                        break;
                     case "Company":
                         _currentWorker = new CompanyDataTableWorker(_datatable, _baseDatawork, _httpContext);
                         break;
@@ -80,15 +95,6 @@ namespace Bussiness.Service
                         break;
                     case "LeaveType":
                         _currentWorker = new LeaveTypeDataTableWorker(_datatable, _baseDatawork, _httpContext);
-                        break;
-                    case "LogType":
-                        _currentWorker = new LogTypeDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
-                        break;
-                    case "Log":
-                        _currentWorker = new LogDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
-                        break;
-                    case "LogEntity":
-                        _currentWorker = new LogEntityDataTableWorker(_datatable, _baseDatawork, _httpContext, _securityDataWork);
                         break;
                     case "Specialization":
                         _currentWorker = new SpecializationDataTableWorker(_datatable, _baseDatawork, _httpContext);

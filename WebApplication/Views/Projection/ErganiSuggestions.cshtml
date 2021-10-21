@@ -228,7 +228,7 @@
                     .AddColumn(true, true, "Error")
                     .FixedLeftColums(2)
                     .AjaxData((data, type, row, meta) => {
-                        data.predicate = 'ProjectionTimeShiftSuggestions';
+                        data.predicate = 'ProjectionErganiSuggestions';
                         if (GetSelectedWorkPlaceId() != '')
                             data.filterByWorkPlaceId = GetSelectedWorkPlaceId();
                         data.filterByValidateOvertime = GetSliderValidateOvertimeValue();

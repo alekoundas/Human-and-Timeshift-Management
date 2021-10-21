@@ -141,11 +141,11 @@
             responsive: true,
             processing: true,
             autoWidth: false,
-            //colReorder: true,
+            colReorder: true,
             scrollX: true,
-            colReorder: {
-                fixedColumnsLeft: this._fixedLeftColums,
-                fixedColumnsRight: this._fixedRightColums
+            fixedColumns: {
+                leftColumns: this._fixedLeftColums,
+                rightColumns: this._fixedRightColums
             },
             lengthMenu: [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "All"]],
             iDisplayLength: -1

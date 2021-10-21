@@ -741,7 +741,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 _filter = _filter.And(x => x.EmployeeWorkPlaces
                 .Any(y => y.WorkPlaceId == _datatable.FilterByWorkPlaceId));
 
-            _filter = _filter.And(x => x.RealWorkHours.Any(y => y.StartOn.Date == DateTime.Now.Date));
+            _filter = _filter.And(x => x.RealWorkHours.Any(y => y.StartOn.Date == DateTime.Now.AddHours(3).Date));
 
             var entities = await _baseDatawork.Employees
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
@@ -958,8 +958,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         var minutes = ((int)totalSeconds / 60 % 60).ToString();
                         if (minutes.Length == 1)
                             minutes = "0" + minutes;
+
+                        var footerMinutes = ((int)totalFooterSeconds / 60 % 60).ToString();
+                        if (footerMinutes.Length == 1)
+                            footerMinutes = "0" + footerMinutes;
+
                         dictionary.Add("Day_" + i, ((int)totalSeconds / 60 / 60).ToString() + ":" + minutes);
-                        dictionary.Add("Day_" + i + "_FooterTotal", ((int)totalFooterSeconds / 60 / 60).ToString() + ":" + minutes);
+                        dictionary.Add("Day_" + i + "_FooterTotal", ((int)totalFooterSeconds / 60 / 60).ToString() + ":" + footerMinutes);
                     }
                 }
 
@@ -1078,401 +1083,171 @@ namespace Bussiness.Service.DataTableServiceWorkers
             var expandoService = new ExpandoService();
             var dataTableHelper = new DataTableHelper<WorkPlace>();
             var returnObjects = new List<ExpandoObject>();
+            var entities = new List<Employee>();
 
             var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
-            includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
+            includes.Add(x =>
+                x.Include(y => y.RealWorkHours)
+                .ThenInclude(y => y.TimeShift)
+                .ThenInclude(y => y.WorkPlace));
 
 
             if (_datatable.FilterByTimeShiftId > 0)
-                _filter = _filter.And(x =>
-                    x.EmployeeWorkPlaces.Any(y =>
-                        y.WorkPlace.TimeShifts.Any(z =>
-                            z.Id == _datatable.FilterByTimeShiftId)));
-
-            if (_datatable.FilterByMonth > 0)
-                _filter = _filter.And(x =>
-                    x.EmployeeWorkPlaces.Any(y =>
-                        y.WorkPlace.TimeShifts.Any(z =>
-                            z.Month == _datatable.FilterByMonth)));
-
-            if (_datatable.FilterByYear > 0)
-                _filter = _filter.And(x =>
-                    x.EmployeeWorkPlaces.Any(y =>
-                        y.WorkPlace.TimeShifts.Any(z =>
-                            z.Year == _datatable.FilterByYear)));
-
-
-            if (_datatable.FilterByTimeShiftId > 0)
-            {
-
-                var entities = await _baseDatawork.Employees
-                    .GetWithFilterQueryable(x => x.OrderBy(y => y.LastName), _filter, includes)
-                    .Select(x => new
-                    {
-                        Id = x.Id,
-                        FirstName = x.FirstName,
-                        LastName = x.LastName,
-                        VatNumber = x.VatNumber,
-                        TimeShifts = x.EmployeeWorkPlaces
-                            .SelectMany(y => y.WorkPlace.TimeShifts.Where(z => z.Id == _datatable.FilterByTimeShiftId))
-                            .Select(y => new
-                            {
-                                y.Id,
-                                y.Title,
-                                y.Month,
-                                y.Year,
-                                y.DaysInMonth,
-                                WorkPlaceTitle = y.WorkPlace.Title
-                            }),
-                        RealWorkHours = x.RealWorkHours
-                            .Where(y => y.TimeShiftId == _datatable.FilterByTimeShiftId)
-                            .Select(y => new
-                            {
-                                Day = y.StartOn.Day,
-                                TimeShiftId = y.TimeShiftId
-                            })
-                    }).ToListAsync();
-
-                foreach (var employee in entities)
-                {
-                    foreach (var timeShift in employee.TimeShifts)
-                    {
-
-                        var workingDays = employee.RealWorkHours
-                            .Where(x => x.TimeShiftId == timeShift.Id)
-                            .Select(x => x.Day)
-                            .ToList()
-                            .Distinct();
-
-                        var dayOffs =
-                           Enumerable.Range(1, timeShift.DaysInMonth).ToList()
-                           .Except(workingDays)
-                           .OrderBy(x => x)
-                           .ToList();
-
-                        var consecuriveCounter = 1;
-                        if (dayOffs.Count > 1)
-                            for (int i = 1; i < dayOffs.Count; i++)
-                            {
-                                if (dayOffs[i] == dayOffs[i - 1] + 1)
-                                    consecuriveCounter++;
-                                else
-                                {
-                                    if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOffCount)
-                                    {
-                                        if (dayOffs[i - consecuriveCounter] - 1 > 0)
+                entities = await _baseDatawork.Employees
+                   .GetWithFilterQueryable(x => x.OrderBy(y => y.LastName), _filter, includes)
+                   .Select(x => new Employee
+                   {
+                       Id = x.Id,
+                       FirstName = x.FirstName,
+                       LastName = x.LastName,
+                       VatNumber = x.VatNumber,
+                       EmployeeWorkPlaces = x.EmployeeWorkPlaces.Select(y => new EmployeeWorkPlace
+                       {
+                           WorkPlace = new WorkPlace
+                           {
+                               Title = y.WorkPlace.Title,
+                               TimeShifts = y.WorkPlace.TimeShifts
+                                    .Where(y => _datatable.StartOn.Month <= y.Month && y.Month <= _datatable.EndOn.Month)
+                                    .Where(y => _datatable.StartOn.Year <= y.Year && y.Year <= _datatable.EndOn.Year)
+                                    .Select(z =>
+                                        new TimeShift
                                         {
-                                            var expandoObj = new ExpandoObject();
-                                            var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                            dictionary.Add("FirstName", employee.FirstName);
-                                            dictionary.Add("LastName", employee.LastName);
-                                            dictionary.Add("VatNumber", employee.VatNumber);
-                                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                            dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                            dictionary.Add("LastConsecutiveDay", dayOffs[i - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
-                                            dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                            returnObjects.Add(expandoObj);
-                                        }
-                                        else
-                                        {
-                                            var expandoObj = new ExpandoObject();
-                                            var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                            dictionary.Add("FirstName", employee.FirstName);
-                                            dictionary.Add("LastName", employee.LastName);
-                                            dictionary.Add("VatNumber", employee.VatNumber);
-                                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                            dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                            dictionary.Add("LastConsecutiveDay", "Ξεκινάει το χρονοδιάγραμμα με ρεπό");
-                                            dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                            returnObjects.Add(expandoObj);
-                                        }
-                                    }
-                                    consecuriveCounter = 1;
-                                }
-                            }
-
-                        if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOffCount)
-                        {
-                            if (dayOffs[dayOffs.Count - consecuriveCounter] - 1 > 0)
-                            {
-
-                                var expandoObj = new ExpandoObject();
-                                var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                dictionary.Add("FirstName", employee.FirstName);
-                                dictionary.Add("LastName", employee.LastName);
-                                dictionary.Add("VatNumber", employee.VatNumber);
-                                dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                dictionary.Add("LastConsecutiveDay", dayOffs[dayOffs.Count - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
-                                dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                returnObjects.Add(expandoObj);
-                            }
-                            else
-                            {
-                                var expandoObj = new ExpandoObject();
-                                var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                dictionary.Add("FirstName", employee.FirstName);
-                                dictionary.Add("LastName", employee.LastName);
-                                dictionary.Add("VatNumber", employee.VatNumber);
-                                dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                dictionary.Add("LastConsecutiveDay", "Δεν έχει εργαστεί στο χρονοδιάγραμμα");
-                                dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                returnObjects.Add(expandoObj);
-                            }
-                        }
-                    }
-                }
-            }
-            else if (_datatable.FilterByMonth > 0 && _datatable.FilterByYear > 0)
-            {
-                var entities = await _baseDatawork.Employees
-                    .GetWithFilterQueryable(x => x.OrderBy(y => y.LastName), _filter, includes)
-                    .Select(x => new
-                    {
-                        Id = x.Id,
-                        FirstName = x.FirstName,
-                        LastName = x.LastName,
-                        VatNumber = x.VatNumber,
-                        TimeShifts = x.EmployeeWorkPlaces
-                            .SelectMany(y => y.WorkPlace.TimeShifts.Where(z => _datatable.FilterByMonth == z.Month && _datatable.FilterByYear == z.Year))
-                            .Select(y => new
-                            {
-                                y.Id,
-                                y.Title,
-                                y.Month,
-                                y.Year,
-                                y.DaysInMonth,
-                                WorkPlaceTitle = y.WorkPlace.Title
-                            }),
-                        RealWorkHours = x.RealWorkHours
-                            .Where(y => _datatable.FilterByMonth == y.StartOn.Month && _datatable.FilterByYear == y.StartOn.Year)
-                            .Select(y => new
-                            {
-                                Day = y.StartOn.Day,
-                                TimeShiftId = y.TimeShiftId
-                            })
-                    }).ToListAsync();
-
-                foreach (var employee in entities)
-                {
-                    foreach (var timeShift in employee.TimeShifts)
-                    {
-
-                        var workingDays = employee.RealWorkHours
-                            .Where(x => x.TimeShiftId == timeShift.Id)
-                            .Select(x => x.Day)
-                            .ToList()
-                            .Distinct();
-
-                        var dayOffs =
-                           Enumerable.Range(1, timeShift.DaysInMonth).ToList()
-                           .Except(workingDays)
-                           .OrderBy(x => x)
-                           .ToList();
-
-                        var consecuriveCounter = 1;
-                        if (dayOffs.Count > 1)
-                            for (int i = 1; i < dayOffs.Count; i++)
-                            {
-                                if (dayOffs[i] == dayOffs[i - 1] + 1)
-                                    consecuriveCounter++;
-                                else
-                                {
-                                    if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOffCount)
-                                    {
-                                        if (dayOffs[i - consecuriveCounter] - 1 > 0)
-                                        {
-                                            var expandoObj = new ExpandoObject();
-                                            var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                            dictionary.Add("FirstName", employee.FirstName);
-                                            dictionary.Add("LastName", employee.LastName);
-                                            dictionary.Add("VatNumber", employee.VatNumber);
-                                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                            dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                            dictionary.Add("LastConsecutiveDay", dayOffs[i - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
-                                            dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                            returnObjects.Add(expandoObj);
-                                        }
-                                        else
-                                        {
-                                            var expandoObj = new ExpandoObject();
-                                            var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                            dictionary.Add("FirstName", employee.FirstName);
-                                            dictionary.Add("LastName", employee.LastName);
-                                            dictionary.Add("VatNumber", employee.VatNumber);
-                                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                            dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                            dictionary.Add("LastConsecutiveDay", "-");
-                                            dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                            returnObjects.Add(expandoObj);
-                                        }
-                                    }
-                                    consecuriveCounter = 1;
-                                }
-                            }
-
-                        if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOffCount)
-                        {
-                            if (dayOffs[dayOffs.Count - consecuriveCounter] - 1 > 0)
-                            {
-
-                                var expandoObj = new ExpandoObject();
-                                var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                dictionary.Add("FirstName", employee.FirstName);
-                                dictionary.Add("LastName", employee.LastName);
-                                dictionary.Add("VatNumber", employee.VatNumber);
-                                dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                dictionary.Add("LastConsecutiveDay", dayOffs[dayOffs.Count - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
-                                dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                returnObjects.Add(expandoObj);
-                            }
-                            else
-                            {
-                                var expandoObj = new ExpandoObject();
-                                var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                dictionary.Add("FirstName", employee.FirstName);
-                                dictionary.Add("LastName", employee.LastName);
-                                dictionary.Add("VatNumber", employee.VatNumber);
-                                dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                dictionary.Add("LastConsecutiveDay", "Δεν έχει εργαστεί στο χρονοδιάγραμμα");
-                                dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                returnObjects.Add(expandoObj);
-                            }
-                        }
-                    }
-                }
-            }
+                                            Id = z.Id,
+                                            Title = z.Title
+                                        })
+                                    .ToList()
+                           }
+                       }).ToList(),
+                       RealWorkHours = x.RealWorkHours
+                           .Where(y => _datatable.StartOn.Date <= y.StartOn.Date && y.StartOn.Date <= _datatable.EndOn.Date)
+                           .Where(y => y.TimeShiftId == _datatable.FilterByTimeShiftId)
+                           .Select(y => new RealWorkHour
+                           {
+                               StartOn = y.StartOn,
+                               EndOn = y.EndOn,
+                               TimeShiftId = y.TimeShiftId
+                           }).ToList()
+                   }).ToListAsync();
             else
-            {
-                var entities = await _baseDatawork.Employees
+                entities = await _baseDatawork.Employees
                     .GetWithFilterQueryable(x => x.OrderBy(y => y.LastName), _filter, includes)
-                    .Select(x => new
+                    .Select(x => new Employee
                     {
                         Id = x.Id,
                         FirstName = x.FirstName,
                         LastName = x.LastName,
                         VatNumber = x.VatNumber,
-                        TimeShifts = x.EmployeeWorkPlaces
-                            .SelectMany(y => y.WorkPlace.TimeShifts)
-                            .Select(y => new
+                        EmployeeWorkPlaces = x.EmployeeWorkPlaces.Select(y => new EmployeeWorkPlace
+                        {
+                            WorkPlace = new WorkPlace
                             {
-                                y.Id,
-                                y.Title,
-                                y.Month,
-                                y.Year,
-                                y.DaysInMonth,
-                                WorkPlaceTitle = y.WorkPlace.Title
-                            }),
+                                Title = y.WorkPlace.Title,
+                                TimeShifts = y.WorkPlace.TimeShifts
+                                .Where(y => _datatable.StartOn.Month <= y.Month && y.Month <= _datatable.EndOn.Month)
+                                .Where(y => _datatable.StartOn.Year <= y.Year && y.Year <= _datatable.EndOn.Year)
+                                .Select(z =>
+                                    new TimeShift
+                                    {
+                                        Id = z.Id,
+                                        Title = z.Title,
+                                        WorkPlace = new WorkPlace { Title = z.WorkPlace.Title }
+                                    })
+                                .ToList()
+                            }
+                        }).ToList(),
                         RealWorkHours = x.RealWorkHours
-                            .Select(y => new
+                            .Where(y => _datatable.StartOn.Date <= y.StartOn.Date && y.StartOn.Date <= _datatable.EndOn.Date)
+                            .Select(y => new RealWorkHour
                             {
-                                Day = y.StartOn.Day,
+                                StartOn = y.StartOn,
+                                EndOn = y.EndOn,
                                 TimeShiftId = y.TimeShiftId
-                            })
+                            }).ToList()
                     }).ToListAsync();
 
-                foreach (var employee in entities)
+
+
+            //Create a list of consecutive dates from date range filter
+            var startOnFilter = _datatable.StartOn.Date;
+            var endOnFilter = _datatable.EndOn.Date;
+            var consecutiveDays = new List<DateTime>();
+
+            while (startOnFilter != endOnFilter)
+            {
+                consecutiveDays.Add(startOnFilter);
+                startOnFilter = startOnFilter.AddDays(1);
+            }
+            consecutiveDays.Add(startOnFilter);
+
+
+
+            foreach (var employee in entities)
+            {
+
+                var workhours = employee.RealWorkHours
+                    .GroupBy(x => x.TimeShiftId);
+
+                foreach (var timeShift in employee.EmployeeWorkPlaces.SelectMany(x => x.WorkPlace.TimeShifts))
                 {
-                    foreach (var timeShift in employee.TimeShifts)
-                    {
-
-                        var workingDays = employee.RealWorkHours
-                            .Where(x => x.TimeShiftId == timeShift.Id)
-                            .Select(x => x.Day)
-                            .ToList()
-                            .Distinct();
-
-                        var dayOffs =
-                           Enumerable.Range(1, timeShift.DaysInMonth).ToList()
-                           .Except(workingDays)
-                           .OrderBy(x => x)
-                           .ToList();
-
-                        var consecuriveCounter = 1;
-                        if (dayOffs.Count > 1)
-                            for (int i = 1; i < dayOffs.Count; i++)
-                            {
-                                if (dayOffs[i] == dayOffs[i - 1] + 1)
-                                    consecuriveCounter++;
-                                else
-                                {
-                                    if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOffCount)
-                                    {
-                                        if (dayOffs[i - consecuriveCounter] - 1 > 0)
-                                        {
-                                            var expandoObj = new ExpandoObject();
-                                            var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                            dictionary.Add("FirstName", employee.FirstName);
-                                            dictionary.Add("LastName", employee.LastName);
-                                            dictionary.Add("VatNumber", employee.VatNumber);
-                                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                            dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                            dictionary.Add("LastConsecutiveDay", dayOffs[i - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
-                                            dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                            returnObjects.Add(expandoObj);
-                                        }
-                                        else
-                                        {
-                                            var expandoObj = new ExpandoObject();
-                                            var dictionary = (IDictionary<string, object>)expandoObj;
-
-                                            dictionary.Add("FirstName", employee.FirstName);
-                                            dictionary.Add("LastName", employee.LastName);
-                                            dictionary.Add("VatNumber", employee.VatNumber);
-                                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                            dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                            dictionary.Add("LastConsecutiveDay", "-");
-                                            dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                            returnObjects.Add(expandoObj);
-                                        }
-                                    }
-                                    consecuriveCounter = 1;
-                                }
-                            }
-
-                        if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOffCount)
+                    if (workhours.Any(y => y.Key == timeShift.Id))
+                        foreach (var timeshift_workhours in workhours)
                         {
-                            if (dayOffs[dayOffs.Count - consecuriveCounter] - 1 > 0)
-                            {
+                            var dayOffDays = new List<DateTime>();
+                            dayOffDays.AddRange(consecutiveDays);
+                            dayOffDays.RemoveAll(x => timeshift_workhours.Any(y => y.StartOn.Date == x));
 
+                            var consecuriveCounter = 1;
+                            if (dayOffDays.Count > 1)
+                                for (int i = 1; i < dayOffDays.Count; i++)
+                                    if (dayOffDays[i] == dayOffDays[i - 1].AddDays(1))
+                                        consecuriveCounter++;
+                                    else
+                                    {
+                                        if (consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+                                        {
+                                            var expandoObj = new ExpandoObject();
+                                            var dictionary = (IDictionary<string, object>)expandoObj;
+
+                                            dictionary.Add("FirstName", employee.FirstName);
+                                            dictionary.Add("LastName", employee.LastName);
+                                            dictionary.Add("VatNumber", employee.VatNumber);
+                                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlace.Title);
+                                            dictionary.Add("TimeShiftTitle", timeShift.Title);
+                                            dictionary.Add("ConsecutiveDays", consecuriveCounter);
+                                            returnObjects.Add(expandoObj);
+                                        }
+                                        consecuriveCounter = 1;
+                                    }
+
+                            if (consecuriveCounter > 0 && consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+                            {
                                 var expandoObj = new ExpandoObject();
                                 var dictionary = (IDictionary<string, object>)expandoObj;
 
                                 dictionary.Add("FirstName", employee.FirstName);
                                 dictionary.Add("LastName", employee.LastName);
                                 dictionary.Add("VatNumber", employee.VatNumber);
-                                dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+                                dictionary.Add("WorkPlaceTitle", timeShift.WorkPlace.Title);
                                 dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                dictionary.Add("LastConsecutiveDay", dayOffs[dayOffs.Count - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
                                 dictionary.Add("ConsecutiveDays", consecuriveCounter);
                                 returnObjects.Add(expandoObj);
-                            }
-                            else
-                            {
-                                var expandoObj = new ExpandoObject();
-                                var dictionary = (IDictionary<string, object>)expandoObj;
 
-                                dictionary.Add("FirstName", employee.FirstName);
-                                dictionary.Add("LastName", employee.LastName);
-                                dictionary.Add("VatNumber", employee.VatNumber);
-                                dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
-                                dictionary.Add("TimeShiftTitle", timeShift.Title);
-                                dictionary.Add("LastConsecutiveDay", "Δεν έχει εργαστεί στο χρονοδιάγραμμα");
-                                dictionary.Add("ConsecutiveDays", consecuriveCounter);
-                                returnObjects.Add(expandoObj);
                             }
+                        }
+                    else
+                    {
+                        if (consecutiveDays.Count <= _datatable.FilterByConsecutiveDayOff_Max)
+                        {
+                            var expandoObj = new ExpandoObject();
+                            var dictionary = (IDictionary<string, object>)expandoObj;
+
+                            dictionary.Add("FirstName", employee.FirstName);
+                            dictionary.Add("LastName", employee.LastName);
+                            dictionary.Add("VatNumber", employee.VatNumber);
+                            dictionary.Add("WorkPlaceTitle", timeShift.WorkPlace.Title);
+                            dictionary.Add("TimeShiftTitle", timeShift.Title);
+                            dictionary.Add("ConsecutiveDays", consecutiveDays.Count);
+                            returnObjects.Add(expandoObj);
                         }
                     }
                 }
@@ -1485,9 +1260,303 @@ namespace Bussiness.Service.DataTableServiceWorkers
         }
 
 
+        //public async Task<ProjectionDataTableWorker> ProjectionEmployeeConsecutiveDayOff()
+        //{
+
+        //    //Mapping
+        //    var expandoService = new ExpandoService();
+        //    var dataTableHelper = new DataTableHelper<WorkPlace>();
+        //    var returnObjects = new List<ExpandoObject>();
+
+        //    var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
+        //    includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
 
 
-        public async Task<ProjectionDataTableWorker> ProjectionTimeShiftSuggestions()
+        //    if (_datatable.FilterByTimeShiftId > 0)
+        //        _filter = _filter.And(x =>
+        //            x.EmployeeWorkPlaces.Any(y =>
+        //                y.WorkPlace.TimeShifts.Any(z =>
+        //                    z.Id == _datatable.FilterByTimeShiftId)));
+
+        //    _filter = _filter.And(x =>
+        //        x.RealWorkHours.Any(y => y.StartOn.Month == _datatable.StartOn.Month && y.StartOn.Year == _datatable.StartOn.Year) ||
+        //        x.RealWorkHours.Any(y => y.StartOn.Month == _datatable.StartOn.AddMonths(-1).Month && y.StartOn.Year == _datatable.StartOn.AddMonths(-1).Year)
+        //    );
+
+        //    if (_datatable.FilterByTimeShiftId > 0)
+        //    {
+
+        //        var entities = await _baseDatawork.Employees
+        //            .GetWithFilterQueryable(x => x.OrderBy(y => y.LastName), _filter, includes)
+        //            .Select(x => new
+        //            {
+        //                Id = x.Id,
+        //                FirstName = x.FirstName,
+        //                LastName = x.LastName,
+        //                VatNumber = x.VatNumber,
+        //                TimeShifts = x.EmployeeWorkPlaces
+        //                    .SelectMany(y => y.WorkPlace.TimeShifts.Where(z => z.Id == _datatable.FilterByTimeShiftId))
+        //                    .Select(y => new
+        //                    {
+        //                        y.Id,
+        //                        y.Title,
+        //                        y.Month,
+        //                        y.Year,
+        //                        y.DaysInMonth,
+        //                        WorkPlaceTitle = y.WorkPlace.Title
+        //                    }),
+        //                RealWorkHours = x.RealWorkHours
+        //                    .Where(y => _datatable.StartOn.Date <= y.StartOn.Date && y.StartOn.Date <= _datatable.EndOn.Date)
+        //                    .Where(y => y.TimeShiftId == _datatable.FilterByTimeShiftId)
+        //                    //.Where(y => x.HireDate.Date <= y.StartOn.Date)
+        //                    .Select(y => new
+        //                    {
+        //                        Day = y.StartOn.Day,
+        //                        TimeShiftId = y.TimeShiftId
+        //                    })
+        //            }).ToListAsync();
+
+        //        foreach (var employee in entities)
+        //        {
+        //            foreach (var timeShift in employee.TimeShifts)
+        //            {
+
+        //                var daysInMonth = timeShift.DaysInMonth;
+        //                var workingDays = employee.RealWorkHours
+        //                    .Where(x => x.TimeShiftId == timeShift.Id)
+        //                    .Select(x => x.Day)
+        //                    .ToList()
+        //                    .Distinct();
+
+        //                //Dont count days in future
+        //                if (timeShift.Year == DateTime.Now.Year && timeShift.Month == DateTime.Now.Month)
+        //                    daysInMonth = Math.Abs(DateTime.Now.Day - timeShift.DaysInMonth);
+
+
+        //                var dayOffs =
+        //                   Enumerable.Range(1, daysInMonth).ToList()
+        //                   .Except(workingDays)
+        //                   .OrderBy(x => x)
+        //                   .ToList();
+
+        //                var consecuriveCounter = 1;
+        //                if (dayOffs.Count > 1)
+        //                    for (int i = 1; i < dayOffs.Count; i++)
+        //                    {
+        //                        //If consecutive
+        //                        if (dayOffs[i] == dayOffs[i - 1] + 1)
+        //                            consecuriveCounter++;
+        //                        else
+        //                        {
+        //                            if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOff_Min && consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+        //                            {
+        //                                if (dayOffs[i - consecuriveCounter] - 1 > 0)
+        //                                {
+        //                                    var expandoObj = new ExpandoObject();
+        //                                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                                    dictionary.Add("FirstName", employee.FirstName);
+        //                                    dictionary.Add("LastName", employee.LastName);
+        //                                    dictionary.Add("VatNumber", employee.VatNumber);
+        //                                    dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                                    dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                                    dictionary.Add("LastConsecutiveDay", dayOffs[i - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
+        //                                    dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                                    returnObjects.Add(expandoObj);
+        //                                }
+        //                                else
+        //                                {
+        //                                    var expandoObj = new ExpandoObject();
+        //                                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                                    dictionary.Add("FirstName", employee.FirstName);
+        //                                    dictionary.Add("LastName", employee.LastName);
+        //                                    dictionary.Add("VatNumber", employee.VatNumber);
+        //                                    dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                                    dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                                    dictionary.Add("LastConsecutiveDay", "Ξεκινάει το χρονοδιάγραμμα με ρεπό");
+        //                                    dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                                    returnObjects.Add(expandoObj);
+        //                                }
+        //                            }
+        //                            consecuriveCounter = 1;
+        //                        }
+        //                    }
+
+        //                if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOff_Min && consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+        //                {
+        //                    if (dayOffs[dayOffs.Count - consecuriveCounter] - 1 > 0)
+        //                    {
+
+        //                        var expandoObj = new ExpandoObject();
+        //                        var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                        dictionary.Add("FirstName", employee.FirstName);
+        //                        dictionary.Add("LastName", employee.LastName);
+        //                        dictionary.Add("VatNumber", employee.VatNumber);
+        //                        dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                        dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                        dictionary.Add("LastConsecutiveDay", dayOffs[dayOffs.Count - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
+        //                        dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                        returnObjects.Add(expandoObj);
+        //                    }
+        //                    else
+        //                    {
+        //                        var expandoObj = new ExpandoObject();
+        //                        var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                        dictionary.Add("FirstName", employee.FirstName);
+        //                        dictionary.Add("LastName", employee.LastName);
+        //                        dictionary.Add("VatNumber", employee.VatNumber);
+        //                        dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                        dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                        dictionary.Add("LastConsecutiveDay", "Δεν έχει εργαστεί στο χρονοδιάγραμμα");
+        //                        dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                        returnObjects.Add(expandoObj);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        var entities = await _baseDatawork.Employees
+        //            .GetWithFilterQueryable(x => x.OrderBy(y => y.LastName), _filter, includes)
+        //            .Select(x => new
+        //            {
+        //                Id = x.Id,
+        //                FirstName = x.FirstName,
+        //                LastName = x.LastName,
+        //                VatNumber = x.VatNumber,
+        //                TimeShifts = x.EmployeeWorkPlaces
+        //                    .SelectMany(y => y.WorkPlace.TimeShifts)
+        //                    .Select(y => new
+        //                    {
+        //                        y.Id,
+        //                        y.Title,
+        //                        y.Month,
+        //                        y.Year,
+        //                        y.DaysInMonth,
+        //                        WorkPlaceTitle = y.WorkPlace.Title
+        //                    }),
+        //                RealWorkHours = x.RealWorkHours
+        //                    .Where(y => _datatable.StartOn.Date <= y.StartOn.Date && y.StartOn.Date <= _datatable.EndOn.Date)
+        //                    //.Where(y => x.HireDate.Date <= y.StartOn.Date)
+        //                    .Select(y => new
+        //                    {
+        //                        Day = y.StartOn.Day,
+        //                        TimeShiftId = y.TimeShiftId
+        //                    })
+        //            }).ToListAsync();
+
+        //        foreach (var employee in entities)
+        //        {
+        //            foreach (var timeShift in employee.TimeShifts)
+        //            {
+
+        //                var workingDays = employee.RealWorkHours
+        //                    .Where(x => x.TimeShiftId == timeShift.Id)
+        //                    .Select(x => x.Day)
+        //                    .ToList()
+        //                    .Distinct();
+
+        //                var dayOffs =
+        //                   Enumerable.Range(1, timeShift.DaysInMonth).ToList()
+        //                   .Except(workingDays)
+        //                   .OrderBy(x => x)
+        //                   .ToList();
+
+        //                var consecuriveCounter = 1;
+        //                if (dayOffs.Count > 1)
+        //                    for (int i = 1; i < dayOffs.Count; i++)
+        //                    {
+        //                        if (dayOffs[i] == dayOffs[i - 1] + 1)
+        //                            consecuriveCounter++;
+        //                        else
+        //                        {
+        //                            if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOff_Min && consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+        //                            {
+        //                                if (dayOffs[i - consecuriveCounter] - 1 > 0)
+        //                                {
+        //                                    var expandoObj = new ExpandoObject();
+        //                                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                                    dictionary.Add("FirstName", employee.FirstName);
+        //                                    dictionary.Add("LastName", employee.LastName);
+        //                                    dictionary.Add("VatNumber", employee.VatNumber);
+        //                                    dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                                    dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                                    dictionary.Add("LastConsecutiveDay", dayOffs[i - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
+        //                                    dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                                    returnObjects.Add(expandoObj);
+        //                                }
+        //                                else
+        //                                {
+        //                                    var expandoObj = new ExpandoObject();
+        //                                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                                    dictionary.Add("FirstName", employee.FirstName);
+        //                                    dictionary.Add("LastName", employee.LastName);
+        //                                    dictionary.Add("VatNumber", employee.VatNumber);
+        //                                    dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                                    dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                                    dictionary.Add("LastConsecutiveDay", "-");
+        //                                    dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                                    returnObjects.Add(expandoObj);
+        //                                }
+        //                            }
+        //                            consecuriveCounter = 1;
+        //                        }
+        //                    }
+
+
+
+        //                if (consecuriveCounter >= _datatable.FilterByConsecutiveDayOff_Min && consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+        //                {
+        //                    if (dayOffs[dayOffs.Count - consecuriveCounter] - 1 > 0)
+        //                    {
+
+        //                        var expandoObj = new ExpandoObject();
+        //                        var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                        dictionary.Add("FirstName", employee.FirstName);
+        //                        dictionary.Add("LastName", employee.LastName);
+        //                        dictionary.Add("VatNumber", employee.VatNumber);
+        //                        dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                        dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                        dictionary.Add("LastConsecutiveDay", dayOffs[dayOffs.Count - consecuriveCounter] - 1 + "/" + timeShift.Month + "/" + timeShift.Year);
+        //                        dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                        returnObjects.Add(expandoObj);
+        //                    }
+        //                    else
+        //                    {
+        //                        var expandoObj = new ExpandoObject();
+        //                        var dictionary = (IDictionary<string, object>)expandoObj;
+
+        //                        dictionary.Add("FirstName", employee.FirstName);
+        //                        dictionary.Add("LastName", employee.LastName);
+        //                        dictionary.Add("VatNumber", employee.VatNumber);
+        //                        dictionary.Add("WorkPlaceTitle", timeShift.WorkPlaceTitle);
+        //                        dictionary.Add("TimeShiftTitle", timeShift.Title);
+        //                        dictionary.Add("LastConsecutiveDay", "Δεν έχει εργαστεί στο χρονοδιάγραμμα");
+        //                        dictionary.Add("ConsecutiveDays", consecuriveCounter);
+        //                        returnObjects.Add(expandoObj);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    EntitiesMapped = returnObjects;
+        //    EntitiesTotal = 0;
+
+        //    return this;
+        //}
+
+
+
+
+        public async Task<ProjectionDataTableWorker> ProjectionErganiSuggestions()
         {
 
             //set search dates of start to earliest Monday and set end to latest of Sunday
@@ -1503,7 +1572,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
 
             var sum = 0.0;
             var includes = new List<Func<IQueryable<WorkHour>, IIncludableQueryable<WorkHour, object>>>();
-            includes.Add(x => x.Include(y => y.Employee).ThenInclude(y => y.RealWorkHours));
+            includes.Add(x => x.Include(y => y.Employee).ThenInclude(y => y.RealWorkHours).ThenInclude(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
             includes.Add(x => x.Include(y => y.Employee).ThenInclude(y => y.Contract));
 
             var filter = PredicateBuilder.New<WorkHour>();
@@ -1532,6 +1601,13 @@ namespace Bussiness.Service.DataTableServiceWorkers
                            WorkingDaysPerWeek = x.Employee.Contract != null ? x.Employee.Contract.WorkingDaysPerWeek : 0,
                            HoursPerWeek = x.Employee.Contract != null ? x.Employee.Contract.HoursPerWeek : 0,
                            HoursPerDay = x.Employee.Contract != null ? x.Employee.Contract.HoursPerDay : 0
+                       }
+                   },
+                   TimeShift = new TimeShift
+                   {
+                       WorkPlace = new WorkPlace
+                       {
+                           Title = x.TimeShift.WorkPlace.Title
                        }
                    }
                })
@@ -1566,7 +1642,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     dictionary.Add("LastName", result.Employee.LastName);
                     dictionary.Add("VatNumber", result.Employee.VatNumber);
                     dictionary.Add("WorkHour", dataTableHelper.GetProjectionTimeShiftSuggestionCellBody(result));
-                    dictionary.Add("Error", $"Βάρδια με λιγότερο απο 11 ώρες διαφορά");
+                    dictionary.Add("Title", result.TimeShift.WorkPlace.Title);
+                    dictionary.Add("Error", $"Βάρδια με λιγότερο απο 11 ώρες διαφορά {result.StartOn.ToShortDateString()}");
 
                     returnObjects.Add(expandoObj);
                 }
@@ -1585,6 +1662,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.Employee.FirstName,
                         x.Employee.LastName,
                         x.Employee.VatNumber,
+                        x.TimeShift.WorkPlace.Title,
                         x.Employee.Contract.DayOfDaysPerWeek
                     })
                     .Select(x => new
@@ -1594,23 +1672,20 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.Key.LastName,
                         x.Key.VatNumber,
                         x.Key.Week,
+                        x.Key.Title,
                         x.Key.DayOfDaysPerWeek,
-                        DayOfDaysPerWeek_Max = (_datatable.FilterByOffsetMax == null) ? int.MaxValue : _datatable.FilterByOffsetMax,
-                        DayOfDaysPerWeek_Min = (_datatable.FilterByOffsetMin == null) ? 0 : _datatable.FilterByOffsetMin,
                         WorkingDays = x.Select(y => y.StartOn.Day).Distinct().Count()
                     })
                     //.Where(x => x.DayOfDaysPerWeek != null)
-                    .Where(x => x.DayOfDaysPerWeek_Min <= (7 - x.WorkingDays) && (7 - x.WorkingDays) <= x.DayOfDaysPerWeek_Max && (7 - x.WorkingDays) != x.DayOfDaysPerWeek)
+                    .Where(x => (7 - x.WorkingDays) != x.DayOfDaysPerWeek)
                     .Select(x => new
                     {
                         x.EmployeeId,
                         x.FirstName,
                         x.LastName,
+                        x.Title,
                         x.VatNumber,
                         Error = $"Η εβδομάδα {x.Week} ξεπερνάει το όριο 'Ρεπό ανα εβδομάδα' με όριο '{x.DayOfDaysPerWeek}" +
-                        //(x.DayOfDaysPerWeek_Max == x.DayOfDaysPerWeek_Min ?
-                        //    x.DayOfDaysPerWeek_Max.ToString() :
-                        //    x.DayOfDaysPerWeek_Min + "-" + x.DayOfDaysPerWeek_Max) +
                         $"' με ρεπό'{7 - x.WorkingDays }'"
                     })
                     .ToList();
@@ -1625,6 +1700,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     dictionary.Add("LastName", result.LastName);
                     dictionary.Add("VatNumber", result.VatNumber);
                     dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
                     dictionary.Add("Error", result.Error);
 
                     returnObjects.Add(expandoObj);
@@ -1643,6 +1719,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.EmployeeId,
                         x.Employee.FirstName,
                         x.Employee.LastName,
+                        x.TimeShift.WorkPlace.Title,
                         x.Employee.VatNumber,
                         x.Employee.Contract.WorkingDaysPerWeek
                     })
@@ -1653,23 +1730,19 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.Key.LastName,
                         x.Key.VatNumber,
                         x.Key.Week,
+                        x.Key.Title,
                         x.Key.WorkingDaysPerWeek,
-                        WorkingDaysPerWeek_Max = (_datatable.FilterByOffsetMax == null) ? int.MaxValue : _datatable.FilterByOffsetMax,
-                        WorkingDaysPerWeek_Min = (_datatable.FilterByOffsetMin == null) ? 0 : _datatable.FilterByOffsetMin,
                         WorkingDays = x.Select(y => y.StartOn.Day).Distinct().Count(),
                     })
-                    //.Where(x => x.WorkingDaysPerWeek != x.WorkingDays)
-                    .Where(x => x.WorkingDaysPerWeek_Min <= x.WorkingDays && x.WorkingDays <= x.WorkingDaysPerWeek_Max && x.WorkingDays != x.WorkingDaysPerWeek)
+                    .Where(x => x.WorkingDays != x.WorkingDaysPerWeek)
                     .Select(x => new
                     {
                         x.EmployeeId,
                         x.FirstName,
                         x.LastName,
                         x.VatNumber,
+                        x.Title,
                         Error = $"Η εβδομάδα {x.Week} ξεπερνάει το όριο 'Εργ. ημ. ανα εβδομάδα' με όριο '{x.WorkingDaysPerWeek}" +
-                            //(x.WorkingDaysPerWeek_Max == x.WorkingDaysPerWeek_Min ?
-                            //    x.WorkingDaysPerWeek_Max.ToString() :
-                            //    x.WorkingDaysPerWeek_Min + "-" + x.WorkingDaysPerWeek_Max) +
                             $"' με ημ. εργασίας'{x.WorkingDays }'"
                     })
                     .ToList();
@@ -1684,6 +1757,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     dictionary.Add("LastName", result.LastName);
                     dictionary.Add("VatNumber", result.VatNumber);
                     dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
                     dictionary.Add("Error", result.Error);
 
                     returnObjects.Add(expandoObj);
@@ -1701,6 +1775,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.EmployeeId,
                         x.Employee.FirstName,
                         x.Employee.LastName,
+                        x.TimeShift.WorkPlace.Title,
                         x.Employee.VatNumber,
                         x.Employee.Contract?.HoursPerWeek
                     })
@@ -1711,23 +1786,19 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.Key.LastName,
                         x.Key.VatNumber,
                         x.Key.Week,
+                        x.Key.Title,
                         x.Key.HoursPerWeek,
-                        HoursPerWeek_Max = (_datatable.FilterByOffsetMax == null) ? double.MaxValue : (double)_datatable.FilterByOffsetMax,
-                        HoursPerWeek_Min = (_datatable.FilterByOffsetMin == null) ? 0 : (double)_datatable.FilterByOffsetMin,
                         WorkingHours = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalHours).Sum(),
                     })
-                    //.Where(x => x.HoursPerWeek != x.WorkingHours)
-                    .Where(x => x.HoursPerWeek_Min <= x.WorkingHours && x.WorkingHours <= x.HoursPerWeek_Max && x.WorkingHours != x.HoursPerWeek)
+                    .Where(x => (decimal)x.WorkingHours != x.HoursPerWeek)
                     .Select(x => new
                     {
                         x.EmployeeId,
                         x.FirstName,
                         x.LastName,
+                        x.Title,
                         x.VatNumber,
                         Error = $"Η εβδομάδα {x.Week} ξεπερνάει το όριο 'Ώρες ανα εβδομάδα' με όριο '{x.HoursPerWeek}" +
-                            //(x.HoursPerWeek_Max == x.HoursPerWeek_Min ?
-                            //    x.HoursPerWeek_Max.ToString() :
-                            //    x.HoursPerWeek_Min + "-" + x.HoursPerWeek_Max) +
                         $"' με ώρες εργασίας'{x.WorkingHours }'"
                     })
                     .ToList();
@@ -1742,6 +1813,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     dictionary.Add("LastName", result.LastName);
                     dictionary.Add("VatNumber", result.VatNumber);
                     dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
                     dictionary.Add("Error", result.Error);
 
                     returnObjects.Add(expandoObj);
@@ -1759,6 +1831,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.EmployeeId,
                         x.Employee.FirstName,
                         x.Employee.LastName,
+                        x.TimeShift.WorkPlace.Title,
                         x.Employee.VatNumber,
                         x.Employee.Contract?.HoursPerDay
                     })
@@ -1769,13 +1842,11 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.Key.FirstName,
                         x.Key.LastName,
                         x.Key.VatNumber,
+                        x.Key.Title,
                         x.Key.HoursPerDay,
-                        HoursPerDay_Max = (_datatable.FilterByOffsetMax == null) ? decimal.MaxValue : (decimal)_datatable.FilterByOffsetMax,
-                        HoursPerDay_Min = (_datatable.FilterByOffsetMin == null) ? 0.0m: (decimal)_datatable.FilterByOffsetMin,
                         WorkingHours = (decimal)x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalHours).Sum(),
                     })
-                    //.Where(x => x.HoursPerDay != x.WorkingHours)
-                    .Where(x => x.HoursPerDay_Min <= x.WorkingHours && x.WorkingHours <= x.HoursPerDay_Max && x.WorkingHours != x.HoursPerDay)
+                    .Where(x => x.WorkingHours != x.HoursPerDay)
                     .Select(x => new
                     {
                         x.Day,
@@ -1783,13 +1854,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         x.FirstName,
                         x.LastName,
                         x.VatNumber,
-                        x.HoursPerDay_Max,
-                        x.HoursPerDay_Min,
+                        x.Title,
                         x.WorkingHours,
-                        Error = $"Η ημέρα {x.Day } ξεπερνάει το όριο 'Ώρες ανα ημέρα' με όριο '{x.HoursPerDay}" +
-                            //(x.HoursPerDay_Max == x.HoursPerDay_Min ?
-                            //    x.HoursPerDay_Max.ToString() :
-                            //    x.HoursPerDay_Min + "-" + x.HoursPerDay_Max) +
+                        Error = $"Η ημέρα {new DateTime(_datatable.StartOn.Year, 1, 1).AddDays(x.Day).ToShortDateString() } ξεπερνάει το όριο 'Ώρες ανα ημέρα' με όριο '{x.HoursPerDay}" +
                         $"' με ώρες εργασίας'{x.WorkingHours.ToString() }'"
                     })
                     .ToList();
@@ -1829,39 +1896,402 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         })
                         .ToList());
 
-                if (_datatable.FilterByOffsetMin == 0 || _datatable.FilterByOffsetMin == null)
+                foreach (var result in hoursPerDayEntities)
                 {
+                    var expandoObj = new ExpandoObject();
+                    var dictionary = (IDictionary<string, object>)expandoObj;
 
-                    var searchDaysDiff = originalEndOn.Date.Subtract(originalStartOn.Date).Days;
-                    foreach (var employee in employees)
-                    {
-                        for (int i = 0; i <= searchDaysDiff; i++)
-                        {
-                            var currentSearchDate = originalStartOn.Date.AddDays(i).Date;
-                            var currentSearchDateDay = CultureInfo.CurrentCulture.DateTimeFormat
-                                .Calendar.GetDayOfYear(currentSearchDate);
+                    dictionary.Add("Id", result.EmployeeId);
+                    dictionary.Add("FirstName", result.FirstName);
+                    dictionary.Add("LastName", result.LastName);
+                    dictionary.Add("VatNumber", result.VatNumber);
+                    dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
+                    dictionary.Add("Error", result.Error);
 
-                            var dateHasWorkHour = hoursPerDayEntities
-                                .Any(x => x.Day == currentSearchDateDay
-                                        && x.EmployeeId == employee.Id);
-
-                            if (!dateHasWorkHour)
-                                hoursPerDayEntities.Add(new
-                                {
-                                    Day = currentSearchDateDay,
-                                    EmployeeId = employee.Id,
-                                    FirstName = employee.FirstName,
-                                    LastName = employee.LastName,
-                                    VatNumber = employee.VatNumber,
-                                    HoursPerDay_Max = (_datatable.FilterByOffsetMax == null) ? decimal.MaxValue: (decimal)_datatable.FilterByOffsetMax,
-                                    HoursPerDay_Min = (_datatable.FilterByOffsetMin == null) ? 0.0m : (decimal)_datatable.FilterByOffsetMin,
-                                    WorkingHours = 0.0M,
-                                    Error = $"Η ημέρα {currentSearchDateDay} ξεπερνάει το όριο 'Ώρες ανα ημέρα' με όριο '{employee.Contract.HoursPerDay.ToString()}' με ώρες εργασίας'{0}'"
-                                });
-
-                        }
-                    }
+                    returnObjects.Add(expandoObj);
                 }
+            }
+            EntitiesMapped = returnObjects;
+            EntitiesTotal = await _baseDatawork.Employees.CountAllAsyncFiltered(_filter);
+
+            return this;
+        }
+
+
+        public async Task<ProjectionDataTableWorker> ProjectionTimeShiftSuggestions()
+        {
+
+            //set search dates of start to earliest Monday and set end to latest of Sunday
+            var originalStartOn = _datatable.StartOn.Date;
+            var originalEndOn = _datatable.EndOn.Date;
+            //If Sunday (DayOfWeek=0)
+            if (_datatable.StartOn.DayOfWeek.GetHashCode() == 0)
+                _datatable.StartOn = _datatable.StartOn.AddDays(-1);
+            else
+                _datatable.StartOn = _datatable.StartOn.AddDays(1 - _datatable.StartOn.DayOfWeek.GetHashCode());
+
+            _datatable.EndOn = _datatable.EndOn.AddDays(7 - _datatable.EndOn.DayOfWeek.GetHashCode());
+
+            var sum = 0.0;
+            var includes = new List<Func<IQueryable<WorkHour>, IIncludableQueryable<WorkHour, object>>>();
+            includes.Add(x => x.Include(y => y.Employee).ThenInclude(y => y.RealWorkHours).ThenInclude(y => y.TimeShift).ThenInclude(y => y.WorkPlace));
+            includes.Add(x => x.Include(y => y.Employee).ThenInclude(y => y.Contract));
+
+            var filter = PredicateBuilder.New<WorkHour>();
+            filter = filter.And(GetSearchFilterWorkHour());
+            filter = filter.And(x => _datatable.StartOn.Date <= x.StartOn.Date && x.StartOn.Date <= _datatable.EndOn.Date);
+
+            if (_datatable.FilterByWorkPlaceId != 0)
+                filter = filter.And(x => x.TimeShift.WorkPlaceId == _datatable.FilterByWorkPlaceId);
+
+            var entities = await _baseDatawork.WorkHours
+               .GetWithFilterQueryable(x => x.OrderBy(y => y.StartOn), filter, includes, _pageSize, _pageIndex)
+               .Select(x => new WorkHour
+               {
+                   Id = x.Id,
+                   StartOn = x.StartOn,
+                   EndOn = x.EndOn,
+                   Employee = new Employee
+                   {
+                       Id = x.EmployeeId,
+                       FirstName = x.Employee.FirstName,
+                       LastName = x.Employee.LastName,
+                       VatNumber = x.Employee.VatNumber,
+                       Contract = new Contract
+                       {
+                           DayOfDaysPerWeek = x.Employee.Contract != null ? x.Employee.Contract.DayOfDaysPerWeek : 0,
+                           WorkingDaysPerWeek = x.Employee.Contract != null ? x.Employee.Contract.WorkingDaysPerWeek : 0,
+                           HoursPerWeek = x.Employee.Contract != null ? x.Employee.Contract.HoursPerWeek : 0,
+                           HoursPerDay = x.Employee.Contract != null ? x.Employee.Contract.HoursPerDay : 0
+                       }
+                   },
+                   TimeShift = new TimeShift
+                   {
+                       WorkPlace = new WorkPlace
+                       {
+                           Title = x.TimeShift.WorkPlace.Title
+                       }
+                   }
+               })
+               .ToListAsync();
+
+            //Mapping
+            var expandoService = new ExpandoService();
+            var dataTableHelper = new DataTableHelper<Employee>();
+            var returnObjects = new List<ExpandoObject>();
+
+
+            //OverTime
+            if (_datatable.FilterByValidateOvertime)
+            {
+                var entitiesFiltered = entities
+                    .Where(x => originalStartOn <= x.StartOn.Date && x.StartOn.Date <= originalEndOn)
+                    .ToList();
+
+                var overTimeEntities = entitiesFiltered
+                    .Where(x => entitiesFiltered
+                        .Where(y => y.Id != x.Id)
+                        .Where(y => y.Employee.Id == x.Employee.Id)
+                        .Any(y => x.EndOn.AddHours(11) >= y.StartOn && x.StartOn.AddHours(-11) <= y.EndOn)).ToList();
+
+                foreach (var result in overTimeEntities)
+                {
+                    var expandoObj = new ExpandoObject();
+                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+                    dictionary.Add("Id", result.Employee.Id);
+                    dictionary.Add("FirstName", result.Employee.FirstName);
+                    dictionary.Add("LastName", result.Employee.LastName);
+                    dictionary.Add("VatNumber", result.Employee.VatNumber);
+                    dictionary.Add("WorkHour", dataTableHelper.GetProjectionTimeShiftSuggestionCellBody(result));
+                    dictionary.Add("Title", result.TimeShift.WorkPlace.Title);
+                    dictionary.Add("Error", $"Βάρδια με λιγότερο απο 11 ώρες διαφορά {result.StartOn.ToShortDateString()}");
+
+                    returnObjects.Add(expandoObj);
+                }
+            }
+
+            //Contract DayOff per week
+            if (_datatable.FilterByValidateDayOfDaysPerWeek)
+            {
+
+                var dayOfDaysPerWeekEntities = entities
+                    .GroupBy(x => new
+                    {
+                        Week = CultureInfo.CurrentCulture.DateTimeFormat.Calendar.GetWeekOfYear(x.StartOn, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday),
+                        Year = x.StartOn.Year,
+                        x.EmployeeId,
+                        x.Employee.FirstName,
+                        x.Employee.LastName,
+                        x.Employee.VatNumber,
+                        x.TimeShift.WorkPlace.Title,
+                        x.Employee.Contract.DayOfDaysPerWeek
+                    })
+                    .Select(x => new
+                    {
+                        x.Key.EmployeeId,
+                        x.Key.FirstName,
+                        x.Key.LastName,
+                        x.Key.VatNumber,
+                        x.Key.Week,
+                        x.Key.Title,
+                        x.Key.DayOfDaysPerWeek,
+                        WorkingDays = x.Select(y => y.StartOn.Day).Distinct().Count()
+                    })
+                    //.Where(x => x.DayOfDaysPerWeek != null)
+                    .Where(x => (7 - x.WorkingDays) < x.DayOfDaysPerWeek)
+                    .Select(x => new
+                    {
+                        x.EmployeeId,
+                        x.FirstName,
+                        x.LastName,
+                        x.Title,
+                        x.VatNumber,
+                        Error = $"Η εβδομάδα {x.Week} ξεπερνάει το όριο 'Ρεπό ανα εβδομάδα' με όριο '{x.DayOfDaysPerWeek}" +
+                        $"' με ρεπό'{7 - x.WorkingDays }'"
+                    })
+                    .ToList();
+
+                foreach (var result in dayOfDaysPerWeekEntities)
+                {
+                    var expandoObj = new ExpandoObject();
+                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+                    dictionary.Add("Id", result.EmployeeId);
+                    dictionary.Add("FirstName", result.FirstName);
+                    dictionary.Add("LastName", result.LastName);
+                    dictionary.Add("VatNumber", result.VatNumber);
+                    dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
+                    dictionary.Add("Error", result.Error);
+
+                    returnObjects.Add(expandoObj);
+                }
+            }
+
+            //Contract WorkDays per week 
+            if (_datatable.FilterByValidateWorkDaysPerWeek)
+            {
+
+                var workingDaysPerWeekEntities = entities
+                    .GroupBy(x => new
+                    {
+                        Week = CultureInfo.CurrentCulture.DateTimeFormat.Calendar.GetWeekOfYear(x.StartOn, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday),
+                        Year = x.StartOn.Year,
+                        x.EmployeeId,
+                        x.Employee.FirstName,
+                        x.Employee.LastName,
+                        x.TimeShift.WorkPlace.Title,
+                        x.Employee.VatNumber,
+                        x.Employee.Contract.WorkingDaysPerWeek
+                    })
+                    .Select(x => new
+                    {
+                        x.Key.EmployeeId,
+                        x.Key.FirstName,
+                        x.Key.LastName,
+                        x.Key.VatNumber,
+                        x.Key.Week,
+                        x.Key.Title,
+                        x.Key.WorkingDaysPerWeek,
+                        WorkingDays = x.Select(y => y.StartOn.Day).Distinct().Count(),
+                    })
+                    .Where(x => x.WorkingDays > x.WorkingDaysPerWeek)
+                    .Select(x => new
+                    {
+                        x.EmployeeId,
+                        x.FirstName,
+                        x.LastName,
+                        x.VatNumber,
+                        x.Title,
+                        Error = $"Η εβδομάδα {x.Week} ξεπερνάει το όριο 'Εργ. ημ. ανα εβδομάδα' με όριο '{x.WorkingDaysPerWeek}" +
+                            $"' με ημ. εργασίας'{x.WorkingDays }'"
+                    })
+                    .ToList();
+
+                foreach (var result in workingDaysPerWeekEntities)
+                {
+                    var expandoObj = new ExpandoObject();
+                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+                    dictionary.Add("Id", result.EmployeeId);
+                    dictionary.Add("FirstName", result.FirstName);
+                    dictionary.Add("LastName", result.LastName);
+                    dictionary.Add("VatNumber", result.VatNumber);
+                    dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
+                    dictionary.Add("Error", result.Error);
+
+                    returnObjects.Add(expandoObj);
+                }
+            }
+
+            //Contract Hours per week
+            if (_datatable.FilterByValidateHoursPerWeek)
+            {
+                var hoursPerWeekEntities = entities
+                    .GroupBy(x => new
+                    {
+                        Week = CultureInfo.CurrentCulture.DateTimeFormat.Calendar.GetWeekOfYear(x.StartOn, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday),
+                        Year = x.StartOn.Year,
+                        x.EmployeeId,
+                        x.Employee.FirstName,
+                        x.Employee.LastName,
+                        x.TimeShift.WorkPlace.Title,
+                        x.Employee.VatNumber,
+                        x.Employee.Contract?.HoursPerWeek
+                    })
+                    .Select(x => new
+                    {
+                        x.Key.EmployeeId,
+                        x.Key.FirstName,
+                        x.Key.LastName,
+                        x.Key.VatNumber,
+                        x.Key.Week,
+                        x.Key.Title,
+                        x.Key.HoursPerWeek,
+                        WorkingHours = x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalHours).Sum(),
+                    })
+                    .Where(x => (decimal)x.WorkingHours > x.HoursPerWeek)
+                    .Select(x => new
+                    {
+                        x.EmployeeId,
+                        x.FirstName,
+                        x.LastName,
+                        x.Title,
+                        x.VatNumber,
+                        Error = $"Η εβδομάδα {x.Week} ξεπερνάει το όριο 'Ώρες ανα εβδομάδα' με όριο '{x.HoursPerWeek}" +
+                        $"' με ώρες εργασίας'{x.WorkingHours }'"
+                    })
+                    .ToList();
+
+                foreach (var result in hoursPerWeekEntities)
+                {
+                    var expandoObj = new ExpandoObject();
+                    var dictionary = (IDictionary<string, object>)expandoObj;
+
+                    dictionary.Add("Id", result.EmployeeId);
+                    dictionary.Add("FirstName", result.FirstName);
+                    dictionary.Add("LastName", result.LastName);
+                    dictionary.Add("VatNumber", result.VatNumber);
+                    dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
+                    dictionary.Add("Error", result.Error);
+
+                    returnObjects.Add(expandoObj);
+                }
+            }
+
+            //Contract Hours per day
+            if (_datatable.FilterByValidateWorkingHoursPerDay)
+            {
+                var hoursPerDayEntities = entities
+                    .Where(x => originalStartOn <= x.StartOn.Date && x.StartOn.Date <= originalEndOn)
+                    .GroupBy(x => new
+                    {
+                        Day = CultureInfo.CurrentCulture.DateTimeFormat.Calendar.GetDayOfYear(x.StartOn),
+                        x.EmployeeId,
+                        x.Employee.FirstName,
+                        x.Employee.LastName,
+                        x.TimeShift.WorkPlace.Title,
+                        x.Employee.VatNumber,
+                        x.Employee.Contract?.HoursPerDay
+                    })
+                    .Select(x => new
+                    {
+                        x.Key.Day,
+                        x.Key.EmployeeId,
+                        x.Key.FirstName,
+                        x.Key.LastName,
+                        x.Key.VatNumber,
+                        x.Key.Title,
+                        x.Key.HoursPerDay,
+                        WorkingHours = (decimal)x.Select(y => new DateRangeService(y.StartOn, y.EndOn).ConvertToTotalWork().TotalHours).Sum(),
+                    })
+                    .Where(x => x.WorkingHours > x.HoursPerDay)
+                    .Select(x => new
+                    {
+                        x.Day,
+                        x.EmployeeId,
+                        x.FirstName,
+                        x.LastName,
+                        x.VatNumber,
+                        x.Title,
+                        x.WorkingHours,
+                        Error = $"Η ημέρα {new DateTime(_datatable.StartOn.Year, 1, 1).AddDays(x.Day).ToShortDateString() } ξεπερνάει το όριο 'Ώρες ανα ημέρα' με όριο '{x.HoursPerDay}" +
+                        $"' με ώρες εργασίας'{x.WorkingHours.ToString() }'"
+                    })
+                    .ToList();
+
+                var employees = new List<Employee>();
+                if (_datatable.FilterByWorkPlaceId == 0)
+                    employees.AddRange(_baseDatawork.Employees.Query
+                        .Include(x => x.Contract)
+                        .Where(x => x.ContractId != null)
+                        .Select(x => new Employee
+                        {
+                            Id = x.Id,
+                            FirstName = x.FirstName,
+                            LastName = x.LastName,
+                            VatNumber = x.VatNumber,
+                            Contract = new Contract
+                            {
+                                HoursPerDay = x.Contract.HoursPerDay
+                            }
+                        })
+                        .ToList());
+                else
+                    employees.AddRange(_baseDatawork.Employees.Query
+                        .Include(x => x.Contract)
+                        .Where(x => x.EmployeeWorkPlaces.Any(y => y.WorkPlaceId == _datatable.FilterByWorkPlaceId))
+                        .Where(x => x.ContractId != null)
+                        .Select(x => new Employee
+                        {
+                            Id = x.Id,
+                            FirstName = x.FirstName,
+                            LastName = x.LastName,
+                            VatNumber = x.VatNumber,
+                            Contract = new Contract
+                            {
+                                HoursPerDay = x.Contract.HoursPerDay
+                            }
+                        })
+                        .ToList());
+
+                //if (_datatable.FilterByOffsetMin == 0 || _datatable.FilterByOffsetMin == null)
+                //{
+
+                //    var searchDaysDiff = originalEndOn.Date.Subtract(originalStartOn.Date).Days;
+                //    foreach (var employee in employees)
+                //    {
+                //        for (int i = 0; i <= searchDaysDiff; i++)
+                //        {
+                //            var currentSearchDate = originalStartOn.Date.AddDays(i).Date;
+                //            var currentSearchDateDay = CultureInfo.CurrentCulture.DateTimeFormat
+                //                .Calendar.GetDayOfYear(currentSearchDate);
+
+                //            var dateHasWorkHour = hoursPerDayEntities
+                //                .Any(x => x.Day == currentSearchDateDay
+                //                        && x.EmployeeId == employee.Id);
+
+                //            if (!dateHasWorkHour)
+                //                hoursPerDayEntities.Add(new
+                //                {
+                //                    Day = currentSearchDateDay,
+                //                    EmployeeId = employee.Id,
+                //                    FirstName = employee.FirstName,
+                //                    LastName = employee.LastName,
+                //                    VatNumber = employee.VatNumber,
+                //                    HoursPerDay_Max = (_datatable.FilterByOffsetMax == null) ? decimal.MaxValue: (decimal)_datatable.FilterByOffsetMax,
+                //                    HoursPerDay_Min = (_datatable.FilterByOffsetMin == null) ? 0.0m : (decimal)_datatable.FilterByOffsetMin,
+                //                    WorkingHours = 0.0M,
+                //                    Error = $"Η ημέρα {currentSearchDateDay} ξεπερνάει το όριο 'Ώρες ανα ημέρα' με όριο '{employee.Contract.HoursPerDay.ToString()}' με ώρες εργασίας'{0}'"
+                //                });
+
+                //        }
+                //    }
+                //}
 
                 foreach (var result in hoursPerDayEntities)
                 {
@@ -1873,6 +2303,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                     dictionary.Add("LastName", result.LastName);
                     dictionary.Add("VatNumber", result.VatNumber);
                     dictionary.Add("WorkHour", "-");
+                    dictionary.Add("Title", result.Title);
                     dictionary.Add("Error", result.Error);
 
                     returnObjects.Add(expandoObj);

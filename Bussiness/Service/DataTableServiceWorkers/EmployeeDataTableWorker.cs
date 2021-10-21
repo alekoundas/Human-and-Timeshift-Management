@@ -526,6 +526,80 @@ namespace Bussiness.Service.DataTableServiceWorkers
             return this;
         }
 
+        public async Task<EmployeeDataTableWorker> TimeShiftAmendment()
+        {
+            var includes = new List<Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>>>();
+            includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(y=>y.Amendment));
+            includes.Add(x => x.Include(y => y.RealWorkHours).ThenInclude(y=>y.TimeShift));
+
+
+            var entities = await _baseDatawork.Employees
+                .GetWithFilterQueryable(SetOrderBy(), null, includes, _pageSize, _pageIndex)
+                .Select(x => new Employee
+                {
+                    Id = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    ErpCode = x.ErpCode,
+                    IsActive = x.IsActive,
+                    RealWorkHours = x.RealWorkHours
+                        //.Where(y => y.TimeShiftId == _datatable.FilterByTimeShiftId)
+                        .Select(y => new RealWorkHour
+                        {
+                            Id = y.Id,
+                            StartOn = y.StartOn,
+                            EndOn = y.EndOn,
+                            TimeShift = new TimeShift
+                            {
+                                Month = y.TimeShift.Month,
+                                Year = y.TimeShift.Year
+
+                            },
+                            AmendmentId = y.AmendmentId,
+                            Amendment = y.Amendment
+                        }).ToList(),
+                    Amendments = x.Amendments
+                        .Where(y=>y.RealWorkHourId==null)
+                        .ToList()
+                }).ToListAsync();
+
+            //Mapping
+            var expandoService = new ExpandoService();
+            var dataTableHelper = new DataTableHelper<Employee>();
+            var returnObjects = new List<ExpandoObject>();
+            var autoIncrementNumber = 0;
+            foreach (var result in entities)
+            {
+                var expandoObj = new ExpandoObject();
+                var dictionary = (IDictionary<string, object>)expandoObj;
+                var timeshift = result.RealWorkHours.Select(x => x.TimeShift).FirstOrDefault();
+                if (timeshift != null)
+                {
+
+
+                    dictionary.Add("FirstName", result.FirstName);
+                    dictionary.Add("LastName", result.LastName);
+                    dictionary.Add("ErpCode", result.ErpCode);
+                    dictionary.Add("IsActive", result.IsActive);
+
+
+
+                    for (int i = 0; i < DateTime.DaysInMonth(timeshift.Year, timeshift.Month); i++)
+                        dictionary.Add("Day_" + i, dataTableHelper
+                            .GetAmendmentCellBodyWorkHours(i + 1, result));
+
+                    dictionary.Add("ToggleSlider", dataTableHelper
+                        .GetEmployeeCheckbox(_datatable, result.Id));
+
+                    returnObjects.Add(expandoObj);
+                }
+            }
+            EntitiesMapped = returnObjects;
+            EntitiesTotal = await _baseDatawork.Employees.CountAllAsyncFiltered(_filter);
+
+            return this;
+        }
+
         public async Task<EmployeeDataTableWorker> RealWorkHourClockIn()
         {
             var clockInState = "none";

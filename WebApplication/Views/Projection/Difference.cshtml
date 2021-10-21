@@ -137,12 +137,6 @@
             ConvertDateForApi(new Date(moment(document.getElementById('SearchRangeInput').value
                 .split('/-/')[1], 'DD/MM/YYYY').valueOf()).setHours(23, 59, 59).valueOf());
 
-
-        const setHoursToMax = date => {
-            var newDate = new Date(date);
-            newDate.setHours(23, 59, 59);
-            return moment(newDate);
-        }
     </script>
     <script>
         $('#WorkPlace_Select2').select2({

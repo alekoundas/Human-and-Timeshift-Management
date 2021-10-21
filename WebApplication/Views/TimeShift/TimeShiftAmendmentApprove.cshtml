@@ -1,0 +1,154 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-1"> </div>
+    <div class="col-md-10">
+
+        <div class="box box-danger" style="margin-top:5%;">
+
+            <div class="box-header">
+                <h3 class="box-title">@ViewData["Title"]</h3>
+                <div class="pull-right">
+                    @Html.ButtonCreateNew("TimeShift")
+                    @Html.ButtonImport("TimeShift")
+                    @Html.ButtonExport("TimeShift")
+                </div>
+            </div>
+            <hr />
+            <div class="box-body table-responsive">
+
+                <table id="WorkPlaceDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Πόστο</th>
+                            <th>Πελάτης</th>
+                            <th>Εταιρία</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Πόστο</th>
+                            <th>Πελάτης</th>
+                            <th>Εταιρία</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-1"> </div>
+
+</div>
+<partial name="_ExcelModals" model='new {Entity = "TimeShift" }'>
+
+    @section Scripts {
+
+        <script>
+            $(() => {
+                var dataTable = new DataTableService('#WorkPlaceDatatable')
+                    .ForApiController('workplaces')
+                    .StartOrderFromCol(1)
+                    .AddColumn(false, false, "", (a, b, data, d) => '<button type="button" id="DetailsButtonNum_' + data.Id + '" class="btn  btn-success DetailsButton"><i class="fa fa-plus"></i></button>')
+                    .AddColumn(true, true, "Title")
+                    .AddColumn(true, true, "IdentifyingName")
+                    .AddColumn(true, true, "CompanyTitle")
+                    .AjaxData((data, type, row, meta) => {
+                        data.Predicate = 'TimeShiftIndex';
+                        return JSON.stringify(data);
+                    })
+                    .CompleteDataTable();
+
+                $('#WorkPlaceDatatable tbody').on('click', 'td.details-control', function () {
+                    var tr = $(this).closest('tr');
+                    var row = dataTable.row(tr);
+                    if (row.child.isShown()) {
+                        // This row is already open - close it
+                        DestroyTimeShiftDatatable(row.data().Id);
+                        row.child.hide();
+                        tr.removeClass('shown');
+                        SetDetailsButtonOff(row.data().Id);
+                    }
+                    else {
+                        // Open this row
+                        row.child(format(row.data().Id)).show();
+                        CreateTimeShiftDatatable(row.data().Id);
+                        SetDetailsButtonOn(row.data().Id);
+                        tr.addClass('shown');
+                    }
+                });
+
+            })
+        </script>
+        <script>
+
+            const SetDetailsButtonOn = id => {
+                var detailButton = document.getElementById('DetailsButtonNum_' + id);
+                detailButton.classList.remove('btn-success');
+                detailButton.firstElementChild.classList.remove('fa-plus');
+
+                detailButton.classList.add('btn-danger');
+                detailButton.firstElementChild.classList.add('fa-minus');
+            }
+
+            const SetDetailsButtonOff = id => {
+                var detailButton = document.getElementById('DetailsButtonNum_' + id);
+                detailButton.classList.remove('btn-danger');
+                detailButton.firstElementChild.classList.remove('fa-minus');
+
+                detailButton.classList.add('btn-success');
+                detailButton.firstElementChild.classList.add('fa-plus');
+            }
+
+
+
+            const format = id => {
+                return '<p>Χρονοδιαγράμματα πόστου</p>' +
+                    '<div style="width:100%">' +
+                    '<div style="float:left; width:2% ">&nbsp</div>' +
+                    '<div style="float:left; width:95% ">' +
+                    '<table id="TimeShiftsDatatableNum_' + id + '" class="table table-bordered table-hover table-responsive">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th>Τίτλος</th>' +
+                    '<th>Μήνας</th>' +
+                    '<th>Έτος</th>' +
+                    '<th>Ενέργειες</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tfoot>' +
+                    '<tr>' +
+                    '<th>Τίτλος</th>' +
+                    '<th>Μήνας</th>' +
+                    '<th>Έτος</th>' +
+                    '<th>Ενέργειες</th>' +
+                    '</tr>' +
+                    '</tfoot>' +
+                    '</table>' +
+                    '</div>' +
+                    '<div style="float:left; width:2% ">&nbsp</div>' +
+                    '</div>';
+            };
+
+            const DestroyTimeShiftDatatable = id =>
+                $('#TimeShiftsDatatableNum_' + id).DataTable().destroy();
+
+            const CreateTimeShiftDatatable = id =>
+                new DataTableService('#TimeShiftsDatatableNum_' + id)
+                    .ForApiController('timeshifts')
+                    .AddColumn(true, true, "Title")
+                    .AddColumn(true, true, "Month")
+                    .AddColumn(true, true, "Year")
+                    .AddColumn(false, false, "Buttons")
+                    .AjaxData((data, type, row, meta) => {
+                        data.predicate = 'TimeShiftIndex';
+                        data.GenericId = id;//WorkPlaceId
+                        return JSON.stringify(data);
+                    })
+                    .CompleteDataTable();
+
+
+        </script>
+    }

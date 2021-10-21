@@ -12,10 +12,12 @@ namespace DataAccess.Models.Entity
         public string Title { get; set; }
 
         [Display(Name = "Ώρες ανα εβδομάδα")]
-        public int HoursPerWeek { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+
+        public decimal HoursPerWeek { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
 
         [Display(Name = "Ώρες ανα ημέρα")]
-        [Column(TypeName = "decimal(18,2)")]
         public decimal HoursPerDay { get; set; }
 
         [Display(Name = "Εργάσιμες μέρες εβδομάδας")]
@@ -28,8 +30,8 @@ namespace DataAccess.Models.Entity
         public string Description { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal GrossSalaryPerHour { get; set; }
 
+        public decimal GrossSalaryPerHour { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal NetSalaryPerHour { get; set; }
 

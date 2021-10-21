@@ -242,6 +242,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionErganiSuggestions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeConsecutiveDayOff_View").Wait();
 
@@ -376,6 +377,8 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "WorkPlace_Delete").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Import").Wait();
                     userManager.AddToRoleAsync(user, "WorkPlace_Export").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShiftAmendment_View").Wait();
+                    userManager.AddToRoleAsync(user, "TimeShiftAmendmentApprove_View").Wait();
 
                     //TimeShift
                     userManager.AddToRoleAsync(user, "TimeShift_View").Wait();
@@ -437,6 +440,7 @@ namespace Business.Seed
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeRealHoursSum_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionRealWorkHourRestrictions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionTimeShiftSuggestions_View").Wait();
+                    userManager.AddToRoleAsync(user, "ProjectionErganiSuggestions_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionHoursWithComments_View").Wait();
                     userManager.AddToRoleAsync(user, "ProjectionEmployeeConsecutiveDayOff_View").Wait();
 
@@ -563,6 +567,8 @@ namespace Business.Seed
             CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Delete");
             CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Import");
             CreateRole(roleManager, "TimeShift", "Χρονοδίαγραμμα", "Export");
+            CreateRole(roleManager, "TimeShiftAmendment", "ΧρονοδίαγραμμαΤροποποιήσεις", "View");
+            CreateRole(roleManager, "TimeShiftAmendmentApprove", "ΧρονοδίαγραμμαΤροποποιήσειςΈγκριση", "View");
 
             //Leave
             CreateRole(roleManager, "Leave", "Άδεια", "View");
@@ -618,6 +624,7 @@ namespace Business.Seed
             CreateRole(roleManager, "ProjectionPresenceDaily", "Προβολή_ΠαρουσίεςΗμ", "View");
             CreateRole(roleManager, "ProjectionRealWorkHourRestrictions", "Προβολή_ΠαρουσίεςΗμ", "View");
             CreateRole(roleManager, "ProjectionTimeShiftSuggestions", "Προβολή_ΥποδείξειςΧρονοδιαγράμματος", "View");
+            CreateRole(roleManager, "ProjectionErganiSuggestions", "Προβολή_ΥποδείξειςΕργάνη", "View");
             CreateRole(roleManager, "ProjectionHoursWithComments", "Προβολή_ΒάρδιεςΜεΣχόλια", "View");
 
             //Administration

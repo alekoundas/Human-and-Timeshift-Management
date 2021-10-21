@@ -1,4 +1,4 @@
-﻿@model DataAccess.Models.Entity.Contract
+﻿@model DataAccess.ViewModels.ContractEdit
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml"; }
 
@@ -19,6 +19,8 @@
 
             <form asp-controller="Contract" asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="ContractMembership" />
+                <input type="hidden" asp-for="ContractType" />
                 <input type="hidden" asp-for="CreatedBy_Id" />
                 <input type="hidden" asp-for="IsActive" />
                 <input type="hidden" asp-for="CreatedBy_FullName" />
@@ -37,7 +39,7 @@
                     <div class="form-group">
                         <label asp-for="DayOfDaysPerWeek" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="DayOfDaysPerWeek" class="form-control" value="0">
+                            <input asp-for="DayOfDaysPerWeek" class="form-control">
                             <span asp-validation-for="DayOfDaysPerWeek" class="text-danger"></span>
                         </div>
                     </div>
@@ -46,7 +48,7 @@
                     <div class="form-group">
                         <label asp-for="WorkingDaysPerWeek" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="WorkingDaysPerWeek" class="form-control" value="0">
+                            <input asp-for="WorkingDaysPerWeek" class="form-control" >
                             <span asp-validation-for="WorkingDaysPerWeek" class="text-danger"></span>
                         </div>
                     </div>
@@ -54,32 +56,28 @@
                     <div class="form-group">
                         <label asp-for="HoursPerWeek" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="HoursPerWeek" class="form-control">
-                            <span asp-validation-for="HoursPerWeek" class="text-danger"value="0"></span>
+                            <input name="HoursPerWeek" class="form-control" pattern="^\d*(\,\d{0,2})?$"  value="@Model.HoursPerWeek">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label asp-for="HoursPerDay" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="HoursPerDay" class="form-control">
-                            <span asp-validation-for="HoursPerDay" class="text-danger" step="0.1" value="0.00"></span>
+                            <input name="HoursPerDay" pattern="^\d*(\,\d{0,2})?$" class="form-control" value="@Model.HoursPerDay">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label asp-for="GrossSalaryPerHour" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="GrossSalaryPerHour" class="form-control">
-                            <span asp-validation-for="GrossSalaryPerHour" class="text-danger"step="0.1"  value="0.00"></span>
+                            <input name="GrossSalaryPerHour" pattern="^\d*(\,\d{0,2})?$" class="form-control" value="@Model.GrossSalaryPerHour">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label asp-for="NetSalaryPerHour" class="control-label"></label>
                         <div class="input-group">
-                            <input asp-for="NetSalaryPerHour" class="form-control">
-                            <span asp-validation-for="NetSalaryPerHour" class="text-danger" step="0.1" value="0.00"></span>
+                            <input name="NetSalaryPerHour" pattern="^\d*(\,\d{0,2})?$" class="form-control" value="@Model.NetSalaryPerHour">
                         </div>
                     </div>
 
@@ -135,6 +133,21 @@
 
 
     <script>
+        //Decimal regex
+        $(document).on('keydown', 'input[pattern]', function (e) {
+            var input = $(this);
+            var oldVal = input.val();
+            var regex = new RegExp(input.attr('pattern'), 'g');
+
+            setTimeout(function () {
+                var newVal = input.val();
+                if (!regex.test(newVal)) {
+                    input.val(oldVal);
+                }
+            }, 1);
+        });
+
+
         $('.ContractMembership_Select2').select2({
             allowClear: true,
             ajax: {

@@ -21,6 +21,9 @@ namespace DataAccess.Configurations
                 .WithMany(x => x.RealWorkHours)
                 .HasForeignKey(x => x.TimeShiftId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.Amendment)
+                .WithMany();
         }
     }
 }

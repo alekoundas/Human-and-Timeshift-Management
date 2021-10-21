@@ -1,11 +1,11 @@
 ﻿class AppendListService {
     constructor(selector) {
-        this._selector = selector;
-        this._url;
+        this._selector = selector; //Id
         this._controller;
         this._title = '';
         this._entityName = '';
         this._existingIds = [];
+        this._existingId = 0;
         this._isEdit = false;
         this._select2Count = 0;
 
@@ -40,6 +40,10 @@
             this._existingIds = ids;
             return this.Init();
         },
+        AppendExistingId: (id) => {
+            this._existingId = id;
+            return this.Init();
+        },
         SetEntityName: (entityName) => {
             this._entityName = entityName;
             return this.Init();
@@ -55,7 +59,8 @@
             if (this._existingIds != undefined)
                 [...this._existingIds].forEach(x => this.#AppendNewSelect2(x))
 
-            //return this.#OnAfterDelete()
+            if (this._existingId > 0)
+                this.#AppendNewSelect2(this._existingId)
         }
     })
 
@@ -141,22 +146,7 @@
     //Select2 - Library
     #Select2Init = (select2Count, existingId, existingText) => {
 
-        //Get data for pre set ids (Select2 loads data on 'open' only)
-        $('#Select2EntityNum_' + select2Count).select2({
-            ajax: {
-                type: "POST",
-                url: '/api/' + this._controller + '/select2',
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                data: params => JSON.stringify(
-                    new DtoFactory().Select2(
-                        params.search,
-                        params.page,
-                        0,
-                        this.#GetSelectedEntities().map(x => x.id)))
-            }
-        })
-
+        //Get data from Id
         if (existingId > 0 || existingId?.length == 36) {
             if (existingText == undefined) {
                 $.ajax({
@@ -166,15 +156,20 @@
                     dataType: "json",
                     data: JSON.stringify(new DtoFactory().Select2(null, null, existingId))
                 }).then((data) => {
-                    $('#Select2EntityNum_' + select2Count).data('select2').trigger('select', {
-                        data: { id: existingId, text: data.results[0].text }
-                    });
+                    var newOption = $("<option selected='selected'></option>")
+                        .val(existingId)
+                        .text(data.results[0].text)
+
+                    $('#Select2EntityNum_' + select2Count).append(newOption).trigger('change');
+
                 });
             }
             else {
-                $('#Select2EntityNum_' + select2Count).data('select2').trigger('select', {
-                    data: { id: existingId, text: existingText }
-                });
+                var newOption = $("<option selected='selected'></option>")
+                    .val(existingId)
+                    .text(existingText)
+
+                $('#Select2EntityNum_' + select2Count).append(newOption).trigger('change');
             }
         }
 
@@ -187,14 +182,16 @@
                 dataType: "json",
                 data: params => JSON.stringify(
                     new DtoFactory().Select2(
-                        params.search,
+                        params.term,
                         params.page,
                         0,
                         this.#GetSelectedEntities().map(x => x.id)))
             }
         }).on('change', (e) => {
-            //this.#RefreshRows();
-            this._onAfterSelect2Change(e.target.value)
+            if (existingId == '' || existingId == undefined) {
+                this.#RefreshRows();
+                this._onAfterSelect2Change(e.target.value);
+            }
         });
 
         if (this._isEdit === false)
@@ -205,6 +202,7 @@
     #RefreshRows() {
         this._select2Count = 0;
         var entities = this.#GetSelectedEntities();
+        console.log(entities);
         document.getElementById('Select2Container').innerHTML = '';
         entities.forEach(data => this.#AppendNewSelect2(data.id, data.text));
     }

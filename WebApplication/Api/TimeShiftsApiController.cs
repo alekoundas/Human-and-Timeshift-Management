@@ -3,6 +3,7 @@ using Bussiness.Helpers;
 using Bussiness.Service;
 using DataAccess;
 using DataAccess.Libraries.Datatable;
+using DataAccess.Libraries.Select2;
 using DataAccess.Models.Entity;
 using DataAccess.ViewModels;
 using LinqKit;
@@ -34,10 +35,10 @@ namespace WebApplication.Api
             _securityDatawork = new SecurityDataWork(securityDbContext);
         }
 
-        //RealWorkHourCreate
-        // GET: api/TimeShiftsApi
+
+        // GET: api/TimeShifts/id
         [HttpGet("{id}")]
-        public async Task<ActionResult<TimeShift>> GetTimeShift(int id)
+        public async Task<ActionResult<TimeShift>> Get(int id)
         {
             var timeShift = await _context.TimeShifts.FindAsync(id);
 
@@ -122,6 +123,41 @@ namespace WebApplication.Api
         }
 
 
+        // POST: api/timeshifts/select2
+        [HttpPost("select2")]
+        public async Task<ActionResult<TimeShift>> Select2(Select2 select2)
+        {
+            var entities = new List<TimeShift>();
+            var select2Helper = new Select2Helper();
+            var includes = new List<Func<IQueryable<TimeShift>, IIncludableQueryable<TimeShift, object>>>();
+            includes.Add(x => x.Include(y => y.WorkPlace));
+            var filter = PredicateBuilder.New<TimeShift>();
+            filter = filter.And(x => true);
+            var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<TimeShift>(HttpContext);
+
+            if (!canShowDeactivated)
+                filter = filter.And(x => x.IsActive == true);
+
+            if (select2.FromEntityId != 0)
+                filter = filter.And(x => x.Id == select2.FromEntityId);
+
+            if (select2.ExistingIds?.Count > 0)
+                foreach (var workPlaceId in select2.ExistingIds)
+                    filter = filter.And(x => x.Id != workPlaceId);
+
+            if (!string.IsNullOrWhiteSpace(select2.Search))
+                filter = filter.And(x => x.Title.Contains(select2.Search));
+
+            entities = await _baseDataWork.TimeShifts
+                .GetPaggingWithFilter(null, filter, includes, 10, select2.Page);
+
+            var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
+            var hasMore = (select2.Page * 10) < total;
+
+            return Ok(select2Helper.CreateTimeShiftsResponse(entities, hasMore));
+        }
+
+
         // GET: api/timeshifts/select2
         [HttpGet("select2")]
         public async Task<ActionResult<TimeShift>> Select2(string search, int page, string predicate = "", int workPlaceId = 0)
@@ -141,7 +177,7 @@ namespace WebApplication.Api
 
             if (predicate == "RealWorkHourCreate")
             {
-                filter = filter.And(x => x.Month == DateTime.Now.Month);
+                filter = filter.And(x => x.Month == DateTime.Now.AddHours(3).Month);
             }
             else if (predicate == "RealWorkHourClockIn")
             {
@@ -188,89 +224,9 @@ namespace WebApplication.Api
 
             return Ok(results);
 
-            //var pageSize = datatable.Length;
-            //var pageIndex = (int)Math.Ceiling((decimal)(datatable.Start / datatable.Length) + 1);
-            //var columnName = datatable.Columns[datatable.Order[0].Column].Data;
-            //var orderDirection = datatable.Order[0].Dir;
-            //var filter = PredicateBuilder.New<TimeShift>();
-            //filter = filter.And(GetSearchFilter(datatable));
-
-            //var canShowDeactivated = DeactivateService.CanShowDeactivatedFromUser<TimeShift>(HttpContext);
-
-            //if (!canShowDeactivated)
-            //    filter = filter.And(x => x.IsActive == true);
-
-
-            //var includes = new List<Func<IQueryable<TimeShift>, IIncludableQueryable<TimeShift, object>>>();
-            //var dataTableHelper = new DataTableHelper<ExpandoObject>();
-            //var timeShifts = new List<TimeShift>();
-
-
-            //if (datatable.Predicate == "TimeShiftIndex")
-            //{
-            //    filter = filter.And(x => x.WorkPlaceId == datatable.GenericId);
-            //    timeShifts = await _baseDataWork.TimeShifts
-            //        .GetPaggingWithFilter(SetOrderBy(columnName, orderDirection), filter, includes, pageSize, pageIndex);
-            //}
-
-            //var mapedData = MapResults(timeShifts, datatable);
-
-            //var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
-            //return Ok(dataTableHelper.CreateResponse(datatable, mapedData, total));
         }
 
-        //protected IEnumerable<ExpandoObject> MapResults(IEnumerable<TimeShift> results, Datatable datatable)
-        //{
-        //    var expandoObject = new ExpandoService();
-        //    var dataTableHelper = new DataTableHelper<TimeShift>();
-        //    List<ExpandoObject> returnObjects = new List<ExpandoObject>();
-        //    foreach (var timeShift in results)
-        //    {
-        //        var expandoObj = expandoObject.GetCopyFrom<TimeShift>(timeShift);
-        //        var dictionary = (IDictionary<string, object>)expandoObj;
-        //        if (datatable.Predicate == "TimeShiftIndex")
-        //        {
-        //            dictionary.Add("Buttons", dataTableHelper.GetButtons("TimeShift",
-        //                "TimeShifts", timeShift.Id.ToString()));
-        //        }
-        //        returnObjects.Add(expandoObj);
-        //    }
-
-        //    return returnObjects;
-        //}
-        //private bool TimeShiftExists(int id)
-        //{
-        //    return _context.TimeShifts.Any(e => e.Id == id);
-        //}
-
-        //private Func<IQueryable<TimeShift>, IOrderedQueryable<TimeShift>> SetOrderBy(string columnName, string orderDirection)
-        //{
-        //    if (columnName != "")
-        //        return x => x.OrderBy(columnName + " " + orderDirection.ToUpper());
-        //    else
-        //        return null;
-        //}
-        //private Expression<Func<TimeShift, bool>> GetSearchFilter(Datatable datatable)
-        //{
-        //    var filter = PredicateBuilder.New<TimeShift>();
-        //    if (datatable.Search.Value != null)
-        //    {
-        //        foreach (var column in datatable.Columns)
-        //        {
-        //            if (column.Data == "Title")
-        //                filter = filter.Or(x => x.Title.Contains(datatable.Search.Value));
-        //            if (column.Data == "Month")
-        //                filter = filter.Or(x => x.Month.ToString().Contains(datatable.Search.Value));
-        //            if (column.Data == "Year")
-        //                filter = filter.Or(x => x.Year.ToString().Contains(datatable.Search.Value));
-        //        }
-
-        //    }
-        //    else
-        //        filter = filter.And(x => true);
-
-        //    return filter;
-        //}
+       
 
         private Expression<Func<TimeShift, bool>> GetUserRoleFilters()
         {

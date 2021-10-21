@@ -65,10 +65,8 @@ namespace WebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                var sss =
-                       ContractCreate.CreateFrom(Contract);
-                _baseDataWork.Contracts.Add(
-                    ContractCreate.CreateFrom(Contract));
+                _baseDataWork.Contracts.Add(ContractCreate.CreateFrom(Contract));
+
                 var status = await _baseDataWork.SaveChangesAsync();
                 if (status > 0)
                     TempData["StatusMessage"] = "H σύμβαση " +
@@ -94,26 +92,29 @@ namespace WebApplication.Controllers
                 .Include(x => x.ContractType)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
+            var result = ContractEdit.CreateFrom(contract);
+
             if (contract == null)
                 return NotFound();
 
             ViewData["Title"] = "Επεξεργασία σύμβασης ";
-            return View(contract);
+            return View(result);
         }
 
         // POST: Contracts/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, Contract Contract)
+        public async Task<ActionResult> Edit(int id, ContractEdit contract)
         {
-            if (id != Contract.Id)
+            if (id != contract.Id)
                 return NotFound();
 
+            var result = ContractEdit.CreateFrom(contract);
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(Contract);
+                    _context.Update(result);
                     await _baseDataWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -121,7 +122,7 @@ namespace WebApplication.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(Contract);
+            return View(result);
         }
 
 

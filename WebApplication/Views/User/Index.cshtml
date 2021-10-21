@@ -1,53 +1,61 @@
-﻿@model DataAccess.ViewModels.ApplicationUserViewModel
-@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
 
 <div class="row">
-    <div class="col-md-3"> </div>
-    <div class="col-md-6">
+    <div class="col-md-1"> </div>
+    <div class="col-md-10">
+
         <div class="box box-danger" style="margin-top:5%;">
 
             <div class="box-header">
                 <h3 class="box-title">@ViewData["Title"]</h3>
                 <div class="pull-right">
-                    @Html.ButtonCreateNew("User")
+                    @Html.ButtonCreateNew("Company")
+                    @Html.ButtonImport("Company")
+                    @Html.ButtonExport("Company")
                 </div>
             </div>
             <hr />
-            <table id="UsersDatatable" class="table table-bordered table-hover table-responsive stripe">
-                <thead>
-                    <tr>
-                        <th>UserName</th>
-                        <th>Email</th>
-                        <th>Ενέργειες</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                    <tr>
-                        <th>UserName</th>
-                        <th>Email</th>
-                        <th>Ενέργειες</th>
-                    </tr>
-                </tfoot>
-            </table>
+            <div class="box-body table-responsive">
+
+                <table id="UsersDatatable" class="table table-bordered table-hover table-responsive stripe">
+                    <thead>
+                        <tr>
+                            <th>UserName</th>
+                            <th>Email</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>UserName</th>
+                            <th>Email</th>
+                            <th>Ενέργειες</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-3"> </div>
+    <div class="col-md-1"> </div>
 
 </div>
 
+
+
+
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
     <script>
         $(() => {
-            var dataTable = new DataTableService('#UsersDatatable')
+            new DataTableService('#UsersDatatable')
                 .ForApiController('users')
                 .StartOrderFromCol(1)
                 .AddColumn(true, true, "UserName")
                 .AddColumn(true, true, "Email")
                 .AddColumn(false, false, "Buttons")
                 .AjaxData((data, type, row, meta) => {
-                    data.Predicate = 'UserIndex';
+                    data.Predicate = 'ApplicationUserIndex';
                     return JSON.stringify(data);
                 })
                 .CompleteDataTable();

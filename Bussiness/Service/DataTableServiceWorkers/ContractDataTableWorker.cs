@@ -4,6 +4,7 @@ using DataAccess.Libraries.Datatable;
 using DataAccess.Models.Entity;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,8 @@ namespace Bussiness.Service.DataTableServiceWorkers
         public async Task<ContractDataTableWorker> ContractIndex()
         {
             var includes = new List<Func<IQueryable<Contract>, IIncludableQueryable<Contract, object>>>();
+            includes.Add(x => x.Include(y => y.ContractMembership));
+            includes.Add(x => x.Include(y => y.ContractType));
 
             var entities = await _baseDatawork.Contracts
                 .GetPaggingWithFilter(SetOrderBy(), _filter, includes, _pageSize, _pageIndex);
@@ -82,6 +85,9 @@ namespace Bussiness.Service.DataTableServiceWorkers
             {
                 var expandoObj = expandoService.GetCopyFrom<Contract>(result);
                 var dictionary = (IDictionary<string, object>)expandoObj;
+
+                dictionary.Add("ContractTypeTitle", result.ContractType.Name);
+                dictionary.Add("ContractMembershipTitle", result.ContractMembership.Name);
 
                 dictionary.Add("Buttons", dataTableHelper
                     .GetButtons("Contract", "Contracts", result.Id.ToString()));

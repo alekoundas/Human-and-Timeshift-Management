@@ -1,5 +1,4 @@
-﻿using DataAccess.Configurations;
-using DataAccess.Models.Audit;
+﻿using DataAccess.Models.Audit;
 using DataAccess.Models.Entity;
 using DataAccess.Repository.Base;
 using DataAccess.Repository.Base.Interface;
@@ -29,6 +28,7 @@ namespace DataAccess
         public IWorkplaceRepository WorkPlaces { get; private set; }
         public ITimeShiftRepository TimeShifts { get; private set; }
         public ILeaveTypeRepository LeaveTypes { get; private set; }
+        public IAmendmentRepository Amendments { get; private set; }
         public IContractTypeRepository ContractTypes { get; private set; }
         public IRealWorkHourRepository RealWorkHours { get; private set; }
         public ISpecializationRepository Specializations { get; private set; }
@@ -49,6 +49,7 @@ namespace DataAccess
             WorkPlaces = new WorkPlaceRepository(_dbcontext);
             LeaveTypes = new LeaveTypeRepository(_dbcontext);
             TimeShifts = new TimeShiftRepository(_dbcontext);
+            Amendments = new AmendmentRepository(_dbcontext);
             ContractTypes = new ContractTypeRepository(_dbcontext);
             RealWorkHours = new RealWorkHourRepository(_dbcontext);
             Specializations = new SpecializationRepository(_dbcontext);
@@ -68,6 +69,17 @@ namespace DataAccess
                 ModifiedOn = DateTime.Now
             });
             return await _dbcontext.SaveChangesAsync();
+        }
+        public int SaveChanges()
+        {
+            //AutoHistory will fill with user values on Edit and Delete
+            _dbcontext.EnsureAutoHistory(() => new AuditAutoHistory
+            {
+                ModifiedBy_FullName = HttpAccessorService.GetLoggeInUser_FullName,
+                ModifiedBy_Id = HttpAccessorService.GetLoggeInUser_Id,
+                ModifiedOn = DateTime.Now
+            });
+            return _dbcontext.SaveChanges();
         }
 
         public void Update<TEntity>(TEntity model)

@@ -66,6 +66,25 @@
                      <ul class="treeview-menu">
                          @Html.LinkButton("Timeshift", "Index", "Χρονοδιάγραμμα", "TimeShift_View")
                          @Html.LinkButton("Timeshift", "Create", "Προσθήκη Χρονοδιαγράμματος", "TimeShift_Create")
+
+                         @if (Html.HasAnyChildButton("TimeShiftAmendment") || Html.HasAnyChildButton("TimeShiftAmendmentApprove") )
+                         {
+
+                            <li class="treeview ">
+                                <a href="#">
+                                    <i class="fa fa-table"></i> <span>Τροποποιήσεις</span>
+                                    <span class="pull-right-container">
+                                        <i class="fa fa-angle-left pull-right"></i>
+                                    </span>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @Html.LinkButton("Timeshift", "Amendment", "Υποβολή", "TimeShiftAmendment_View")
+                                    @Html.LinkButton("Timeshift", "AmendmentApprove", "Έγκριση", "TimeShiftAmendmentApprove_View")
+                                </ul>
+
+                            </li>
+                         }
+
                      </ul>
                  </li>
              }
@@ -170,6 +189,9 @@
             </li>
             <li class="treeview-menu">
                 @Html.LinkButton("Projection", "TimeShiftSuggestions", "Υποδείξεις Χρονοδιαγράμματος", "ProjectionTimeShiftSuggestions_View")
+            </li>
+             <li class="treeview-menu">
+                @Html.LinkButton("Projection", "ErganiSuggestions", "Υποδείξεις Εργάνη", "ProjectionErganiSuggestions_View")
             </li>
             <li class="treeview-menu">
                 @Html.LinkButton("Projection", "HoursWithComments", "(Π)Βάρδιες με σχόλια", "ProjectionHoursWithComments_View")
@@ -335,22 +357,6 @@
                 @Html.LinkButton("Log", "Index", "Log εφαρμογής", "Log_View")
             </li>
             
-            @* Register *@
-            <!-- Register -->
-            @*<li class="treeview ">
-                    <a href="#">
-                        <i class="fa fa-dashboard"></i> <span>εγγραφη</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </span>
-                    </a>
-                    <ul class="treeview-menu">
-                        @Html.LinkButton("Account", "Register", "Εγγραφή")
-                        @Html.LinkButton("Account", "CreateUser", "Προσθήκη νέου χρήστη")
-
-                    </ul>
-                </li>*@
-
 
             @*<li class="header">LABELS</li>
                 <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
