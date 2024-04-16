@@ -43,9 +43,8 @@ namespace DataAccess.Repository.Base
 
             return await Context.RealWorkHours.Where(filter)
                 .Where(x =>
-                   x.TimeShiftId == viewModel.TimeShiftId && (
-                   x.StartOn.Day == viewModel.CellDay ||
-                   x.EndOn.Value.Day == viewModel.CellDay))
+                   x.TimeShiftId == viewModel.TimeShiftId &&
+                   x.StartOn.Day == viewModel.CellDay)
                 .ToListAsync();
         }
 

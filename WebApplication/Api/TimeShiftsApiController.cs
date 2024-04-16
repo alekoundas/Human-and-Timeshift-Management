@@ -149,7 +149,7 @@ namespace WebApplication.Api
                 filter = filter.And(x => x.Title.Contains(select2.Search));
 
             entities = await _baseDataWork.TimeShifts
-                .GetPaggingWithFilter(null, filter, includes, 10, select2.Page);
+                .GetPaggingWithFilter(x => x.OrderBy(y => y.CreatedOn), filter, includes, 10, select2.Page);
 
             var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
             var hasMore = (select2.Page * 10) < total;
@@ -178,10 +178,13 @@ namespace WebApplication.Api
             if (predicate == "RealWorkHourCreate")
             {
                 filter = filter.And(x => x.Month == DateTime.Now.AddHours(3).Month);
+                filter = filter.And(x => x.Year == DateTime.Now.AddHours(3).Year);
             }
             else if (predicate == "RealWorkHourClockIn")
             {
                 filter = filter.And(x => x.Month == DateTime.Now.Month);
+                filter = filter.And(x => x.Year == DateTime.Now.AddHours(3).Year);
+
                 var loggedInUserId = HttpAccessorService.GetLoggeInUser_Id;
                 if (loggedInUserId != null)
                 {
@@ -207,7 +210,7 @@ namespace WebApplication.Api
             {
                 filter = filter.And(x => x.Title.Contains(search) || x.WorkPlace.Title.Contains(search));
                 timeShifts = (List<TimeShift>)await _baseDataWork.TimeShifts
-                   .GetPaggingWithFilter(null, filter, includes, 10, page);
+                   .GetPaggingWithFilter(x=>x.OrderBy(y=>y.CreatedOn), filter, includes, 10, page);
             }
             var total = await _baseDataWork.TimeShifts.CountAllAsyncFiltered(filter);
             var hasMore = (page * 10) < total;

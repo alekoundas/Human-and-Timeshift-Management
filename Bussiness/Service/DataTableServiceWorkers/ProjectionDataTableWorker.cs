@@ -1187,6 +1187,11 @@ namespace Bussiness.Service.DataTableServiceWorkers
                 var workhours = employee.RealWorkHours
                     .GroupBy(x => x.TimeShiftId);
 
+                if (workhours.Any())
+                {
+                    var asdasdf = "sdfsdsdsdsd";
+                }
+
                 foreach (var timeShift in employee.EmployeeWorkPlaces.SelectMany(x => x.WorkPlace.TimeShifts))
                 {
                     if (workhours.Any(y => y.Key == timeShift.Id))
@@ -1203,7 +1208,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                                         consecuriveCounter++;
                                     else
                                     {
-                                        if (consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+                                        if (consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max && consecuriveCounter >= _datatable.FilterByConsecutiveDayOff_Min)
                                         {
                                             var expandoObj = new ExpandoObject();
                                             var dictionary = (IDictionary<string, object>)expandoObj;
@@ -1219,7 +1224,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                                         consecuriveCounter = 1;
                                     }
 
-                            if (consecuriveCounter > 0 && consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max)
+                            if (consecuriveCounter > 0 && consecuriveCounter <= _datatable.FilterByConsecutiveDayOff_Max && consecuriveCounter >= _datatable.FilterByConsecutiveDayOff_Min)
                             {
                                 var expandoObj = new ExpandoObject();
                                 var dictionary = (IDictionary<string, object>)expandoObj;
@@ -1236,7 +1241,7 @@ namespace Bussiness.Service.DataTableServiceWorkers
                         }
                     else
                     {
-                        if (consecutiveDays.Count <= _datatable.FilterByConsecutiveDayOff_Max)
+                        if (consecutiveDays.Count <= _datatable.FilterByConsecutiveDayOff_Max && consecutiveDays.Count >= _datatable.FilterByConsecutiveDayOff_Min)
                         {
                             var expandoObj = new ExpandoObject();
                             var dictionary = (IDictionary<string, object>)expandoObj;
